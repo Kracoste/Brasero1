@@ -9,6 +9,7 @@ import { LeafletMap } from "@/components/LeafletMap";
 import { Price } from "@/components/Price";
 import { ProductGallery } from "@/components/ProductGallery";
 import { Section } from "@/components/Section";
+import { AddToCartButton } from "@/components/AddToCartButton";
 import { products } from "@/content/products";
 import { getProductBySlug } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
@@ -60,12 +61,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
             <Price amount={product.price} />
             <div className="space-y-4 rounded-3xl border border-clay-100 bg-white/90 p-6 shadow-inner">
-              <button
-                type="button"
-                className="w-full rounded-full bg-clay-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-clay-800"
-              >
-                Ajouter au panier (bientôt)
-              </button>
+              <AddToCartButton product={product} />
               <p className="text-sm text-slate-500">
                 {product.availability} — {product.shipping}
               </p>

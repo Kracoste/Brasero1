@@ -3,15 +3,18 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, ShoppingBag, UserRound, X } from 'lucide-react';
+import { Menu, ShoppingBag, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/lib/site';
 import { navLinks } from '@/components/navigation';
+import { UserNav } from '@/components/UserNav';
+import { useCart } from '@/lib/cart-context';
 
 export const Header = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { itemCount } = useCart();
 
   const toggle = () => setOpen((prev) => !prev);
 
@@ -39,19 +42,18 @@ export const Header = () => {
             );
           })}
           <div className="flex items-center gap-2">
-            <Link
-              href="/connexion"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-clay-900 transition hover:-translate-y-0.5 hover:border-clay-400"
-            >
-              <UserRound size={16} />
-              Connexion
-            </Link>
+            <UserNav />
             <Link
               href="/panier"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-clay-900 transition hover:-translate-y-0.5 hover:border-clay-400"
+              className="relative inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-clay-900 transition hover:-translate-y-0.5 hover:border-clay-400"
             >
               <ShoppingBag size={16} />
               Panier
+              {itemCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-clay-900 text-xs font-bold text-white">
+                  {itemCount}
+                </span>
+              )}
             </Link>
           </div>
           <Link
