@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fefbf6;
+  --foreground: #0f0f0f;
+  --clay-50: #fdf4ec;
+  --clay-100: #f7e3d0;
+  --clay-200: #edc4a3;
+  --clay-300: #e6a97d;
+  --clay-600: #b75c24;
+  --clay-700: #964918;
+  --clay-900: #53260b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-clay-50: var(--clay-50);
+  --color-clay-100: var(--clay-100);
+  --color-clay-200: var(--clay-200);
+  --color-clay-300: var(--clay-300);
+  --color-clay-600: var(--clay-600);
+  --color-clay-700: var(--clay-700);
+  --color-clay-900: var(--clay-900);
+  --font-sans: var(--font-geist-sans), "Inter", sans-serif;
+  --font-display: var(--font-display-variable, var(--font-geist-sans), "Inter");
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background-color: var(--clay-200);
+  color: var(--clay-900);
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
+}
