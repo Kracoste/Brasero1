@@ -35,26 +35,22 @@ export function UserNav() {
   };
 
   if (loading) {
-    return (
-      <div className="h-8 w-8 animate-pulse rounded-full bg-slate-200"></div>
-    );
+    return <div className="h-8 w-8 animate-pulse rounded-full bg-white/20"></div>;
   }
 
   if (user) {
     return (
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 text-white">
         <Link
           href="/mon-compte"
-          className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm transition hover:bg-slate-50"
+          className="flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white transition hover:bg-white/20"
         >
-          <UserIcon size={16} className="text-clay-900" />
-          <span className="hidden text-slate-700 sm:inline">
-            {user.email?.split('@')[0]}
-          </span>
+          <UserIcon size={16} className="text-white" />
+          <span className="hidden sm:inline">{user.email?.split('@')[0]}</span>
         </Link>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50"
+          className="flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white transition hover:bg-white/20"
           title="Se déconnecter"
         >
           <LogOut size={16} />
@@ -68,13 +64,13 @@ export function UserNav() {
     <div className="flex items-center gap-2">
       <Link
         href="/connexion"
-        className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        className="rounded-full border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white"
       >
         Connexion
       </Link>
       <Link
         href="/inscription"
-        className="rounded-full bg-clay-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-clay-900/20 transition hover:-translate-y-0.5 hover:bg-clay-800"
+        className="rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-clay-900/30 transition hover:-translate-y-0.5"
       >
         Inscription
       </Link>

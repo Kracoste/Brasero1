@@ -63,7 +63,7 @@ export const HeroCarousel = () => {
   const slide = slides[current];
 
   return (
-    <div className="relative overflow-hidden rounded-4xl border border-slate-100 bg-black/5 shadow-2xl">
+    <div className="relative overflow-hidden rounded-4xl bg-black/5 shadow-2xl">
       <div className="relative h-[520px] w-full">
         <Image
           src={slide.backgroundImage}
@@ -106,12 +106,9 @@ export const HeroCarousel = () => {
                   <Price amount={activeProduct.price} className="text-2xl font-semibold" />
                   <Link
                     href={`/produits/${activeProduct.slug}`}
-                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+                    className="inline-flex items-center rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
                   >
-                    <span aria-hidden className="transition duration-300 group-hover:rotate-12">
-                      🔥
-                    </span>
-                    Voir la fiche produit
+                    Ajouter au panier
                   </Link>
                 </div>
               )
@@ -168,10 +165,10 @@ const ProductCardOverlay = ({ product }: { product: (typeof braseros)[number] })
   const image = product.images[0];
 
   return (
-    <div className="absolute bottom-8 right-24 z-20 w-full max-w-xs rounded-[32px] border border-white/60 bg-white/95 p-6 shadow-2xl md:p-7">
+    <div className="absolute bottom-8 right-24 z-20 w-full max-w-xs rounded-[32px] bg-white/95 p-6 shadow-2xl md:p-7">
       <p className="text-xs uppercase tracking-wide text-slate-400">{product.badge}</p>
       <div className="mt-3 flex flex-col items-center gap-4">
-        <div className="w-full overflow-hidden rounded-3xl border border-slate-100">
+        <div className="w-full overflow-hidden rounded-3xl">
           <Image
             src={image.src}
             alt={image.alt}
@@ -192,11 +189,10 @@ const ProductCardOverlay = ({ product }: { product: (typeof braseros)[number] })
         </div>
       </div>
       <Link
-        className="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-clay-900/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+        className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-clay-900/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
         href={`/produits/${product.slug}`}
       >
-        <span aria-hidden className="transition duration-300 group-hover:rotate-12">🔥</span>
-        Voir le produit
+        Ajouter au panier
       </Link>
     </div>
   );

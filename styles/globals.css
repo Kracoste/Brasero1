@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fefbf6;
-  --foreground: #0f0f0f;
+  --background: #050505;
+  --foreground: #f7f7f7;
   --clay-50: #fdf4ec;
   --clay-100: #f7e3d0;
   --clay-200: #edc4a3;
@@ -37,8 +37,8 @@ body {
 }
 
 ::selection {
-  background-color: var(--clay-200);
-  color: var(--clay-900);
+  background-color: #1f1f1f;
+  color: #fff;
 }
 
 @keyframes accordion-down {

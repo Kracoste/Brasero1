@@ -11,8 +11,8 @@ export const Badge = ({ variant = "default", className, ...props }: BadgeProps) 
     className={cn(
       "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wide",
       variant === "default"
-        ? "bg-clay-600/10 text-clay-700"
-        : "border border-clay-300 text-clay-600",
+        ? "bg-white/10 text-white/80"
+        : "border border-white/30 text-white/70",
       className,
     )}
     {...props}

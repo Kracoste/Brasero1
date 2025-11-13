@@ -21,7 +21,7 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-ecru-50/90 backdrop-blur-md">
       <nav className="mx-auto flex max-w-[95%] items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="font-display text-lg font-semibold tracking-tight text-clay-900">
+        <Link href="/" className="font-display text-lg font-semibold tracking-tight text-white">
           Brasero Atelier
         </Link>
 
@@ -34,7 +34,7 @@ export const Header = () => {
                 href={link.href}
                 className={cn(
                   'text-sm font-medium transition-colors',
-                  isActive ? 'text-clay-900' : 'text-slate-500 hover:text-clay-800',
+                  isActive ? 'text-white' : 'text-white/70 hover:text-white',
                 )}
               >
                 {link.label}
@@ -45,7 +45,7 @@ export const Header = () => {
             <UserNav />
             <Link
               href="/panier"
-              className="relative inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-clay-900 transition hover:-translate-y-0.5 hover:border-clay-400"
+              className="relative inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white"
             >
               <ShoppingBag size={16} />
               Panier
@@ -81,13 +81,13 @@ export const Header = () => {
           open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
         )}
       >
-        <div className="mx-auto w-[95%] space-y-4 border-t border-slate-100 bg-white px-6 py-6 shadow-lg">
+        <div className="mx-auto w-[95%] space-y-4 border-t border-white/10 bg-[#050505] px-6 py-6 shadow-lg">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="block text-base font-semibold text-clay-900"
+              className="block text-base font-semibold text-white"
             >
               {link.label}
             </Link>
@@ -96,19 +96,19 @@ export const Header = () => {
             <Link
               href="/connexion"
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-full border border-slate-200 px-4 py-2 text-center text-sm font-semibold text-clay-900"
+              className="flex-1 rounded-full border border-white/40 px-4 py-2 text-center text-sm font-semibold text-white"
             >
               Connexion
             </Link>
             <Link
               href="/panier"
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-full border border-slate-200 px-4 py-2 text-center text-sm font-semibold text-clay-900"
+              className="flex-1 rounded-full border border-white/40 px-4 py-2 text-center text-sm font-semibold text-white"
             >
               Panier
             </Link>
           </div>
-          <div className="border-t border-slate-100 pt-4 text-sm text-slate-500">
+          <div className="border-t border-white/10 pt-4 text-sm text-white/60">
             {siteConfig.address}
             <br />
             {siteConfig.phone}
