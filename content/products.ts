@@ -60,7 +60,7 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "/LBF1.png",
+        src: "/brasero85.png",
         alt: "Braséro Signature 80 en situation nocturne",
         width: 1200,
         height: 900,
@@ -413,10 +413,10 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1200&q=80",
-        alt: "Fendeur manuel dans un atelier bois",
-        width: 1200,
-        height: 900,
+        src: "/fendeur.png",
+        alt: "Fendeur à bûches sur billot",
+        width: 900,
+        height: 1600,
         blurDataURL: blurPlaceholder,
       },
       {

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from mzet "next";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/Badge";
