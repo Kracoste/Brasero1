@@ -60,7 +60,7 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "/brasero85.png",
+        src: "/brasero4.png",
         alt: "Braséro Signature 80 en situation nocturne",
         width: 1200,
         height: 900,

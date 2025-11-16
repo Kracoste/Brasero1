@@ -1,27 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050505;
-  --foreground: #f7f7f7;
-  --clay-50: #fdf4ec;
-  --clay-100: #f7e3d0;
-  --clay-200: #edc4a3;
-  --clay-300: #e6a97d;
-  --clay-600: #b75c24;
-  --clay-700: #964918;
-  --clay-900: #53260b;
+  --background: #f6f6f9;
+  --foreground: #0f172a;
+  --brand-primary: #111827;
+  --brand-accent: #ff5751;
+  --brand-secondary: #0f6a36;
+  --muted: #6b7280;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-clay-50: var(--clay-50);
-  --color-clay-100: var(--clay-100);
-  --color-clay-200: var(--clay-200);
-  --color-clay-300: var(--clay-300);
-  --color-clay-600: var(--clay-600);
-  --color-clay-700: var(--clay-700);
-  --color-clay-900: var(--clay-900);
   --font-sans: var(--font-geist-sans), "Inter", sans-serif;
   --font-display: var(--font-display-variable, var(--font-geist-sans), "Inter");
 }
@@ -37,8 +27,8 @@ body {
 }
 
 ::selection {
-  background-color: #1f1f1f;
-  color: #fff;
+  background-color: #111827;
+  color: #f6f6f9;
 }
 
 @keyframes accordion-down {
