@@ -18,17 +18,19 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
   return (
     <div>
       <div className="relative overflow-hidden rounded-3xl bg-slate-100">
-        <Image
-          key={activeImage.src}
-          src={activeImage.src}
-          alt={activeImage.alt}
-          width={activeImage.width}
-          height={activeImage.height}
-          placeholder="blur"
-          blurDataURL={activeImage.blurDataURL}
-          className="aspect-video w-full object-cover"
-          priority
-        />
+        <div className="relative w-full pb-[65%]">
+          <Image
+            key={activeImage.src}
+            src={activeImage.src}
+            alt={activeImage.alt}
+            fill
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            placeholder="blur"
+            blurDataURL={activeImage.blurDataURL}
+            className="object-cover"
+            priority
+          />
+        </div>
         <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
           {product.images.map((_, index) => (
             <span

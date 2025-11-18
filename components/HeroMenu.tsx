@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type MenuItem = {
@@ -51,12 +51,6 @@ const heroItems: MenuItem[] = [
   },
 ];
 
-const services = [
-  { title: 'Livraison gratuite', subtitle: 'France metropolitaine' },
-  { title: 'Retours faciles', subtitle: '30 jours pour changer davis' },
-  { title: 'Support 7/7', subtitle: 'Artisans disponibles' },
-];
-
 export const HeroMenu = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const activeItem = heroItems[currentIndex];
@@ -77,95 +71,78 @@ export const HeroMenu = () => {
   };
 
   return (
-    <div className="relative w-full space-y-8 px-8 py-12 lg:px-16 lg:py-16">
+    <div className="relative w-full overflow-hidden">
+      {/* Image pleine largeur en arrière-plan */}
+      <div className="relative h-[500px] w-full lg:h-[650px]">
+        <Image
+          key={activeItem.id}
+          src={activeItem.image}
+          alt={activeItem.label}
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        {/* Overlay gradient pour lisibilité */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30" />
+      </div>
+
+      {/* Contenu superposé sur l'image */}
+      <div className="absolute inset-0 flex items-center">
+        <div className="w-full px-8 sm:px-12 lg:px-16">
+          <div className="mx-auto max-w-7xl">
+            <div className="max-w-2xl space-y-6 text-white">
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/90">
+                Work light, LED, white
+              </p>
+              
+              <h1 className="font-display text-5xl font-bold leading-tight lg:text-6xl">
+                {activeItem.title}
+              </h1>
+              
+              <p className="text-lg leading-relaxed text-white/90 lg:text-xl">
+                {activeItem.description}
+              </p>
+              
+              <Link
+                href="/produits"
+                className="inline-flex w-fit items-center rounded-full bg-white px-10 py-4 text-sm font-semibold uppercase tracking-wide text-slate-900 transition hover:-translate-y-0.5 hover:bg-white/95"
+              >
+                Shop now
+              </Link>
+              
+              <div className="flex gap-2 pt-2">
+                {heroItems.map((item, index) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      index === currentIndex ? 'w-8 bg-white' : 'w-3 bg-white/40'
+                    }`}
+                    aria-label={`Aller a ${item.label}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Flèches de navigation */}
       <button
         onClick={goToPrevious}
-        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white lg:left-8"
+        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:left-8"
         aria-label="Precedent"
       >
         <ChevronLeft className="h-6 w-6 text-slate-800" />
       </button>
       <button
         onClick={goToNext}
-        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white lg:right-8"
+        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:right-8"
         aria-label="Suivant"
       >
         <ChevronRight className="h-6 w-6 text-slate-800" />
       </button>
-
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_1.2fr]">
-        <div className="space-y-6">
-          <label className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-400">
-            Collections
-          </label>
-          
-          <div className="flex gap-2">
-            {heroItems.map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => setCurrentIndex(index)}
-                className={`h-2 rounded-full transition-all ${
-                  index === currentIndex
-                    ? 'w-8 bg-[#111827]'
-                    : 'w-2 bg-slate-300 hover:bg-slate-400'
-                }`}
-                aria-label={`Aller a ${item.label}`}
-              />
-            ))}
-          </div>
-
-          <div className="rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-            <p className="text-base font-semibold text-slate-800">{activeItem.label}</p>
-          </div>
-
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
-            Menu deroulant
-          </p>
-          <h1 className="font-display text-5xl font-bold leading-tight text-[#111827]">
-            {activeItem.title}
-          </h1>
-          <p className="text-lg leading-relaxed text-slate-600">{activeItem.description}</p>
-
-          <div className="flex flex-wrap gap-4 pt-4">
-            <Link
-              href="/produits"
-              className="rounded-full bg-[#111827] px-8 py-4 text-sm font-semibold uppercase tracking-wide text-white shadow-lg transition-all hover:bg-[#000000] hover:shadow-xl"
-            >
-              Shop now
-            </Link>
-            <Link
-              href="/atelier"
-              className="rounded-full border-2 border-slate-300 bg-white px-8 py-4 text-sm font-semibold uppercase tracking-wide text-slate-700 transition-all hover:border-slate-400 hover:bg-slate-50"
-            >
-              Visiter latelier
-            </Link>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-200 to-slate-300 p-1 shadow-2xl">
-          <div className="relative h-80 w-full overflow-hidden rounded-3xl lg:h-[450px]">
-            <Image
-              src={activeItem.image}
-              alt={activeItem.label}
-              fill
-              className="object-cover transition-all duration-700"
-              sizes="(max-width: 768px) 100vw, 800px"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-3">
-        {services.map((service) => (
-          <div
-            key={service.title}
-            className="rounded-2xl border border-slate-200 bg-white px-6 py-6 text-center shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
-          >
-            <p className="text-base font-bold text-[#111827]">{service.title}</p>
-            <p className="mt-1 text-sm text-slate-500">{service.subtitle}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };

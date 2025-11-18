@@ -150,8 +150,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Horizon 60 sur terrasse bois",
+        src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Horizon 60 sur un rooftop urbain",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -233,8 +233,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Origine 100 en jardin contemporain",
+        src: "https://images.unsplash.com/photo-1500534310685-79d0e5230d1d?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Origine 100 prêt pour une grande tablée",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -323,8 +323,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Compact 55 dans un patio",
+        src: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Compact 55 prêt à accueillir des invités",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -413,8 +413,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Canyon 70 sur terrasse en bois",
+        src: "https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Canyon 70 illuminant un jardin paysagé",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -503,8 +503,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1437623889155-075d40e2e59f?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Nomade 45 posé sur un ponton",
+        src: "https://images.unsplash.com/photo-1523419409543-0c1df022bddb?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Nomade 45 prêt pour une escapade",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -593,8 +593,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Atlas 90 et son plateau de rangement",
+        src: "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Atlas 90 avec son socle log design",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -683,8 +683,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Zénith 50 allumé sur une terrasse",
+        src: "https://images.unsplash.com/photo-1437623889155-075d40e2e59f?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Zénith 50 avec anneau lumineux",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -766,8 +766,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Dune 75 au crépuscule",
+        src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Dune 75 dans un paysage désertique",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,
@@ -849,8 +849,8 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
-        alt: "Braséro Lumina 65 avec niches éclairées",
+        src: "https://images.unsplash.com/photo-1500534313519-23966a77d8e1?auto=format&fit=crop&w=1200&q=80",
+        alt: "Braséro Lumina 65 et ses niches lumineuses",
         width: 1200,
         height: 900,
         blurDataURL: blurPlaceholder,

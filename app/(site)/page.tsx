@@ -4,7 +4,7 @@ import { ProductShowcase } from "@/components/ProductShowcase";
 export default function HomePage() {
   return (
     <>
-      <section className="bg-gradient-to-br from-slate-50 to-slate-100">
+      <section>
         <HeroMenu />
       </section>
 
