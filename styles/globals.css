@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f6f9;
-  --foreground: #0f172a;
-  --brand-primary: #111827;
+  --background: #000000;
+  --foreground: #ffffff;
+  --brand-primary: #1a1a1a;
   --brand-accent: #ff5751;
   --brand-secondary: #0f6a36;
-  --muted: #6b7280;
+  --muted: #9ca3af;
 }
 
 @theme inline {
@@ -16,6 +16,7 @@
   --font-display: var(--font-display-variable, var(--font-geist-sans), "Inter");
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
@@ -27,8 +28,8 @@ body {
 }
 
 ::selection {
-  background-color: #111827;
-  color: #f6f6f9;
+  background-color: #ff5751;
+  color: #000000;
 }
 
 @keyframes accordion-down {

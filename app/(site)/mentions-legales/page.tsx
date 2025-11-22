@@ -12,10 +12,10 @@ export default function MentionsLegalesPage() {
     <Section className="pb-24">
       <Container className="space-y-6">
         <h1 className="font-display text-4xl font-semibold text-clay-900">Mentions légales</h1>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-400">
           Ces informations sont fournies à titre indicatif. Remplacez-les par vos données officielles.
         </p>
-        <div className="space-y-4 rounded-3xl border border-slate-100 bg-white/80 p-6 text-sm text-slate-600">
+        <div className="space-y-4 rounded-3xl border border-slate-800 bg-black/80 p-6 text-sm text-slate-400">
           <p>
             Éditeur : Brasero Atelier — SAS au capital de 50 000 €, RCS Niort 000 000 000,
             siège social Rue du Moulin, 79320 Moncoutant-sur-Sèvre.

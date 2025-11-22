@@ -12,7 +12,7 @@ type SiteLayoutProps = {
 export default function SiteLayout({ children }: SiteLayoutProps) {
   return (
     <CartProvider>
-      <div className="flex min-h-screen flex-col bg-gradient-to-b from-white via-[#f6f6f9] to-[#eef1f8]">
+      <div className="flex min-h-screen flex-col bg-black text-white">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

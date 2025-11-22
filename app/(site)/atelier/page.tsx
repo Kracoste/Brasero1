@@ -36,7 +36,7 @@ export default function AtelierPage() {
             <h1 className="font-display text-4xl font-semibold text-clay-900">
               Une flamme née aux Deux-Sèvres
             </h1>
-            <p className="text-base text-slate-600">
+            <p className="text-base text-slate-400">
               Depuis Moncoutant, nous découpons, roulons et soudons des braséros conçus pour durer.
               Notre équipe maîtrise la transformation de l&apos;acier corten et assure un suivi
               complet de chaque pièce.
@@ -60,11 +60,11 @@ export default function AtelierPage() {
 
       <Section>
         <Container className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
-          <div className="space-y-6 rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-lg">
+          <div className="space-y-6 rounded-3xl border border-slate-800 bg-black/90 p-8 shadow-lg">
             <h2 className="font-display text-3xl font-semibold text-clay-900">
               Fabrication 100% intégrée
             </h2>
-            <ul className="space-y-4 text-sm text-slate-600">
+            <ul className="space-y-4 text-sm text-slate-400">
               <li>
                 <strong className="font-semibold text-clay-900">Découpe laser.</strong> Chaque
                 vasque est découpée sur nos tables Bystronic pour garantir des arrêtes parfaites.
@@ -98,7 +98,7 @@ export default function AtelierPage() {
           <h3 className="font-display text-2xl font-semibold text-clay-900">
             Venir à Moncoutant
           </h3>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-400">
             {siteConfig.address} — Prise de rendez-vous au {siteConfig.phone}. Accès par la N149,
             parking visiteur sur place.
           </p>

@@ -28,10 +28,10 @@ export const ProductFilters = ({ value, onChange, total }: ProductFiltersProps) 
   };
 
   const selectClasses =
-    "w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-clay-500";
+    "w-full rounded-full border border-slate-700 bg-black px-4 py-2 text-sm font-medium text-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-clay-500";
 
   return (
-    <div className={cn("space-y-4 rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-sm")}>
+    <div className={cn("space-y-4 rounded-3xl border border-slate-800 bg-black/80 p-6 shadow-sm")}>
       <div className="flex flex-col gap-1">
         <p className="text-sm font-semibold text-clay-900">Filtres</p>
         <p className="text-xs text-slate-500">
@@ -99,7 +99,7 @@ export const ProductFilters = ({ value, onChange, total }: ProductFiltersProps) 
       <button
         type="button"
         onClick={handleReset}
-        className="w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-clay-300 hover:text-clay-900"
+        className="w-full rounded-full border border-slate-700 bg-black px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-clay-300 hover:text-clay-900"
       >
         Réinitialiser
       </button>

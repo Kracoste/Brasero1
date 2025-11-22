@@ -13,7 +13,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-slate-100 bg-white/90 p-6 shadow-lg">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-slate-800 bg-black/90 p-6 shadow-lg">
       <div>
         <label htmlFor="name" className="text-sm font-semibold text-clay-900">
           Nom complet
@@ -22,7 +22,7 @@ export const ContactForm = () => {
           id="name"
           name="name"
           required
-          className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
+          className="mt-2 w-full rounded-2xl border border-slate-700 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
         />
       </div>
       <div>
@@ -34,7 +34,7 @@ export const ContactForm = () => {
           name="email"
           type="email"
           required
-          className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
+          className="mt-2 w-full rounded-2xl border border-slate-700 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
         />
       </div>
       <div>
@@ -46,7 +46,7 @@ export const ContactForm = () => {
           name="message"
           rows={4}
           required
-          className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
+          className="mt-2 w-full rounded-2xl border border-slate-700 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
         />
       </div>
       <button

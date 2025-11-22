@@ -229,7 +229,7 @@ export const ProductShowcase = () => {
                 <span className="product-showcase__origin">France Braseros</span>
               </div>
               <h3 className="product-showcase__name">{card.product.name}</h3>
-              <Price amount={card.product.price} className="product-showcase__price" />
+              <Price amount={card.product.price} className="product-showcase__price" tone="light" />
               <Link
                 href={`/produits/${card.product.slug}`}
                 className="product-showcase__link"

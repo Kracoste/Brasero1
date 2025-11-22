@@ -45,15 +45,15 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
     <div className={`flex flex-col gap-4 ${className}`}>
       {/* Sélecteur de quantité */}
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-slate-700">Quantité :</span>
-        <div className="flex items-center rounded-lg border border-slate-300 bg-white">
+        <span className="text-sm font-medium text-slate-300">Quantité :</span>
+        <div className="flex items-center rounded-lg border border-slate-300 bg-black">
           <button
             type="button"
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="p-2 transition hover:bg-slate-50"
+            className="p-2 transition hover:bg-slate-900"
             aria-label="Diminuer la quantité"
           >
-            <Minus size={16} className="text-slate-600" />
+            <Minus size={16} className="text-slate-400" />
           </button>
           <span className="min-w-[3rem] px-4 text-center font-semibold text-clay-900">
             {quantity}
@@ -61,10 +61,10 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
           <button
             type="button"
             onClick={() => setQuantity(quantity + 1)}
-            className="p-2 transition hover:bg-slate-50"
+            className="p-2 transition hover:bg-slate-900"
             aria-label="Augmenter la quantité"
           >
-            <Plus size={16} className="text-slate-600" />
+            <Plus size={16} className="text-slate-400" />
           </button>
         </div>
       </div>

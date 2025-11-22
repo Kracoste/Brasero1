@@ -17,7 +17,7 @@ export type LeafletMapProps = {
 const defaultLabel = "Atelier Brasero — Moncoutant";
 
 const MapContent = ({ lat, lng, zoom = 13, markerLabel = defaultLabel, className }: LeafletMapProps) => (
-  <div className={cn("overflow-hidden rounded-3xl border border-slate-100", className)}>
+  <div className={cn("overflow-hidden rounded-3xl border border-slate-800", className)}>
     <MapContainer
       center={[lat, lng]}
       zoom={zoom}

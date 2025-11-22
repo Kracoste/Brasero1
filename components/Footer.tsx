@@ -10,7 +10,7 @@ const legalLinks = [
 ];
 
 export const Footer = () => (
-  <footer className="border-t border-slate-200 bg-white text-slate-700">
+  <footer className="border-t border-slate-800 bg-black text-slate-300">
     <Container className="flex flex-col gap-8 py-12 md:flex-row md:items-start md:justify-between">
       <div>
         <p className="font-display text-xl font-semibold text-[#111827]">Brasero Atelier</p>
@@ -51,7 +51,7 @@ export const Footer = () => (
         </div>
       </div>
     </Container>
-    <div className="border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <div className="border-t border-slate-700 py-4 text-center text-xs text-slate-500">
       © {new Date().getFullYear()} Brasero Atelier — Fabriqué à Moncoutant (79)
     </div>
   </footer>

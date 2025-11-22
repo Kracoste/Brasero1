@@ -27,12 +27,12 @@ export default function PanierPage() {
     return (
       <Section className="py-24">
         <Container className="max-w-2xl text-center">
-          <div className="rounded-3xl border border-slate-200 bg-white p-12">
+          <div className="rounded-3xl border border-slate-700 bg-black p-12">
             <ShoppingBag size={64} className="mx-auto mb-6 text-slate-300" />
             <h1 className="font-display text-3xl font-semibold text-clay-900">
               Votre panier est vide
             </h1>
-            <p className="mt-4 text-slate-600">
+            <p className="mt-4 text-slate-400">
               Découvrez nos braséros et ajoutez-en à votre panier pour commencer.
             </p>
             <Link
@@ -55,7 +55,7 @@ export default function PanierPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="font-display text-3xl font-semibold text-clay-900">Mon panier</h1>
-              <p className="mt-2 text-slate-600">
+              <p className="mt-2 text-slate-400">
                 {itemCount} article{itemCount > 1 ? 's' : ''} dans votre panier
               </p>
             </div>
@@ -73,12 +73,12 @@ export default function PanierPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                  className="flex gap-4 rounded-2xl border border-slate-700 bg-black p-4 shadow-sm"
                 >
                   {/* Image du produit */}
                   <Link
                     href={`/produits/${item.product_slug}`}
-                    className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-slate-50"
+                    className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-slate-900"
                   >
                     {item.product_image && (
                       <Image
@@ -99,30 +99,30 @@ export default function PanierPage() {
                       >
                         {item.product_name}
                       </Link>
-                      <p className="mt-1 text-sm text-slate-600">
+                      <p className="mt-1 text-sm text-slate-400">
                         <Price amount={item.product_price} /> / unité
                       </p>
                     </div>
 
                     <div className="flex items-center justify-between">
                       {/* Sélecteur de quantité */}
-                      <div className="flex items-center rounded-lg border border-slate-300 bg-white">
+                      <div className="flex items-center rounded-lg border border-slate-300 bg-black">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="p-2 transition hover:bg-slate-50"
+                          className="p-2 transition hover:bg-slate-900"
                           aria-label="Diminuer la quantité"
                         >
-                          <Minus size={14} className="text-slate-600" />
+                          <Minus size={14} className="text-slate-400" />
                         </button>
                         <span className="min-w-[2.5rem] px-3 text-center text-sm font-semibold text-clay-900">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-2 transition hover:bg-slate-50"
+                          className="p-2 transition hover:bg-slate-900"
                           aria-label="Augmenter la quantité"
                         >
-                          <Plus size={14} className="text-slate-600" />
+                          <Plus size={14} className="text-slate-400" />
                         </button>
                       </div>
 
@@ -147,21 +147,21 @@ export default function PanierPage() {
 
             {/* Résumé de la commande */}
             <div className="lg:col-span-1">
-              <div className="sticky top-24 space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="sticky top-24 space-y-4 rounded-2xl border border-slate-700 bg-black p-6 shadow-sm">
                 <h2 className="text-lg font-semibold text-clay-900">Résumé de la commande</h2>
 
-                <div className="space-y-2 border-t border-slate-200 pt-4">
+                <div className="space-y-2 border-t border-slate-700 pt-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Sous-total</span>
+                    <span className="text-slate-400">Sous-total</span>
                     <Price amount={totalPrice} />
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Livraison</span>
-                    <span className="text-slate-600">Calculée à l'étape suivante</span>
+                    <span className="text-slate-400">Livraison</span>
+                    <span className="text-slate-400">Calculée à l'étape suivante</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold">
+                <div className="flex justify-between border-t border-slate-700 pt-4 text-lg font-bold">
                   <span className="text-clay-900">Total</span>
                   <Price amount={totalPrice} className="text-clay-900" />
                 </div>
@@ -172,7 +172,7 @@ export default function PanierPage() {
 
                 <Link
                   href="/produits"
-                  className="block text-center text-sm font-medium text-slate-600 hover:text-clay-900"
+                  className="block text-center text-sm font-medium text-slate-400 hover:text-clay-900"
                 >
                   ← Continuer mes achats
                 </Link>

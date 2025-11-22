@@ -26,7 +26,7 @@ const specSchema = z.object({
 export const productSchema = z.object({
   slug: z.string(),
   name: z.string(),
-  category: z.enum(["brasero", "accessoire"]),
+  category: z.enum(["brasero", "fendeur"]),
   price: z.number(),
   shortDescription: z.string(),
   description: z.string(),

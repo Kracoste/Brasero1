@@ -17,7 +17,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
 
   return (
     <div>
-      <div className="relative overflow-hidden rounded-3xl bg-slate-100">
+      <div className="relative overflow-hidden rounded-3xl bg-slate-800">
         <div className="relative w-full pb-[65%]">
           <Image
             key={activeImage.src}
@@ -36,8 +36,8 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             <span
               key={`dot-${product.slug}-${index}`}
               className={cn(
-                "h-1.5 w-10 rounded-full bg-white/40 transition",
-                activeIndex === index && "bg-white",
+                "h-1.5 w-10 rounded-full bg-black/40 transition",
+                activeIndex === index && "bg-black",
               )}
             />
           ))}

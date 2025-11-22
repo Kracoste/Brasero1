@@ -1,4 +1,4 @@
-import type { Metadata } from mzet "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/Badge";
@@ -15,7 +15,7 @@ import { getProductBySlug } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
 
 type ProductPageProps = {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 };
 
 export async function generateStaticParams() {
@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params;
   const product = getProductBySlug(products, slug);
   if (!product) return {};
 
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const product = getProductBySlug(products, slug);
   if (!product) notFound();
 
@@ -57,16 +57,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="space-y-3">
               <Badge>{product.badge}</Badge>
               <h1 className="font-display text-4xl font-semibold text-clay-900">{product.name}</h1>
-              <p className="text-base text-slate-600">{product.description}</p>
+              <p className="text-base text-slate-400">{product.description}</p>
             </div>
             <Price amount={product.price} />
-            <div className="space-y-4 rounded-3xl border border-clay-100 bg-white/90 p-6 shadow-inner">
+            <div className="space-y-4 rounded-3xl border border-clay-100 bg-black/90 p-6 shadow-inner">
               <AddToCartButton product={product} />
               <p className="text-sm text-slate-500">
                 {product.availability} — {product.shipping}
               </p>
             </div>
-            <div className="grid gap-4 rounded-3xl border border-slate-100 bg-white/70 p-6 sm:grid-cols-2">
+            <div className="grid gap-4 rounded-3xl border border-slate-800 bg-black/70 p-6 sm:grid-cols-2">
               <div>
                 <p className="text-xs uppercase text-slate-400">Acier</p>
                 <p className="text-sm font-semibold text-clay-900">{product.specs.acier}</p>
@@ -86,7 +86,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-slate-400">Points forts</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-600">
+              <ul className="mt-3 space-y-2 text-sm text-slate-400">
                 {product.highlights.map((item) => (
                   <li key={item}>• {item}</li>
                 ))}
@@ -104,7 +104,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <h2 className="font-display text-3xl font-semibold text-clay-900">
                 Fabriqué à Moncoutant (79)
               </h2>
-              <p className="text-base text-slate-600">
+              <p className="text-base text-slate-400">
                 Chaque {product.category === "brasero" ? "braséro" : "accessoire"} est assemblé,
                 contrôlé et conditionné dans notre atelier aux Deux-Sèvres. Les soudures sont
                 doublées et le numéro de série est gravé sous le pied.

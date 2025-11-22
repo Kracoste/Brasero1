@@ -39,21 +39,21 @@ export function FloatingCart() {
           />
 
           {/* Panneau coulissant */}
-          <div className="fixed bottom-0 right-0 z-50 flex h-[80vh] w-full flex-col bg-white shadow-2xl sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-2xl">
+          <div className="fixed bottom-0 right-0 z-50 flex h-[80vh] w-full flex-col bg-black shadow-2xl sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 p-4">
+            <div className="flex items-center justify-between border-b border-slate-700 p-4">
               <div>
                 <h3 className="font-semibold text-clay-900">Mon panier</h3>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-slate-400">
                   {itemCount} article{itemCount > 1 ? 's' : ''}
                 </p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="rounded-full p-2 transition hover:bg-slate-100"
+                className="rounded-full p-2 transition hover:bg-slate-800"
                 aria-label="Fermer"
               >
-                <X size={20} className="text-slate-600" />
+                <X size={20} className="text-slate-400" />
               </button>
             </div>
 
@@ -63,10 +63,10 @@ export function FloatingCart() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
+                    className="flex gap-3 rounded-lg border border-slate-700 bg-slate-900 p-3"
                   >
                     {/* Image */}
-                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-white">
+                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-black">
                       {item.product_image && (
                         <Image
                           src={item.product_image}
@@ -87,7 +87,7 @@ export function FloatingCart() {
                         >
                           {item.product_name}
                         </Link>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-slate-400">
                           Quantité: {item.quantity}
                         </p>
                       </div>
@@ -111,7 +111,7 @@ export function FloatingCart() {
             </div>
 
             {/* Footer avec total et bouton */}
-            <div className="border-t border-slate-200 p-4">
+            <div className="border-t border-slate-700 p-4">
               <div className="mb-4 flex items-center justify-between">
                 <span className="font-semibold text-clay-900">Total</span>
                 <Price amount={totalPrice} className="text-xl font-bold text-clay-900" />

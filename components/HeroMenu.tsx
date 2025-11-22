@@ -106,7 +106,7 @@ export const HeroMenu = () => {
               
               <Link
                 href="/produits"
-                className="inline-flex w-fit items-center rounded-full bg-white px-10 py-4 text-sm font-semibold uppercase tracking-wide text-slate-900 transition hover:-translate-y-0.5 hover:bg-white/95"
+                className="inline-flex w-fit items-center rounded-full bg-black px-10 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-black/95"
               >
                 Shop now
               </Link>
@@ -117,7 +117,7 @@ export const HeroMenu = () => {
                     key={item.id}
                     onClick={() => setCurrentIndex(index)}
                     className={`h-1.5 rounded-full transition-all ${
-                      index === currentIndex ? 'w-8 bg-white' : 'w-3 bg-white/40'
+                      index === currentIndex ? 'w-8 bg-black' : 'w-3 bg-black/40'
                     }`}
                     aria-label={`Aller a ${item.label}`}
                   />
@@ -131,14 +131,14 @@ export const HeroMenu = () => {
       {/* Flèches de navigation */}
       <button
         onClick={goToPrevious}
-        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:left-8"
+        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:left-8"
         aria-label="Precedent"
       >
         <ChevronLeft className="h-6 w-6 text-slate-800" />
       </button>
       <button
         onClick={goToNext}
-        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:right-8"
+        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:right-8"
         aria-label="Suivant"
       >
         <ChevronRight className="h-6 w-6 text-slate-800" />

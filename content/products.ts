@@ -885,7 +885,7 @@ const rawProducts: Product[] = [
   {
     slug: "fendeur-buches-atelier",
     name: "Fendeur à bûches Atelier",
-    category: "accessoire",
+    category: "fendeur",
     price: 270,
     shortDescription: "Préparez vos bûches en toute sécurité, sans effort.",
     description:

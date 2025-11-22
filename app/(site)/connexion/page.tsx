@@ -36,13 +36,13 @@ export default function ConnexionPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ecru-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center font-display text-3xl font-semibold text-clay-900">
             Connexion à votre compte
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600">
+          <p className="mt-2 text-center text-sm text-slate-400">
             Ou{' '}
             <Link href="/inscription" className="font-medium text-clay-900 hover:text-clay-800">
               créez un nouveau compte
@@ -57,9 +57,9 @@ export default function ConnexionPage() {
             </div>
           )}
 
-          <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="space-y-4 rounded-2xl border border-slate-700 bg-black p-6 shadow-sm">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300">
                 Adresse email
               </label>
               <input
@@ -70,13 +70,13 @@ export default function ConnexionPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-white placeholder-slate-400 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
                 placeholder="vous@exemple.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-300">
                 Mot de passe
               </label>
               <input
@@ -87,7 +87,7 @@ export default function ConnexionPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-white placeholder-slate-400 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
                 placeholder="••••••••"
               />
             </div>
@@ -106,7 +106,7 @@ export default function ConnexionPage() {
           <div className="text-center">
             <Link
               href="/"
-              className="text-sm font-medium text-slate-600 hover:text-clay-900"
+              className="text-sm font-medium text-slate-400 hover:text-clay-900"
             >
               ← Retour à l'accueil
             </Link>

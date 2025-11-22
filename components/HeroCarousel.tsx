@@ -82,7 +82,7 @@ export const HeroCarousel = () => {
 
             {slide.type === "story" ? (
               <div className="mt-4 grid gap-4 text-sm text-slate-100 lg:grid-cols-[0.8fr_1.2fr]">
-                <div className="rounded-2xl border border-white/20 bg-white/10 p-4">
+                <div className="rounded-2xl border border-white/20 bg-black/10 p-4">
                   <p className="flex items-center gap-2 text-xs uppercase tracking-wide text-white/80">
                     <ShieldCheck size={16} /> Fabriqué en France
                   </p>
@@ -90,7 +90,7 @@ export const HeroCarousel = () => {
                     Moncoutant (Deux-Sèvres) — {siteConfig.address}
                   </p>
                 </div>
-                <div className="h-40 overflow-hidden rounded-2xl border border-white/20 bg-white/10">
+                <div className="h-40 overflow-hidden rounded-2xl border border-white/20 bg-black/10">
                   <LeafletMap
                     lat={siteConfig.atelier.lat}
                     lng={siteConfig.atelier.lng}
@@ -152,8 +152,8 @@ const CarouselControls = ({ current, total, onNavigate }: ControlProps) => (
         <span
           key={index}
           className={cn(
-            "h-1.5 w-10 rounded-full bg-white/40 transition",
-            current === index && "bg-white",
+            "h-1.5 w-10 rounded-full bg-black/40 transition",
+            current === index && "bg-black",
           )}
         />
       ))}
@@ -165,7 +165,7 @@ const ProductCardOverlay = ({ product }: { product: (typeof braseros)[number] })
   const image = product.images[0];
 
   return (
-    <div className="absolute bottom-8 right-24 z-20 w-full max-w-xs rounded-[32px] bg-white/95 p-6 shadow-2xl md:p-7">
+    <div className="absolute bottom-8 right-24 z-20 w-full max-w-xs rounded-[32px] bg-black/95 p-6 shadow-2xl md:p-7">
       <p className="text-xs uppercase tracking-wide text-slate-400">{product.badge}</p>
       <div className="mt-3 flex flex-col items-center gap-4">
         <div className="w-full overflow-hidden rounded-3xl">
