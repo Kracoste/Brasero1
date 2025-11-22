@@ -1,20 +1,33 @@
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+'use client';
+
 import { Container } from '@/components/Container';
 import { Section } from '@/components/Section';
+import { ProductCard } from '@/components/ProductCard';
+import { useFavorites } from '@/lib/favorites-context';
+import { products } from '@/content/products';
 import { Heart } from 'lucide-react';
+import Link from 'next/link';
 
-export const metadata = {
-  title: 'Mes Favoris - Brasero.fr',
-  description: 'Retrouvez tous vos produits favoris',
-};
+export default function FavorisPage() {
+  const { favorites, loading, isFavorite } = useFavorites();
 
-export default async function FavorisPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Récupérer les produits complets à partir des slugs favoris
+  const favoriteProducts = products.filter(product => 
+    isFavorite(product.slug)
+  );
 
-  if (!user) {
-    redirect('/connexion?redirect=/favoris');
+  if (loading) {
+    return (
+      <main>
+        <Section>
+          <Container>
+            <div className="py-12 text-center">
+              <p className="text-slate-400">Chargement...</p>
+            </div>
+          </Container>
+        </Section>
+      </main>
+    );
   }
 
   return (
@@ -27,15 +40,29 @@ export default async function FavorisPage() {
               <h1 className="text-3xl font-bold text-white">Mes Favoris</h1>
             </div>
             
-            <div className="rounded-lg border border-slate-700 bg-slate-900 p-8 text-center">
-              <Heart className="mx-auto mb-4 h-12 w-12 text-slate-300" />
-              <p className="text-lg text-slate-400">
-                Vous n'avez pas encore de produits favoris.
-              </p>
-              <p className="mt-2 text-sm text-slate-500">
-                Explorez notre catalogue et ajoutez vos braséros préférés à vos favoris !
-              </p>
-            </div>
+            {favoriteProducts.length === 0 ? (
+              <div className="rounded-lg border border-slate-700 bg-slate-900 p-8 text-center">
+                <Heart className="mx-auto mb-4 h-12 w-12 text-slate-600" />
+                <p className="text-lg text-slate-400 mb-4">
+                  Vous n'avez pas encore de produits favoris.
+                </p>
+                <p className="text-sm text-slate-500 mb-6">
+                  Explorez notre catalogue et ajoutez vos braséros préférés à vos favoris !
+                </p>
+                <Link
+                  href="/produits"
+                  className="inline-block rounded-full bg-[#ff5751] px-6 py-3 font-semibold text-white hover:bg-[#ff4741] transition"
+                >
+                  Découvrir nos produits
+                </Link>
+              </div>
+            ) : (
+              <div className="grid gap-6">
+                {favoriteProducts.map((product) => (
+                  <ProductCard key={product.slug} product={product} />
+                ))}
+              </div>
+            )}
           </div>
         </Container>
       </Section>

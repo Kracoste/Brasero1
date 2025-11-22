@@ -49,13 +49,13 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-700 bg-[#111827] shadow-sm">
+    <header className="header-texture sticky top-0 z-40 w-full border-b border-slate-700 shadow-[0_10px_40px_rgba(0,0,0,0.45)]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-6 py-3">
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-2xl font-black tracking-tight text-[#ff5751]">
+            <Link href="/" className="font-display text-[1.4rem] font-semibold uppercase tracking-[0.35em] text-[#ff6d5a]">
               BRASERO
-              <span className="text-white">.FR</span>
+              <span className="text-white/90">.FR</span>
             </Link>
             
             <div
@@ -65,7 +65,7 @@ export const Header = () => {
             >
               <button
                 type="button"
-                className="flex items-center gap-2 rounded-full bg-black/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black/20"
+                className="flex items-center gap-2 rounded-full bg-black/10 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.35em] text-white transition hover:bg-black/20"
                 aria-haspopup="menu"
                 aria-expanded={categoriesOpen}
                 onClick={toggleCategories}
@@ -105,7 +105,7 @@ export const Header = () => {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      'text-sm font-medium transition',
+                      'text-[0.75rem] font-semibold uppercase tracking-[0.35em] transition',
                       isActive ? 'text-white' : 'text-white/70 hover:text-white',
                     )}
                   >
@@ -150,7 +150,7 @@ export const Header = () => {
       </div>
 
       {open && (
-        <div className="border-t border-white/20 bg-[#111827] px-4 py-4 md:hidden">
+        <div className="header-texture-panel border-t border-white/20 px-4 py-4 md:hidden">
           <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link

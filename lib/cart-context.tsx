@@ -30,6 +30,34 @@ type CartContextType = {
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+const LOCAL_CART_KEY = 'brasero:guest-cart';
+
+const readGuestCart = (): CartItem[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(LOCAL_CART_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((item) => typeof item === 'object' && item !== null) as CartItem[];
+    }
+    return [];
+  } catch {
+    return [];
+  }
+};
+
+const persistGuestCart = (items: CartItem[]) => {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(items));
+};
+
+const generateGuestId = (slug: string) =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `guest-${slug}-${Date.now()}`;
+
+const isGuestItem = (item: CartItem) => item.id.startsWith('guest-');
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -37,6 +65,54 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [cartId, setCartId] = useState<string | null>(null);
   const supabase = createClient();
+  const syncGuestCart = (updater: (items: CartItem[]) => CartItem[]) => {
+    setItems(prev => {
+      const next = updater(prev);
+      persistGuestCart(next);
+      return next;
+    });
+  };
+
+  const addGuestItem = (
+    product: { slug: string; name: string; price: number; image?: string },
+    quantity: number,
+  ) => {
+    syncGuestCart(prev => {
+      const existing = prev.find(
+        (item) => isGuestItem(item) && item.product_slug === product.slug,
+      );
+      if (existing) {
+        return prev.map((item) =>
+          item.id === existing.id ? { ...item, quantity: item.quantity + quantity } : item,
+        );
+      }
+      const newItem: CartItem = {
+        id: generateGuestId(product.slug),
+        product_slug: product.slug,
+        product_name: product.name,
+        product_price: product.price,
+        product_image: product.image || null,
+        quantity,
+      };
+      return [...prev, newItem];
+    });
+  };
+
+  const updateGuestItem = (itemId: string, quantity: number) => {
+    syncGuestCart(prev =>
+      prev
+        .map((item) => (item.id === itemId ? { ...item, quantity } : item))
+        .filter((item) => item.quantity > 0),
+    );
+  };
+
+  const removeGuestItem = (itemId: string) => {
+    syncGuestCart(prev => prev.filter((item) => item.id !== itemId));
+  };
+
+  const clearGuestCart = () => {
+    syncGuestCart(() => []);
+  };
 
   // Calculer le nombre total d'articles
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -52,6 +128,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       if (user) {
         await loadCart(user.id);
+      } else {
+        const guestItems = readGuestCart();
+        setItems(guestItems);
       }
       setLoading(false);
     };
@@ -65,7 +144,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (newUser) {
         await loadCart(newUser.id);
       } else {
-        setItems([]);
+        setItems(readGuestCart());
         setCartId(null);
       }
     });
@@ -95,7 +174,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cart = newCart;
       }
 
-      if (!cart) return;
+      if (!cart) return null;
 
       setCartId(cart.id);
 
@@ -108,8 +187,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (itemsError) throw itemsError;
 
       setItems(cartItems || []);
+      return cart.id as string;
     } catch (error) {
       console.error('Error loading cart:', error);
+      return null;
     }
   };
 
@@ -118,26 +199,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
     product: { slug: string; name: string; price: number; image?: string },
     quantity: number = 1
   ) => {
-    if (!user || !cartId) {
-      // Rediriger vers la connexion
-      window.location.href = '/connexion';
+    if (!user) {
+      addGuestItem(product, quantity);
+      return;
+    }
+
+    const ensuredCartId = cartId ?? (await loadCart(user.id));
+
+    if (!ensuredCartId) {
+      addGuestItem(product, quantity);
       return;
     }
 
     try {
-      // Vérifier si l'article existe déjà
-      const existingItem = items.find(item => item.product_slug === product.slug);
+      const existingItem = items.find(
+        item => !isGuestItem(item) && item.product_slug === product.slug
+      );
 
       if (existingItem) {
-        // Mettre à jour la quantité
         const newQuantity = existingItem.quantity + quantity;
         await updateQuantity(existingItem.id, newQuantity);
       } else {
-        // Ajouter un nouvel article
         const { data, error } = await supabase
           .from('cart_items')
           .insert({
-            cart_id: cartId,
+            cart_id: ensuredCartId,
             product_slug: product.slug,
             product_name: product.name,
             product_price: product.price,
@@ -149,10 +235,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error;
 
-        setItems([...items, data]);
+        setItems(prev => [
+          ...prev.filter(item => !(isGuestItem(item) && item.product_slug === product.slug)),
+          data,
+        ]);
       }
     } catch (error) {
       console.error('Error adding item:', error);
+      addGuestItem(product, quantity);
       throw error;
     }
   };
@@ -164,6 +254,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    if (!user) {
+      updateGuestItem(itemId, quantity);
+      return;
+    }
+
+    const ensuredCartId = cartId ?? (await loadCart(user.id));
+    if (!ensuredCartId) {
+      updateGuestItem(itemId, quantity);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('cart_items')
@@ -172,17 +273,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      setItems(items.map(item => 
-        item.id === itemId ? { ...item, quantity } : item
-      ));
+      setItems(prev =>
+        prev.map(item => (item.id === itemId ? { ...item, quantity } : item))
+      );
     } catch (error) {
       console.error('Error updating quantity:', error);
+      updateGuestItem(itemId, quantity);
       throw error;
     }
   };
 
   // Supprimer un article du panier
   const removeItem = async (itemId: string) => {
+    if (!user) {
+      removeGuestItem(itemId);
+      return;
+    }
+
+    const ensuredCartId = cartId ?? (await loadCart(user.id));
+    if (!ensuredCartId) {
+      removeGuestItem(itemId);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('cart_items')
@@ -191,28 +304,39 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      setItems(items.filter(item => item.id !== itemId));
+      setItems(prev => prev.filter(item => item.id !== itemId));
     } catch (error) {
       console.error('Error removing item:', error);
+      removeGuestItem(itemId);
       throw error;
     }
   };
 
   // Vider le panier
   const clearCart = async () => {
-    if (!cartId) return;
+    if (!user) {
+      clearGuestCart();
+      return;
+    }
+
+    const ensuredCartId = cartId ?? (await loadCart(user.id));
+    if (!ensuredCartId) {
+      clearGuestCart();
+      return;
+    }
 
     try {
       const { error } = await supabase
         .from('cart_items')
         .delete()
-        .eq('cart_id', cartId);
+        .eq('cart_id', ensuredCartId);
 
       if (error) throw error;
 
       setItems([]);
     } catch (error) {
       console.error('Error clearing cart:', error);
+      clearGuestCart();
       throw error;
     }
   };

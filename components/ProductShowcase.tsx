@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Heart, ShoppingBag } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { Price } from "@/components/Price";
 import { braseros } from "@/content/products";
 import type { Product } from "@/lib/schema";
+import { useCart } from "@/lib/cart-context";
+import { useFavorites } from "@/lib/favorites-context";
 import "@/styles/product-showcase.css";
 
 type LayoutSlot = {
@@ -115,6 +118,65 @@ const layout: LayoutSlot[] = [
 ];
 
 const px = (value: number) => `${value}px`;
+
+const ShowcaseActions = ({ product }: { product: Product }) => {
+  const { addItem, loading } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const [adding, setAdding] = useState(false);
+
+  const handleToggleFavorite = async () => {
+    await toggleFavorite({
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+      image: product.images[0]?.src,
+    });
+  };
+
+  const handleAddToCart = async () => {
+    setAdding(true);
+    try {
+      await addItem({
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        image: product.images[0]?.src ?? "",
+      });
+      setTimeout(() => setAdding(false), 900);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      setAdding(false);
+    }
+  };
+
+  return (
+    <div className="product-showcase__actions">
+      <button
+        type="button"
+        onClick={handleToggleFavorite}
+        className={`product-showcase__btn product-showcase__btn--ghost${
+          isFavorite(product.slug) ? " product-showcase__btn--ghost-active" : ""
+        }`}
+      >
+        <Heart
+          className="product-showcase__btn-icon"
+          fill={isFavorite(product.slug) ? "currentColor" : "none"}
+          strokeWidth={1.5}
+        />
+        {isFavorite(product.slug) ? "Retirer des favoris" : "Ajouter aux favoris"}
+      </button>
+      <button
+        type="button"
+        className="product-showcase__btn product-showcase__btn--solid"
+        onClick={handleAddToCart}
+        disabled={adding || loading}
+      >
+        <ShoppingBag className="product-showcase__btn-icon" />
+        {adding ? "Ajouté au panier" : "Mettre dans le panier"}
+      </button>
+    </div>
+  );
+};
 
 export const ProductShowcase = () => {
   const [ready, setReady] = useState(false);
@@ -230,6 +292,7 @@ export const ProductShowcase = () => {
               </div>
               <h3 className="product-showcase__name">{card.product.name}</h3>
               <Price amount={card.product.price} className="product-showcase__price" tone="light" />
+              <ShowcaseActions product={card.product} />
               <Link
                 href={`/produits/${card.product.slug}`}
                 className="product-showcase__link"

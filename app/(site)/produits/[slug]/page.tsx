@@ -10,12 +10,14 @@ import { Price } from "@/components/Price";
 import { ProductGallery } from "@/components/ProductGallery";
 import { Section } from "@/components/Section";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
 import { products } from "@/content/products";
 import { getProductBySlug } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
 
 type ProductPageProps = {
-  params: { slug: string };
+  // Next.js 16 transmet désormais `params` sous forme de Promise
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
@@ -23,7 +25,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const product = getProductBySlug(products, slug);
   if (!product) return {};
 
@@ -44,7 +46,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const product = getProductBySlug(products, slug);
   if (!product) notFound();
 
@@ -62,6 +64,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <Price amount={product.price} />
             <div className="space-y-4 rounded-3xl border border-clay-100 bg-black/90 p-6 shadow-inner">
               <AddToCartButton product={product} />
+              <AddToFavoritesButton product={product} />
               <p className="text-sm text-slate-500">
                 {product.availability} — {product.shipping}
               </p>

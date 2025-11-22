@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { FloatingCart } from "@/components/FloatingCart";
 import { CartProvider } from "@/lib/cart-context";
+import { FavoritesProvider } from "@/lib/favorites-context";
 
 type SiteLayoutProps = {
   children: ReactNode;
@@ -12,12 +13,14 @@ type SiteLayoutProps = {
 export default function SiteLayout({ children }: SiteLayoutProps) {
   return (
     <CartProvider>
-      <div className="flex min-h-screen flex-col bg-black text-white">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <FloatingCart />
-      </div>
+      <FavoritesProvider>
+        <div className="flex min-h-screen flex-col bg-black text-white">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <FloatingCart />
+        </div>
+      </FavoritesProvider>
     </CartProvider>
   );
 }

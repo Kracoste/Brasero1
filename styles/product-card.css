@@ -103,6 +103,77 @@
   letter-spacing: 0.08em;
 }
 
+.product-card__actions {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.product-card__btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(6, 6, 12, 0.8);
+  color: #f8f2e6;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease,
+    color 0.3s ease;
+}
+
+.product-card__btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.product-card__btn:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(10, 12, 18, 0.95);
+}
+
+.product-card__btn:active {
+  transform: translateY(1px);
+}
+
+.product-card__btn--primary {
+  background: linear-gradient(120deg, #ff6b56, #ffb677);
+  border-color: transparent;
+  color: #0c0b0f;
+  font-weight: 600;
+}
+
+.product-card__btn--primary:hover {
+  background: linear-gradient(120deg, #ff816d, #ffc487);
+}
+
+.product-card__btn--primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.product-card__btn--secondary {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.product-card__btn--secondary-active {
+  border-color: rgba(255, 116, 90, 0.8);
+  color: #ffbba5;
+  background: rgba(255, 116, 90, 0.12);
+}
+
+.product-card__btn--secondary-active svg {
+  transform: scale(1.05);
+}
+
 .product-card__cta {
   margin-top: 12px;
   display: inline-flex;
