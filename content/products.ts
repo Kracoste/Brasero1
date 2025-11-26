@@ -150,7 +150,7 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
+        src: "/Brasero.png",
         alt: "Braséro Horizon 60 sur un rooftop urbain",
         width: 1200,
         height: 900,

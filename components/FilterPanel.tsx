@@ -100,6 +100,7 @@ const FiltersContent = ({
 }: FiltersContentProps) => (
   <div className="space-y-6">
     <CategorySection />
+    <FormatSection />
     <DimensionSection />
     <PriceSection
       priceMin={priceMin}
@@ -134,6 +135,26 @@ const CategorySection = () => (
   </div>
 );
 
+const FormatSection = () => (
+  <div className="border-t border-slate-200 pt-6">
+    <h3 className="text-base font-bold text-slate-900 mb-4">Format Du Braséro</h3>
+    <div className="space-y-3">
+      {['Hexagonal', 'Rond', 'Carré'].map((label) => (
+        <label
+          key={label}
+          className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+        >
+          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+            <input type="checkbox" className="peer sr-only" />
+            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+          </div>
+          <span>{label}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+);
+
 const DeliverySection = () => (
   <div className="border-t border-slate-200 pt-6">
     <h3 className="text-sm font-bold text-slate-900 mb-4">Livraison</h3>
@@ -146,7 +167,7 @@ const DeliverySection = () => (
 
 const DimensionSection = () => (
   <div className="border-t border-slate-200 pt-6">
-    <h3 className="text-base font-bold text-slate-900 mb-4">Dimensions</h3>
+    <h3 className="text-base font-bold text-slate-900 mb-4">Dimensions Braséro</h3>
     <div className="space-y-3">
       {[45, 50, 55, 60, 65, 70, 75, 80, 90, 100].map((size) => (
         <label
