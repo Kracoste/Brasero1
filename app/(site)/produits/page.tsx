@@ -38,17 +38,15 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? 'Préparez vos bûches en toute sécurité avec notre fendeur manuel fabriqué en France.'
     : 'Diamètres de 55 à 100 cm, aciers corten ou thermolaqués et accessoires prêts à rejoindre votre terrasse. Filtres et tri vous permettent de comparer en un coup d\'œil.';
 
+  const containerClass = 'space-y-10 w-full max-w-[1600px] px-0 sm:px-4 lg:px-0';
+
   return (
-    <Section className="pb-24">
-      <Container className="space-y-10">
-        <div className="space-y-4">
-          <p className="text-sm uppercase tracking-wide text-slate-400">Catalogue</p>
-          <h1 className="font-display text-4xl font-semibold text-clay-900">{title}</h1>
-          <p className="text-base text-slate-400">
-            {description}
-          </p>
+    <Section className="pb-24 bg-white">
+      <Container className={containerClass}>
+        <h1 className="text-4xl font-bold text-[#2d2d2d] mb-8 px-4 sm:px-0">NOS BRASÉROS</h1>
+        <div className="px-4 sm:px-0">
+          <CatalogueView products={filteredProducts} />
         </div>
-        <CatalogueView products={filteredProducts} />
       </Container>
     </Section>
   );

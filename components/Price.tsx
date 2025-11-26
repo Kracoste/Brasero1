@@ -8,12 +8,12 @@ type PriceProps = {
 
 const toneClasses = {
   light: {
-    wrapper: "text-white",
-    detail: "text-slate-300",
+    wrapper: "text-[#2d2d2d]",
+    detail: "text-slate-600",
   },
   dark: {
-    wrapper: "text-white",
-    detail: "text-slate-400",
+    wrapper: "text-[#2d2d2d]",
+    detail: "text-slate-600",
   },
 } as const;
 

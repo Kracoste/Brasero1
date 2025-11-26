@@ -13,7 +13,7 @@ const moncoutant = {
 const rawProducts: Product[] = [
   {
     slug: "brasero-signature-80",
-    name: "Braséro Signature 80",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 890,
     shortDescription: "La pièce maîtresse pour les grandes tablées en extérieur.",
@@ -32,8 +32,8 @@ const rawProducts: Product[] = [
     badge: "Best-seller atelier",
     specs: {
       acier: "Corten HLE 4 mm",
-      epaisseur: "4 mm",
-      dimensions: "Ø 80 cm x H 42 cm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 60 cm x H 42 cm",
       poids: "48 kg",
     },
     highlights: [
@@ -102,7 +102,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-horizon-60",
-    name: "Braséro Horizon 60",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 590,
     shortDescription: "Compact et léger, idéal pour les terrasses urbaines.",
@@ -121,8 +121,8 @@ const rawProducts: Product[] = [
     badge: "Edition terrasse",
     specs: {
       acier: "Corten HLE 3 mm",
-      epaisseur: "3 mm",
-      dimensions: "Ø 60 cm x H 38 cm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 75 cm x H 38 cm",
       poids: "32 kg",
       compatibilite: "Anneau plancha 58 cm",
     },
@@ -185,7 +185,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-origine-100",
-    name: "Braséro Origine 100",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 1290,
     shortDescription: "Format spectaculaire pour les événements et tables XL.",
@@ -204,8 +204,8 @@ const rawProducts: Product[] = [
     badge: "Format pro",
     specs: {
       acier: "Corten premium 5 mm",
-      epaisseur: "5 mm",
-      dimensions: "Ø 100 cm x H 45 cm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 90 cm x H 45 cm",
       poids: "62 kg",
       compatibilite: "Anneau plancha 95 cm",
     },
@@ -275,7 +275,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-compact-55",
-    name: "Braséro Compact 55",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 420,
     shortDescription: "Le compagnon des balcons et petites terrasses.",
@@ -294,8 +294,8 @@ const rawProducts: Product[] = [
     badge: "Nouveauté",
     specs: {
       acier: "Acier brut thermolaqué",
-      epaisseur: "3 mm",
-      dimensions: "Ø 55 cm x H 35 cm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 105 cm x H 35 cm",
       poids: "24 kg",
       compatibilite: "Grille inox 50 cm",
     },
@@ -365,7 +365,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-canyon-70",
-    name: "Braséro Canyon 70",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 760,
     shortDescription: "Silhouette sculpturale et large rebord pour jouer avec les braises.",
@@ -384,8 +384,8 @@ const rawProducts: Product[] = [
     badge: "Édition jardin",
     specs: {
       acier: "Corten patiné 4 mm",
-      epaisseur: "4 mm",
-      dimensions: "Ø 70 cm x H 40 cm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 60 cm x H 40 cm",
       poids: "40 kg",
       compatibilite: "Plancha 68 cm",
     },
@@ -455,7 +455,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-nomade-45",
-    name: "Braséro Nomade 45",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 320,
     shortDescription: "Format léger avec poignée intégrée pour suivre vos escapades.",
@@ -474,8 +474,8 @@ const rawProducts: Product[] = [
     badge: "Nomade",
     specs: {
       acier: "Galva thermolaqué 3 mm",
-      epaisseur: "3 mm",
-      dimensions: "Ø 45 cm x H 28 cm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 75 cm x H 28 cm",
       poids: "16 kg",
       compatibilite: "Grille pliable 42 cm",
     },
@@ -545,7 +545,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-atlas-90",
-    name: "Braséro Atlas 90",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 990,
     shortDescription: "Un disque monumental avec plateau log pour scenographier vos repas.",
@@ -564,7 +564,7 @@ const rawProducts: Product[] = [
     badge: "Edition signature",
     specs: {
       acier: "Corten laminé 4 mm",
-      epaisseur: "4 mm",
+      epaisseur: "Bol 5 mm",
       dimensions: "Ø 90 cm x H 44 cm",
       poids: "55 kg",
       compatibilite: "Anneau plancha 86 cm",
@@ -635,7 +635,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-zenith-50",
-    name: "Braséro Zénith 50",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 370,
     shortDescription: "Une capsule compacte avec anneau lumineux intégré.",
@@ -654,8 +654,8 @@ const rawProducts: Product[] = [
     badge: "Compact lumineux",
     specs: {
       acier: "Inox thermolaqué 3 mm",
-      epaisseur: "3 mm",
-      dimensions: "Ø 50 cm x H 32 cm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 105 cm x H 32 cm",
       poids: "20 kg",
       compatibilite: "Grille inox 48 cm",
     },
@@ -718,7 +718,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-dune-75",
-    name: "Braséro Dune 75",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 680,
     shortDescription: "Inspiration désertique avec courbes asymétriques.",
@@ -801,7 +801,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-lumina-65",
-    name: "Braséro Lumina 65",
+    name: "Braséro Atelier LBF en Acier",
     category: "brasero",
     price: 540,
     shortDescription: "Format vertical avec niches pour bougies et accessoires.",
@@ -884,7 +884,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "fendeur-buches-atelier",
-    name: "Fendeur à bûches Atelier",
+    name: "Braséro Atelier LBF en Acier",
     category: "fendeur",
     price: 270,
     shortDescription: "Préparez vos bûches en toute sécurité, sans effort.",

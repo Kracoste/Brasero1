@@ -178,13 +178,19 @@ const ShowcaseActions = ({ product }: { product: Product }) => {
   );
 };
 
-export const ProductShowcase = () => {
-  const [ready, setReady] = useState(false);
-  const [progress, setProgress] = useState(0);
+type ProductShowcaseProps = {
+  animate?: boolean;
+};
+
+export const ProductShowcase = ({ animate = true }: ProductShowcaseProps = {}) => {
+  const [ready, setReady] = useState(!animate);
+  const [progress, setProgress] = useState(animate ? 0 : 1);
   const containerRef = useRef<HTMLDivElement>(null);
   const totalRows = layout.reduce((max, item) => Math.max(max, item.rowStart + item.rowSpan), 0);
 
   useEffect(() => {
+    if (!animate) return;
+
     const node = containerRef.current;
     if (!node) return;
 
@@ -201,9 +207,17 @@ export const ProductShowcase = () => {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [animate]);
 
   useEffect(() => {
+    if (!animate || ready) return;
+    const timeout = setTimeout(() => setReady(true), 800);
+    return () => clearTimeout(timeout);
+  }, [animate, ready]);
+
+  useEffect(() => {
+    if (!animate) return;
+
     const handleScroll = () => {
       const node = containerRef.current;
       if (!node) return;
@@ -233,7 +247,7 @@ export const ProductShowcase = () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, []);
+  }, [animate]);
 
   const cards = layout
     .map((slot) => {
@@ -255,7 +269,7 @@ export const ProductShowcase = () => {
       {cards.map((card) => {
         const image = card.product.images[0];
         const activationPoint = (card.rowStart - 1) / totalRows;
-        const isVisible = ready && progress >= activationPoint;
+        const isVisible = animate ? ready && progress >= activationPoint : true;
         return (
           <article
             key={card.product.slug}

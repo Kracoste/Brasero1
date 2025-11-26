@@ -63,7 +63,7 @@ export const HeroCarousel = () => {
   const slide = slides[current];
 
   return (
-    <div className="relative overflow-hidden rounded-4xl bg-black/5 shadow-2xl">
+    <div className="relative z-0 overflow-hidden rounded-4xl bg-black/5 shadow-2xl">
       <div className="relative h-[520px] w-full">
         <Image
           src={slide.backgroundImage}

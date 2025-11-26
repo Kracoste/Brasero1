@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #111111;
   --brand-primary: #1a1a1a;
   --brand-accent: #ff5751;
   --brand-secondary: #0f6a36;
@@ -58,9 +58,79 @@ body {
   animation: accordion-up 0.2s ease-out;
 }
 
+.filter-button {
+  position: relative;
+}
+
+.filter-button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 3.3ch;
+  height: 3px;
+  background: #8b4513;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.filter-button:hover::after,
+.filter-button:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.dual-range-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+  margin: 0;
+}
+
+.dual-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #8b4513;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+  cursor: pointer;
+  margin-top: -7px;
+}
+
+.dual-range-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #8b4513;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.dual-range-input::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+}
+
+.dual-range-input::-moz-range-track {
+  height: 4px;
+  background: transparent;
+}
+
 .header-texture {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background:
     linear-gradient(120deg, rgba(255, 99, 72, 0.16), rgba(255, 255, 255, 0) 45%),
     linear-gradient(300deg, rgba(87, 194, 181, 0.18), rgba(0, 0, 0, 0) 55%),
@@ -113,4 +183,36 @@ body {
       transparent 7px
     ),
     linear-gradient(170deg, rgba(5, 7, 13, 0.95), rgba(3, 3, 7, 0.9));
+}
+
+/* Animation trait marron sous le bouton Filtres */
+.filter-button::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #8B4513;
+  transition: width 0.3s ease-out;
+}
+
+.filter-button:hover::after {
+  width: 100%;
+}
+
+/* Animation trait marron sous les liens de navigation */
+.nav-link-hover::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #8B4513;
+  transition: width 0.3s ease-out;
+}
+
+.nav-link-hover:hover::after {
+  width: 100%;
 }

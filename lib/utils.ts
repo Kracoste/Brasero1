@@ -17,6 +17,8 @@ export type FilterState = {
   material?: string;
   price?: string;
   sort?: "price-asc" | "price-desc" | "popular";
+  priceMin?: number;
+  priceMax?: number;
 };
 
 type Predicate = (product: Product) => boolean;
@@ -67,6 +69,12 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
     if (filters.price && filters.price !== "all") {
       const predicate = pricePredicates[filters.price];
       if (predicate && !predicate(product)) return false;
+    }
+    if (typeof filters.priceMin === "number" && product.price < filters.priceMin) {
+      return false;
+    }
+    if (typeof filters.priceMax === "number" && product.price > filters.priceMax) {
+      return false;
     }
 
     return true;

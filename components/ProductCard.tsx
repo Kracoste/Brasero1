@@ -81,7 +81,6 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
   return (
     <article className={`product-card ${className ?? ""}`}>
       <div className="product-card__body">
-        {product.badge && <span className="product-card__badge">{product.badge}</span>}
         <div className="product-card__image">
           <Image
             src={image.src}
@@ -94,23 +93,23 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
         </div>
         <div className="product-card__content">
           <span className="product-card__status">EN STOCK</span>
-          <h3 className="product-card__name">{product.name}</h3>
-          <Price amount={product.price} className="product-card__price" tone="light" />
-          <div className="product-card__actions">
+          <div className="product-card__name-wrapper">
+            <h3 className="product-card__name">{product.name}</h3>
             <button
               type="button"
               onClick={toggleFavorite}
-              className={`product-card__btn product-card__btn--secondary${
-                isFavorite ? " product-card__btn--secondary-active" : ""
-              }`}
+              className="product-card__favorite-btn"
+              aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
             >
               <Heart
-                className="product-card__btn-icon"
+                className="product-card__favorite-icon"
                 fill={isFavorite ? "currentColor" : "none"}
                 strokeWidth={1.5}
               />
-              {isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
             </button>
+          </div>
+          <Price amount={product.price} className="product-card__price" tone="light" />
+          <div className="product-card__actions">
             <button
               type="button"
               onClick={handleAddToCart}
