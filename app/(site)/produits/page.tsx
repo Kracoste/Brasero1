@@ -45,7 +45,10 @@ export default async function ProductsPage({ searchParams }: Props) {
       <Container className={containerClass}>
         <h1 className="text-4xl font-bold text-[#2d2d2d] mb-8 px-4 sm:px-0">NOS BRASÉROS</h1>
         <div className="px-4 sm:px-0">
-          <CatalogueView products={filteredProducts} />
+          <CatalogueView
+            products={filteredProducts}
+            showCategoryFilters={category !== "accessoire"}
+          />
         </div>
       </Container>
     </Section>

@@ -10,9 +10,10 @@ import { applyFilters, type FilterState } from "@/lib/utils";
 
 type CatalogueViewProps = {
   products: Product[];
+  showCategoryFilters?: boolean;
 };
 
-export const CatalogueView = ({ products }: CatalogueViewProps) => {
+export const CatalogueView = ({ products, showCategoryFilters = true }: CatalogueViewProps) => {
   const [filters, setFilters] = useState<FilterState>({ sort: "popular" });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filteredProducts = applyFilters(products, filters);
@@ -33,6 +34,7 @@ export const CatalogueView = ({ products }: CatalogueViewProps) => {
             onChange={setFilters}
             inline={false}
             onToggle={setFiltersOpen}
+            showCategoryFilters={showCategoryFilters}
           />
         </div>
 

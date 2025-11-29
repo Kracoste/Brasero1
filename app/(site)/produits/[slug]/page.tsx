@@ -54,7 +54,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const compatibleAccessories = accessoriesCatalog
     .filter((item) => item.slug !== product.slug)
     .sort((a, b) => b.popularScore - a.popularScore)
-    .slice(0, 10);
+    .slice(0, 20);
 
   return (
     <div className="bg-[#f9f6f1] pb-24">

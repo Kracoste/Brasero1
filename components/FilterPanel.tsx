@@ -11,9 +11,18 @@ interface FilterPanelProps {
   onChange: (filters: FilterState) => void;
   inline?: boolean;
   onToggle?: (isOpen: boolean) => void;
+  showCategoryFilters?: boolean;
 }
 
-export const FilterPanel = ({ minPrice, maxPrice, value, onChange, inline = true, onToggle }: FilterPanelProps) => {
+export const FilterPanel = ({
+  minPrice,
+  maxPrice,
+  value,
+  onChange,
+  inline = true,
+  onToggle,
+  showCategoryFilters = true,
+}: FilterPanelProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
@@ -46,6 +55,7 @@ export const FilterPanel = ({ minPrice, maxPrice, value, onChange, inline = true
       maxPrice={maxPrice}
       rangeMinPercent={rangeMinPercent}
       rangeMaxPercent={rangeMaxPercent}
+      showCategories={showCategoryFilters}
       onMinChange={(next) => {
         setPriceMin(next);
         commitPrice(next, priceMax);
@@ -83,6 +93,7 @@ interface FiltersContentProps {
   maxPrice: number;
   rangeMinPercent: number;
   rangeMaxPercent: number;
+  showCategories: boolean;
   onMinChange: (value: number) => void;
   onMaxChange: (value: number) => void;
 }
@@ -95,11 +106,12 @@ const FiltersContent = ({
   maxPrice,
   rangeMinPercent,
   rangeMaxPercent,
+  showCategories,
   onMinChange,
   onMaxChange,
 }: FiltersContentProps) => (
   <div className="space-y-6">
-    <CategorySection />
+    {showCategories && <CategorySection />}
     <FormatSection />
     <DimensionSection />
     <PriceSection
@@ -235,9 +247,9 @@ const PriceSection = ({
         </div>
 
         <div className="relative mt-4" style={{ height: '20px' }}>
-          <div className="absolute top-1/2 left-2 right-2 h-2 -translate-y-1/2 rounded-full bg-white border border-[#d7cbc0]" />
+          <div className="absolute top-1/2 left-2 right-2 h-2 -translate-y-1/2 rounded-full bg-[#f5e9d7]" />
           <div
-            className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-[#8B4513]"
+            className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#f5e9d7] via-[#c98b5a] to-[#6b3a1e]"
             style={{
               left: `calc(8px + (100% - 16px) * ${rangeMinPercent / 100})`,
               right: `calc(8px + (100% - 16px) * ${(100 - rangeMaxPercent) / 100})`,
