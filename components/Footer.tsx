@@ -10,12 +10,12 @@ const legalLinks = [
 ];
 
 export const Footer = () => (
-  <footer className="border-t border-slate-800 bg-black text-slate-300">
+  <footer className="border-t border-gray-200 bg-white text-gray-700">
     <Container className="flex flex-col gap-8 py-12 md:flex-row md:items-start md:justify-between">
       <div>
         <p className="font-display text-xl font-semibold text-[#111827]">Brasero Atelier</p>
-        <p className="mt-3 max-w-sm text-sm text-slate-500">{siteConfig.description}</p>
-        <div className="mt-4 text-sm text-slate-500">
+        <p className="mt-3 max-w-sm text-sm text-gray-600">{siteConfig.description}</p>
+        <div className="mt-4 text-sm text-gray-600">
           {siteConfig.address}
           <br />
           {siteConfig.email}
@@ -24,7 +24,7 @@ export const Footer = () => (
         </div>
       </div>
 
-      <div className="flex flex-1 justify-between gap-8 text-sm text-slate-500 md:justify-end">
+      <div className="flex flex-1 justify-between gap-8 text-sm text-gray-600 md:justify-end">
         <div>
           <p className="font-semibold text-[#111827]">Navigation</p>
           <ul className="mt-3 space-y-2">
@@ -51,7 +51,7 @@ export const Footer = () => (
         </div>
       </div>
     </Container>
-    <div className="border-t border-slate-700 py-4 text-center text-xs text-slate-500">
+    <div className="border-t border-gray-200 py-4 text-center text-xs text-gray-500">
       © {new Date().getFullYear()} Brasero Atelier — Fabriqué à Moncoutant (79)
     </div>
   </footer>

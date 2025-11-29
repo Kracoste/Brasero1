@@ -108,6 +108,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               />
             </button>
           </div>
+          <p className="product-card__description">{product.shortDescription}</p>
           <Price amount={product.price} className="product-card__price" tone="light" />
           <div className="product-card__actions">
             <button

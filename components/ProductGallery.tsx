@@ -16,9 +16,8 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
   const activeImage = product.images[activeIndex];
 
   return (
-    <div>
-      <div className="relative overflow-hidden rounded-3xl bg-slate-800">
-        <div className="relative w-full pb-[65%]">
+    <div className="flex flex-col items-center lg:items-end">
+      <div className="relative w-full aspect-[5/6] lg:aspect-[3/4]">
           <Image
             key={activeImage.src}
             src={activeImage.src}
@@ -27,10 +26,9 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             sizes="(max-width: 1024px) 100vw, 45vw"
             placeholder="blur"
             blurDataURL={activeImage.blurDataURL}
-            className="object-cover"
+            className="object-contain scale-125 origin-center"
             priority
           />
-        </div>
         <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
           {product.images.map((_, index) => (
             <span

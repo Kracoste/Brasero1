@@ -11,9 +11,11 @@ type AddToFavoritesButtonProps = {
     price: number;
     images: { src: string }[];
   };
+  className?: string;
+  size?: "default" | "compact";
 };
 
-export function AddToFavoritesButton({ product }: AddToFavoritesButtonProps) {
+export function AddToFavoritesButton({ product, className = "", size = "default" }: AddToFavoritesButtonProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const [loading, setLoading] = useState(false);
 
@@ -35,11 +37,12 @@ export function AddToFavoritesButton({ product }: AddToFavoritesButtonProps) {
 
   const isInFavorites = isFavorite(product.slug);
 
+  const padding = size === "compact" ? "px-3 py-2 text-sm" : "px-6 py-3";
   return (
     <button
       onClick={handleToggle}
       disabled={loading}
-      className={`flex items-center justify-center gap-2 rounded-full border px-6 py-3 font-semibold transition ${
+      className={`flex items-center justify-center gap-2 rounded-full border ${padding} font-semibold transition ${className} ${
         isInFavorites
           ? 'border-[#ff5751] bg-[#ff5751] text-white hover:bg-[#ff4741]'
           : 'border-slate-700 bg-black text-slate-300 hover:border-[#ff5751] hover:text-[#ff5751]'

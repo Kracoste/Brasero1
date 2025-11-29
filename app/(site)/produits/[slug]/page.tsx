@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/Badge";
+import { AccessoryGrid } from "@/components/AccessoryGrid";
 import { Container } from "@/components/Container";
 import { FAQ } from "@/components/FAQ";
 import { FeatureList } from "@/components/FeatureList";
@@ -10,10 +11,10 @@ import { Price } from "@/components/Price";
 import { ProductGallery } from "@/components/ProductGallery";
 import { Section } from "@/components/Section";
 import { AddToCartButton } from "@/components/AddToCartButton";
-import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
-import { products } from "@/content/products";
+import { ProductTabs } from "@/components/ProductTabs";
+import { accessoires as accessoriesCatalog, products } from "@/content/products";
 import { getProductBySlug } from "@/lib/utils";
-import { siteConfig } from "@/lib/site";
+import { Users, Flame, Box, Ruler, Weight } from "lucide-react";
 
 type ProductPageProps = {
   // Next.js 16 transmet désormais `params` sous forme de Promise
@@ -50,81 +51,99 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = getProductBySlug(products, slug);
   if (!product) notFound();
 
+  const reference = `REF-${product.slug.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+  const compatibleAccessories = accessoriesCatalog
+    .filter((item) => item.slug !== product.slug)
+    .sort((a, b) => b.popularScore - a.popularScore)
+    .slice(0, 10);
+
   return (
-    <div className="pb-24">
+    <div className="bg-[#f9f6f1] pb-24">
       <Section className="pt-10">
-        <Container className="grid gap-12 lg:grid-cols-2">
-          <ProductGallery key={product.slug} product={product} />
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <Badge>{product.badge}</Badge>
-              <h1 className="font-display text-4xl font-semibold text-clay-900">{product.name}</h1>
-              <p className="text-base text-slate-400">{product.description}</p>
+        <Container className="max-w-6xl">
+          <div className="grid gap-10 lg:grid-cols-[minmax(320px,1fr)_minmax(420px,1fr)] items-start">
+            <div className="space-y-16">
+              <ProductGallery key={product.slug} product={product} />
             </div>
-            <Price amount={product.price} />
-            <div className="space-y-4 rounded-3xl border border-clay-100 bg-black/90 p-6 shadow-inner">
-              <AddToCartButton product={product} />
-              <AddToFavoritesButton product={product} />
-              <p className="text-sm text-slate-500">
-                {product.availability} — {product.shipping}
-              </p>
-            </div>
-            <div className="grid gap-4 rounded-3xl border border-slate-800 bg-black/70 p-6 sm:grid-cols-2">
-              <div>
-                <p className="text-xs uppercase text-slate-400">Acier</p>
-                <p className="text-sm font-semibold text-clay-900">{product.specs.acier}</p>
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                  <span>France Braseros</span>
+                  <Badge>{product.badge}</Badge>
+                </div>
+                <h1 className="font-display text-4xl font-semibold text-slate-900">{product.name}</h1>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                  <span className="font-semibold">
+                    Référence&nbsp;: <span className="font-mono text-slate-900">{reference}</span>
+                  </span>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    En stock
+                  </span>
+                </div>
+                <p className="text-base leading-relaxed text-slate-600">{product.description}</p>
               </div>
-              <div>
-                <p className="text-xs uppercase text-slate-400">Dimensions</p>
-                <p className="text-sm font-semibold text-clay-900">{product.specs.dimensions}</p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                    <Users className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-slate-800">Nombre de convives : </span>
+                    <span className="text-sm text-slate-600">{product.diameter <= 50 ? "4 à 6" : product.diameter <= 70 ? "6 à 8" : product.diameter <= 90 ? "10 à 12" : "12 à 16"} personnes</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                    <Flame className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-slate-800">Type de combustible : </span>
+                    <span className="text-sm text-slate-600">Bois</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                    <Box className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-slate-800">Matière : </span>
+                    <span className="text-sm text-slate-600">{product.material}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                    <Ruler className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-slate-800">Dimensions : </span>
+                    <span className="text-sm text-slate-600">{product.specs.dimensions}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                    <Weight className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-slate-800">Poids : </span>
+                    <span className="text-sm text-slate-600">{product.weight} kg</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xs uppercase text-slate-400">Épaisseur</p>
-                <p className="text-sm font-semibold text-clay-900">{product.specs.epaisseur}</p>
+
+              <div className="space-y-4">
+                <Price amount={product.price} className="text-4xl font-bold" />
+                <AddToCartButton product={product} />
               </div>
-              <div>
-                <p className="text-xs uppercase text-slate-400">Poids</p>
-                <p className="text-sm font-semibold text-clay-900">{product.specs.poids}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-400">Points forts</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-400">
-                {product.highlights.map((item) => (
-                  <li key={item}>• {item}</li>
-                ))}
-              </ul>
             </div>
           </div>
         </Container>
       </Section>
 
-      <Section>
-        <Container className="space-y-16">
+      <Section className="py-0 sm:py-4">
+        <Container className="space-y-2">
+          <ProductTabs product={product} accessories={compatibleAccessories} />
           <FeatureList product={product} />
-          <div className="grid gap-10 lg:grid-cols-2">
-            <div className="space-y-4">
-              <h2 className="font-display text-3xl font-semibold text-clay-900">
-                Fabriqué à Moncoutant (79)
-              </h2>
-              <p className="text-base text-slate-400">
-                Chaque {product.category === "brasero" ? "braséro" : "accessoire"} est assemblé,
-                contrôlé et conditionné dans notre atelier aux Deux-Sèvres. Les soudures sont
-                doublées et le numéro de série est gravé sous le pied.
-              </p>
-              <p className="text-sm text-slate-500">Retrait sur place possible sur rendez-vous.</p>
-            </div>
-            <LeafletMap
-              lat={siteConfig.atelier.lat}
-              lng={siteConfig.atelier.lng}
-              zoom={12}
-              markerLabel="Brasero Atelier"
-            />
-          </div>
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-clay-900">FAQ</h3>
-            <FAQ items={product.faq} className="mt-6" />
-          </div>
         </Container>
       </Section>
     </div>

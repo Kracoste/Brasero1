@@ -201,6 +201,15 @@ body {
   width: 100%;
 }
 
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Animation trait marron sous les liens de navigation */
 .nav-link-hover::after {
   content: "";

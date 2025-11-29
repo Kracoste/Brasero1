@@ -1,19 +1,26 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Axe,
+  Battery,
   Box,
+  Briefcase,
   ChefHat,
   Droplet,
   Factory,
   Feather,
   Flame,
+  Hand,
   Leaf,
+  Lightbulb,
+  Ruler,
   Shield,
   ShieldCheck,
   Sparkles,
   Sun,
   Target,
+  Thermometer,
   Truck,
+  Utensils,
   Wind,
   Wrench,
 } from "lucide-react";
@@ -37,6 +44,13 @@ const iconMap: Record<string, LucideIcon> = {
   Shield,
   Box,
   Truck,
+  Thermometer,
+  Hand,
+  Ruler,
+  Utensils,
+  Lightbulb,
+  Battery,
+  Briefcase,
 };
 
 type FeatureListProps = {
@@ -50,14 +64,14 @@ export const FeatureList = ({ product }: FeatureListProps) => (
       return (
         <div
           key={feature.title}
-          className="flex items-start gap-4 rounded-2xl border border-slate-800 bg-black/70 p-4"
+          className="flex items-start gap-4 p-4"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-clay-900/10 text-clay-900">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
             <Icon size={20} />
           </span>
           <div>
-            <p className="text-sm font-semibold text-clay-900">{feature.title}</p>
-            <p className="text-sm text-slate-500">{feature.description}</p>
+            <p className="text-sm font-semibold text-gray-900">{feature.title}</p>
+            <p className="text-sm text-gray-600">{feature.description}</p>
           </div>
         </div>
       );

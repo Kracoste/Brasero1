@@ -20,15 +20,15 @@ export const FAQ = ({ items, className }: FAQProps) => (
       <Accordion.Item
         key={item.question}
         value={`item-${index}`}
-        className="overflow-hidden rounded-2xl border border-slate-800 bg-black/70"
+        className="overflow-hidden border-b border-gray-200 last:border-b-0"
       >
         <Accordion.Header>
-          <Accordion.Trigger className="flex w-full items-center justify-between px-6 py-5 text-left text-base font-semibold text-clay-900">
+          <Accordion.Trigger className="flex w-full items-center justify-between py-5 text-left text-base font-semibold text-gray-900">
             {item.question}
-            <span className="ml-4 text-xs uppercase tracking-wide text-slate-400">+</span>
+            <span className="ml-4 text-xs uppercase tracking-wide text-gray-500">+</span>
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content className="px-6 pb-5 text-sm text-slate-400 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+        <Accordion.Content className="pb-5 text-sm text-gray-600 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
           {item.answer}
         </Accordion.Content>
       </Accordion.Item>
