@@ -16,7 +16,7 @@ type AddToFavoritesButtonProps = {
 };
 
 export function AddToFavoritesButton({ product, className = "", size = "default" }: AddToFavoritesButtonProps) {
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorite, toggleFavorite, favoriteCount } = useFavorites();
   const [loading, setLoading] = useState(false);
 
   const handleToggle = async () => {
@@ -40,19 +40,27 @@ export function AddToFavoritesButton({ product, className = "", size = "default"
   const padding = size === "compact" ? "px-3 py-2 text-sm" : "px-6 py-3";
   return (
     <button
+      type="button"
       onClick={handleToggle}
       disabled={loading}
-      className={`flex items-center justify-center gap-2 rounded-full border ${padding} font-semibold transition ${className} ${
+      className={`flex items-center justify-center gap-2 rounded-full border ${padding} font-semibold transition ${
         isInFavorites
-          ? 'border-[#ff5751] bg-[#ff5751] text-white hover:bg-[#ff4741]'
-          : 'border-slate-700 bg-black text-slate-300 hover:border-[#ff5751] hover:text-[#ff5751]'
-      } disabled:opacity-50 disabled:cursor-not-allowed`}
+          ? "border-red-500 bg-white text-black hover:border-red-600 hover:text-red-600"
+          : "border-slate-300 bg-white text-black hover:border-red-500 hover:text-red-500"
+      } disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
-      <Heart
-        size={20}
-        className={isInFavorites ? 'fill-white' : ''}
-      />
-      <span>{isInFavorites ? 'Retirer des favoris' : 'Ajouter aux favoris'}</span>
+      <div className="relative">
+        <Heart
+          size={20}
+          className={isInFavorites ? "text-red-600" : "text-red-500"}
+        />
+        {favoriteCount > 0 && (
+          <span className="absolute -right-2 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+            {favoriteCount}
+          </span>
+        )}
+      </div>
+      <span className="text-black">{isInFavorites ? "Retirer des favoris" : "Ajouter aux favoris"}</span>
     </button>
   );
 }

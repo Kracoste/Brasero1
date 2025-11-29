@@ -5,7 +5,6 @@ import { Badge } from "@/components/Badge";
 import { AccessoryGrid } from "@/components/AccessoryGrid";
 import { Container } from "@/components/Container";
 import { FAQ } from "@/components/FAQ";
-import { FeatureList } from "@/components/FeatureList";
 import { LeafletMap } from "@/components/LeafletMap";
 import { Price } from "@/components/Price";
 import { ProductGallery } from "@/components/ProductGallery";
@@ -143,7 +142,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <Section className="py-0 sm:py-4">
         <Container className="space-y-2">
           <ProductTabs product={product} accessories={compatibleAccessories} />
-          <FeatureList product={product} />
         </Container>
       </Section>
     </div>

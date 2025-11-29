@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { navLinks } from '@/components/navigation';
 import { UserNav } from '@/components/UserNav';
 import { useCart } from '@/lib/cart-context';
+import { useFavorites } from "@/lib/favorites-context";
 
 const categoryMenu = [
   {
@@ -26,6 +27,7 @@ const categoryMenu = [
 export const Header = () => {
   const pathname = usePathname();
   const { itemCount } = useCart();
+  const { favoriteCount } = useFavorites();
   const [open, setOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
@@ -82,7 +84,14 @@ export const Header = () => {
           {/* Icônes à droite */}
           <div className="flex items-center gap-2">
             <Link href="/favoris" className="hidden md:flex items-center gap-1 text-xs text-slate-600 hover:text-slate-900 transition">
-              <Heart size={18} />
+              <span className="relative">
+                <Heart size={18} />
+                {favoriteCount > 0 && (
+                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1 text-[10px] font-semibold text-white">
+                    {favoriteCount}
+                  </span>
+                )}
+              </span>
               <span className="hidden lg:inline">Favoris</span>
             </Link>
             <Link href="/panier" className="hidden md:flex items-center gap-1 text-xs text-slate-600 hover:text-slate-900 transition">

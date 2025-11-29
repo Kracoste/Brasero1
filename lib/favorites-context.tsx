@@ -17,6 +17,7 @@ export type FavoriteItem = {
 type FavoritesContextType = {
   favorites: FavoriteItem[];
   loading: boolean;
+  favoriteCount: number;
   isFavorite: (productSlug: string) => boolean;
   addFavorite: (product: {
     slug: string;
@@ -200,6 +201,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       value={{
         favorites,
         loading,
+        favoriteCount: user ? favorites.length : guestFavorites.size,
         isFavorite,
         addFavorite,
         removeFavorite,

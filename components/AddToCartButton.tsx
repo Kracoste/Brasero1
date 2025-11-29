@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { ShoppingCart, Check, Minus, Plus } from 'lucide-react';
 import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
+import { accessoires } from "@/content/products";
 
 type AddToCartButtonProps = {
   product: {
@@ -21,9 +22,38 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
 
+  const readSelectedAccessories = () => {
+    if (typeof window === "undefined") return new Set<string>();
+    try {
+      const raw = window.localStorage.getItem("brasero:selected-accessories");
+      if (!raw) return new Set<string>();
+      const parsed = JSON.parse(raw);
+      return new Set(Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === "string") : []);
+    } catch {
+      return new Set<string>();
+    }
+  };
+
   const handleAddToCart = async () => {
     setAdding(true);
     try {
+      const selectedAccessories = readSelectedAccessories();
+      const accessoriesToAdd = accessoires.filter(
+        (acc) => selectedAccessories.has(acc.slug) && acc.slug !== product.slug
+      );
+
+      for (const acc of accessoriesToAdd) {
+        await addItem(
+          {
+            slug: acc.slug,
+            name: acc.name,
+            price: acc.price,
+            image: acc.images[0]?.src,
+          },
+          1
+        );
+      }
+
       await addItem(
         {
           slug: product.slug,
@@ -75,12 +105,13 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
 
       {/* Bouton Ajouter au panier */}
       <button
+        type="button"
         onClick={handleAddToCart}
         disabled={adding || added}
         className={`flex items-center justify-center gap-2 rounded-md px-6 py-3 font-semibold text-white shadow-lg transition ${
           added
-            ? 'bg-emerald-600 hover:bg-emerald-700'
-            : 'bg-gradient-to-r from-[#6d1a0c] via-[#8c1d10] to-[#c4251a] hover:brightness-110'
+            ? "bg-emerald-600 hover:bg-emerald-700"
+            : "bg-gradient-to-r from-[#e6f4e6] via-[#6fbf73] to-[#2f6f3a] hover:brightness-110"
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {added ? (

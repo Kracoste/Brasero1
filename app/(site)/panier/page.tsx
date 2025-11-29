@@ -27,21 +27,19 @@ export default function PanierPage() {
     return (
       <Section className="py-24">
         <Container className="max-w-2xl text-center">
-          <div className="rounded-3xl border border-slate-700 bg-black p-12">
-            <ShoppingBag size={64} className="mx-auto mb-6 text-slate-300" />
-            <h1 className="font-display text-3xl font-semibold text-clay-900">
-              Votre panier est vide
-            </h1>
-            <p className="mt-4 text-slate-400">
-              Découvrez nos braséros et ajoutez-en à votre panier pour commencer.
-            </p>
-            <Link
-              href="/produits"
-              className="mt-8 inline-flex items-center justify-center rounded-full bg-clay-900 px-6 py-3 font-semibold text-white hover:bg-clay-800"
-            >
-              Découvrir nos produits
-            </Link>
-          </div>
+          <ShoppingBag size={64} className="mx-auto mb-6 text-slate-400" />
+          <h1 className="font-display text-3xl font-semibold text-slate-900">
+            Votre panier est vide
+          </h1>
+          <p className="mt-4 text-slate-600">
+            Découvrez nos braséros et ajoutez-en à votre panier pour commencer.
+          </p>
+          <Link
+            href="/produits"
+            className="mt-8 inline-flex items-center justify-center rounded-full bg-clay-900 px-6 py-3 font-semibold text-white hover:bg-clay-800"
+          >
+            Découvrir nos produits
+          </Link>
         </Container>
       </Section>
     );
@@ -73,7 +71,7 @@ export default function PanierPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 rounded-2xl border border-slate-700 bg-black p-4 shadow-sm"
+                  className="flex gap-4 rounded-2xl p-4"
                 >
                   {/* Image du produit */}
                   <Link
@@ -93,42 +91,39 @@ export default function PanierPage() {
                   {/* Informations du produit */}
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
-                      <Link
-                        href={`/produits/${item.product_slug}`}
-                        className="font-semibold text-clay-900 hover:text-clay-700"
-                      >
+                      <Link href={`/produits/${item.product_slug}`} className="font-semibold text-clay-900 hover:text-clay-700">
                         {item.product_name}
                       </Link>
-                      <p className="mt-1 text-sm text-slate-400">
+                      <p className="mt-1 text-sm text-slate-500">
                         <Price amount={item.product_price} /> / unité
                       </p>
                     </div>
 
                     <div className="flex items-center justify-between">
                       {/* Sélecteur de quantité */}
-                      <div className="flex items-center rounded-lg border border-slate-300 bg-black">
+                      <div className="flex items-center rounded-lg border border-slate-300 bg-white">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="p-2 transition hover:bg-slate-900"
+                          className="p-2 transition hover:bg-slate-100"
                           aria-label="Diminuer la quantité"
                         >
-                          <Minus size={14} className="text-slate-400" />
+                          <Minus size={14} className="text-slate-500" />
                         </button>
-                        <span className="min-w-[2.5rem] px-3 text-center text-sm font-semibold text-clay-900">
+                        <span className="min-w-[2.5rem] px-3 text-center text-sm font-semibold text-slate-900">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-2 transition hover:bg-slate-900"
+                          className="p-2 transition hover:bg-slate-100"
                           aria-label="Augmenter la quantité"
                         >
-                          <Plus size={14} className="text-slate-400" />
+                          <Plus size={14} className="text-slate-500" />
                         </button>
                       </div>
 
                       {/* Prix total de la ligne */}
                       <div className="flex items-center gap-4">
-                        <p className="text-lg font-bold text-clay-900">
+                        <p className="text-lg font-bold text-slate-900">
                           <Price amount={item.product_price * item.quantity} />
                         </p>
                         <button
@@ -147,23 +142,23 @@ export default function PanierPage() {
 
             {/* Résumé de la commande */}
             <div className="lg:col-span-1">
-              <div className="sticky top-24 space-y-4 rounded-2xl border border-slate-700 bg-black p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-clay-900">Résumé de la commande</h2>
+              <div className="sticky top-24 space-y-4 p-0">
+                <h2 className="text-lg font-semibold text-slate-900">Résumé de la commande</h2>
 
-                <div className="space-y-2 border-t border-slate-700 pt-4">
+                <div className="space-y-2 border-t border-slate-200 pt-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Sous-total</span>
+                    <span className="text-slate-600">Sous-total</span>
                     <Price amount={totalPrice} />
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Livraison</span>
-                    <span className="text-slate-400">Calculée à l'étape suivante</span>
+                    <span className="text-slate-600">Livraison</span>
+                    <span className="text-slate-500">Calculée à l'étape suivante</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between border-t border-slate-700 pt-4 text-lg font-bold">
-                  <span className="text-clay-900">Total</span>
-                  <Price amount={totalPrice} className="text-clay-900" />
+                <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold">
+                  <span className="text-slate-900">Total</span>
+                  <Price amount={totalPrice} className="text-slate-900" />
                 </div>
 
                 <button className="w-full rounded-full bg-clay-900 px-6 py-3 font-semibold text-white hover:bg-clay-800">
@@ -172,7 +167,7 @@ export default function PanierPage() {
 
                 <Link
                   href="/produits"
-                  className="block text-center text-sm font-medium text-slate-400 hover:text-clay-900"
+                  className="block text-center text-sm font-medium text-slate-600 hover:text-clay-900"
                 >
                   ← Continuer mes achats
                 </Link>

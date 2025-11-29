@@ -1,12 +1,31 @@
 'use client';
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Truck } from "lucide-react";
 
 import type { Product } from "@/lib/schema";
 import { formatCurrency } from "@/lib/utils";
+
+const SELECTED_ACCESSORIES_KEY = "brasero:selected-accessories";
+
+const readSelectedAccessories = () => {
+  if (typeof window === "undefined") return new Set<string>();
+  try {
+    const raw = window.localStorage.getItem(SELECTED_ACCESSORIES_KEY);
+    if (!raw) return new Set<string>();
+    const parsed = JSON.parse(raw);
+    return new Set(Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === "string") : []);
+  } catch {
+    return new Set<string>();
+  }
+};
+
+const persistSelectedAccessories = (slugs: Set<string>) => {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(SELECTED_ACCESSORIES_KEY, JSON.stringify(Array.from(slugs)));
+};
 
 type AccessoryGridProps = {
   products: Product[];
@@ -22,6 +41,10 @@ export const AccessoryGrid = ({
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setSelectedItems(readSelectedAccessories());
+  }, []);
+
   const toggleSelect = (slug: string) => {
     setSelectedItems((prev) => {
       const next = new Set(prev);
@@ -30,6 +53,7 @@ export const AccessoryGrid = ({
       } else {
         next.add(slug);
       }
+      persistSelectedAccessories(next);
       return next;
     });
   };
@@ -99,16 +123,18 @@ export const AccessoryGrid = ({
                   <button
                     type="button"
                     onClick={() => toggleSelect(product.slug)}
-                    className={`absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded border transition ${
-                      isSelected ? "border-green-500 bg-green-500" : "border-gray-300 bg-white"
-                    }`}
+                    className="absolute right-3 top-1/2 flex h-4 w-4 -translate-y-1/2 items-center justify-center"
                     aria-label="Sélectionner l'accessoire"
                   >
-                    {isSelected && (
-                      <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
+                    <span
+                      className={`flex h-full w-full items-center justify-center border transition ${
+                        isSelected ? "border-[#0f172a]" : "border-gray-300 hover:border-[#0f172a]"
+                      }`}
+                    >
+                      {isSelected && (
+                        <span className="block h-2 w-2 bg-[#0f172a]" />
+                      )}
+                    </span>
                   </button>
                   <span className="absolute left-1/2 top-12 -translate-x-1/2 rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white">
                     Black Friday
