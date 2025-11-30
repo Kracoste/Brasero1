@@ -23,7 +23,7 @@ export default function HomePage() {
                 compact
               />
               <CategoryTile
-                title="Tables brasero"
+                title="Nos Accessoires"
                 cta="Voir tous"
                 image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
                 href="/produits?category=accessoire"

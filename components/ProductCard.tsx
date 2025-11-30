@@ -120,10 +120,10 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               <ShoppingBag className="product-card__btn-icon" />
               {adding ? "Ajouté au panier" : "Mettre dans le panier"}
             </button>
+            <Link href={`/produits/${product.slug}`} className="product-card__cta">
+              Voir les détails
+            </Link>
           </div>
-          <Link href={`/produits/${product.slug}`} className="product-card__cta">
-            Voir les détails
-          </Link>
         </div>
       </div>
     </article>
