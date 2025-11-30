@@ -243,7 +243,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error adding item:', error);
       addGuestItem(product, quantity);
-      throw error;
+      // Ne pas remonter l'erreur pour ne pas interrompre le flux d'ajout
+      return;
     }
   };
 

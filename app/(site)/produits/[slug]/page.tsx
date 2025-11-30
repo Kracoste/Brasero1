@@ -82,53 +82,55 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="text-base leading-relaxed text-slate-600">{product.description}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                    <Users className="h-5 w-5 text-red-600" />
+              {product.category !== "accessoire" && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                      <Users className="h-5 w-5 text-red-600" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-slate-800">Nombre de convives : </span>
+                      <span className="text-sm text-slate-600">{product.diameter <= 50 ? "4 à 6" : product.diameter <= 70 ? "6 à 8" : product.diameter <= 90 ? "10 à 12" : "12 à 16"} personnes</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-sm font-semibold text-slate-800">Nombre de convives : </span>
-                    <span className="text-sm text-slate-600">{product.diameter <= 50 ? "4 à 6" : product.diameter <= 70 ? "6 à 8" : product.diameter <= 90 ? "10 à 12" : "12 à 16"} personnes</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                      <Flame className="h-5 w-5 text-red-600" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-slate-800">Type de combustible : </span>
+                      <span className="text-sm text-slate-600">Bois</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                      <Box className="h-5 w-5 text-red-600" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-slate-800">Matière : </span>
+                      <span className="text-sm text-slate-600">{product.material}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                      <Ruler className="h-5 w-5 text-red-600" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-slate-800">Dimensions : </span>
+                      <span className="text-sm text-slate-600">{product.specs.dimensions}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                      <Weight className="h-5 w-5 text-red-600" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-slate-800">Poids : </span>
+                      <span className="text-sm text-slate-600">{product.weight} kg</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                    <Flame className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-slate-800">Type de combustible : </span>
-                    <span className="text-sm text-slate-600">Bois</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                    <Box className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-slate-800">Matière : </span>
-                    <span className="text-sm text-slate-600">{product.material}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                    <Ruler className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-slate-800">Dimensions : </span>
-                    <span className="text-sm text-slate-600">{product.specs.dimensions}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                    <Weight className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-slate-800">Poids : </span>
-                    <span className="text-sm text-slate-600">{product.weight} kg</span>
-                  </div>
-                </div>
-              </div>
+              )}
 
               <div className="space-y-4">
                 <Price amount={product.price} className="text-4xl font-bold" />

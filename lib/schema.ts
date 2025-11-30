@@ -58,6 +58,14 @@ export const productSchema = z.object({
       answer: z.string(),
     }),
   ),
+  customSpecs: z
+    .array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export type Product = z.infer<typeof productSchema>;

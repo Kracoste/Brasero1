@@ -19,6 +19,7 @@ export type FilterState = {
   sort?: "price-asc" | "price-desc" | "popular";
   priceMin?: number;
   priceMax?: number;
+  fendeurType?: "manuel" | "electrique";
 };
 
 type Predicate = (product: Product) => boolean;

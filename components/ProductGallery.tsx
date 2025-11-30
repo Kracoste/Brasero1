@@ -14,6 +14,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const activeImage = product.images[activeIndex];
+  const isWideAccessory = product.slug === "spatule-plancha-inox";
 
   return (
     <div className="flex flex-col items-center lg:items-end">
@@ -26,7 +27,10 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             sizes="(max-width: 1024px) 100vw, 45vw"
             placeholder="blur"
             blurDataURL={activeImage.blurDataURL}
-            className="object-contain scale-125 origin-center"
+            className={cn(
+              "object-contain origin-center transition-transform duration-300",
+              isWideAccessory ? "scale-100 p-6" : "scale-125"
+            )}
             priority
           />
         <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">

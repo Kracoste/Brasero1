@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { FadeIn } from "@/components/FadeIn";
 import { FilterPanel } from "@/components/FilterPanel";
@@ -11,13 +11,15 @@ import { applyFilters, type FilterState } from "@/lib/utils";
 type CatalogueViewProps = {
   products: Product[];
   showCategoryFilters?: boolean;
+  category?: string;
 };
 
-export const CatalogueView = ({ products, showCategoryFilters = true }: CatalogueViewProps) => {
+export const CatalogueView = ({ products, showCategoryFilters = true, category }: CatalogueViewProps) => {
   const [filters, setFilters] = useState<FilterState>({ sort: "popular" });
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const filteredProducts = applyFilters(products, filters);
-  const priceValues = products.map((product) => product.price);
+  const filteredProducts = useMemo(() => applyFilters(products, filters), [products, filters]);
+
+  const priceValues = useMemo(() => products.map((product) => product.price), [products]);
   const minPrice = priceValues.length ? Math.min(...priceValues) : 0;
   const maxPrice = priceValues.length ? Math.max(...priceValues) : 0;
   const dimensions = [60, 75, 90, 105];
@@ -35,6 +37,7 @@ export const CatalogueView = ({ products, showCategoryFilters = true }: Catalogu
             inline={false}
             onToggle={setFiltersOpen}
             showCategoryFilters={showCategoryFilters}
+            variant={category === "fendeur" ? "fendeur" : "default"}
           />
         </div>
 
@@ -64,9 +67,9 @@ export const CatalogueView = ({ products, showCategoryFilters = true }: Catalogu
             }
             
             return (
-              <FadeIn key={product.slug}>
-                <ProductCard product={productWithDimension} className="catalog-card" />
-              </FadeIn>
+              <div key={product.slug} className="h-full">
+                <ProductCard product={productWithDimension} className="catalog-card h-full" />
+              </div>
             );
           })}
           </div>

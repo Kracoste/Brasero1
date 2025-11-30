@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -30,6 +30,8 @@ export const Header = () => {
   const { favoriteCount } = useFavorites();
   const [open, setOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [accessoriesOpen, setAccessoriesOpen] = useState(false);
+  const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
 
   const toggle = () => setOpen((prev) => !prev);
   const toggleCategories = () => setCategoriesOpen((prev) => !prev);
@@ -58,14 +60,70 @@ export const Header = () => {
           <div className="flex-1 flex justify-center">
             <div className="hidden items-center gap-6 md:flex">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href;
+                if (link.label === "Accessoires") {
+                  const isActive =
+                    pathname === link.href ||
+                    pathname.includes("category=accessoire") ||
+                    pathname.includes("category=fendeur");
+                  return (
+                    <div
+                      key={link.href}
+                      className="relative mx-6"
+                      onMouseEnter={() => {
+                        if (accessoriesTimer.current) clearTimeout(accessoriesTimer.current);
+                        setAccessoriesOpen(true);
+                      }}
+                      onMouseLeave={() => {
+                        if (accessoriesTimer.current) clearTimeout(accessoriesTimer.current);
+                        accessoriesTimer.current = setTimeout(() => setAccessoriesOpen(false), 250);
+                      }}
+                    >
+                      <Link
+                        href={link.href}
+                        className={cn(
+                          "nav-link-hover text-[0.85rem] font-semibold uppercase tracking-[0.25em] transition relative pb-1",
+                          isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                      <div
+                        className={cn(
+                          "absolute left-0 top-full z-20 mt-2 w-56 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity",
+                          accessoriesOpen ? "flex opacity-100" : "hidden opacity-0",
+                        )}
+                      >
+                        <Link
+                          href="/produits?category=accessoire&section=range-buches"
+                          className="px-4 pt-4 text-[0.9rem] font-semibold text-[#8b2d2d] hover:bg-slate-50"
+                        >
+                          Range-bûches
+                        </Link>
+                        <Link
+                          href="/produits?category=fendeur"
+                          className="px-4 py-3 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          Fendeur à bûches
+                        </Link>
+                        <Link
+                          href="/produits?category=accessoire"
+                          className="px-4 pb-4 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          Tous nos accessoires
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                }
+
+                const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      'nav-link-hover text-[0.85rem] font-semibold uppercase tracking-[0.25em] transition relative pb-1 mx-6',
-                      isActive ? 'text-slate-900' : 'text-slate-700 hover:text-slate-900',
+                      "nav-link-hover text-[0.85rem] font-semibold uppercase tracking-[0.25em] transition relative pb-1 mx-6",
+                      isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                     )}
                   >
                     {link.label}

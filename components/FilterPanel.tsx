@@ -12,6 +12,7 @@ interface FilterPanelProps {
   inline?: boolean;
   onToggle?: (isOpen: boolean) => void;
   showCategoryFilters?: boolean;
+  variant?: "default" | "fendeur";
 }
 
 export const FilterPanel = ({
@@ -22,6 +23,7 @@ export const FilterPanel = ({
   inline = true,
   onToggle,
   showCategoryFilters = true,
+  variant = "default",
 }: FilterPanelProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -47,24 +49,31 @@ export const FilterPanel = ({
   };
 
   const content = (
-    <FiltersContent
-      showFullLayout={inline}
-      priceMin={priceMin}
-      priceMax={priceMax}
-      minPrice={minPrice}
-      maxPrice={maxPrice}
-      rangeMinPercent={rangeMinPercent}
-      rangeMaxPercent={rangeMaxPercent}
-      showCategories={showCategoryFilters}
-      onMinChange={(next) => {
-        setPriceMin(next);
-        commitPrice(next, priceMax);
-      }}
-      onMaxChange={(next) => {
-        setPriceMax(next);
-        commitPrice(priceMin, next);
-      }}
-    />
+    variant === "fendeur" ? (
+      <FendeurTypeSection
+        value={value.fendeurType}
+        onChange={(fendeurType) => onChange({ ...value, fendeurType })}
+      />
+    ) : (
+      <FiltersContent
+        showFullLayout={inline}
+        priceMin={priceMin}
+        priceMax={priceMax}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        rangeMinPercent={rangeMinPercent}
+        rangeMaxPercent={rangeMaxPercent}
+        showCategories={showCategoryFilters}
+        onMinChange={(next) => {
+          setPriceMin(next);
+          commitPrice(next, priceMax);
+        }}
+        onMaxChange={(next) => {
+          setPriceMax(next);
+          commitPrice(priceMin, next);
+        }}
+      />
+    )
   );
 
   if (inline) {
@@ -141,6 +150,40 @@ const CategorySection = () => (
             <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
           </div>
           <span>{label}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+);
+
+const FendeurTypeSection = ({
+  value,
+  onChange,
+}: {
+  value?: "manuel" | "electrique";
+  onChange: (val?: "manuel" | "electrique") => void;
+}) => (
+  <div>
+    <h3 className="text-base font-bold text-slate-900 mb-4">Fendeurs à bûches</h3>
+    <div className="space-y-3">
+      {[
+        { label: "Fendeur à bûches manuelle", value: "manuel" as const },
+        { label: "Fendeur à bûches électriques", value: "electrique" as const },
+      ].map((item) => (
+        <label
+          key={item.value}
+          className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+        >
+          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+            <input
+              type="checkbox"
+              checked={value === item.value}
+              onChange={(e) => onChange(e.target.checked ? item.value : undefined)}
+              className="peer sr-only"
+            />
+            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+          </div>
+          <span>{item.label}</span>
         </label>
       ))}
     </div>

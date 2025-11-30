@@ -142,7 +142,7 @@ export const AccessoryGrid = ({
                 </div>
 
                 <Link href={`/produits/${product.slug}`} className="block">
-                  <div className="relative flex h-52 items-center justify-center bg-white">
+                  <div className="relative flex h-52 items-center justify-center overflow-hidden rounded-md bg-white">
                     {image ? (
                       <Image
                         src={image.src}

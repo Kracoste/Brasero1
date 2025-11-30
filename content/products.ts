@@ -932,10 +932,10 @@ const rawProducts: Product[] = [
     ],
     images: [
       {
-        src: "/fendeur.png",
-        alt: "Fendeur à bûches sur billot",
-        width: 900,
-        height: 1600,
+        src: "/acceuil/Fendeur-Buches.png",
+        alt: "Fendeur à bûches",
+        width: 1200,
+        height: 900,
         blurDataURL: blurPlaceholder,
       },
       {
@@ -1344,9 +1344,18 @@ const rawProducts: Product[] = [
     specs: { acier: "Inox", epaisseur: "N/A", dimensions: "L 40 cm", poids: "0.4 kg" },
     highlights: ["Lame large", "Inox pro", "Manche bois"],
     features: [{ icon: "ChefHat", title: "Cuisine", description: "Comme un chef sur plancha." }],
-    images: [{ src: "/accessories/spatule-plancha.jpg", alt: "Spatule plancha", width: 1200, height: 900, blurDataURL: blurPlaceholder }],
+    images: [{ src: "/accessories/spatule-plancha.png", alt: "Spatule plancha", width: 1200, height: 900, blurDataURL: blurPlaceholder }],
     location: moncoutant,
     faq: [{ question: "Lame flexible ?", answer: "Semi-rigide, idéale pour plancha." }],
+    customSpecs: [
+      { label: "Marque", value: "France Braseros" },
+      { label: "Fabrication", value: "France" },
+      { label: "Matière", value: "Inox / Bois" },
+      { label: "Longueur", value: "40 cm" },
+      { label: "Largeur lame", value: "15 cm" },
+      { label: "Poids", value: "0.4 kg" },
+      { label: "Usage", value: "Retourner et servir sur plancha" },
+    ],
   },
   {
     slug: "kit-ustensiles-bbq",

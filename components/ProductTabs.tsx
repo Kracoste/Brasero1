@@ -91,19 +91,20 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
                 <h3 className="text-base font-semibold text-gray-900">Spécifications</h3>
               </div>
               <dl className="text-sm text-gray-700">
-                {[
-                  { label: "Marque", value: "France Braseros" },
-                  { label: "Fabrication", value: product.madeIn },
-                  { label: "Matière", value: product.material },
-                  { label: "Diamètre", value: `${product.diameter} cm` },
-                  { label: "Hauteur", value: `${product.height} cm` },
-                  { label: "Épaisseur", value: `${product.thickness} mm` },
-                  { label: "Poids", value: `${product.weight} kg` },
-                  { label: "Acier", value: product.specs.acier },
-                  { label: "Épaisseur bol", value: product.specs.epaisseur },
-                  { label: "Dimensions", value: product.specs.dimensions },
-                  product.specs.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
-                ]
+                {(product.customSpecs ??
+                  [
+                    { label: "Marque", value: "France Braseros" },
+                    { label: "Fabrication", value: product.madeIn },
+                    { label: "Matière", value: product.material },
+                    { label: "Diamètre", value: `${product.diameter} cm` },
+                    { label: "Hauteur", value: `${product.height} cm` },
+                    { label: "Épaisseur", value: `${product.thickness} mm` },
+                    { label: "Poids", value: `${product.weight} kg` },
+                    { label: "Acier", value: product.specs.acier },
+                    { label: "Épaisseur bol", value: product.specs.epaisseur },
+                    { label: "Dimensions", value: product.specs.dimensions },
+                    product.specs.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
+                  ])!
                   .filter(Boolean)
                   .map((item, idx) => (
                     <div
