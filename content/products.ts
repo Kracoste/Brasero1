@@ -1964,12 +1964,12 @@ const rawProducts: Product[] = [
     return {
       slug: `brasero-visuel-${index + 1}`,
       name: `Braséro Atelier LBF Ø${diameter}`,
-      category: "brasero",
+      category: "brasero" as const,
       price: 590 + index * 30,
       shortDescription: "Braséro visuel présenté avec notre image Brasero.png.",
       description:
         "Braséro acier corten livré prêt à l'emploi. Idéal pour illustrer la collection avec l'image Brasero.png tout en conservant nos spécifications artisanales.",
-      madeIn: "France",
+      madeIn: "France" as const,
       material: "Acier corten HLE",
       diameter,
       thickness: 4,

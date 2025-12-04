@@ -20,11 +20,11 @@ const tabs = [
 
 export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => {
   const [activeTab, setActiveTab] = useState("description");
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const warrantyRef = useRef<HTMLDivElement>(null);
-  const reviewsRef = useRef<HTMLDivElement>(null);
+  const descriptionRef = useRef<HTMLDivElement | null>(null);
+  const warrantyRef = useRef<HTMLDivElement | null>(null);
+  const reviewsRef = useRef<HTMLDivElement | null>(null);
 
-  const tabToRef: Record<string, React.RefObject<HTMLDivElement>> = {
+  const tabToRef: Record<string, React.RefObject<HTMLDivElement | null>> = {
     description: descriptionRef,
     specifications: descriptionRef,
     garantie: warrantyRef,

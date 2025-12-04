@@ -112,6 +112,9 @@ interface FiltersContentProps {
   showCategories: boolean;
   diameter?: string;
   onDiameterChange: (val?: string) => void;
+  showPromo?: boolean;
+  promoValue?: boolean;
+  onPromoChange?: (val: boolean) => void;
   onMinChange: (value: number) => void;
   onMaxChange: (value: number) => void;
 }
@@ -127,6 +130,9 @@ const FiltersContent = ({
   showCategories,
   diameter,
   onDiameterChange,
+  showPromo,
+  promoValue,
+  onPromoChange,
   onMinChange,
   onMaxChange,
 }: FiltersContentProps) => (
@@ -134,6 +140,23 @@ const FiltersContent = ({
     {showCategories && <CategorySection />}
     <FormatSection />
     <DimensionSection diameter={diameter} onChange={onDiameterChange} />
+    {showPromo && (
+      <div className="border-t border-slate-200 pt-6">
+        <h3 className="text-base font-bold text-slate-900 mb-4">Promotions</h3>
+        <label className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900">
+          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+            <input
+              type="checkbox"
+              checked={promoValue}
+              onChange={(e) => onPromoChange?.(e.target.checked)}
+              className="peer sr-only"
+            />
+            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+          </div>
+          <span>Afficher uniquement les promotions</span>
+        </label>
+      </div>
+    )}
     <PriceSection
       priceMin={priceMin}
       priceMax={priceMax}

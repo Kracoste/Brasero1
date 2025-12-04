@@ -13,6 +13,7 @@ import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductTabs } from "@/components/ProductTabs";
 import { createClient } from "@/lib/supabase/server";
 import { resolveDiameter } from "@/lib/utils";
+import type { Product } from "@/lib/schema";
 import { Users, Flame, Box, Ruler, Weight } from "lucide-react";
 
 // Désactiver le cache pour toujours afficher les dernières données
@@ -35,6 +36,54 @@ const normalizeSpecs = (specs: any) => {
   return specs;
 };
 
+const mapDbProductToProduct = (p: any): Product | null => {
+  if (!p) return null;
+  const specs = normalizeSpecs(p.specs);
+  const diameter =
+    resolveDiameter({
+      ...p,
+      specs,
+    }) ?? 0;
+
+  return {
+    slug: p.slug ?? "",
+    name: p.name ?? "Produit",
+    shortDescription: p.shortDescription || p.short_description || "",
+    description: p.description || "",
+    category: (p.category as Product["category"]) || "accessoire",
+    price: Number(p.price ?? 0),
+    comparePrice: p.comparePrice || p.compare_price,
+    discountPercent: p.discountPercent || p.discount_percent,
+    badge: p.badge || "Nouveau",
+    images: (p.images || []).map((img: any) => ({
+      src: img.src,
+      alt: img.alt || p.name || "Image produit",
+      width: img.width || 800,
+      height: img.height || 600,
+      blurDataURL: img.blurDataURL || "",
+    })),
+    material: p.material || "Acier",
+    madeIn: "France",
+    diameter,
+    thickness: p.thickness || 0,
+    height: p.height || 0,
+    weight: p.weight || 0,
+    warranty: p.warranty || "Garantie atelier",
+    availability: p.availability || "En stock",
+    shipping: p.shipping || "",
+    popularScore: p.popularScore || p.popular_score || 50,
+    specs:
+      (specs && Object.keys(specs).length > 0
+        ? specs
+        : { dimensions: diameter ? `Ø ${diameter} cm` : "-" }) ?? {},
+    highlights: p.highlights || [],
+    features: p.features || [],
+    faq: p.faq || [],
+    customSpecs: p.customSpecs || p.custom_specs || [],
+    location: p.location || { city: "", dept: "", lat: 0, lng: 0 },
+  };
+};
+
 // Fonction pour récupérer un produit depuis Supabase uniquement
 async function getProduct(slug: string) {
   const supabase = await createClient();
@@ -44,53 +93,7 @@ async function getProduct(slug: string) {
     .eq('slug', slug)
     .single();
 
-  if (!p) return null;
-
-  const specs = normalizeSpecs(p.specs);
-  const diameter =
-    resolveDiameter({
-      ...p,
-      specs,
-    }) ?? 0;
-
-  // Transformer le produit Supabase au format attendu (supporte camelCase et snake_case)
-  return {
-    slug: p.slug,
-    name: p.name,
-    shortDescription: p.shortDescription || p.short_description || '',
-    description: p.description || '',
-    category: p.category,
-    price: p.price,
-    comparePrice: p.comparePrice || p.compare_price,
-    discountPercent: p.discountPercent || p.discount_percent,
-    badge: p.badge || 'Nouveau',
-    images: (p.images || []).map((img: any) => ({
-      src: img.src,
-      alt: img.alt || p.name,
-      width: img.width || 800,
-      height: img.height || 600,
-    })),
-    material: p.material || 'Acier',
-    madeIn: p.madeIn || p.made_in || 'France',
-    diameter,
-    thickness: p.thickness || 0,
-    height: p.height || 0,
-    weight: p.weight || 0,
-    warranty: p.warranty || '',
-    availability: p.availability || 'En stock',
-    shipping: p.shipping || '',
-    popularScore: p.popularScore || p.popular_score || 50,
-    inStock: p.inStock ?? p.in_stock ?? true,
-    specs:
-      (specs && Object.keys(specs).length > 0
-        ? specs
-        : { dimensions: diameter ? `Ø ${diameter} cm` : '-' }) ?? {},
-    highlights: p.highlights || [],
-    features: p.features || [],
-    faq: p.faq || [],
-    customSpecs: p.customSpecs || p.custom_specs || [],
-    location: p.location,
-  };
+  return mapDbProductToProduct(p);
 }
 
 // Récupérer tous les accessoires depuis Supabase
@@ -102,17 +105,9 @@ async function getAccessories() {
     .eq('category', 'accessoire')
     .order('popularScore', { ascending: false });
 
-  return (data || []).map((p: any) => ({
-    slug: p.slug,
-    name: p.name,
-    shortDescription: p.shortDescription || p.short_description || '',
-    category: p.category,
-    price: p.price,
-    comparePrice: p.comparePrice || p.compare_price,
-    discountPercent: p.discountPercent || p.discount_percent,
-    images: p.images || [],
-    popularScore: p.popularScore || p.popular_score || 50,
-  }));
+  return (data || [])
+    .map((p: any) => mapDbProductToProduct(p))
+    .filter((p): p is Product => Boolean(p));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
