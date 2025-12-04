@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { FloatingCart } from "@/components/FloatingCart";
+import { VisitTracker } from "@/components/VisitTracker";
 import { CartProvider } from "@/lib/cart-context";
 import { FavoritesProvider } from "@/lib/favorites-context";
 
@@ -19,6 +20,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
           <main className="flex-1">{children}</main>
           <Footer />
           <FloatingCart />
+          <VisitTracker />
         </div>
       </FavoritesProvider>
     </CartProvider>
