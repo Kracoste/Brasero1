@@ -1912,6 +1912,102 @@ const rawProducts: Product[] = [
     location: moncoutant,
     faq: [{ question: "Nettoyage ?", answer: "Éponge humide, pas de machine. Le cuir se nourrit avec un lait incolore." }],
   },
+  {
+    slug: "brasero-hexa-atelier",
+    name: "Braséro Atelier Hexa",
+    category: "brasero",
+    price: 690,
+    shortDescription: "Braséro hexagonal en acier corten avec large surface de chauffe.",
+    description:
+      "Un braséro hexagonal conçu dans notre atelier, en acier corten HLE de 4 mm, pour diffuser la chaleur de façon homogène et offrir une grande surface de cuisson plancha. Livré prêt à l'emploi avec pied stable et drainage discret.",
+    madeIn: "France",
+    material: "Acier corten HLE",
+    diameter: 75,
+    thickness: 4,
+    height: 40,
+    weight: 36,
+    warranty: "Garantie 3 ans structure",
+    availability: "Disponible immédiatement",
+    shipping: "Livraison Express sous 72h",
+    popularScore: 72,
+    badge: "Hexagonal",
+    specs: {
+      acier: "Corten HLE 4 mm",
+      epaisseur: "Bol 5 mm",
+      dimensions: "Ø 75 cm x H 40 cm",
+      poids: "36 kg",
+      compatibilite: "Anneau plancha 68 cm",
+    },
+    highlights: ["Format hexagonal", "Patine naturelle", "Drainage discret"],
+    features: [
+      { icon: "Compass", title: "Design hexagonal", description: "Diffusion de chaleur homogène sur 6 faces." },
+      { icon: "Droplet", title: "Drainage central", description: "Évacuation cachée pour éviter l'eau stagnante." },
+    ],
+    images: [
+      {
+        src: "/Produits/Brasero-Hexa1.png",
+        alt: "Braséro hexagonal en acier corten",
+        width: 1200,
+        height: 900,
+        blurDataURL: blurPlaceholder,
+      },
+    ],
+    location: moncoutant,
+    faq: [
+      { question: "Livré monté ?", answer: "Oui, prêt à l'emploi dès réception." },
+      { question: "Compatible plancha ?", answer: "Oui, avec l'anneau plancha 68 cm." },
+    ],
+  },
+  // Braséros visuels supplémentaires
+  ...["60", "75", "80", "90", "100"].map((diameterStr, index) => {
+    const diameter = Number(diameterStr);
+    return {
+      slug: `brasero-visuel-${index + 1}`,
+      name: `Braséro Atelier LBF Ø${diameter}`,
+      category: "brasero",
+      price: 590 + index * 30,
+      shortDescription: "Braséro visuel présenté avec notre image Brasero.png.",
+      description:
+        "Braséro acier corten livré prêt à l'emploi. Idéal pour illustrer la collection avec l'image Brasero.png tout en conservant nos spécifications artisanales.",
+      madeIn: "France",
+      material: "Acier corten HLE",
+      diameter,
+      thickness: 4,
+      height: 40,
+      weight: 30 + index * 2,
+      warranty: "Garantie 3 ans structure",
+      availability: "Disponible immédiatement",
+      shipping: "Livraison Express sous 72h",
+      popularScore: 60 + index,
+      badge: "Visuel",
+      specs: {
+        acier: "Corten HLE 4 mm",
+        epaisseur: "Bol 5 mm",
+        dimensions: `Ø ${diameter} cm x H 40 cm`,
+        poids: `${30 + index * 2} kg`,
+        compatibilite: "Anneau plancha 58 cm",
+      },
+      highlights: ["Image Brasero.png", "Patine naturelle", "Fabrication atelier"],
+      features: [
+        { icon: "Flame", title: "Chaleur homogène", description: "Rebord incliné pour diffuser la chaleur." },
+        { icon: "ShieldCheck", title: "Acier certifié", description: "Plaques corten européennes contrôlées." },
+      ],
+      images: [
+        {
+          src: "/Brasero.png",
+          alt: "Braséro Atelier visuel",
+          width: 1200,
+          height: 900,
+          blurDataURL: blurPlaceholder,
+        },
+      ],
+      location: moncoutant,
+      faq: [
+        { question: "Prêt à l'emploi ?", answer: "Oui, livré soudé et prêt à être utilisé." },
+        { question: "Compatibilité accessoires ?", answer: "Compatible plancha 58 cm et grille inox." },
+      ],
+    };
+  }),
   ...promoProducts,
 ];
 

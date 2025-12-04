@@ -93,7 +93,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             className="product-card__image-el"
           />
           {isPromo && (
-            <span className="product-card__promo-flag">-{product.discountPercent}%</span>
+            <span className="product-card__promo-ribbon">-{product.discountPercent}%</span>
           )}
         </div>
         <div className="product-card__content">

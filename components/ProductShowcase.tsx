@@ -154,8 +154,8 @@ const ShowcaseActions = ({ product }: { product: Product }) => {
       <button
         type="button"
         onClick={handleToggleFavorite}
-        className={`product-showcase__btn product-showcase__btn--ghost${
-          isFavorite(product.slug) ? " product-showcase__btn--ghost-active" : ""
+        className={`product-showcase__btn product-showcase__btn--ghost favorites-lime ${
+          isFavorite(product.slug) ? " favorites-lime--active" : ""
         }`}
       >
         <Heart

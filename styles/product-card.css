@@ -71,19 +71,20 @@
   transform: translateY(-4px) scale(1.04);
 }
 
-.product-card__promo-flag {
+.product-card__promo-ribbon {
   position: absolute;
-  left: 50%;
-  bottom: 14px;
-  transform: translateX(-50%);
-  padding: 5px 16px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #1f2933, #111827);
-  color: #fff;
-  font-size: 0.78rem;
-  letter-spacing: 0.15em;
+  top: 10px;
+  left: -30px;
+  padding: 6px 28px;
+  background: linear-gradient(120deg, #0f172a, #1e293b);
+  color: #f8fafc;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
+  transform: rotate(-45deg);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.25);
+  pointer-events: none;
 }
 
 .product-card__content {

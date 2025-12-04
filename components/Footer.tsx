@@ -1,48 +1,85 @@
 import Link from "next/link";
 
 import { Container } from "@/components/Container";
-import { navLinks } from "@/components/navigation";
-import { siteConfig } from "@/lib/site";
 
-const legalLinks = [
-  { href: "/mentions-legales", label: "Mentions légales" },
-  { href: "/cgv", label: "CGV" },
+const serviceLinks = [
+  { href: "/info/service-clientele", label: "Service à la clientèle" },
+  { href: "/info/commander", label: "Commander" },
+  { href: "/info/paiement", label: "Paiement" },
+  { href: "/info/expedition", label: "Expédition" },
+  { href: "/info/retourner", label: "Retourner" },
+  { href: "/info/confidentialite-politique", label: "Confidentialité & Politique" },
+  { href: "/info/contact", label: "Contact" },
+  { href: "/info/faq", label: "Questions fréquemment posées" },
+];
+
+const proLinks = [
+  { href: "/info/commande-affaires", label: "Commande d'affaires" },
+  { href: "/info/produits-sur-mesure", label: "Produits sur mesure" },
+];
+
+const aboutLinks = [
+  { href: "/info/a-propos-de-nous", label: "À propos de nous" },
+  { href: "/info/donnees-entreprise-contact", label: "Données sur l'entreprise et contact" },
+  { href: "/info/bulletin-information", label: "Bulletin d'information" },
+  { href: "/info/astuces-conseils", label: "Astuces et conseils" },
+  { href: "/info/blog", label: "Blog" },
+];
+
+const categoryLinks = [
+  { href: "/info/braseros-exterieurs", label: "Braseros extérieurs" },
+  { href: "/info/accessoires", label: "Accessoires" },
 ];
 
 export const Footer = () => (
-  <footer className="border-t border-gray-200 bg-white text-gray-700">
-    <Container className="flex flex-col gap-8 py-12 md:flex-row md:items-start md:justify-between">
-      <div>
-        <p className="font-display text-xl font-semibold text-[#111827]">Brasero Atelier</p>
-        <p className="mt-3 max-w-sm text-sm text-gray-600">{siteConfig.description}</p>
-        <div className="mt-4 text-sm text-gray-600">
-          {siteConfig.address}
-          <br />
-          {siteConfig.email}
-          <br />
-          {siteConfig.phone}
-        </div>
-      </div>
-
-      <div className="flex flex-1 justify-between gap-8 text-sm text-gray-600 md:justify-end">
+  <footer className="border-t border-gray-200 bg-white text-gray-800">
+    <Container className="py-12">
+      <div className="grid gap-10 md:grid-cols-4">
         <div>
-          <p className="font-semibold text-[#111827]">Navigation</p>
-          <ul className="mt-3 space-y-2">
-            {navLinks.map((link) => (
+          <p className="font-semibold text-lg text-gray-900">Service à la clientèle</p>
+          <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            {serviceLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="transition hover:text-[#111827]">
+                <Link href={link.href} className="transition hover:text-gray-900">
                   {link.label}
                 </Link>
               </li>
             ))}
           </ul>
         </div>
+
         <div>
-          <p className="font-semibold text-[#111827]">Légal</p>
-          <ul className="mt-3 space-y-2">
-            {legalLinks.map((link) => (
+          <p className="font-semibold text-lg text-gray-900">Catégories</p>
+          <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            {categoryLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="transition hover:text-[#111827]">
+                <Link href={link.href} className="transition hover:text-gray-900">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="font-semibold text-lg text-gray-900">Entreprises</p>
+          <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            {proLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="transition hover:text-gray-900">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="font-semibold text-lg text-gray-900">À propos de Brasero Atelier</p>
+          <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            {aboutLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="transition hover:text-gray-900">
                   {link.label}
                 </Link>
               </li>

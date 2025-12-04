@@ -168,6 +168,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase
         .from('favorites')
         .delete()
+        .eq('user_id', user.id)
         .eq('product_slug', productSlug);
 
       if (error) throw error;

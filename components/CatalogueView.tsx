@@ -51,27 +51,11 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category }
               ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
               : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
           }`} style={{ maxWidth: filtersOpen ? 'none' : '100%' }}>
-          {filteredProducts.map((product, index) => {
-            let productWithDimension = product;
-            
-            if (index < 4) {
-              productWithDimension = {
-                ...product,
-                name: `Braséro Atelier LBF en Acier Ø${dimensions[index]}`
-              };
-            } else if (index >= 4 && index < 8) {
-              productWithDimension = {
-                ...product,
-                name: `Braséro Atelier LBF en Acier Corten Ø${dimensions[index - 4]}`
-              };
-            }
-            
-            return (
-              <div key={product.slug} className="h-full">
-                <ProductCard product={productWithDimension} className="catalog-card h-full" />
-              </div>
-            );
-          })}
+          {filteredProducts.map((product) => (
+            <div key={product.slug} className="h-full">
+              <ProductCard product={product} className="catalog-card h-full" />
+            </div>
+          ))}
           </div>
         </div>
       </div>

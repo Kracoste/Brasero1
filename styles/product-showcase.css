@@ -186,6 +186,19 @@
   background: rgba(255, 116, 90, 0.1);
 }
 
+.favorites-lime {
+  border-color: transparent;
+  background: linear-gradient(120deg, #f4e1c1, #c18f52, #7a4b1f);
+  color: #fff8ef;
+  font-weight: 700;
+  box-shadow: 0 10px 25px rgba(193, 143, 82, 0.25);
+}
+
+.favorites-lime--active {
+  opacity: 0.95;
+  box-shadow: 0 10px 25px rgba(193, 143, 82, 0.35);
+}
+
 .product-showcase__btn--solid {
   background: linear-gradient(90deg, #d0ff52, #1f7a1a);
   border: none;

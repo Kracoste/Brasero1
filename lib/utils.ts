@@ -35,7 +35,9 @@ export const productFilterOptions = {
   diameter: [
     { label: "Tous les diamètres", value: "all" },
     { label: "Ø 60 cm", value: "60" },
+    { label: "Ø 75 cm", value: "75" },
     { label: "Ø 80 cm", value: "80" },
+    { label: "Ø 90 cm", value: "90" },
     { label: "Ø 100 cm", value: "100" },
   ],
   material: [
@@ -90,8 +92,13 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
       return [...filtered].sort((a, b) => a.price - b.price);
     case "price-desc":
       return [...filtered].sort((a, b) => b.price - a.price);
-    default:
+    default: {
+      // Si un diamètre est sélectionné, on trie par diamètre pour refléter ce filtre
+      if (filters.diameter && filters.diameter !== "all") {
+        return [...filtered].sort((a, b) => a.diameter - b.diameter);
+      }
       return [...filtered].sort((a, b) => b.popularScore - a.popularScore);
+    }
   }
 };
 

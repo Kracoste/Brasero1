@@ -45,9 +45,9 @@ export function AddToFavoritesButton({ product, className = "", size = "default"
       disabled={loading}
       className={`flex items-center justify-center gap-2 rounded-full border ${padding} font-semibold transition ${
         isInFavorites
-          ? "border-transparent bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] text-white hover:brightness-110"
-          : "border-transparent bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] text-white hover:brightness-110"
-      } disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+          ? "border-transparent bg-gradient-to-r from-[#f4e1c1] via-[#c18f52] to-[#7a4b1f] text-white hover:brightness-110"
+          : "border-transparent bg-gradient-to-r from-[#f4e1c1] via-[#c18f52] to-[#7a4b1f] text-white hover:brightness-110"
+      } shadow-lg shadow-amber-700/20 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       <div className="relative">
         <Heart

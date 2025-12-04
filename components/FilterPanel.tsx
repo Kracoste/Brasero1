@@ -66,6 +66,8 @@ export const FilterPanel = ({
         rangeMinPercent={rangeMinPercent}
         rangeMaxPercent={rangeMaxPercent}
         showCategories={showCategoryFilters}
+        diameter={value.diameter}
+        onDiameterChange={(diameter) => onChange({ ...value, diameter })}
         showPromo={showPromoFilters}
         promoValue={value.promo ?? false}
         onPromoChange={(promo) => onChange({ ...value, promo })}
@@ -108,6 +110,8 @@ interface FiltersContentProps {
   rangeMinPercent: number;
   rangeMaxPercent: number;
   showCategories: boolean;
+  diameter?: string;
+  onDiameterChange: (val?: string) => void;
   onMinChange: (value: number) => void;
   onMaxChange: (value: number) => void;
 }
@@ -121,13 +125,15 @@ const FiltersContent = ({
   rangeMinPercent,
   rangeMaxPercent,
   showCategories,
+  diameter,
+  onDiameterChange,
   onMinChange,
   onMaxChange,
 }: FiltersContentProps) => (
   <div className="space-y-6">
     {showCategories && <CategorySection />}
     <FormatSection />
-    <DimensionSection />
+    <DimensionSection diameter={diameter} onChange={onDiameterChange} />
     <PriceSection
       priceMin={priceMin}
       priceMax={priceMax}
@@ -225,17 +231,45 @@ const DeliverySection = () => (
   </div>
 );
 
-const DimensionSection = () => (
+const DimensionSection = ({
+  diameter,
+  onChange,
+}: {
+  diameter?: string;
+  onChange: (val?: string) => void;
+}) => (
   <div className="border-t border-slate-200 pt-6">
     <h3 className="text-base font-bold text-slate-900 mb-4">Dimensions Braséro</h3>
     <div className="space-y-3">
+      <label className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900">
+        <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+          <input
+            type="radio"
+            name="diameter-filter"
+            checked={!diameter}
+            onChange={(e) => e.target.checked && onChange(undefined)}
+            className="peer sr-only"
+          />
+          <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+        </div>
+        <span>Tous les diamètres</span>
+      </label>
+
       {[45, 50, 55, 60, 65, 70, 75, 80, 90, 100].map((size) => (
         <label
           key={size}
           className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
         >
           <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
-            <input type="checkbox" className="peer sr-only" />
+            <input
+              type="radio"
+              name="diameter-filter"
+              checked={diameter === String(size)}
+              onChange={() =>
+                onChange(diameter === String(size) ? undefined : String(size))
+              }
+              className="peer sr-only"
+            />
             <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
           </div>
           <span>Ø {size}cm</span>
