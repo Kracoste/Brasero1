@@ -3,14 +3,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useRef, useState } from 'react';
-import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
+import { Heart, Menu, ShoppingBag, User, X, LogOut } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { navLinks } from '@/components/navigation';
-import { UserNav } from '@/components/UserNav';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from "@/lib/favorites-context";
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 const categoryMenu = [
   {
@@ -27,12 +28,65 @@ const categoryMenu = [
 
 export const Header = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { itemCount } = useCart();
   const { favoriteCount } = useFavorites();
   const [open, setOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [accessoriesOpen, setAccessoriesOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
+  const accountTimer = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      
+      // Vérifier si l'utilisateur est admin
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        setIsAdmin(profile?.role === 'admin');
+      }
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setUser(session?.user ?? null);
+      if (!session?.user) {
+        setIsAdmin(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    if (loggingOut) return; // Éviter les doubles clics
+    setLoggingOut(true);
+    setAccountMenuOpen(false);
+    
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      setUser(null);
+      setIsAdmin(false);
+      // Forcer un rechargement complet
+      window.location.replace('/');
+    } catch (error) {
+      console.error('Erreur déconnexion:', error);
+      setLoggingOut(false);
+    }
+  };
 
   const toggle = () => setOpen((prev) => !prev);
   const toggleCategories = () => setCategoriesOpen((prev) => !prev);
@@ -146,33 +200,109 @@ export const Header = () => {
           </div>
           
           {/* Icônes à droite */}
-          <div className="flex items-center gap-2">
-            <Link href="/favoris" className="hidden md:flex items-center gap-1 text-xs text-slate-600 hover:text-slate-900 transition">
+          <div className="flex items-center gap-6 mr-24">
+            {/* Favoris */}
+            <Link href="/favoris" className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition">
               <span className="relative">
-                <Heart size={18} />
+                <Heart size={22} />
                 {favoriteCount > 0 && (
-                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1 text-[10px] font-semibold text-white">
+                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1.5 text-[10px] font-semibold text-white">
                     {favoriteCount}
                   </span>
                 )}
               </span>
-              <span className="hidden lg:inline">Favoris</span>
+              <span className="text-[10px] uppercase tracking-wide mt-1">Mes Favoris</span>
             </Link>
-            <Link href="/panier" className="hidden md:flex items-center gap-1 text-xs text-slate-600 hover:text-slate-900 transition">
+
+            {/* Mon Compte */}
+            <div 
+              className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition relative cursor-pointer"
+              onMouseEnter={() => {
+                if (accountTimer.current) clearTimeout(accountTimer.current);
+                setAccountMenuOpen(true);
+              }}
+              onMouseLeave={() => {
+                if (accountTimer.current) clearTimeout(accountTimer.current);
+                accountTimer.current = setTimeout(() => setAccountMenuOpen(false), 250);
+              }}
+            >
+              <User size={22} />
+              <span className="text-[10px] uppercase tracking-wide mt-1">Mon Compte</span>
+              
+              {/* Menu déroulant */}
+              <div
+                className={cn(
+                  "absolute top-full mt-2 w-48 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity z-50",
+                  accountMenuOpen ? "flex opacity-100" : "hidden opacity-0"
+                )}
+              >
+                {user ? (
+                  <>
+                    <div className="px-4 pt-3 pb-2 border-b border-slate-100">
+                      <p className="text-xs text-slate-500">Connecté en tant que</p>
+                      <p className="text-sm font-medium text-slate-900 truncate">{user.email}</p>
+                    </div>
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="px-4 py-2 text-sm font-medium text-amber-600 hover:bg-amber-50 flex items-center gap-2"
+                        onClick={() => setAccountMenuOpen(false)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M14 9h2"/><path d="M14 14h4"/></svg>
+                        Dashboard Admin
+                      </Link>
+                    )}
+                    <Link
+                      href="/mon-compte"
+                      className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                      onClick={() => setAccountMenuOpen(false)}
+                    >
+                      <User size={16} />
+                      Mon profil
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      disabled={loggingOut}
+                      className="px-4 py-2 pb-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left disabled:opacity-50"
+                    >
+                      <LogOut size={16} />
+                      {loggingOut ? 'Déconnexion...' : 'Déconnexion'}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/connexion"
+                      className="px-4 pt-4 pb-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                      onClick={() => setAccountMenuOpen(false)}
+                    >
+                      Connexion
+                    </Link>
+                    <Link
+                      href="/inscription"
+                      className="px-4 pt-2 pb-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                      onClick={() => setAccountMenuOpen(false)}
+                    >
+                      Inscription
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Panier */}
+            <Link href="/panier" className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition">
               <span className="relative">
-                <ShoppingBag size={18} />
+                <ShoppingBag size={22} />
                 {itemCount > 0 && (
-                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1 text-[10px] font-semibold text-white">
+                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1.5 text-[10px] font-semibold text-white">
                     {itemCount}
                   </span>
                 )}
               </span>
-              <span className="hidden lg:inline">Panier</span>
+              <span className="text-[10px] uppercase tracking-wide mt-1">Panier</span>
             </Link>
-            <div className="hidden md:flex items-center gap-1 text-xs text-slate-600 hover:text-slate-900 transition">
-              <User size={18} />
-              <UserNav />
-            </div>
+
             <button
               type="button"
               onClick={toggle}

@@ -177,7 +177,7 @@ export const AccessoryGrid = ({
                     ))}
                   </div>
 
-                  <p>{product.specs.dimensions || `Ø ${product.diameter} cm`}</p>
+                  <p>{product.specs?.dimensions || (product.diameter ? `Ø ${product.diameter} cm` : '')}</p>
                   <p className="line-clamp-1 text-gray-500">{product.shortDescription}</p>
 
                   <div className="flex items-center gap-2 text-green-600">

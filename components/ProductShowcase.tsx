@@ -6,7 +6,6 @@ import { Heart, ShoppingBag } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { Price } from "@/components/Price";
-import { braseros } from "@/content/products";
 import type { Product } from "@/lib/schema";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
@@ -180,9 +179,10 @@ const ShowcaseActions = ({ product }: { product: Product }) => {
 
 type ProductShowcaseProps = {
   animate?: boolean;
+  braseros?: Product[];
 };
 
-export const ProductShowcase = ({ animate = true }: ProductShowcaseProps = {}) => {
+export const ProductShowcase = ({ animate = true, braseros = [] }: ProductShowcaseProps) => {
   const [ready, setReady] = useState(!animate);
   const [progress, setProgress] = useState(animate ? 0 : 1);
   const containerRef = useRef<HTMLDivElement>(null);

@@ -25,7 +25,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             alt={activeImage.alt}
             fill
             sizes="(max-width: 1024px) 100vw, 45vw"
-            placeholder="blur"
+            placeholder={activeImage.blurDataURL ? "blur" : "empty"}
             blurDataURL={activeImage.blurDataURL}
             className={cn(
               "object-contain origin-center transition-transform duration-300",
@@ -66,7 +66,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
               width={160}
               height={120}
               className="h-24 w-32 object-cover"
-              placeholder="blur"
+              placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}
             />
           </button>

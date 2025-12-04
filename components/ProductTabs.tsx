@@ -100,10 +100,10 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
                     { label: "Hauteur", value: `${product.height} cm` },
                     { label: "Épaisseur", value: `${product.thickness} mm` },
                     { label: "Poids", value: `${product.weight} kg` },
-                    { label: "Acier", value: product.specs.acier },
-                    { label: "Épaisseur bol", value: product.specs.epaisseur },
-                    { label: "Dimensions", value: product.specs.dimensions },
-                    product.specs.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
+                    product.specs?.acier ? { label: "Acier", value: product.specs.acier } : null,
+                    product.specs?.epaisseur ? { label: "Épaisseur bol", value: product.specs.epaisseur } : null,
+                    product.specs?.dimensions ? { label: "Dimensions", value: product.specs.dimensions } : null,
+                    product.specs?.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
                   ])!
                   .filter(Boolean)
                   .map((item, idx) => (

@@ -3,12 +3,16 @@ import type { Metadata } from "next";
 import { CatalogueView } from "@/components/CatalogueView";
 import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
-import { products } from "@/content/products";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Catalogue",
   description: "Parcourez nos braséros en acier corten et notre fendeur à bûches Made in France.",
 };
+
+// Désactiver le cache pour toujours afficher les dernières données
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 type SearchParams = {
   category?: string;
@@ -22,12 +26,50 @@ export default async function ProductsPage({ searchParams }: Props) {
   const params = await searchParams;
   const category = params.category;
   
+  // Récupérer les produits depuis Supabase uniquement
+  const supabase = await createClient();
+  const { data: supabaseProducts } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  // Transformer les produits Supabase au format attendu (supporte camelCase et snake_case)
+  const allProducts = (supabaseProducts || []).map((p: any) => ({
+    slug: p.slug,
+    name: p.name,
+    shortDescription: p.shortDescription || p.short_description || '',
+    description: p.description || '',
+    category: p.category,
+    price: p.price,
+    comparePrice: p.comparePrice || p.compare_price,
+    discountPercent: p.discountPercent || p.discount_percent,
+    badge: p.badge,
+    images: p.images || [],
+    material: p.material,
+    madeIn: p.madeIn || p.made_in || 'France',
+    diameter: p.diameter,
+    thickness: p.thickness,
+    height: p.height,
+    weight: p.weight,
+    warranty: p.warranty,
+    availability: p.availability || 'En stock',
+    shipping: p.shipping,
+    popularScore: p.popularScore || p.popular_score || 50,
+    inStock: p.inStock ?? p.in_stock ?? true,
+    specs: p.specs || {},
+    highlights: p.highlights || [],
+    features: p.features || [],
+    faq: p.faq || [],
+    customSpecs: p.customSpecs || p.custom_specs || [],
+    location: p.location,
+  }));
+  
   const filteredProducts =
     category === "promotions"
-      ? products.filter((product) => typeof product.discountPercent === "number" && product.discountPercent > 0)
+      ? allProducts.filter((product) => typeof product.discountPercent === "number" && product.discountPercent > 0)
       : category
-      ? products.filter((product) => product.category === category)
-      : products;
+      ? allProducts.filter((product) => product.category === category)
+      : allProducts;
 
   const title = category === "brasero"
     ? "Nos Braséros"

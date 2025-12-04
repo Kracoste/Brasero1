@@ -1,8 +1,34 @@
 import { HeroMenu } from "@/components/HeroMenu";
 import { ProductCard } from "@/components/ProductCard";
-import { braseros } from "@/content/products";
+import { createClient } from "@/lib/supabase/server";
 
-export default function HomePage() {
+// Désactiver le cache pour toujours afficher les dernières données
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
+  // Récupérer les braséros depuis Supabase
+  const supabase = await createClient();
+  const { data: braseroProduits } = await supabase
+    .from('products')
+    .select('*')
+    .eq('category', 'brasero')
+    .order('popularScore', { ascending: false })
+    .limit(4);
+
+  const braseros = (braseroProduits || []).map((p: any) => ({
+    slug: p.slug,
+    name: p.name,
+    shortDescription: p.shortDescription || p.short_description || '',
+    category: p.category,
+    price: p.price,
+    comparePrice: p.comparePrice || p.compare_price,
+    discountPercent: p.discountPercent || p.discount_percent,
+    badge: p.badge,
+    images: p.images || [],
+    popularScore: p.popularScore || p.popular_score || 50,
+  }));
+
   return (
     <>
       <section className="bg-[#f6f1e9] py-10">
@@ -43,16 +69,11 @@ export default function HomePage() {
             </h2>
           </div>
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr">
-            {braseros.slice(0, 4).map((product, index) => {
-              const dimensions = [60, 75, 90, 105];
-              const productWithDimension = {
-                ...product,
-                name: `Braséro Atelier LBF en Acier Ø${dimensions[index]}`,
-              };
+            {braseros.map((product, index) => {
               return (
                 <ProductCard
                   key={product.slug}
-                  product={productWithDimension}
+                  product={product}
                   className="home-highlight-card"
                 />
               );

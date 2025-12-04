@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { ShoppingCart, Check, Minus, Plus } from 'lucide-react';
 import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
-import { accessoires } from "@/content/products";
 
 type AddToCartButtonProps = {
   product: {
@@ -22,38 +21,9 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const readSelectedAccessories = () => {
-    if (typeof window === "undefined") return new Set<string>();
-    try {
-      const raw = window.localStorage.getItem("brasero:selected-accessories");
-      if (!raw) return new Set<string>();
-      const parsed = JSON.parse(raw);
-      return new Set(Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === "string") : []);
-    } catch {
-      return new Set<string>();
-    }
-  };
-
   const handleAddToCart = async () => {
     setAdding(true);
     try {
-      const selectedAccessories = readSelectedAccessories();
-      const accessoriesToAdd = accessoires.filter(
-        (acc) => selectedAccessories.has(acc.slug) && acc.slug !== product.slug
-      );
-
-      for (const acc of accessoriesToAdd) {
-        await addItem(
-          {
-            slug: acc.slug,
-            name: acc.name,
-            price: acc.price,
-            image: acc.images[0]?.src,
-          },
-          1
-        );
-      }
-
       await addItem(
         {
           slug: product.slug,

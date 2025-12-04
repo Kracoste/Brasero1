@@ -7,9 +7,17 @@ import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 
 import { LeafletMap } from "@/components/LeafletMap";
 import { Price } from "@/components/Price";
-import { braseros } from "@/content/products";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils";
+
+type ProductType = {
+  slug: string;
+  name: string;
+  badge?: string;
+  shortDescription: string;
+  price: number;
+  images: Array<{ src: string; alt: string; blurDataURL?: string }>;
+};
 
 type Slide = {
   id: string;
@@ -31,25 +39,29 @@ const storySlide: Slide = {
     "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=80",
 };
 
-const productSlides: Slide[] = braseros.map((product) => ({
-  id: product.slug,
-  type: "product",
-  title: product.name,
-  subtitle: product.badge,
-  description: product.shortDescription,
-  backgroundImage: product.images[0].src,
-}));
+type HeroCarouselProps = {
+  braseros: ProductType[];
+};
 
-const slides = [storySlide, ...productSlides];
+export const HeroCarousel = ({ braseros }: HeroCarouselProps) => {
+  const productSlides: Slide[] = braseros.map((product) => ({
+    id: product.slug,
+    type: "product",
+    title: product.name,
+    subtitle: product.badge || '',
+    description: product.shortDescription,
+    backgroundImage: product.images?.[0]?.src || '',
+  }));
 
-export const HeroCarousel = () => {
+  const slides = [storySlide, ...productSlides];
+  
   const [current, setCurrent] = useState(0);
 
   const activeProduct = useMemo(() => {
     const slide = slides[current];
     if (slide.type !== "product") return undefined;
     return braseros.find((product) => product.slug === slide.id);
-  }, [current]);
+  }, [current, braseros, slides]);
 
   const goTo = (direction: "prev" | "next") => {
     setCurrent((prev) => {
@@ -161,8 +173,9 @@ const CarouselControls = ({ current, total, onNavigate }: ControlProps) => (
   </>
 );
 
-const ProductCardOverlay = ({ product }: { product: (typeof braseros)[number] }) => {
-  const image = product.images[0];
+const ProductCardOverlay = ({ product }: { product: ProductType }) => {
+  const image = product.images?.[0];
+  if (!image) return null;
 
   return (
     <div className="absolute bottom-8 right-24 z-20 w-full max-w-xs rounded-[32px] bg-black/95 p-6 shadow-2xl md:p-7">
@@ -175,7 +188,7 @@ const ProductCardOverlay = ({ product }: { product: (typeof braseros)[number] })
             width={320}
             height={240}
             className="h-40 w-full object-cover"
-            placeholder="blur"
+            placeholder={image.blurDataURL ? "blur" : "empty"}
             blurDataURL={image.blurDataURL}
           />
         </div>

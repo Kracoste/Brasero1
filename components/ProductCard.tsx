@@ -88,7 +88,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             src={image.src}
             alt={image.alt}
             fill
-            placeholder="blur"
+            placeholder={image.blurDataURL ? "blur" : "empty"}
             blurDataURL={image.blurDataURL}
             className="product-card__image-el"
           />

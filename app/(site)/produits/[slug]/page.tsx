@@ -11,22 +11,92 @@ import { ProductGallery } from "@/components/ProductGallery";
 import { Section } from "@/components/Section";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductTabs } from "@/components/ProductTabs";
-import { accessoires as accessoriesCatalog, products } from "@/content/products";
-import { getProductBySlug } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/server";
 import { Users, Flame, Box, Ruler, Weight } from "lucide-react";
 
+// Désactiver le cache pour toujours afficher les dernières données
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 type ProductPageProps = {
-  // Next.js 16 transmet désormais `params` sous forme de Promise
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+// Fonction pour récupérer un produit depuis Supabase uniquement
+async function getProduct(slug: string) {
+  const supabase = await createClient();
+  const { data: p } = await supabase
+    .from('products')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (!p) return null;
+
+  // Transformer le produit Supabase au format attendu (supporte camelCase et snake_case)
+  return {
+    slug: p.slug,
+    name: p.name,
+    shortDescription: p.shortDescription || p.short_description || '',
+    description: p.description || '',
+    category: p.category,
+    price: p.price,
+    comparePrice: p.comparePrice || p.compare_price,
+    discountPercent: p.discountPercent || p.discount_percent,
+    badge: p.badge || 'Nouveau',
+    images: (p.images || []).map((img: any) => ({
+      src: img.src,
+      alt: img.alt || p.name,
+      width: img.width || 800,
+      height: img.height || 600,
+    })),
+    material: p.material || 'Acier',
+    madeIn: p.madeIn || p.made_in || 'France',
+    diameter: p.diameter || 0,
+    thickness: p.thickness || 0,
+    height: p.height || 0,
+    weight: p.weight || 0,
+    warranty: p.warranty || '',
+    availability: p.availability || 'En stock',
+    shipping: p.shipping || '',
+    popularScore: p.popularScore || p.popular_score || 50,
+    inStock: p.inStock ?? p.in_stock ?? true,
+    specs: p.specs || {
+      dimensions: `${p.diameter || '-'} cm`,
+    },
+    highlights: p.highlights || [],
+    features: p.features || [],
+    faq: p.faq || [],
+    customSpecs: p.customSpecs || p.custom_specs || [],
+    location: p.location,
+  };
+}
+
+// Récupérer tous les accessoires depuis Supabase
+async function getAccessories() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('products')
+    .select('*')
+    .eq('category', 'accessoire')
+    .order('popularScore', { ascending: false });
+
+  return (data || []).map((p: any) => ({
+    slug: p.slug,
+    name: p.name,
+    shortDescription: p.shortDescription || p.short_description || '',
+    category: p.category,
+    price: p.price,
+    comparePrice: p.comparePrice || p.compare_price,
+    discountPercent: p.discountPercent || p.discount_percent,
+    images: p.images || [],
+    popularScore: p.popularScore || p.popular_score || 50,
+  }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(products, slug);
+  const product = await getProduct(slug);
   if (!product) return {};
 
   return {
@@ -35,7 +105,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     openGraph: {
       title: product.name,
       description: product.shortDescription,
-      images: product.images.slice(0, 1).map((image) => ({
+      images: product.images.slice(0, 1).map((image: any) => ({
         url: image.src,
         width: image.width,
         height: image.height,
@@ -47,13 +117,15 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(products, slug);
+  const product = await getProduct(slug);
   if (!product) notFound();
 
   const reference = `REF-${product.slug.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
-  const compatibleAccessories = accessoriesCatalog
+  
+  // Récupérer les accessoires depuis Supabase
+  const allAccessories = await getAccessories();
+  const compatibleAccessories = allAccessories
     .filter((item) => item.slug !== product.slug)
-    .sort((a, b) => b.popularScore - a.popularScore)
     .slice(0, 20);
 
   return (
@@ -111,15 +183,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       <span className="text-sm text-slate-600">{product.material}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                      <Ruler className="h-5 w-5 text-red-600" />
+                  {product.specs?.dimensions && (
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                        <Ruler className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-slate-800">Dimensions : </span>
+                        <span className="text-sm text-slate-600">{product.specs.dimensions}</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-sm font-semibold text-slate-800">Dimensions : </span>
-                      <span className="text-sm text-slate-600">{product.specs.dimensions}</span>
-                    </div>
-                  </div>
+                  )}
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
                       <Weight className="h-5 w-5 text-red-600" />

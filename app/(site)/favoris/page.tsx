@@ -41,9 +41,9 @@ export default function FavorisPage() {
             </div>
             
             {favoriteProducts.length === 0 ? (
-              <div className="rounded-lg border border-slate-700 bg-slate-900 p-8 text-center">
-                <Heart className="mx-auto mb-4 h-12 w-12 text-slate-600" />
-                <p className="text-lg text-slate-400 mb-4">
+              <div className="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
+                <Heart className="mx-auto mb-4 h-12 w-12 text-slate-400" />
+                <p className="text-lg text-slate-700 mb-4">
                   Vous n'avez pas encore de produits favoris.
                 </p>
                 <p className="text-sm text-slate-500 mb-6">
