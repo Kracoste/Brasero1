@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Price } from "@/components/Price";
 import { useCart } from "@/lib/cart-context";
 import type { Product } from "@/lib/schema";
+import { formatCurrency } from "@/lib/utils";
 import "@/styles/product-card.css";
 
 type ProductCardProps = {
@@ -42,6 +43,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
   const { addItem, loading } = useCart();
   const [adding, setAdding] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const isPromo = typeof product.discountPercent === "number" && product.discountPercent > 0 && !!product.comparePrice;
 
   useEffect(() => {
     const favorites = readFavorites();
@@ -90,6 +92,9 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             blurDataURL={image.blurDataURL}
             className="product-card__image-el"
           />
+          {isPromo && (
+            <span className="product-card__promo-flag">-{product.discountPercent}%</span>
+          )}
         </div>
         <div className="product-card__content">
           <span className="product-card__status">EN STOCK</span>
@@ -109,7 +114,17 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             </button>
           </div>
           <p className="product-card__description">{product.shortDescription}</p>
-          <Price amount={product.price} className="product-card__price" tone="light" />
+          {isPromo ? (
+            <div className="product-card__promo-pricing">
+              <div className="product-card__promo-current">
+                <span>{formatCurrency(product.price)}</span>
+                <span className="product-card__promo-note">après remise</span>
+              </div>
+              <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} TTC</span>
+            </div>
+          ) : (
+            <Price amount={product.price} className="product-card__price" tone="light" />
+          )}
           <div className="product-card__actions">
             <button
               type="button"
@@ -117,8 +132,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               disabled={adding || loading}
               className="product-card__btn product-card__btn--primary"
             >
-              <ShoppingBag className="product-card__btn-icon" />
-              {adding ? "Ajouté au panier" : "Mettre dans le panier"}
+              {adding ? "Ajouté au panier" : "Ajouter au panier"}
             </button>
             <Link href={`/produits/${product.slug}`} className="product-card__cta">
               Voir les détails

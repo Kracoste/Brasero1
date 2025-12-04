@@ -45,8 +45,8 @@ export function AddToFavoritesButton({ product, className = "", size = "default"
       disabled={loading}
       className={`flex items-center justify-center gap-2 rounded-full border ${padding} font-semibold transition ${
         isInFavorites
-          ? "border-transparent bg-gradient-to-r from-[#f5e9d7] via-[#c98b5a] to-[#6b3a1e] text-white hover:brightness-110"
-          : "border-transparent bg-gradient-to-r from-[#f5e9d7] via-[#c98b5a] to-[#6b3a1e] text-white hover:brightness-110"
+          ? "border-transparent bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] text-white hover:brightness-110"
+          : "border-transparent bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] text-white hover:brightness-110"
       } disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       <div className="relative">

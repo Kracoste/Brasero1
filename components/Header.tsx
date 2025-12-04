@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react';
@@ -46,14 +47,19 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white shadow-sm">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center py-5">
-          {/* Nom du site à gauche */}
-          <Link
-            href="/"
-            className="font-display text-[1.2rem] font-semibold uppercase tracking-[0.3em] text-[#2d2d2d] sm:text-[1.6rem] sm:tracking-[0.4em] whitespace-nowrap ml-32"
-          >
-            ATELIER LBF
+      <div className="w-full px-3 sm:px-5 lg:px-6">
+        <div className="flex items-center py-0 gap-4">
+          {/* Logo à gauche */}
+          <Link href="/" className="flex-shrink-0">
+          <Image
+            src="/logo/Logo1.png"
+            alt="Atelier LBF Logo"
+            width={1400}
+            height={500}
+            className="w-auto max-h-20 sm:max-h-24"
+            style={{ objectFit: "contain" }}
+            priority
+          />
           </Link>
           
           {/* Navigation centrée */}

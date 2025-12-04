@@ -20,6 +20,7 @@ export type FilterState = {
   priceMin?: number;
   priceMax?: number;
   fendeurType?: "manuel" | "electrique";
+  promo?: boolean;
 };
 
 type Predicate = (product: Product) => boolean;
@@ -57,6 +58,9 @@ export const productFilterOptions = {
 
 export const applyFilters = (products: Product[], filters: FilterState) => {
   const filtered = products.filter((product) => {
+    if (filters.promo) {
+      return typeof product.discountPercent === "number" && product.discountPercent > 0;
+    }
     if (filters.diameter && filters.diameter !== "all") {
       if (String(product.diameter) !== filters.diameter) return false;
     }

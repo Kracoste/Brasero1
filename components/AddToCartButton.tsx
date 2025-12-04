@@ -108,10 +108,10 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
         type="button"
         onClick={handleAddToCart}
         disabled={adding || added}
-        className={`flex items-center justify-center gap-2 rounded-md px-6 py-3 font-semibold text-white shadow-lg transition ${
+        className={`flex items-center justify-center gap-2 rounded-md px-6 py-3 font-semibold shadow-lg transition ${
           added
-            ? "bg-emerald-600 hover:bg-emerald-700"
-            : "bg-gradient-to-r from-[#e6f4e6] via-[#6fbf73] to-[#2f6f3a] hover:brightness-110"
+            ? "bg-emerald-600 text-white hover:bg-emerald-700"
+            : "bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] text-[#06210a] hover:brightness-110"
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {added ? (

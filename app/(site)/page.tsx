@@ -116,11 +116,11 @@ const PromoTile = () => (
     />
     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
     <div className="relative flex h-full flex-col items-start justify-center gap-4 px-8 py-12 sm:px-12">
-      <p className="text-lg font-semibold text-amber-200">Nos promotions</p>
+      <p className="text-lg font-semibold text-[#d0ff52]">Nos promotions</p>
       <h3 className="text-4xl font-black leading-tight sm:text-5xl">
         PROMOTIONS <br /> JUSQU&apos;À 40%
       </h3>
-      <p className="text-lg text-amber-100">
+      <p className="text-lg text-[#c5f74e]">
         Promotions pouvant aller jusqu&apos;à 40% sur nos braséros et accessoires.
       </p>
       <a

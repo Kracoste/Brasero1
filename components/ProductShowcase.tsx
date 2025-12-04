@@ -172,7 +172,7 @@ const ShowcaseActions = ({ product }: { product: Product }) => {
         disabled={adding || loading}
       >
         <ShoppingBag className="product-showcase__btn-icon" />
-        {adding ? "Ajouté au panier" : "Mettre dans le panier"}
+        {adding ? "Ajouté au panier" : "Ajouter au panier"}
       </button>
     </div>
   );

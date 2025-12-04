@@ -106,7 +106,7 @@ export const HeroCarousel = () => {
                   <Price amount={activeProduct.price} className="text-2xl font-semibold" />
                   <Link
                     href={`/produits/${activeProduct.slug}`}
-                    className="inline-flex items-center rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+                    className="inline-flex items-center rounded-full bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-200"
                   >
                     Ajouter au panier
                   </Link>
@@ -189,7 +189,7 @@ const ProductCardOverlay = ({ product }: { product: (typeof braseros)[number] })
         </div>
       </div>
       <Link
-        className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-clay-900/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+        className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] px-6 py-3 text-base font-semibold text-white shadow-lg shadow-green-900/30 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-200"
         href={`/produits/${product.slug}`}
       >
         Ajouter au panier

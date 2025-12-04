@@ -70,7 +70,7 @@ export function UserNav() {
       </Link>
       <Link
         href="/inscription"
-        className="rounded-full bg-gradient-to-r from-clay-900 via-clay-700 to-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-clay-900/30 transition hover:-translate-y-0.5"
+        className="rounded-full bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-900/30 transition hover:-translate-y-0.5"
       >
         Inscription
       </Link>

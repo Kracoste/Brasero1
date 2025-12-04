@@ -221,7 +221,7 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
             ))}
           </div>
 
-          <button className="text-sm font-medium text-orange-600 hover:text-orange-700">
+          <button className="text-sm font-medium text-[#1f7a1a] hover:text-[#166614]">
             Voir tous les avis →
           </button>
         </div>

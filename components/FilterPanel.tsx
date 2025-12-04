@@ -13,6 +13,7 @@ interface FilterPanelProps {
   onToggle?: (isOpen: boolean) => void;
   showCategoryFilters?: boolean;
   variant?: "default" | "fendeur";
+  showPromoFilters?: boolean;
 }
 
 export const FilterPanel = ({
@@ -24,6 +25,7 @@ export const FilterPanel = ({
   onToggle,
   showCategoryFilters = true,
   variant = "default",
+  showPromoFilters = false,
 }: FilterPanelProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -64,6 +66,9 @@ export const FilterPanel = ({
         rangeMinPercent={rangeMinPercent}
         rangeMaxPercent={rangeMaxPercent}
         showCategories={showCategoryFilters}
+        showPromo={showPromoFilters}
+        promoValue={value.promo ?? false}
+        onPromoChange={(promo) => onChange({ ...value, promo })}
         onMinChange={(next) => {
           setPriceMin(next);
           commitPrice(next, priceMax);
@@ -292,7 +297,7 @@ const PriceSection = ({
         <div className="relative mt-4" style={{ height: '20px' }}>
           <div className="absolute top-1/2 left-2 right-2 h-2 -translate-y-1/2 rounded-full bg-[#f5e9d7]" />
           <div
-            className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#f5e9d7] via-[#c98b5a] to-[#6b3a1e]"
+            className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a]"
             style={{
               left: `calc(8px + (100% - 16px) * ${rangeMinPercent / 100})`,
               right: `calc(8px + (100% - 16px) * ${(100 - rangeMaxPercent) / 100})`,

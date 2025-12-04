@@ -187,14 +187,19 @@
 }
 
 .product-showcase__btn--solid {
-  background: linear-gradient(120deg, #ff6a55, #ffc686);
-  border-color: transparent;
-  color: #0d0c12;
+  background: linear-gradient(90deg, #d0ff52, #1f7a1a);
+  border: none;
+  color: #06210a;
   font-weight: 600;
+  box-shadow: none;
+}
+
+.product-showcase__btn--solid svg {
+  color: #06210a;
 }
 
 .product-showcase__btn--solid:hover {
-  background: linear-gradient(120deg, #ff836e, #ffd39a);
+  background: linear-gradient(90deg, #dcff75, #279327);
 }
 
 .product-showcase__link {

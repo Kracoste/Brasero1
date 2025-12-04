@@ -10,10 +10,72 @@ const moncoutant = {
   lng: -0.6342,
 } as const;
 
+const promoImages = [
+  { src: "/accessories/allume-feu.jpg", alt: "Allume-feu spécial braséro" },
+  { src: "/accessories/brosse-nettoyage.jpg", alt: "Brosse de nettoyage" },
+  { src: "/accessories/gants-cuir.jpg", alt: "Gants cuir résistants chaleur" },
+  { src: "/accessories/kit-ustensiles.jpg", alt: "Kit d'ustensiles barbecue" },
+  { src: "/accessories/pince-brasero.jpg", alt: "Pince à braises inox" },
+  { src: "/accessories/grille-inox.jpg", alt: "Grille inox compatible braséro" },
+  { src: "/accessories/plancha-acier.jpg", alt: "Plancha acier" },
+  { src: "/accessories/spatule-plancha.png", alt: "Spatule plancha inox" },
+  { src: "/accessories/support-buches.jpg", alt: "Support à bûches design" },
+  { src: "/accessories/tablier-cuir.jpg", alt: "Tablier en cuir" },
+] as const;
+
+const promoProducts: Product[] = Array.from({ length: 20 }).map((_, index) => {
+  const basePrice = 89 + index * 7;
+  const discountPercent = 15 + ((index * 3) % 6) * 5; // entre 15% et 40%
+  const price = Math.max(29, Math.round(basePrice * (1 - discountPercent / 100)));
+  const image = promoImages[index % promoImages.length];
+
+  return {
+    slug: `promo-accessoire-${index + 1}`,
+    name: `Accessoire Promo ${index + 1}`,
+    category: "accessoire",
+    price,
+    comparePrice: basePrice,
+    discountPercent,
+    shortDescription: "Accessoire en promotion jusqu'à -40%.",
+    description:
+      "Profitez de nos offres spéciales sur cet accessoire compatible avec l'ensemble de nos braséros.",
+    madeIn: "France",
+    material: "Acier / Bois",
+    diameter: 0,
+    thickness: 0,
+    height: 10,
+    weight: 1,
+    warranty: "Garantie 2 ans",
+    availability: "En stock",
+    shipping: "Livraison sous 3 jours",
+    popularScore: 60 + index,
+    badge: "Promo",
+    specs: { acier: "Acier inox", epaisseur: "N/A", dimensions: "Taille universelle", poids: "1 kg" },
+    highlights: ["Prix réduit", "Compatible braséros", "Livraison rapide"],
+    features: [{ icon: "Percent", title: "Jusqu'à -40%", description: "Offre limitée sur cet accessoire." }],
+    images: [
+      {
+        src: image.src,
+        alt: image.alt,
+        width: 1200,
+        height: 900,
+        blurDataURL: blurPlaceholder,
+      },
+    ],
+    location: moncoutant,
+    faq: [{ question: "Quels braséros ?", answer: "Compatible avec toute notre gamme." }],
+    customSpecs: [
+      { label: "Marque", value: "France Braseros" },
+      { label: "Promotion", value: `-${discountPercent}%` },
+      { label: "Compatibilité", value: "Tous braséros" },
+    ],
+  };
+});
+
 const rawProducts: Product[] = [
   {
     slug: "brasero-signature-80",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Fendeur à bûches Atelier LBF",
     category: "brasero",
     price: 890,
     shortDescription: "La pièce maîtresse pour les grandes tablées en extérieur.",
@@ -127,18 +189,13 @@ const rawProducts: Product[] = [
       compatibilite: "Anneau plancha 58 cm",
     },
     highlights: [
-      "Pied ventilé anti-traces",
-      "Idéal pour 6 à 8 convives",
-      "Accessoire plancha disponible",
+      "Pied tulipe ventilé",
+      "Patine satinée",
+      "Livraison express 72h",
     ],
     features: [
       {
-        icon: "Wind",
-        title: "Tirage maîtrisé",
-        description: "Grilles d'aération découpées au laser pour une combustion propre.",
-      },
-      {
-        icon: "Sun",
+        icon: "Sparkles",
         title: "Finition satinée",
         description: "Patine stabilisée en atelier pour un rendu uniforme.",
       },
@@ -146,6 +203,11 @@ const rawProducts: Product[] = [
         icon: "Wrench",
         title: "Montage instantané",
         description: "Reçu soudé, aucun assemblage requis.",
+      },
+      {
+        icon: "Truck",
+        title: "Livraison express",
+        description: "Expédié sous 72h avec prise de rendez-vous.",
       },
     ],
     images: [
@@ -1850,6 +1912,7 @@ const rawProducts: Product[] = [
     location: moncoutant,
     faq: [{ question: "Nettoyage ?", answer: "Éponge humide, pas de machine. Le cuir se nourrit avec un lait incolore." }],
   },
+  ...promoProducts,
 ];
 
 export const products = rawProducts.map((product) => productSchema.parse(product));

@@ -66,7 +66,7 @@ export const FeatureList = ({ product }: FeatureListProps) => (
           key={feature.title}
           className="flex items-start gap-4 p-4"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#e8f5e9] text-[#1f7a1a]">
             <Icon size={20} />
           </span>
           <div>

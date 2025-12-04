@@ -28,6 +28,8 @@ export const productSchema = z.object({
   name: z.string(),
   category: z.enum(["brasero", "fendeur", "accessoire"]),
   price: z.number(),
+  comparePrice: z.number().optional(),
+  discountPercent: z.number().optional(),
   shortDescription: z.string(),
   description: z.string(),
   madeIn: z.literal("France"),

@@ -24,7 +24,7 @@ export function FloatingCart() {
         aria-label="Ouvrir le panier"
       >
         <ShoppingCart size={24} />
-        <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">
+        <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#d0ff52] text-xs font-bold text-black">
           {itemCount}
         </span>
       </button>

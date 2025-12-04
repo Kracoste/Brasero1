@@ -159,15 +159,15 @@ export const AccessoryGrid = ({
 
                 <div className="space-y-3 px-4 pb-5 pt-3 text-sm text-gray-600">
                   <Link href={`/produits/${product.slug}`}>
-                    <h3 className="min-h-[40px] text-base font-semibold text-gray-900 hover:text-orange-600">{product.name}</h3>
+                    <h3 className="min-h-[40px] text-base font-semibold text-gray-900 hover:text-[#1f7a1a]">{product.name}</h3>
                   </Link>
 
-                  <div className="flex gap-0.5 text-orange-400">
+                  <div className="flex gap-0.5 text-[#6fbf73]">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <svg
                         key={`${product.slug}-star-${index}`}
                         className={`h-5 w-5 ${
-                          index < fullStars || (index === fullStars && hasHalfStar) ? "text-orange-400" : "text-gray-200"
+                          index < fullStars || (index === fullStars && hasHalfStar) ? "text-[#6fbf73]" : "text-gray-200"
                         }`}
                         fill="currentColor"
                         viewBox="0 0 20 20"

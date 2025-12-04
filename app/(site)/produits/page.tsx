@@ -22,14 +22,19 @@ export default async function ProductsPage({ searchParams }: Props) {
   const params = await searchParams;
   const category = params.category;
   
-  const filteredProducts = category 
-    ? products.filter(p => p.category === category)
-    : products;
+  const filteredProducts =
+    category === "promotions"
+      ? products.filter((product) => typeof product.discountPercent === "number" && product.discountPercent > 0)
+      : category
+      ? products.filter((product) => product.category === category)
+      : products;
 
   const title = category === "brasero"
     ? "Nos Braséros"
     : category === "fendeur"
     ? "Fendeur à bûches"
+    : category === "promotions"
+    ? "Nos Promotions"
     : category === "accessoire"
     ? "Nos Accessoires"
     : "Nos créations";
@@ -40,6 +45,8 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Préparez vos bûches en toute sécurité avec notre fendeur manuel fabriqué en France."
     : category === "accessoire"
     ? "Accessoires compatibles et indispensables pour compléter votre braséro."
+    : category === "promotions"
+    ? "Découvrez nos offres limitées et promotions exceptionnelles jusqu'à 40%."
     : "Diamètres de 55 à 100 cm, aciers corten ou thermolaqués et accessoires prêts à rejoindre votre terrasse. Filtres et tri vous permettent de comparer en un coup d'œil.";
 
   const containerClass = 'space-y-10 w-full max-w-[1600px] px-0 sm:px-4 lg:px-0';
@@ -51,7 +58,7 @@ export default async function ProductsPage({ searchParams }: Props) {
         <div className="px-4 sm:px-0">
           <CatalogueView
             products={filteredProducts}
-            showCategoryFilters={category !== "accessoire"}
+            showCategoryFilters={category !== "accessoire" && category !== "promotions"}
             category={category}
           />
         </div>
