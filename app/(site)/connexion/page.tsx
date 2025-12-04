@@ -107,13 +107,11 @@ export default function ConnexionPage() {
                 placeholder="••••••••"
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative flex w-full justify-center rounded-full bg-clay-900 px-4 py-3 text-sm font-semibold text-white hover:bg-clay-800 focus:outline-none focus:ring-2 focus:ring-clay-900 focus:ring-offset-2 disabled:opacity-50"
+              className="group relative flex w-full justify-center rounded-full bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 mt-4"
             >
               {loading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
@@ -122,7 +120,7 @@ export default function ConnexionPage() {
           <div className="text-center">
             <Link
               href="/"
-              className="text-sm font-medium text-slate-600 hover:text-clay-900"
+              className="text-sm font-medium text-slate-600 hover:text-slate-900"
             >
               ← Retour à l'accueil
             </Link>

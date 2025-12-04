@@ -97,30 +97,20 @@ export const Header = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (loggingOut) return;
     setLoggingOut(true);
-    setAccountMenuOpen(false);
     
     try {
       const supabase = supabaseRef.current;
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        console.error('Erreur signOut:', error);
-        throw error;
-      }
-      
-      // Reset état local
-      setUser(null);
-      setIsAdmin(false);
-      
-      // Forcer un rechargement complet pour nettoyer tout l'état
-      window.location.href = '/';
+      await supabase.auth.signOut();
     } catch (error) {
       console.error('Erreur déconnexion:', error);
-      setLoggingOut(false);
-      // Même en cas d'erreur, essayer de recharger
+    } finally {
+      // Toujours recharger la page, même en cas d'erreur
       window.location.href = '/';
     }
   };
@@ -298,9 +288,9 @@ export const Header = () => {
                       Mon profil
                     </Link>
                     <button
-                      onClick={handleLogout}
+                      onMouseDown={handleLogout}
                       disabled={loggingOut}
-                      className="px-4 py-2 pb-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left disabled:opacity-50"
+                      className="px-4 py-2 pb-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left disabled:opacity-50 cursor-pointer"
                     >
                       <LogOut size={16} />
                       {loggingOut ? 'Déconnexion...' : 'Déconnexion'}
