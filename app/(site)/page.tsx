@@ -1,6 +1,7 @@
 import { HeroMenu } from "@/components/HeroMenu";
 import { ProductCard } from "@/components/ProductCard";
 import { createClient } from "@/lib/supabase/server";
+import type { Product } from "@/lib/schema";
 
 // Désactiver le cache pour toujours afficher les dernières données
 export const revalidate = 0;
@@ -20,14 +21,30 @@ export default async function HomePage() {
     slug: p.slug,
     name: p.name,
     shortDescription: p.shortDescription || p.short_description || '',
+    description: p.description || '',
     category: p.category,
     price: p.price,
     comparePrice: p.comparePrice || p.compare_price,
     discountPercent: p.discountPercent || p.discount_percent,
-    badge: p.badge,
+    badge: p.badge || '',
     images: p.images || [],
     popularScore: p.popularScore || p.popular_score || 50,
-  }));
+    madeIn: 'France' as const,
+    material: p.material || '',
+    diameter: p.diameter || 0,
+    thickness: p.thickness || 0,
+    height: p.height || 0,
+    weight: p.weight || 0,
+    warranty: p.warranty || '',
+    availability: p.availability || 'En stock',
+    shipping: p.shipping || '',
+    specs: p.specs || { acier: '', epaisseur: '', dimensions: '', poids: '' },
+    highlights: p.highlights || [],
+    features: p.features || [],
+    location: p.location || { city: '', dept: '', lat: 0, lng: 0 },
+    faq: p.faq || [],
+    customSpecs: p.customSpecs || p.custom_specs,
+  })) as Product[];
 
   return (
     <>
