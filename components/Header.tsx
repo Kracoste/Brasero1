@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
 import { Heart, Menu, ShoppingBag, User, X, LogOut } from 'lucide-react';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 import { cn } from '@/lib/utils';
 import { navLinks } from '@/components/navigation';
@@ -35,56 +36,92 @@ export const Header = () => {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [accessoriesOpen, setAccessoriesOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
   const accountTimer = useRef<NodeJS.Timeout | null>(null);
+  const supabaseRef = useRef(createClient());
 
   useEffect(() => {
-    const supabase = createClient();
-    
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
-      // Vérifier si l'utilisateur est admin
-      if (user) {
-        const { data: profile } = await supabase
+    const supabase = supabaseRef.current;
+
+    const fetchRole = async (userId: string) => {
+      try {
+        const { data: profile, error } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', user.id)
+          .eq('id', userId)
           .single();
-        setIsAdmin(profile?.role === 'admin');
-      }
-    };
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
-      if (!session?.user) {
+        
+        if (error) {
+          console.error('Erreur récupération profil:', error);
+          setIsAdmin(false);
+          return;
+        }
+        
+        const isAdminUser = profile?.role === 'admin';
+        console.log('Role utilisateur:', profile?.role, 'isAdmin:', isAdminUser);
+        setIsAdmin(isAdminUser);
+      } catch (err) {
+        console.error('Exception fetchRole:', err);
         setIsAdmin(false);
       }
+    };
+
+    const syncUser = async (nextUser: SupabaseUser | null) => {
+      console.log('syncUser appelé avec:', nextUser?.email);
+      setUser(nextUser);
+      if (nextUser) {
+        await fetchRole(nextUser.id);
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    const init = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Erreur getUser:', error);
+      }
+      console.log('Init user:', user?.email);
+      await syncUser(user);
+    };
+    void init();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event, session?.user?.email);
+      await syncUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
-    if (loggingOut) return; // Éviter les doubles clics
+    if (loggingOut) return;
     setLoggingOut(true);
     setAccountMenuOpen(false);
     
     try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      const supabase = supabaseRef.current;
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Erreur signOut:', error);
+        throw error;
+      }
+      
+      // Reset état local
       setUser(null);
       setIsAdmin(false);
-      // Forcer un rechargement complet
-      window.location.replace('/');
+      
+      // Forcer un rechargement complet pour nettoyer tout l'état
+      window.location.href = '/';
     } catch (error) {
       console.error('Erreur déconnexion:', error);
       setLoggingOut(false);
+      // Même en cas d'erreur, essayer de recharger
+      window.location.href = '/';
     }
   };
 
@@ -329,6 +366,15 @@ export const Header = () => {
                 {link.label}
               </Link>
             ))}
+            {user && isAdmin && (
+              <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-center text-sm font-semibold text-amber-700"
+              >
+                Dashboard Admin
+              </Link>
+            )}
             <Link
               href="/connexion"
               onClick={() => setOpen(false)}

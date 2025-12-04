@@ -4,6 +4,19 @@ import { CatalogueView } from "@/components/CatalogueView";
 import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
 import { createClient } from "@/lib/supabase/server";
+import { resolveDiameter } from "@/lib/utils";
+
+const normalizeSpecs = (specs: any) => {
+  if (!specs) return {};
+  if (typeof specs === "string") {
+    try {
+      return JSON.parse(specs);
+    } catch {
+      return {};
+    }
+  }
+  return specs;
+};
 
 export const metadata: Metadata = {
   title: "Catalogue",
@@ -34,35 +47,44 @@ export default async function ProductsPage({ searchParams }: Props) {
     .order('created_at', { ascending: false });
 
   // Transformer les produits Supabase au format attendu (supporte camelCase et snake_case)
-  const allProducts = (supabaseProducts || []).map((p: any) => ({
-    slug: p.slug,
-    name: p.name,
-    shortDescription: p.shortDescription || p.short_description || '',
-    description: p.description || '',
-    category: p.category,
-    price: p.price,
-    comparePrice: p.comparePrice || p.compare_price,
-    discountPercent: p.discountPercent || p.discount_percent,
-    badge: p.badge,
-    images: p.images || [],
-    material: p.material,
-    madeIn: p.madeIn || p.made_in || 'France',
-    diameter: p.diameter,
-    thickness: p.thickness,
-    height: p.height,
-    weight: p.weight,
-    warranty: p.warranty,
-    availability: p.availability || 'En stock',
-    shipping: p.shipping,
-    popularScore: p.popularScore || p.popular_score || 50,
-    inStock: p.inStock ?? p.in_stock ?? true,
-    specs: p.specs || {},
-    highlights: p.highlights || [],
-    features: p.features || [],
-    faq: p.faq || [],
-    customSpecs: p.customSpecs || p.custom_specs || [],
-    location: p.location,
-  }));
+  const allProducts = (supabaseProducts || []).map((p: any) => {
+    const specs = normalizeSpecs(p.specs);
+    const diameter =
+      resolveDiameter({
+        ...p,
+        specs,
+      }) ?? 0;
+
+    return {
+      diameter,
+      slug: p.slug,
+      name: p.name,
+      shortDescription: p.shortDescription || p.short_description || '',
+      description: p.description || '',
+      category: p.category,
+      price: p.price,
+      comparePrice: p.comparePrice || p.compare_price,
+      discountPercent: p.discountPercent || p.discount_percent,
+      badge: p.badge,
+      images: p.images || [],
+      material: p.material,
+      madeIn: p.madeIn || p.made_in || 'France',
+      thickness: p.thickness,
+      height: p.height,
+      weight: p.weight,
+      warranty: p.warranty,
+      availability: p.availability || 'En stock',
+      shipping: p.shipping,
+      popularScore: p.popularScore || p.popular_score || 50,
+      inStock: p.inStock ?? p.in_stock ?? true,
+      specs: specs || {},
+      highlights: p.highlights || [],
+      features: p.features || [],
+      faq: p.faq || [],
+      customSpecs: p.customSpecs || p.custom_specs || [],
+      location: p.location,
+    };
+  });
   
   const filteredProducts =
     category === "promotions"

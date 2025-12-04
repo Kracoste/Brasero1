@@ -12,6 +12,7 @@ import { Section } from "@/components/Section";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductTabs } from "@/components/ProductTabs";
 import { createClient } from "@/lib/supabase/server";
+import { resolveDiameter } from "@/lib/utils";
 import { Users, Flame, Box, Ruler, Weight } from "lucide-react";
 
 // Désactiver le cache pour toujours afficher les dernières données
@@ -20,6 +21,18 @@ export const dynamic = 'force-dynamic';
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
+};
+
+const normalizeSpecs = (specs: any) => {
+  if (!specs) return {};
+  if (typeof specs === "string") {
+    try {
+      return JSON.parse(specs);
+    } catch {
+      return {};
+    }
+  }
+  return specs;
 };
 
 // Fonction pour récupérer un produit depuis Supabase uniquement
@@ -32,6 +45,13 @@ async function getProduct(slug: string) {
     .single();
 
   if (!p) return null;
+
+  const specs = normalizeSpecs(p.specs);
+  const diameter =
+    resolveDiameter({
+      ...p,
+      specs,
+    }) ?? 0;
 
   // Transformer le produit Supabase au format attendu (supporte camelCase et snake_case)
   return {
@@ -52,7 +72,7 @@ async function getProduct(slug: string) {
     })),
     material: p.material || 'Acier',
     madeIn: p.madeIn || p.made_in || 'France',
-    diameter: p.diameter || 0,
+    diameter,
     thickness: p.thickness || 0,
     height: p.height || 0,
     weight: p.weight || 0,
@@ -61,9 +81,10 @@ async function getProduct(slug: string) {
     shipping: p.shipping || '',
     popularScore: p.popularScore || p.popular_score || 50,
     inStock: p.inStock ?? p.in_stock ?? true,
-    specs: p.specs || {
-      dimensions: `${p.diameter || '-'} cm`,
-    },
+    specs:
+      (specs && Object.keys(specs).length > 0
+        ? specs
+        : { dimensions: diameter ? `Ø ${diameter} cm` : '-' }) ?? {},
     highlights: p.highlights || [],
     features: p.features || [],
     faq: p.faq || [],
