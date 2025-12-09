@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
@@ -13,19 +13,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+  const checkAdmin = useCallback(async () => {
+    try {
+      // Utiliser getSession pour une vérification plus rapide (côté client)
+      const { data: { session } } = await supabase.auth.getSession();
       
-      console.log('Admin check - User:', user?.id, user?.email);
-      
-      if (!user) {
+      if (!session?.user) {
         setDebugInfo('Pas d\'utilisateur connecté - redirection vers connexion');
-        console.log('Admin check - No user, redirecting to login');
         router.push('/connexion?redirect=/admin');
         return;
       }
 
+      const user = session.user;
       setDebugInfo(`Utilisateur: ${user.email} - Vérification du rôle...`);
 
       // Vérifier si l'utilisateur est admin
@@ -35,33 +34,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         .eq('id', user.id)
         .single();
 
-      console.log('Admin check - Profile:', profile, 'Error:', error);
-
-      if (error) {
-        setDebugInfo(`Erreur: ${error.message}`);
+      if (error || !profile) {
+        setDebugInfo(`Erreur: ${error?.message || 'Profil non trouvé'}`);
+        setTimeout(() => router.push('/'), 2000);
         return;
       }
 
-      if (!profile) {
-        setDebugInfo(`Profil non trouvé pour ${user.email}`);
+      if (profile.role !== 'admin') {
+        setDebugInfo(`Rôle: "${profile.role}" (pas admin) - redirection vers accueil`);
+        setTimeout(() => router.push('/'), 2000);
         return;
       }
 
-      if (profile?.role !== 'admin') {
-        setDebugInfo(`Rôle: "${profile?.role}" (pas admin) - redirection vers accueil`);
-        console.log('Admin check - Not admin, redirecting to home');
-        setTimeout(() => router.push('/'), 3000);
-        return;
-      }
-
-      console.log('Admin check - SUCCESS, user is admin');
       setDebugInfo('Accès admin autorisé !');
       setIsAdmin(true);
       setLoading(false);
-    };
-
-    checkAdmin();
+    } catch (error) {
+      console.error('Admin check error:', error);
+      setDebugInfo('Erreur lors de la vérification');
+      setTimeout(() => router.push('/'), 2000);
+    }
   }, [router, supabase]);
+
+  useEffect(() => {
+    checkAdmin();
+  }, [checkAdmin]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

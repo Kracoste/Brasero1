@@ -2,17 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { TrendingUp, Users, ShoppingCart, Euro, Eye, Package, Globe, Clock } from 'lucide-react';
+import { TrendingUp, Users, ShoppingCart, Euro, Eye, Package } from 'lucide-react';
 
 type Stats = {
   totalVisits: number;
-  todayVisits: number;
-  uniqueVisitors: number;
   totalSales: number;
   totalRevenue: number;
   totalProducts: number;
   totalCustomers: number;
-  topPages: Array<{ page: string; count: number }>;
   recentOrders: Array<{
     id: string;
     customer: string;
@@ -25,13 +22,10 @@ type Stats = {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({
     totalVisits: 0,
-    todayVisits: 0,
-    uniqueVisitors: 0,
     totalSales: 0,
     totalRevenue: 0,
     totalProducts: 0,
     totalCustomers: 0,
-    topPages: [],
     recentOrders: [],
   });
   const [loading, setLoading] = useState(true);
@@ -40,75 +34,51 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Récupérer les visites
-        const { data: visits, count: totalVisitsCount } = await supabase
-          .from('visits')
-          .select('*', { count: 'exact' });
+        // Récupérer les statistiques en parallèle pour plus de rapidité
+        const [ordersResult, productsResult, customersResult] = await Promise.all([
+          supabase
+            .from('orders')
+            .select('id, customer_name, total, created_at, status')
+            .order('created_at', { ascending: false })
+            .limit(10),
+          supabase
+            .from('products')
+            .select('*', { count: 'exact', head: true }),
+          supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+        ]);
 
-        // Visites aujourd'hui
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const { count: todayVisitsCount } = await supabase
-          .from('visits')
-          .select('*', { count: 'exact', head: true })
-          .gte('created_at', today.toISOString());
+        const orders = ordersResult.data || [];
+        const productsCount = productsResult.count || 0;
+        const customersCount = customersResult.count || 0;
 
-        // Visiteurs uniques
-        const uniqueVisitorIds = new Set(visits?.map((v: any) => v.visitor_id) || []);
-
-        // Pages les plus visitées
-        const pageCount: Record<string, number> = {};
-        visits?.forEach((v: any) => {
-          pageCount[v.page] = (pageCount[v.page] || 0) + 1;
-        });
-        const topPages = Object.entries(pageCount)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([page, count]) => ({ page, count }));
-
-        // Récupérer les commandes
-        const { data: orders } = await supabase
-          .from('orders')
-          .select('*');
-
-        const { count: productsCount } = await supabase
-          .from('products')
-          .select('*', { count: 'exact', head: true });
-
-        const { count: customersCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-
-        const totalRevenue = orders?.reduce((sum: number, order: any) => sum + (order.total || 0), 0) || 0;
+        // Calculer les stats
+        const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
 
         setStats({
-          totalVisits: totalVisitsCount || 0,
-          todayVisits: todayVisitsCount || 0,
-          uniqueVisitors: uniqueVisitorIds.size,
-          totalSales: orders?.length || 0,
+          totalVisits: 0,
+          totalSales: orders.length,
           totalRevenue: totalRevenue,
-          totalProducts: productsCount || 0,
-          totalCustomers: customersCount || 0,
-          topPages: topPages,
-          recentOrders: orders?.slice(0, 5).map((order: any) => ({
+          totalProducts: productsCount,
+          totalCustomers: customersCount,
+          recentOrders: orders.slice(0, 5).map((order: any) => ({
             id: order.id,
             customer: order.customer_name || 'Client',
             amount: order.total || 0,
             date: new Date(order.created_at).toLocaleDateString('fr-FR'),
             status: order.status || 'pending',
-          })) || [],
+          })),
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
+        // Valeurs à zéro si erreur
         setStats({
           totalVisits: 0,
-          todayVisits: 0,
-          uniqueVisitors: 0,
           totalSales: 0,
           totalRevenue: 0,
           totalProducts: 0,
           totalCustomers: 0,
-          topPages: [],
           recentOrders: [],
         });
       } finally {
@@ -148,77 +118,16 @@ export default function AdminDashboard() {
         <p className="text-slate-600 mt-1">Bienvenue dans votre panneau d'administration</p>
       </div>
 
-      {/* Statistiques de visites */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">📊 Statistiques de visites</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 shadow-lg text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm">Visites totales</p>
-                <p className="text-4xl font-bold mt-1">{stats.totalVisits.toLocaleString()}</p>
-              </div>
-              <div className="h-14 w-14 bg-white/20 rounded-full flex items-center justify-center">
-                <Eye className="h-7 w-7 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 shadow-lg text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm">Visites aujourd'hui</p>
-                <p className="text-4xl font-bold mt-1">{stats.todayVisits.toLocaleString()}</p>
-              </div>
-              <div className="h-14 w-14 bg-white/20 rounded-full flex items-center justify-center">
-                <Clock className="h-7 w-7 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 shadow-lg text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm">Visiteurs uniques</p>
-                <p className="text-4xl font-bold mt-1">{stats.uniqueVisitors.toLocaleString()}</p>
-              </div>
-              <div className="h-14 w-14 bg-white/20 rounded-full flex items-center justify-center">
-                <Globe className="h-7 w-7 text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Pages les plus visitées */}
-      {stats.topPages.length > 0 && (
-        <div className="mb-8 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">🔥 Pages les plus visitées</h3>
-          <div className="space-y-3">
-            {stats.topPages.map((page, index) => (
-              <div key={page.page} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-slate-400 w-6">#{index + 1}</span>
-                  <span className="text-sm text-slate-700">{page.page === '/' ? 'Accueil' : page.page}</span>
-                </div>
-                <span className="text-sm font-semibold text-slate-900">{page.count} visites</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Statistiques principales */}
-      <h2 className="text-xl font-semibold text-slate-900 mb-4">💼 Statistiques commerciales</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600">Produits</p>
-              <p className="text-3xl font-bold text-slate-900 mt-1">{stats.totalProducts}</p>
+              <p className="text-sm text-slate-600">Visites totales</p>
+              <p className="text-3xl font-bold text-slate-900 mt-1">{stats.totalVisits.toLocaleString()}</p>
             </div>
-            <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
-              <Package className="h-6 w-6 text-indigo-600" />
+            <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <Eye className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>

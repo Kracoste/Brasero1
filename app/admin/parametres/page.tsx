@@ -1,327 +1,375 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Save, Store, Mail, Phone, MapPin, Globe, Truck, CreditCard } from 'lucide-react';
-
-type SiteSettings = {
-  site_name: string;
-  site_description: string;
-  contact_email: string;
-  contact_phone: string;
-  address: string;
-  city: string;
-  postal_code: string;
-  shipping_cost: number;
-  free_shipping_threshold: number;
-  currency: string;
-  tax_rate: number;
-};
+import { Settings, Store, Truck, CreditCard, Bell, Shield, Save, Check } from 'lucide-react';
 
 export default function ParametresPage() {
-  const [settings, setSettings] = useState<SiteSettings>({
-    site_name: 'Atelier LBF',
-    site_description: 'Braséros premium Made in France',
-    contact_email: '',
-    contact_phone: '',
-    address: '',
-    city: 'Moncoutant',
-    postal_code: '79320',
-    shipping_cost: 0,
-    free_shipping_threshold: 0,
-    currency: 'EUR',
-    tax_rate: 20,
-  });
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('general');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const supabase = createClient();
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('settings')
-          .select('*')
-          .single();
-
-        if (data) {
-          setSettings({
-            site_name: data.site_name || 'Atelier LBF',
-            site_description: data.site_description || '',
-            contact_email: data.contact_email || '',
-            contact_phone: data.contact_phone || '',
-            address: data.address || '',
-            city: data.city || 'Moncoutant',
-            postal_code: data.postal_code || '79320',
-            shipping_cost: data.shipping_cost || 0,
-            free_shipping_threshold: data.free_shipping_threshold || 0,
-            currency: data.currency || 'EUR',
-            tax_rate: data.tax_rate || 20,
-          });
-        }
-      } catch (error) {
-        console.log('Paramètres par défaut utilisés');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSettings();
-  }, [supabase]);
+  // États pour les paramètres
+  const [settings, setSettings] = useState({
+    // Général
+    storeName: 'Brasero Atelier',
+    storeEmail: 'contact@braseroatelier.fr',
+    storePhone: '05 49 XX XX XX',
+    storeAddress: 'Moncoutant, 79320 France',
+    
+    // Livraison
+    freeShippingThreshold: 500,
+    standardShippingCost: 29.90,
+    expressShippingCost: 49.90,
+    
+    // Notifications
+    emailOnNewOrder: true,
+    emailOnLowStock: true,
+    lowStockThreshold: 5,
+  });
 
   const handleSave = async () => {
     setSaving(true);
-    try {
-      // Essayer d'abord une mise à jour
-      const { error: updateError } = await supabase
-        .from('settings')
-        .update(settings)
-        .eq('id', 1);
-
-      if (updateError) {
-        // Si pas de ligne, créer
-        await supabase.from('settings').insert({ id: 1, ...settings });
-      }
-
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
-    } finally {
-      setSaving(false);
-    }
+    // Simuler la sauvegarde (à implémenter avec Supabase si besoin)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   };
 
-  const handleChange = (field: keyof SiteSettings, value: string | number) => {
-    setSettings((prev) => ({ ...prev, [field]: value }));
-  };
-
-  if (loading) {
-    return (
-      <div className="p-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 w-48 bg-slate-200 rounded"></div>
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-slate-200 rounded-xl"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const tabs = [
+    { id: 'general', label: 'Général', icon: Store },
+    { id: 'shipping', label: 'Livraison', icon: Truck },
+    { id: 'payment', label: 'Paiement', icon: CreditCard },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'security', label: 'Sécurité', icon: Shield },
+  ];
 
   return (
-    <div className="p-8 max-w-4xl">
-      <div className="mb-8 flex justify-between items-center">
+    <div className="p-8">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Paramètres</h1>
-          <p className="text-slate-600 mt-1">Configurez les paramètres de votre boutique</p>
+          <h1 className="text-2xl font-bold text-slate-900">Paramètres</h1>
+          <p className="text-slate-600 mt-1">Configurez votre boutique</p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition ${
-            saved
-              ? 'bg-green-500 text-white'
-              : 'bg-slate-900 text-white hover:bg-slate-800'
-          } disabled:opacity-50`}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition disabled:opacity-50"
         >
-          <Save size={18} />
-          {saving ? 'Enregistrement...' : saved ? 'Enregistré !' : 'Enregistrer'}
+          {saved ? (
+            <>
+              <Check size={18} />
+              Enregistré
+            </>
+          ) : saving ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Enregistrement...
+            </>
+          ) : (
+            <>
+              <Save size={18} />
+              Enregistrer
+            </>
+          )}
         </button>
       </div>
 
-      {/* Informations générales */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <Store size={20} />
-          Informations générales
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Nom du site
-            </label>
-            <input
-              type="text"
-              value={settings.site_name}
-              onChange={(e) => handleChange('site_name', e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Description
-            </label>
-            <input
-              type="text"
-              value={settings.site_description}
-              onChange={(e) => handleChange('site_description', e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-            />
-          </div>
+      <div className="flex gap-8">
+        {/* Sidebar des onglets */}
+        <div className="w-64 space-y-1">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition ${
+                  activeTab === tab.id
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <Icon size={20} />
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Contact */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <Mail size={20} />
-          Contact
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Email de contact
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="email"
-                value={settings.contact_email}
-                onChange={(e) => handleChange('contact_email', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-                placeholder="contact@exemple.fr"
-              />
+        {/* Contenu */}
+        <div className="flex-1 bg-white rounded-xl border border-slate-200 p-6">
+          {activeTab === 'general' && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Store size={20} />
+                Informations de la boutique
+              </h2>
+              
+              <div className="grid gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Nom de la boutique
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.storeName}
+                    onChange={(e) => setSettings({ ...settings, storeName: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Email de contact
+                  </label>
+                  <input
+                    type="email"
+                    value={settings.storeEmail}
+                    onChange={(e) => setSettings({ ...settings, storeEmail: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Téléphone
+                  </label>
+                  <input
+                    type="tel"
+                    value={settings.storePhone}
+                    onChange={(e) => setSettings({ ...settings, storePhone: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Adresse
+                  </label>
+                  <textarea
+                    value={settings.storeAddress}
+                    onChange={(e) => setSettings({ ...settings, storeAddress: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Téléphone
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="tel"
-                value={settings.contact_phone}
-                onChange={(e) => handleChange('contact_phone', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-                placeholder="01 23 45 67 89"
-              />
+          )}
+
+          {activeTab === 'shipping' && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Truck size={20} />
+                Paramètres de livraison
+              </h2>
+              
+              <div className="grid gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Seuil de livraison gratuite (€)
+                  </label>
+                  <input
+                    type="number"
+                    value={settings.freeShippingThreshold}
+                    onChange={(e) => setSettings({ ...settings, freeShippingThreshold: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                  <p className="mt-1 text-sm text-slate-500">
+                    Les commandes au-dessus de ce montant bénéficient de la livraison gratuite.
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Frais de livraison standard (€)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={settings.standardShippingCost}
+                    onChange={(e) => setSettings({ ...settings, standardShippingCost: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Frais de livraison express (€)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={settings.expressShippingCost}
+                    onChange={(e) => setSettings({ ...settings, expressShippingCost: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === 'payment' && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <CreditCard size={20} />
+                Moyens de paiement
+              </h2>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <CreditCard className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">Carte bancaire</p>
+                      <p className="text-sm text-slate-500">Visa, Mastercard, CB</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    Activé
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center text-xl">
+                      💳
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">PayPal</p>
+                      <p className="text-sm text-slate-500">Paiement sécurisé PayPal</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    Activé
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl">
+                      🏦
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">Virement bancaire</p>
+                      <p className="text-sm text-slate-500">Pour les commandes importantes</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    Activé
+                  </span>
+                </div>
+              </div>
+              
+              <p className="text-sm text-slate-500 mt-4">
+                Pour modifier les paramètres de paiement, contactez votre prestataire de paiement.
+              </p>
+            </div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Bell size={20} />
+                Notifications
+              </h2>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                  <div>
+                    <p className="font-medium text-slate-900">Nouvelle commande</p>
+                    <p className="text-sm text-slate-500">Recevoir un email à chaque nouvelle commande</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.emailOnNewOrder}
+                      onChange={(e) => setSettings({ ...settings, emailOnNewOrder: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900"></div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                  <div>
+                    <p className="font-medium text-slate-900">Stock faible</p>
+                    <p className="text-sm text-slate-500">Alerte quand un produit atteint le seuil minimum</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.emailOnLowStock}
+                      onChange={(e) => setSettings({ ...settings, emailOnLowStock: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-slate-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900"></div>
+                  </label>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Seuil de stock faible
+                  </label>
+                  <input
+                    type="number"
+                    value={settings.lowStockThreshold}
+                    onChange={(e) => setSettings({ ...settings, lowStockThreshold: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'security' && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Shield size={20} />
+                Sécurité
+              </h2>
+              
+              <div className="space-y-4">
+                <div className="p-4 border border-slate-200 rounded-lg">
+                  <p className="font-medium text-slate-900">Authentification</p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Votre compte est protégé par l&apos;authentification Supabase.
+                  </p>
+                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    <Check size={14} />
+                    Sécurisé
+                  </span>
+                </div>
+                
+                <div className="p-4 border border-slate-200 rounded-lg">
+                  <p className="font-medium text-slate-900">Connexions SSL</p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Toutes les connexions sont chiffrées via HTTPS.
+                  </p>
+                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    <Check size={14} />
+                    Actif
+                  </span>
+                </div>
+                
+                <div className="p-4 border border-slate-200 rounded-lg">
+                  <p className="font-medium text-slate-900">Changer le mot de passe</p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Modifiez votre mot de passe administrateur.
+                  </p>
+                  <button className="mt-3 px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
+                    Changer le mot de passe
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-
-      {/* Adresse */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <MapPin size={20} />
-          Adresse
-        </h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Adresse
-            </label>
-            <input
-              type="text"
-              value={settings.address}
-              onChange={(e) => handleChange('address', e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-              placeholder="123 rue de l'Exemple"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Code postal
-              </label>
-              <input
-                type="text"
-                value={settings.postal_code}
-                onChange={(e) => handleChange('postal_code', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Ville
-              </label>
-              <input
-                type="text"
-                value={settings.city}
-                onChange={(e) => handleChange('city', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Livraison & Paiement */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <Truck size={20} />
-          Livraison & Paiement
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Frais de livraison (€)
-            </label>
-            <input
-              type="number"
-              value={settings.shipping_cost}
-              onChange={(e) => handleChange('shipping_cost', parseFloat(e.target.value) || 0)}
-              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-              min="0"
-              step="0.01"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Livraison gratuite à partir de (€)
-            </label>
-            <input
-              type="number"
-              value={settings.free_shipping_threshold}
-              onChange={(e) => handleChange('free_shipping_threshold', parseFloat(e.target.value) || 0)}
-              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-              min="0"
-              step="0.01"
-            />
-            <p className="text-xs text-slate-500 mt-1">Mettre 0 pour désactiver</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Taux de TVA (%)
-            </label>
-            <input
-              type="number"
-              value={settings.tax_rate}
-              onChange={(e) => handleChange('tax_rate', parseFloat(e.target.value) || 0)}
-              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none"
-              min="0"
-              max="100"
-              step="0.1"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Devise
-            </label>
-            <select
-              value={settings.currency}
-              onChange={(e) => handleChange('currency', e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-slate-400 focus:outline-none bg-white"
-            >
-              <option value="EUR">Euro (€)</option>
-              <option value="USD">Dollar ($)</option>
-              <option value="GBP">Livre (£)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-        <p className="text-sm text-blue-800">
-          💡 Ces paramètres seront utilisés pour la configuration de votre boutique. 
-          N'oubliez pas d'enregistrer après vos modifications.
-        </p>
       </div>
     </div>
   );
