@@ -32,11 +32,11 @@ export default function AtelierPage() {
       <Section className="pt-10">
         <Container className="space-y-8">
           <div className="space-y-3">
-            <p className="text-sm uppercase tracking-wide text-slate-400">Savoir-faire</p>
-            <h1 className="font-display text-4xl font-semibold text-clay-900">
+            <p className="text-sm uppercase tracking-wide text-slate-500">Savoir-faire</p>
+            <h1 className="font-display text-4xl font-semibold text-slate-900">
               Une flamme née aux Deux-Sèvres
             </h1>
-            <p className="text-base text-slate-400">
+            <p className="text-base text-slate-600">
               Depuis Moncoutant, nous découpons, roulons et soudons des braséros conçus pour durer.
               Notre équipe maîtrise la transformation de l&apos;acier corten et assure un suivi
               complet de chaque pièce.
@@ -60,25 +60,25 @@ export default function AtelierPage() {
 
       <Section>
         <Container className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
-          <div className="space-y-6 rounded-3xl border border-slate-800 bg-black/90 p-8 shadow-lg">
-            <h2 className="font-display text-3xl font-semibold text-clay-900">
+          <div className="space-y-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-lg">
+            <h2 className="font-display text-3xl font-semibold text-slate-900">
               Fabrication 100% intégrée
             </h2>
-            <ul className="space-y-4 text-sm text-slate-400">
+            <ul className="space-y-4 text-sm text-slate-600">
               <li>
-                <strong className="font-semibold text-clay-900">Découpe laser.</strong> Chaque
+                <strong className="font-semibold text-slate-900">Découpe laser.</strong> Chaque
                 vasque est découpée sur nos tables Bystronic pour garantir des arrêtes parfaites.
               </li>
               <li>
-                <strong className="font-semibold text-clay-900">Formage & roulage.</strong> Les
+                <strong className="font-semibold text-slate-900">Formage & roulage.</strong> Les
                 pièces sont roulées sur cintreuse 3 rouleaux avant d&apos;être soudées en continu.
               </li>
               <li>
-                <strong className="font-semibold text-clay-900">Soudure TIG contrôlée.</strong> Nos
+                <strong className="font-semibold text-slate-900">Soudure TIG contrôlée.</strong> Nos
                 chaudronniers réalisent les soudures visibles puis les poncent pour un rendu premium.
               </li>
               <li>
-                <strong className="font-semibold text-clay-900">Finition & patine.</strong> Passage
+                <strong className="font-semibold text-slate-900">Finition & patine.</strong> Passage
                 en cabine, polissage manuel et pré-patine stabilisée pour un vieillissement homogène.
               </li>
             </ul>
@@ -98,7 +98,7 @@ export default function AtelierPage() {
           <h3 className="font-display text-2xl font-semibold text-clay-900">
             Venir à Moncoutant
           </h3>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-600">
             {siteConfig.address} — Prise de rendez-vous au {siteConfig.phone}. Accès par la N149,
             parking visiteur sur place.
           </p>

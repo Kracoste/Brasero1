@@ -37,7 +37,7 @@ export default function FavorisPage() {
           <div className="py-12">
             <div className="mb-8 flex items-center gap-3">
               <Heart className="h-8 w-8 text-[#ff5751]" />
-              <h1 className="text-3xl font-bold text-white">Mes Favoris</h1>
+              <h1 className="text-3xl font-bold text-slate-900">Mes Favoris</h1>
             </div>
             
             {favoriteProducts.length === 0 ? (

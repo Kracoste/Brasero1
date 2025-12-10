@@ -105,8 +105,8 @@ export default function MonComptePage() {
         <div className="space-y-8">
           {/* Header */}
           <div>
-            <h1 className="font-display text-3xl font-semibold text-clay-900">Mon compte</h1>
-            <p className="mt-2 text-slate-400">Gérez vos informations personnelles</p>
+            <h1 className="font-display text-3xl font-semibold text-slate-900">Mon compte</h1>
+            <p className="mt-2 text-slate-600">Gérez vos informations personnelles</p>
           </div>
 
           {/* Message de succès/erreur */}

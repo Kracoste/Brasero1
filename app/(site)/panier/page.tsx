@@ -52,8 +52,8 @@ export default function PanierPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="font-display text-3xl font-semibold text-clay-900">Mon panier</h1>
-              <p className="mt-2 text-slate-400">
+              <h1 className="font-display text-3xl font-semibold text-slate-900">Mon panier</h1>
+              <p className="mt-2 text-slate-600">
                 {itemCount} article{itemCount > 1 ? 's' : ''} dans votre panier
               </p>
             </div>

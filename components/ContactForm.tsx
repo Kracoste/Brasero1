@@ -13,20 +13,20 @@ export const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-slate-800 bg-black/90 p-6 shadow-lg">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
       <div>
-        <label htmlFor="name" className="text-sm font-semibold text-clay-900">
+        <label htmlFor="name" className="text-sm font-semibold text-slate-900">
           Nom complet
         </label>
         <input
           id="name"
           name="name"
           required
-          className="mt-2 w-full rounded-2xl border border-slate-700 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
+          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
         />
       </div>
       <div>
-        <label htmlFor="email" className="text-sm font-semibold text-clay-900">
+        <label htmlFor="email" className="text-sm font-semibold text-slate-900">
           Email
         </label>
         <input
@@ -34,11 +34,11 @@ export const ContactForm = () => {
           name="email"
           type="email"
           required
-          className="mt-2 w-full rounded-2xl border border-slate-700 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
+          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
         />
       </div>
       <div>
-        <label htmlFor="message" className="text-sm font-semibold text-clay-900">
+        <label htmlFor="message" className="text-sm font-semibold text-slate-900">
           Message
         </label>
         <textarea
@@ -46,12 +46,12 @@ export const ContactForm = () => {
           name="message"
           rows={4}
           required
-          className="mt-2 w-full rounded-2xl border border-slate-700 px-4 py-3 text-sm shadow-inner focus:border-clay-500 focus:outline-none focus:ring-2 focus:ring-clay-200"
+          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
         />
       </div>
       <button
         type="submit"
-        className="w-full rounded-full bg-clay-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-clay-800"
+        className="w-full rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
       >
         Envoyer
       </button>
