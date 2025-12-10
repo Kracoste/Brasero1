@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -167,7 +167,7 @@ export default function MetricPage() {
   }, []);
 
   const { title, icon } = useMemo(() => {
-    const map: Record<Metric, { title: string; icon: JSX.Element }> = {
+    const map: Record<Metric, { title: string; icon: React.ReactNode }> = {
       visites: { title: 'Visites', icon: <Eye className="h-5 w-5 text-emerald-600" /> },
       ca: { title: "Chiffre d'affaires", icon: <Euro className="h-5 w-5 text-sky-600" /> },
       ventes: { title: 'Ventes', icon: <ShoppingCart className="h-5 w-5 text-amber-600" /> },
