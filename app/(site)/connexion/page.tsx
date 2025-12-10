@@ -27,26 +27,41 @@ function ConnexionPageContent() {
 
       if (error) throw error;
 
-      // Vérifier si l'utilisateur est admin
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
+      if (!data.user) {
+        throw new Error('Erreur de connexion');
+      }
+
+      // Vérifier si l'utilisateur est admin (avec timeout)
+      let isAdmin = false;
+      try {
+        const profilePromise = supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+        
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('timeout')), 3000)
+        );
+        
+        const { data: profile } = await Promise.race([profilePromise, timeoutPromise]) as any;
+        isAdmin = profile?.role === 'admin';
+      } catch {
+        // Si erreur ou timeout, on continue sans vérifier le rôle admin
+        console.log('Could not fetch profile, continuing...');
+      }
 
       // Rediriger vers la page demandée ou vers admin si admin
       const redirectTo = searchParams.get('redirect');
       if (redirectTo) {
-        router.push(redirectTo);
-      } else if (profile?.role === 'admin') {
-        router.push('/admin');
+        window.location.href = redirectTo;
+      } else if (isAdmin) {
+        window.location.href = '/admin';
       } else {
-        router.push('/');
+        window.location.href = '/';
       }
-      router.refresh();
     } catch (error: any) {
       setError(error.message || 'Une erreur est survenue');
-    } finally {
       setLoading(false);
     }
   };
