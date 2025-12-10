@@ -30,6 +30,7 @@ export default function NewProduct() {
     comparePrice: '',
     hasPromotion: false,
     discountPercent: '',
+    diameter: '',
     length: '',
     width: '',
     height: '',
@@ -117,6 +118,9 @@ export default function NewProduct() {
     if (formData.hasPromotion && !formData.comparePrice) {
       newErrors.comparePrice = 'Le prix avant promo est requis';
     }
+    if (formData.category === 'brasero' && !formData.diameter) {
+      newErrors.diameter = 'Le diamètre est requis pour filtrer ce braséro';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -178,6 +182,7 @@ export default function NewProduct() {
         price: parseFloat(formData.price),
         comparePrice: formData.hasPromotion ? parseFloat(formData.comparePrice) : null,
         discountPercent: formData.hasPromotion ? discountPercent : null,
+        diameter: formData.diameter ? parseInt(formData.diameter) : null,
         length: formData.length ? parseInt(formData.length) : null,
         width: formData.width ? parseInt(formData.width) : null,
         height: formData.height ? parseInt(formData.height) : null,
@@ -487,6 +492,24 @@ export default function NewProduct() {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Dimensions et caractéristiques</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Diamètre (cm) {formData.category === 'brasero' && <span className="text-red-500">*</span>}
+              </label>
+              <input
+                type="number"
+                name="diameter"
+                value={formData.diameter}
+                onChange={handleInputChange}
+                min="0"
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
+                  errors.diameter ? 'border-red-500' : 'border-slate-200'
+                }`}
+                placeholder="45"
+              />
+              {errors.diameter && <p className="text-red-500 text-sm mt-1">{errors.diameter}</p>}
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Longueur (cm)

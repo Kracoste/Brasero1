@@ -1,84 +1,37 @@
-'use client';
-
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, ChevronLeft } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ChevronLeft } from 'lucide-react';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string>('Chargement...');
-  const router = useRouter();
-  const supabase = createClient();
+import { createClient } from '@/lib/supabase/server';
+import { AdminSignOutButton } from '@/components/AdminSignOutButton';
 
-  const checkAdmin = useCallback(async () => {
-    try {
-      // Utiliser getSession pour une vérification plus rapide (côté client)
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
-        setDebugInfo('Pas d\'utilisateur connecté - redirection vers connexion');
-        router.push('/connexion?redirect=/admin');
-        return;
-      }
+// Vérification serveur pour éviter le loader bloquant côté client
+export const dynamic = 'force-dynamic';
 
-      const user = session.user;
-      setDebugInfo(`Utilisateur: ${user.email} - Vérification du rôle...`);
+type AdminLayoutProps = {
+  children: ReactNode;
+};
 
-      // Vérifier si l'utilisateur est admin
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
+export default async function AdminLayout({ children }: AdminLayoutProps) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-      if (error || !profile) {
-        setDebugInfo(`Erreur: ${error?.message || 'Profil non trouvé'}`);
-        setTimeout(() => router.push('/'), 2000);
-        return;
-      }
-
-      if (profile.role !== 'admin') {
-        setDebugInfo(`Rôle: "${profile.role}" (pas admin) - redirection vers accueil`);
-        setTimeout(() => router.push('/'), 2000);
-        return;
-      }
-
-      setDebugInfo('Accès admin autorisé !');
-      setIsAdmin(true);
-      setLoading(false);
-    } catch (error) {
-      console.error('Admin check error:', error);
-      setDebugInfo('Erreur lors de la vérification');
-      setTimeout(() => router.push('/'), 2000);
-    }
-  }, [router, supabase]);
-
-  useEffect(() => {
-    checkAdmin();
-  }, [checkAdmin]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-  };
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-100">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-slate-900 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Vérification des accès...</p>
-          <p className="mt-2 text-sm text-slate-500 bg-white p-3 rounded-lg mt-4 max-w-md">{debugInfo}</p>
-        </div>
-      </div>
-    );
+  if (userError || !user) {
+    redirect('/connexion?redirect=/admin');
   }
 
-  if (!isAdmin) {
-    return null;
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError || profile?.role !== 'admin') {
+    redirect('/');
   }
 
   return (
@@ -148,20 +101,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ChevronLeft size={20} />
             Retour au site
           </Link>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition text-red-400 w-full mt-2"
-          >
-            <LogOut size={20} />
-            Déconnexion
-          </button>
+          <AdminSignOutButton className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition text-red-400 w-full mt-2" />
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
+      <main className="flex-1 overflow-auto">{children}</main>
     </div>
   );
 }

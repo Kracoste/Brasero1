@@ -259,7 +259,7 @@ export const Header = () => {
               {/* Menu déroulant */}
               <div
                 className={cn(
-                  "absolute top-full mt-2 w-48 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity z-50",
+                  "absolute top-full mt-2 w-48 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity z-50 overflow-hidden",
                   accountMenuOpen ? "flex opacity-100" : "hidden opacity-0"
                 )}
               >
@@ -290,7 +290,7 @@ export const Header = () => {
                     <button
                       onMouseDown={handleLogout}
                       disabled={loggingOut}
-                      className="px-4 py-2 pb-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left disabled:opacity-50 cursor-pointer"
+                      className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left disabled:opacity-50 cursor-pointer"
                     >
                       <LogOut size={16} />
                       {loggingOut ? 'Déconnexion...' : 'Déconnexion'}

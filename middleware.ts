@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   // Ignorer le middleware pour les routes publiques qui n'ont pas besoin d'auth
-  const publicPaths = ['/', '/produits', '/accessoires', '/contact', '/atelier', '/info', '/cgv', '/mentions-legales']
+  const publicPaths = ['/', '/produits', '/accessoires', '/contact', '/atelier', '/info', '/cgv', '/mentions-legales', '/connexion', '/inscription']
   const pathname = request.nextUrl.pathname
   
   // Si c'est une route publique, passer sans vérifier la session
@@ -15,6 +15,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
   
+  // Pour /admin, toujours mettre à jour la session
   return await updateSession(request)
 }
 

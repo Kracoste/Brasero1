@@ -27,8 +27,8 @@ const aboutLinks = [
 ];
 
 const categoryLinks = [
-  { href: "/info/braseros-exterieurs", label: "Braseros extérieurs" },
-  { href: "/info/accessoires", label: "Accessoires" },
+  { href: "/produits?category=brasero", label: "Braseros extérieurs" },
+  { href: "/accessoires", label: "Accessoires" },
 ];
 
 export const Footer = () => (
