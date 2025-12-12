@@ -269,16 +269,14 @@ export const Header = () => {
                       <p className="text-xs text-slate-500">Connecté en tant que</p>
                       <p className="text-sm font-medium text-slate-900 truncate">{user.email}</p>
                     </div>
-                    {isAdmin && (
-                      <Link
-                        href="/admin"
-                        className="px-4 py-2 text-sm font-medium text-amber-600 hover:bg-amber-50 flex items-center gap-2"
-                        onClick={() => setAccountMenuOpen(false)}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M14 9h2"/><path d="M14 14h4"/></svg>
-                        Dashboard Admin
-                      </Link>
-                    )}
+                    <Link
+                      href="/admin"
+                      className="px-4 py-2 text-sm font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 flex items-center gap-2 border-b border-slate-100"
+                      onClick={() => setAccountMenuOpen(false)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M14 9h2"/><path d="M14 14h4"/></svg>
+                      Dashboard Admin
+                    </Link>
                     <Link
                       href="/mon-compte"
                       className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"

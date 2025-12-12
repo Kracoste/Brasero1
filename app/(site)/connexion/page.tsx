@@ -19,49 +19,47 @@ function ConnexionPageContent() {
     setError(null);
     setLoading(true);
 
+    const adminEmails = ['allouhugo@gmail.com'];
+
     try {
+      console.log('Tentative de connexion...');
+      
+      // Timeout de 10 secondes max
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+      
+      clearTimeout(timeoutId);
+      console.log('Réponse reçue:', { data, error });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur Supabase:', error);
+        throw error;
+      }
 
       if (!data.user) {
         throw new Error('Erreur de connexion');
       }
 
-      // Vérifier si l'utilisateur est admin (avec timeout)
-      let isAdmin = false;
-      try {
-        const profilePromise = supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-        
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('timeout')), 3000)
-        );
-        
-        const { data: profile } = await Promise.race([profilePromise, timeoutPromise]) as any;
-        isAdmin = profile?.role === 'admin';
-      } catch {
-        // Si erreur ou timeout, on continue sans vérifier le rôle admin
-        console.log('Could not fetch profile, continuing...');
-      }
-
-      // Rediriger vers la page demandée ou vers admin si admin
-      const redirectTo = searchParams.get('redirect');
-      if (redirectTo) {
-        window.location.href = redirectTo;
-      } else if (isAdmin) {
-        window.location.href = '/admin';
-      } else {
-        window.location.href = '/';
-      }
+      console.log('User connecté:', data.user.email);
+      
+      const emailLower = data.user.email?.toLowerCase() || '';
+      const isAdmin = adminEmails.includes(emailLower);
+      const target = isAdmin ? '/admin' : '/';
+      
+      console.log('Redirection vers:', target);
+      window.location.href = target;
     } catch (error: any) {
-      setError(error.message || 'Une erreur est survenue');
+      console.error('Erreur catch:', error);
+      if (error.name === 'AbortError') {
+        setError('Connexion trop longue, veuillez réessayer');
+      } else {
+        setError(error.message || 'Une erreur est survenue');
+      }
       setLoading(false);
     }
   };
@@ -148,7 +146,7 @@ function ConnexionPageContent() {
 
 export default function ConnexionPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
       <ConnexionPageContent />
     </Suspense>
   );

@@ -360,13 +360,19 @@ const PriceSection = ({
           />
         </div>
 
-        <div className="relative mt-4" style={{ height: '20px' }}>
-          <div className="absolute top-1/2 left-2 right-2 h-2 -translate-y-1/2 rounded-full bg-[#f5e9d7]" />
+        <div className="relative mt-4" style={{ height: '14px' }}>
           <div
-            className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#d0ff52] to-[#1f7a1a]"
+            className="absolute top-1/2 -translate-y-1/2 rounded-full"
+            style={{ height: '4px', background: '#f5e9d7', left: '9px', right: '9px' }}
+          />
+          <div
+            className="absolute top-1/2 -translate-y-1/2 rounded-full"
             style={{
-              left: `calc(8px + (100% - 16px) * ${rangeMinPercent / 100})`,
-              right: `calc(8px + (100% - 16px) * ${(100 - rangeMaxPercent) / 100})`,
+              height: '4px',
+              left: `calc(9px + (100% - 18px) * ${rangeMinPercent / 100})`,
+              right: `calc(9px + (100% - 18px) * ${(100 - rangeMaxPercent) / 100})`,
+              background: 'linear-gradient(90deg, #d8b88a 0%, #b57945 50%, #5a3416 100%)',
+              zIndex: 1,
             }}
           />
           <input
