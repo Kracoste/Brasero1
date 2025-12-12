@@ -24,13 +24,25 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     redirect('/connexion?redirect=/admin');
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  // Liste des emails admin
+  const adminEmails = ['allouhugo@gmail.com'];
+  const isAdminByEmail = adminEmails.includes(user.email?.toLowerCase() || '');
 
-  if (profileError || profile?.role !== 'admin') {
+  // Vérifier aussi le profil en base (mais ne pas bloquer si erreur)
+  let isAdminByProfile = false;
+  try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    isAdminByProfile = profile?.role === 'admin';
+  } catch {
+    // Ignorer les erreurs de profil
+  }
+
+  // Admin si email dans la liste OU role admin dans profiles
+  if (!isAdminByEmail && !isAdminByProfile) {
     redirect('/');
   }
 
