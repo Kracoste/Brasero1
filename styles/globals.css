@@ -120,16 +120,17 @@ body {
 
 .dual-range-input::-webkit-slider-runnable-track {
   height: var(--dual-track-height);
-  background: transparent;
-  margin-left: var(--dual-thumb-radius);
-  margin-right: var(--dual-thumb-radius);
+  background: linear-gradient(90deg, #a86b2d, #8b4513);
+  border-radius: var(--dual-track-height);
+  margin: 0;
 }
 
 .dual-range-input::-moz-range-track {
   height: var(--dual-track-height);
-  background: transparent;
-  margin-left: var(--dual-thumb-radius);
-  margin-right: var(--dual-thumb-radius);
+  background: linear-gradient(90deg, #a86b2d, #8b4513);
+  /* Coupe la track pour qu'elle ne dépasse pas sous les thumbs */
+  border-radius: var(--dual-track-height);
+  margin: 0;
 }
 
 .header-texture {
@@ -143,9 +144,10 @@ body {
 
 .header-texture::before {
   content: "";
-  position: absolute;
+  position: relative;
   inset: 0;
   pointer-events: none;
+  z-index: 1;
   opacity: 0.35;
   mix-blend-mode: screen;
   background-image: linear-gradient(

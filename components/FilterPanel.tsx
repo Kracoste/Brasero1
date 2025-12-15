@@ -335,12 +335,12 @@ const PriceSection = ({
   const step = Math.max(1, Math.round((maxPrice - minPrice) / 40));
   const thumbSize = 18;
   const thumbBorder = 3;
-  const thumbInnerInset = thumbSize / 2 - thumbBorder;
-  // Strictement le rayon du thumb (sans border)
-  // Décalage pour éviter tout débordement visuel de la barre
-  const thumbVisualInsetLeft = thumbSize / 2;
-  const thumbVisualInsetRight = thumbSize / 2 + 5;
-  const trackWidth = `calc(100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px)`;
+  const trackInset = thumbSize / 2 + thumbBorder; // coupe la barre à l'intérieur du thumb
+  const trackAvailable = `calc(100% - ${trackInset * 2}px)`;
+  const baseLeft = `${trackInset}px`;
+  const baseRight = `calc(${trackInset}px + 1px)`;
+  const activeLeft = `calc(${trackInset}px + (${trackAvailable}) * ${rangeMinPercent / 100})`;
+  const activeRight = `calc(${trackInset}px + (${trackAvailable}) * ${(100 - rangeMaxPercent) / 100} + 1px)`;
 
   return (
     <div className="border-t border-slate-200 pt-6">
@@ -376,8 +376,8 @@ const PriceSection = ({
               top: '50%',
               height: '4px',
               background: '#f5e9d7',
-              left: `${thumbVisualInsetLeft + thumbInnerInset}px`,
-              right: `${thumbVisualInsetRight + thumbInnerInset}px`,
+              left: baseLeft,
+              right: baseRight,
               zIndex: 0,
               transform: 'translateY(-50%)',
             }}
@@ -388,8 +388,8 @@ const PriceSection = ({
             style={{
               top: '50%',
               height: '4px',
-              left: `calc(${thumbVisualInsetLeft + thumbInnerInset}px + (100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px) * ${rangeMinPercent / 100})`,
-              right: `calc(${thumbVisualInsetRight + thumbInnerInset}px + (100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px) * ${(100 - rangeMaxPercent) / 100})`,
+              left: activeLeft,
+              right: activeRight,
               background: 'linear-gradient(90deg, #d8b88a 0%, #b57945 50%, #5a3416 100%)',
               zIndex: 1,
               transform: 'translateY(-50%)',
@@ -407,8 +407,8 @@ const PriceSection = ({
             style={{
               position: 'absolute',
               top: '50%',
-              left: `${thumbVisualInsetLeft}px`,
-              width: `calc(100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px)`,
+              left: 0,
+              width: '100%',
               transform: 'translateY(-50%)',
               zIndex: 2,
             }}
@@ -424,8 +424,8 @@ const PriceSection = ({
             style={{
               position: 'absolute',
               top: '50%',
-              left: `${thumbVisualInsetLeft}px`,
-              width: `calc(100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px)`,
+              left: 0,
+              width: '100%',
               transform: 'translateY(-50%)',
               zIndex: 3,
             }}
