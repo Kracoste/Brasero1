@@ -333,6 +333,14 @@ const PriceSection = ({
   onMaxChange,
 }: PriceSectionProps) => {
   const step = Math.max(1, Math.round((maxPrice - minPrice) / 40));
+  const thumbSize = 18;
+  const thumbBorder = 3;
+  const thumbInnerInset = thumbSize / 2 - thumbBorder;
+  // Strictement le rayon du thumb (sans border)
+  // Décalage pour éviter tout débordement visuel de la barre
+  const thumbVisualInsetLeft = thumbSize / 2;
+  const thumbVisualInsetRight = thumbSize / 2 + 5;
+  const trackWidth = `calc(100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px)`;
 
   return (
     <div className="border-t border-slate-200 pt-6">
@@ -360,21 +368,34 @@ const PriceSection = ({
           />
         </div>
 
-        <div className="relative mt-4" style={{ height: '14px' }}>
+        <div className="relative mt-4" style={{ height: `${thumbSize + 2 * thumbBorder}px` }}>
+          {/* Barre de fond beige */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 rounded-full"
-            style={{ height: '4px', background: '#f5e9d7', left: '9px', right: '9px' }}
-          />
-          <div
-            className="absolute top-1/2 -translate-y-1/2 rounded-full"
+            className="absolute left-0 right-0 rounded-full pointer-events-none"
             style={{
+              top: '50%',
               height: '4px',
-              left: `calc(9px + (100% - 18px) * ${rangeMinPercent / 100})`,
-              right: `calc(9px + (100% - 18px) * ${(100 - rangeMaxPercent) / 100})`,
-              background: 'linear-gradient(90deg, #d8b88a 0%, #b57945 50%, #5a3416 100%)',
-              zIndex: 1,
+              background: '#f5e9d7',
+              left: `${thumbVisualInsetLeft + thumbInnerInset}px`,
+              right: `${thumbVisualInsetRight + thumbInnerInset}px`,
+              zIndex: 0,
+              transform: 'translateY(-50%)',
             }}
           />
+          {/* Barre active dégradée */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              top: '50%',
+              height: '4px',
+              left: `calc(${thumbVisualInsetLeft + thumbInnerInset}px + (100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px) * ${rangeMinPercent / 100})`,
+              right: `calc(${thumbVisualInsetRight + thumbInnerInset}px + (100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px) * ${(100 - rangeMaxPercent) / 100})`,
+              background: 'linear-gradient(90deg, #d8b88a 0%, #b57945 50%, #5a3416 100%)',
+              zIndex: 1,
+              transform: 'translateY(-50%)',
+            }}
+          />
+          {/* Les deux inputs range */}
           <input
             type="range"
             min={minPrice}
@@ -383,7 +404,14 @@ const PriceSection = ({
             value={priceMin}
             onChange={(event) => onMinChange(Math.min(Number(event.target.value), priceMax - 1))}
             className="dual-range-input"
-            style={{ top: '50%', transform: 'translateY(-50%)' }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: `${thumbVisualInsetLeft}px`,
+              width: `calc(100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px)`,
+              transform: 'translateY(-50%)',
+              zIndex: 2,
+            }}
           />
           <input
             type="range"
@@ -393,7 +421,14 @@ const PriceSection = ({
             value={priceMax}
             onChange={(event) => onMaxChange(Math.max(Number(event.target.value), priceMin + 1))}
             className="dual-range-input"
-            style={{ top: '50%', transform: 'translateY(-50%)' }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: `${thumbVisualInsetLeft}px`,
+              width: `calc(100% - ${thumbVisualInsetLeft + thumbVisualInsetRight}px)`,
+              transform: 'translateY(-50%)',
+              zIndex: 3,
+            }}
           />
         </div>
       </div>

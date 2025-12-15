@@ -49,15 +49,6 @@ body {
     height: 0;
   }
 }
-
-.animate-accordion-down {
-  animation: accordion-down 0.2s ease-out;
-}
-
-.animate-accordion-up {
-  animation: accordion-up 0.2s ease-out;
-}
-
 .filter-button {
   position: relative;
 }
@@ -80,12 +71,20 @@ body {
   transform: scaleX(1);
 }
 
+
+:root {
+  --dual-thumb-size: 18px;
+  --dual-thumb-border: 3px;
+  --dual-track-height: 4px;
+  --dual-thumb-radius: calc(var(--dual-thumb-size) / 2);
+}
+
 .dual-range-input {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 4px;
+  height: var(--dual-thumb-size);
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
@@ -96,36 +95,41 @@ body {
 .dual-range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: var(--dual-thumb-size);
+  height: var(--dual-thumb-size);
   border-radius: 50%;
-  border: 3px solid #8b4513;
+  border: var(--dual-thumb-border) solid #8b4513;
   background: #ffffff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
   cursor: pointer;
-  margin-top: -7px;
+  margin-top: calc((var(--dual-track-height) - var(--dual-thumb-size)) / 2); /* centre la barre dans le thumb */
 }
 
 .dual-range-input::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: var(--dual-thumb-size);
+  height: var(--dual-thumb-size);
   border-radius: 50%;
-  border: 3px solid #8b4513;
+  border: var(--dual-thumb-border) solid #8b4513;
   background: #ffffff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
   cursor: pointer;
+  margin-top: calc((var(--dual-track-height) - var(--dual-thumb-size)) / 2); /* centre la barre dans le thumb */
 }
 
 .dual-range-input::-webkit-slider-runnable-track {
-  height: 4px;
+  height: var(--dual-track-height);
   background: transparent;
+  margin-left: var(--dual-thumb-radius);
+  margin-right: var(--dual-thumb-radius);
 }
 
 .dual-range-input::-moz-range-track {
-  height: 4px;
+  height: var(--dual-track-height);
   background: transparent;
+  margin-left: var(--dual-thumb-radius);
+  margin-right: var(--dual-thumb-radius);
 }
 
 .header-texture {
