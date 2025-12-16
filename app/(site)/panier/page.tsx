@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { Container } from '@/components/Container';
 import { Section } from '@/components/Section';
@@ -7,9 +8,98 @@ import { Price } from '@/components/Price';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+
+type CheckoutForm = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  address: string;
+  postal_code: string;
+  city: string;
+  country: string;
+};
+
+type CheckoutStep = 'review' | 'details' | 'payment';
+
+const emptyCheckoutForm: CheckoutForm = {
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  address: '',
+  postal_code: '',
+  city: '',
+  country: 'France',
+};
 
 export default function PanierPage() {
   const { items, itemCount, totalPrice, loading, updateQuantity, removeItem, clearCart } = useCart();
+  const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('review');
+  const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(emptyCheckoutForm);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const prefillFromProfile = async () => {
+      setProfileLoading(true);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name,last_name,phone,address,postal_code,city,country')
+          .eq('id', user.id)
+          .single();
+
+        setCheckoutForm((prev) => ({
+          ...prev,
+          email: user.email ?? prev.email,
+          first_name: profile?.first_name ?? prev.first_name,
+          last_name: profile?.last_name ?? prev.last_name,
+          phone: profile?.phone ?? prev.phone,
+          address: profile?.address ?? prev.address,
+          postal_code: profile?.postal_code ?? prev.postal_code,
+          city: profile?.city ?? prev.city,
+          country: profile?.country ?? prev.country,
+        }));
+      }
+
+      setProfileLoading(false);
+    };
+
+    prefillFromProfile();
+  }, [supabase]);
+
+  const handleInputChange = (field: keyof CheckoutForm) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCheckoutForm((prev) => ({ ...prev, [field]: event.target.value }));
+  };
+
+  const startCheckout = () => {
+    setCheckoutStep('details');
+  };
+
+  const handleCheckoutSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (
+      !checkoutForm.first_name ||
+      !checkoutForm.last_name ||
+      !checkoutForm.email ||
+      !checkoutForm.address ||
+      !checkoutForm.postal_code ||
+      !checkoutForm.city
+    ) {
+      setFormError('Merci de renseigner tous les champs obligatoires.');
+      return;
+    }
+
+    setFormError(null);
+    setCheckoutStep('payment');
+  };
 
   if (loading) {
     return (
@@ -161,9 +251,133 @@ export default function PanierPage() {
                   <Price amount={totalPrice} className="text-slate-900" />
                 </div>
 
-                <button className="w-full rounded-full bg-clay-900 px-6 py-3 font-semibold text-white hover:bg-clay-800">
-                  Passer la commande
-                </button>
+                {checkoutStep === 'review' && (
+                  <button
+                    className="w-full rounded-full bg-clay-900 px-6 py-3 font-semibold text-white hover:bg-clay-800"
+                    onClick={startCheckout}
+                  >
+                    Je passe ma commande
+                  </button>
+                )}
+
+                {checkoutStep === 'details' && (
+                  <div className="rounded-2xl border border-slate-200 p-4">
+                    <h3 className="text-base font-semibold text-slate-900">Mes informations</h3>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {profileLoading
+                        ? 'Chargement de vos informations...'
+                        : "Vérifiez vos coordonnées ou complétez-les pour finaliser votre commande."}
+                    </p>
+
+                    <form className="mt-4 space-y-3" onSubmit={handleCheckoutSubmit}>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="text-sm font-medium text-slate-700">
+                          Prénom *
+                          <input
+                            type="text"
+                            className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                            value={checkoutForm.first_name}
+                            onChange={handleInputChange('first_name')}
+                            required
+                          />
+                        </label>
+                        <label className="text-sm font-medium text-slate-700">
+                          Nom *
+                          <input
+                            type="text"
+                            className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                            value={checkoutForm.last_name}
+                            onChange={handleInputChange('last_name')}
+                            required
+                          />
+                        </label>
+                      </div>
+
+                      <label className="text-sm font-medium text-slate-700">
+                        Email *
+                        <input
+                          type="email"
+                          className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                          value={checkoutForm.email}
+                          onChange={handleInputChange('email')}
+                          required
+                        />
+                      </label>
+
+                      <label className="text-sm font-medium text-slate-700">
+                        Téléphone
+                        <input
+                          type="tel"
+                          className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                          value={checkoutForm.phone}
+                          onChange={handleInputChange('phone')}
+                        />
+                      </label>
+
+                      <label className="text-sm font-medium text-slate-700">
+                        Adresse complète *
+                        <input
+                          type="text"
+                          className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                          value={checkoutForm.address}
+                          onChange={handleInputChange('address')}
+                          required
+                        />
+                      </label>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="text-sm font-medium text-slate-700">
+                          Code postal *
+                          <input
+                            type="text"
+                            className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                            value={checkoutForm.postal_code}
+                            onChange={handleInputChange('postal_code')}
+                            required
+                          />
+                        </label>
+                        <label className="text-sm font-medium text-slate-700">
+                          Ville *
+                          <input
+                            type="text"
+                            className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                            value={checkoutForm.city}
+                            onChange={handleInputChange('city')}
+                            required
+                          />
+                        </label>
+                      </div>
+
+                      <label className="text-sm font-medium text-slate-700">
+                        Pays
+                        <input
+                          type="text"
+                          className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                          value={checkoutForm.country}
+                          onChange={handleInputChange('country')}
+                        />
+                      </label>
+
+                      {formError && <p className="text-sm text-red-600">{formError}</p>}
+
+                      <button
+                        type="submit"
+                        className="w-full rounded-full bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-500"
+                      >
+                        Continuer vers le paiement
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {checkoutStep === 'payment' && (
+                  <div className="rounded-2xl border border-dashed border-slate-300 p-4 text-sm text-slate-600">
+                    <p className="font-semibold text-slate-900">Paiement</p>
+                    <p className="mt-1">
+                      Merci ! Vos informations sont enregistrées. L’intégration des modes de paiement arrive dans la prochaine étape.
+                    </p>
+                  </div>
+                )}
 
                 <Link
                   href="/produits"

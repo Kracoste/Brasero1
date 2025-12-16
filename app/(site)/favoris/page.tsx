@@ -83,7 +83,7 @@ const mapProduct = (source: SupabaseProduct): Product => {
     badge: source.badge || '',
     images: source.images || [],
     material: source.material,
-    madeIn: source.madeIn || source.made_in || 'France',
+    madeIn: (source.madeIn || source.made_in || 'France') as Product['madeIn'],
     thickness: parseNumber((source as any).thickness ?? specs?.epaisseur, 0),
     height: parseNumber((source as any).height, 0),
     weight: parseNumber((source as any).weight, 0),
