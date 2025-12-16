@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { FilterState } from '@/lib/utils';
+import { CustomDualRange } from './CustomDualRange';
 
 interface FilterPanelProps {
   minPrice: number;
@@ -44,10 +45,6 @@ export const FilterPanel = ({
     setPriceMax(value.priceMax ?? maxPrice);
   }, [minPrice, maxPrice, value.priceMin, value.priceMax]);
 
-  const totalRange = useMemo(() => Math.max(maxPrice - minPrice, 1), [minPrice, maxPrice]);
-  const rangeMinPercent = ((priceMin - minPrice) / totalRange) * 100;
-  const rangeMaxPercent = ((priceMax - minPrice) / totalRange) * 100;
-
   const commitPrice = (nextMin: number, nextMax: number) => {
     onChange({ ...value, priceMin: nextMin, priceMax: nextMax });
   };
@@ -65,8 +62,6 @@ export const FilterPanel = ({
         priceMax={priceMax}
         minPrice={minPrice}
         maxPrice={maxPrice}
-        rangeMinPercent={rangeMinPercent}
-        rangeMaxPercent={rangeMaxPercent}
         showCategories={showCategoryFilters}
         diameter={value.diameter}
         onDiameterChange={(diameter) => onChange({ ...value, diameter })}
@@ -110,8 +105,6 @@ interface FiltersContentProps {
   priceMax: number;
   minPrice: number;
   maxPrice: number;
-  rangeMinPercent: number;
-  rangeMaxPercent: number;
   showCategories: boolean;
   diameter?: string;
   onDiameterChange: (val?: string) => void;
@@ -129,8 +122,6 @@ const FiltersContent = ({
   priceMax,
   minPrice,
   maxPrice,
-  rangeMinPercent,
-  rangeMaxPercent,
   showCategories,
   diameter,
   onDiameterChange,
@@ -167,8 +158,6 @@ const FiltersContent = ({
       priceMax={priceMax}
       minPrice={minPrice}
       maxPrice={maxPrice}
-      rangeMinPercent={rangeMinPercent}
-      rangeMaxPercent={rangeMaxPercent}
       onMinChange={onMinChange}
       onMaxChange={onMaxChange}
     />
@@ -316,8 +305,6 @@ interface PriceSectionProps {
   priceMax: number;
   minPrice: number;
   maxPrice: number;
-  rangeMinPercent: number;
-  rangeMaxPercent: number;
   onMinChange: (value: number) => void;
   onMaxChange: (value: number) => void;
 }
@@ -327,20 +314,10 @@ const PriceSection = ({
   priceMax,
   minPrice,
   maxPrice,
-  rangeMinPercent,
-  rangeMaxPercent,
   onMinChange,
   onMaxChange,
 }: PriceSectionProps) => {
   const step = Math.max(1, Math.round((maxPrice - minPrice) / 40));
-  const thumbSize = 18;
-  const thumbBorder = 3;
-  const trackInset = thumbSize / 2 + thumbBorder; // coupe la barre à l'intérieur du thumb
-  const trackAvailable = `calc(100% - ${trackInset * 2}px)`;
-  const baseLeft = `${trackInset}px`;
-  const baseRight = `calc(${trackInset}px + 1px)`;
-  const activeLeft = `calc(${trackInset}px + (${trackAvailable}) * ${rangeMinPercent / 100})`;
-  const activeRight = `calc(${trackInset}px + (${trackAvailable}) * ${(100 - rangeMaxPercent) / 100} + 1px)`;
 
   return (
     <div className="border-t border-slate-200 pt-6">
@@ -368,69 +345,16 @@ const PriceSection = ({
           />
         </div>
 
-        <div className="relative mt-4" style={{ height: `${thumbSize + 2 * thumbBorder}px` }}>
-          {/* Barre de fond beige */}
-          <div
-            className="absolute left-0 right-0 rounded-full pointer-events-none"
-            style={{
-              top: '50%',
-              height: '4px',
-              background: '#f5e9d7',
-              left: baseLeft,
-              right: baseRight,
-              zIndex: 0,
-              transform: 'translateY(-50%)',
-            }}
-          />
-          {/* Barre active dégradée */}
-          <div
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              top: '50%',
-              height: '4px',
-              left: activeLeft,
-              right: activeRight,
-              background: 'linear-gradient(90deg, #d8b88a 0%, #b57945 50%, #5a3416 100%)',
-              zIndex: 1,
-              transform: 'translateY(-50%)',
-            }}
-          />
-          {/* Les deux inputs range */}
-          <input
-            type="range"
-            min={minPrice}
-            max={maxPrice}
-            step={step}
-            value={priceMin}
-            onChange={(event) => onMinChange(Math.min(Number(event.target.value), priceMax - 1))}
-            className="dual-range-input"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: 0,
-              width: '100%',
-              transform: 'translateY(-50%)',
-              zIndex: 2,
-            }}
-          />
-          <input
-            type="range"
-            min={minPrice}
-            max={maxPrice}
-            step={step}
-            value={priceMax}
-            onChange={(event) => onMaxChange(Math.max(Number(event.target.value), priceMin + 1))}
-            className="dual-range-input"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: 0,
-              width: '100%',
-              transform: 'translateY(-50%)',
-              zIndex: 3,
-            }}
-          />
-        </div>
+        <CustomDualRange
+          min={minPrice}
+          max={maxPrice}
+          step={step}
+          value={[priceMin, priceMax]}
+          onChange={([nextMin, nextMax]) => {
+            onMinChange(nextMin);
+            onMaxChange(nextMax);
+          }}
+        />
       </div>
     </div>
   );

@@ -71,68 +71,6 @@ body {
   transform: scaleX(1);
 }
 
-
-:root {
-  --dual-thumb-size: 18px;
-  --dual-thumb-border: 3px;
-  --dual-track-height: 4px;
-  --dual-thumb-radius: calc(var(--dual-thumb-size) / 2);
-}
-
-.dual-range-input {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: var(--dual-thumb-size);
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  pointer-events: none;
-  margin: 0;
-}
-
-.dual-range-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: var(--dual-thumb-size);
-  height: var(--dual-thumb-size);
-  border-radius: 50%;
-  border: var(--dual-thumb-border) solid #8b4513;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  pointer-events: auto;
-  cursor: pointer;
-  margin-top: calc((var(--dual-track-height) - var(--dual-thumb-size)) / 2); /* centre la barre dans le thumb */
-}
-
-.dual-range-input::-moz-range-thumb {
-  width: var(--dual-thumb-size);
-  height: var(--dual-thumb-size);
-  border-radius: 50%;
-  border: var(--dual-thumb-border) solid #8b4513;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  pointer-events: auto;
-  cursor: pointer;
-  margin-top: calc((var(--dual-track-height) - var(--dual-thumb-size)) / 2); /* centre la barre dans le thumb */
-}
-
-.dual-range-input::-webkit-slider-runnable-track {
-  height: var(--dual-track-height);
-  background: linear-gradient(90deg, #a86b2d, #8b4513);
-  border-radius: var(--dual-track-height);
-  margin: 0;
-}
-
-.dual-range-input::-moz-range-track {
-  height: var(--dual-track-height);
-  background: linear-gradient(90deg, #a86b2d, #8b4513);
-  /* Coupe la track pour qu'elle ne dépasse pas sous les thumbs */
-  border-radius: var(--dual-track-height);
-  margin: 0;
-}
-
 .header-texture {
   position: relative;
   overflow: visible;
@@ -144,10 +82,9 @@ body {
 
 .header-texture::before {
   content: "";
-  position: relative;
+  position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
   opacity: 0.35;
   mix-blend-mode: screen;
   background-image: linear-gradient(
