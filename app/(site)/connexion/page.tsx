@@ -22,44 +22,24 @@ function ConnexionPageContent() {
     const adminEmails = ['allouhugo@gmail.com'];
 
     try {
-      console.log('Tentative de connexion...');
-      
-      // Timeout de 10 secondes max
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
-      clearTimeout(timeoutId);
-      console.log('Réponse reçue:', { data, error });
 
-      if (error) {
-        console.error('Erreur Supabase:', error);
-        throw error;
+      if (error || !data.user) {
+        throw error || new Error('Erreur de connexion');
       }
 
-      if (!data.user) {
-        throw new Error('Erreur de connexion');
-      }
-
-      console.log('User connecté:', data.user.email);
-      
       const emailLower = data.user.email?.toLowerCase() || '';
       const isAdmin = adminEmails.includes(emailLower);
-      const target = isAdmin ? '/admin' : '/';
-      
-      console.log('Redirection vers:', target);
-      window.location.href = target;
+      const redirectFromQuery = searchParams?.get('redirectTo');
+      const target = redirectFromQuery || (isAdmin ? '/admin' : '/');
+
+      router.replace(target);
+      router.refresh();
     } catch (error: any) {
-      console.error('Erreur catch:', error);
-      if (error.name === 'AbortError') {
-        setError('Connexion trop longue, veuillez réessayer');
-      } else {
-        setError(error.message || 'Une erreur est survenue');
-      }
+      setError(error?.message || 'Une erreur est survenue');
       setLoading(false);
     }
   };
