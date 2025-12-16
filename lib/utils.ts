@@ -67,6 +67,7 @@ export const resolveDiameter = (source: Record<string, unknown>) => {
 export type FilterState = {
   diameter?: string;
   material?: string;
+  format?: "hexagonal" | "rond" | "carre";
   price?: string;
   sort?: "price-asc" | "price-desc" | "popular";
   priceMin?: number;
@@ -76,6 +77,45 @@ export type FilterState = {
 };
 
 type Predicate = (product: Product) => boolean;
+
+const stripDiacritics = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const normalizeText = (value?: string) =>
+  value ? stripDiacritics(value.toLowerCase()) : "";
+
+const gatherProductText = (product: Product) => {
+  const specs = product.specs as Record<string, unknown> | undefined;
+  return [
+    (product as Record<string, unknown>)["format"],
+    specs?.["format"],
+    specs?.["acier"],
+    product.badge,
+    product.name,
+    product.shortDescription,
+    product.description,
+    product.material,
+  ]
+    .filter((entry): entry is string => typeof entry === "string" && entry.length > 0)
+    .map((entry) => normalizeText(entry))
+    .join(" ");
+};
+
+const inferFormat = (product: Product): "hexagonal" | "rond" | "carre" | undefined => {
+  const text = gatherProductText(product);
+  if (text.includes("hex")) return "hexagonal";
+  if (text.includes("carre") || text.includes("square")) return "carre";
+  if (text.includes("rond") || text.includes("round") || text.includes("cercle")) return "rond";
+  return undefined;
+};
+
+const inferMaterial = (product: Product): "corten" | "acier" | "inox" | undefined => {
+  const text = gatherProductText(product);
+  if (text.includes("inox")) return "inox";
+  if (text.includes("corten")) return "corten";
+  if (text.includes("acier") || text.includes("steel") || text.includes("thermolaque")) {
+    return "acier";
+  }
+  return undefined;
+};
 
 const pricePredicates: Record<string, Predicate> = {
   lt500: (product) => product.price < 500,
@@ -129,7 +169,14 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
     }
 
     if (filters.material && filters.material !== "all") {
-      if (!product.material.toLowerCase().includes(filters.material)) {
+      const materialType = inferMaterial(product);
+      if (materialType !== filters.material) {
+        return false;
+      }
+    }
+
+    if (filters.format) {
+      if (inferFormat(product) !== filters.format) {
         return false;
       }
     }

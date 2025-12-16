@@ -14,6 +14,13 @@ type ProductImage = {
   isCardImage: boolean;
 };
 
+const DIAMETER_OPTIONS = [45, 50, 55, 60, 65, 70, 75, 80, 90, 100];
+const FORMAT_OPTIONS = [
+  { label: 'Rond', value: 'rond' },
+  { label: 'Hexagonal', value: 'hexagonal' },
+  { label: 'Carré', value: 'carre' },
+];
+
 export default function NewProduct() {
   const router = useRouter();
   const supabase = createClient();
@@ -39,6 +46,7 @@ export default function NewProduct() {
     material: 'corten',
     weight: '',
     inStock: true,
+    format: '',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -173,6 +181,8 @@ export default function NewProduct() {
       }
 
       // Créer le produit dans la base de données
+      const specsPayload = formData.format ? { format: formData.format } : null;
+
       const productData = {
         name: formData.name,
         slug: formData.slug,
@@ -190,6 +200,7 @@ export default function NewProduct() {
         baseThickness: formData.baseThickness ? parseFloat(formData.baseThickness) : null,
         weight: formData.weight || null,
         material: formData.material,
+        specs: specsPayload,
         inStock: formData.inStock,
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
@@ -329,8 +340,9 @@ export default function NewProduct() {
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
               >
-                <option value="corten">Acier Corten</option>
-                <option value="acier">Acier</option>
+                <option value="corten">Braséro Corten</option>
+                <option value="acier">Braséro Acier</option>
+                <option value="inox">Braséro Inox</option>
               </select>
             </div>
           </div>
@@ -496,18 +508,41 @@ export default function NewProduct() {
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Diamètre (cm) {formData.category === 'brasero' && <span className="text-red-500">*</span>}
               </label>
-              <input
-                type="number"
+              <select
                 name="diameter"
                 value={formData.diameter}
                 onChange={handleInputChange}
-                min="0"
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
                   errors.diameter ? 'border-red-500' : 'border-slate-200'
                 }`}
-                placeholder="45"
-              />
+              >
+                <option value="">Sélectionnez un diamètre</option>
+                {DIAMETER_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    Ø {size} cm
+                  </option>
+                ))}
+              </select>
               {errors.diameter && <p className="text-red-500 text-sm mt-1">{errors.diameter}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Forme du braséro
+              </label>
+              <select
+                name="format"
+                value={formData.format}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+              >
+                <option value="">Sélectionnez une forme</option>
+                {FORMAT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

@@ -155,7 +155,7 @@ export const Header = () => {
                   return (
                     <div
                       key={link.href}
-                      className="relative mx-6"
+                      className="relative mx-6 flex items-center"
                       onMouseEnter={() => {
                         if (accessoriesTimer.current) clearTimeout(accessoriesTimer.current);
                         setAccessoriesOpen(true);
@@ -168,7 +168,7 @@ export const Header = () => {
                       <Link
                         href={link.href}
                         className={cn(
-                          "nav-link-hover text-[0.85rem] font-semibold uppercase tracking-[0.25em] transition relative pb-1",
+                          "nav-link-hover text-[0.85rem] font-semibold uppercase tracking-[0.25em] transition relative pb-1 inline-flex items-center",
                           isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                         )}
                       >

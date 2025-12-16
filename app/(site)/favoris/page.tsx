@@ -1,22 +1,136 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+import { Heart } from 'lucide-react';
+import Link from 'next/link';
+
 import { Container } from '@/components/Container';
 import { Section } from '@/components/Section';
 import { ProductCard } from '@/components/ProductCard';
 import { useFavorites } from '@/lib/favorites-context';
-import { products } from '@/content/products';
-import { Heart } from 'lucide-react';
-import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import type { Product } from '@/lib/schema';
+import { resolveDiameter } from '@/lib/utils';
+
+type SupabaseProduct = {
+  slug: string;
+  name: string;
+  shortDescription?: string;
+  short_description?: string;
+  description?: string;
+  category: string;
+  price: number;
+  comparePrice?: number;
+  compare_price?: number;
+  discountPercent?: number;
+  discount_percent?: number;
+  badge?: string;
+  images?: Product['images'];
+  material: string;
+  madeIn?: string;
+  made_in?: string;
+  specs?: any;
+  highlights?: string[];
+  features?: Product['features'];
+  faq?: Product['faq'];
+  customSpecs?: Product['customSpecs'];
+  custom_specs?: Product['customSpecs'];
+  location?: Product['location'];
+  diameter?: number;
+  popularScore?: number;
+  popular_score?: number;
+};
+
+const normalizeSpecs = (specs: any) => {
+  if (!specs) return {};
+  if (typeof specs === 'string') {
+    try {
+      return JSON.parse(specs);
+    } catch {
+      return {};
+    }
+  }
+  return specs;
+};
+
+const parseNumber = (value: any, fallback = 0) => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number.parseFloat(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return fallback;
+};
+
+const mapProduct = (source: SupabaseProduct): Product => {
+  const specs = normalizeSpecs(source.specs);
+  const diameter =
+    resolveDiameter({
+      ...source,
+      specs,
+    }) ?? 0;
+
+  return {
+    diameter,
+    slug: source.slug,
+    name: source.name,
+    shortDescription: source.shortDescription || source.short_description || '',
+    description: source.description || '',
+    category: (source.category as Product['category']) ?? 'brasero',
+    price: source.price,
+    comparePrice: source.comparePrice || source.compare_price,
+    discountPercent: source.discountPercent || source.discount_percent,
+    badge: source.badge || '',
+    images: source.images || [],
+    material: source.material,
+    madeIn: source.madeIn || source.made_in || 'France',
+    thickness: parseNumber((source as any).thickness ?? specs?.epaisseur, 0),
+    height: parseNumber((source as any).height, 0),
+    weight: parseNumber((source as any).weight, 0),
+    warranty: (source as any).warranty || 'Garantie 2 ans',
+    availability: (source as any).availability || 'En stock',
+    shipping: (source as any).shipping || '',
+    popularScore: source.popularScore || source.popular_score || 50,
+    specs,
+    highlights: source.highlights || [],
+    features: source.features || [],
+    faq: source.faq || [],
+    customSpecs: source.customSpecs || source.custom_specs || [],
+    location: source.location || {
+      city: 'Moncoutant',
+      dept: '79',
+      lat: 46.65,
+      lng: -0.72,
+    },
+  };
+};
 
 export default function FavorisPage() {
-  const { favorites, loading, isFavorite } = useFavorites();
+  const { loading: favoritesLoading, isFavorite } = useFavorites();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
 
-  // Récupérer les produits complets à partir des slugs favoris
-  const favoriteProducts = products.filter(product => 
-    isFavorite(product.slug)
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase.from('products').select('*');
+      if (!error && data) {
+        setProducts(data.map(mapProduct));
+      } else {
+        console.error('Error loading products for favorites:', error);
+      }
+      setProductsLoading(false);
+    };
+
+    fetchProducts();
+  }, []);
+
+  const favoriteProducts = useMemo(
+    () => products.filter((product) => isFavorite(product.slug)),
+    [products, isFavorite],
   );
 
-  if (loading) {
+  if (favoritesLoading || productsLoading) {
     return (
       <main>
         <Section>

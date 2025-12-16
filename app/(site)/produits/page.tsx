@@ -68,6 +68,7 @@ export default async function ProductsPage({ searchParams }: Props) {
       badge: p.badge,
       images: p.images || [],
       material: p.material,
+      format: (specs?.format as string | undefined) || p.format,
       madeIn: p.madeIn || p.made_in || 'France',
       thickness: p.thickness,
       height: p.height,

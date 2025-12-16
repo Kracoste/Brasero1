@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingBag } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Price } from "@/components/Price";
 import { useCart } from "@/lib/cart-context";
+import { useFavorites } from "@/lib/favorites-context";
 import type { Product } from "@/lib/schema";
 import { formatCurrency } from "@/lib/utils";
 import "@/styles/product-card.css";
@@ -16,52 +17,29 @@ type ProductCardProps = {
   className?: string;
 };
 
-const FAVORITES_STORAGE_KEY = "brasero:favorites";
-
-const readFavorites = () => {
-  if (typeof window === "undefined") return new Set<string>();
-  try {
-    const raw = window.localStorage.getItem(FAVORITES_STORAGE_KEY);
-    if (!raw) return new Set<string>();
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      return new Set(parsed.filter((item): item is string => typeof item === "string"));
-    }
-    return new Set<string>();
-  } catch {
-    return new Set<string>();
-  }
-};
-
-const persistFavorites = (favorites: Set<string>) => {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(Array.from(favorites)));
-};
-
 export const ProductCard = ({ product, className }: ProductCardProps) => {
   const image = product.images[0];
   const { addItem, loading } = useCart();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const [adding, setAdding] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const isPromo = typeof product.discountPercent === "number" && product.discountPercent > 0 && !!product.comparePrice;
 
-  useEffect(() => {
-    const favorites = readFavorites();
-    setIsFavorite(favorites.has(product.slug));
-  }, [product.slug]);
-
-  const toggleFavorite = () => {
-    if (typeof window === "undefined") return;
-    setIsFavorite((prev) => {
-      const favorites = readFavorites();
-      if (prev) {
-        favorites.delete(product.slug);
-      } else {
-        favorites.add(product.slug);
-      }
-      persistFavorites(favorites);
-      return !prev;
-    });
+  const handleToggleFavorite = async () => {
+    if (favoriteLoading) return;
+    setFavoriteLoading(true);
+    try {
+      await toggleFavorite({
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        image: image?.src,
+      });
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    } finally {
+      setFavoriteLoading(false);
+    }
   };
 
   const handleAddToCart = async () => {
@@ -102,13 +80,14 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             <h3 className="product-card__name">{product.name}</h3>
             <button
               type="button"
-              onClick={toggleFavorite}
+              onClick={handleToggleFavorite}
               className="product-card__favorite-btn"
-              aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+              aria-label={isFavorite(product.slug) ? "Retirer des favoris" : "Ajouter aux favoris"}
+              disabled={favoriteLoading}
             >
               <Heart
                 className="product-card__favorite-icon"
-                fill={isFavorite ? "currentColor" : "none"}
+                fill={isFavorite(product.slug) ? "currentColor" : "none"}
                 strokeWidth={1.5}
               />
             </button>

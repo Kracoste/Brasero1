@@ -49,7 +49,7 @@ export const FilterPanel = ({
     onChange({ ...value, priceMin: nextMin, priceMax: nextMax });
   };
 
-  const content = (
+const content = (
     variant === "fendeur" ? (
       <FendeurTypeSection
         value={value.fendeurType}
@@ -63,6 +63,10 @@ export const FilterPanel = ({
         minPrice={minPrice}
         maxPrice={maxPrice}
         showCategories={showCategoryFilters}
+        material={value.material}
+        onMaterialChange={(material) => onChange({ ...value, material })}
+        format={value.format}
+        onFormatChange={(format) => onChange({ ...value, format })}
         diameter={value.diameter}
         onDiameterChange={(diameter) => onChange({ ...value, diameter })}
         showPromo={showPromoFilters}
@@ -106,6 +110,10 @@ interface FiltersContentProps {
   minPrice: number;
   maxPrice: number;
   showCategories: boolean;
+  material?: string;
+  onMaterialChange: (value?: string) => void;
+  format?: "hexagonal" | "rond" | "carre";
+  onFormatChange: (value?: "hexagonal" | "rond" | "carre") => void;
   diameter?: string;
   onDiameterChange: (val?: string) => void;
   showPromo?: boolean;
@@ -123,6 +131,10 @@ const FiltersContent = ({
   minPrice,
   maxPrice,
   showCategories,
+  material,
+  onMaterialChange,
+  format,
+  onFormatChange,
   diameter,
   onDiameterChange,
   showPromo,
@@ -133,8 +145,8 @@ const FiltersContent = ({
   onMaxChange,
 }: FiltersContentProps) => (
   <div className="space-y-6">
-    {showCategories && <CategorySection />}
-    <FormatSection />
+    {showCategories && <CategorySection value={material} onChange={onMaterialChange} />}
+    <FormatSection value={format} onChange={onFormatChange} />
     <DimensionSection diameter={diameter} onChange={onDiameterChange} diameters={diameters} />
     {showPromo && (
       <div className="border-t border-slate-200 pt-6">
@@ -164,25 +176,44 @@ const FiltersContent = ({
   </div>
 );
 
-const CategorySection = () => (
-  <div>
-    <h3 className="text-base font-bold text-slate-900 mb-4">Catégories</h3>
-    <div className="space-y-3">
-      {['Braséro Corten', 'Braséro Acier', 'Fendeur à bûches'].map((label) => (
-        <label
-          key={label}
-          className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
-        >
-          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
-            <input type="checkbox" className="peer sr-only" />
-            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-          </div>
-          <span>{label}</span>
-        </label>
-      ))}
+const CategorySection = ({
+  value,
+  onChange,
+}: {
+  value?: string;
+  onChange: (val?: string) => void;
+}) => {
+  const categories = [
+    { label: "Braséro Corten", value: "corten" },
+    { label: "Braséro Acier", value: "acier" },
+    { label: "Braséro Inox", value: "inox" },
+  ];
+
+  return (
+    <div>
+      <h3 className="text-base font-bold text-slate-900 mb-4">Catégories</h3>
+      <div className="space-y-3">
+        {categories.map((category) => (
+          <label
+            key={category.value}
+            className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+          >
+            <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+              <input
+                type="checkbox"
+                checked={value === category.value}
+                onChange={(event) => onChange(event.target.checked ? category.value : undefined)}
+                className="peer sr-only"
+              />
+              <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+            </div>
+            <span>{category.label}</span>
+          </label>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const FendeurTypeSection = ({
   value,
@@ -218,25 +249,44 @@ const FendeurTypeSection = ({
   </div>
 );
 
-const FormatSection = () => (
-  <div className="border-t border-slate-200 pt-6">
-    <h3 className="text-base font-bold text-slate-900 mb-4">Format Du Braséro</h3>
-    <div className="space-y-3">
-      {['Hexagonal', 'Rond', 'Carré'].map((label) => (
-        <label
-          key={label}
-          className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
-        >
-          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
-            <input type="checkbox" className="peer sr-only" />
-            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-          </div>
-          <span>{label}</span>
-        </label>
-      ))}
+const FormatSection = ({
+  value,
+  onChange,
+}: {
+  value?: "hexagonal" | "rond" | "carre";
+  onChange: (val?: "hexagonal" | "rond" | "carre") => void;
+}) => {
+  const formats: { label: string; value: "hexagonal" | "rond" | "carre" }[] = [
+    { label: "Hexagonal", value: "hexagonal" },
+    { label: "Rond", value: "rond" },
+    { label: "Carré", value: "carre" },
+  ];
+
+  return (
+    <div className="border-t border-slate-200 pt-6">
+      <h3 className="text-base font-bold text-slate-900 mb-4">Format Du Braséro</h3>
+      <div className="space-y-3">
+        {formats.map((formatOption) => (
+          <label
+            key={formatOption.value}
+            className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+          >
+            <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+              <input
+                type="checkbox"
+                checked={value === formatOption.value}
+                onChange={(event) => onChange(event.target.checked ? formatOption.value : undefined)}
+                className="peer sr-only"
+              />
+              <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+            </div>
+            <span>{formatOption.label}</span>
+          </label>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const DeliverySection = () => (
   <div className="border-t border-slate-200 pt-6">
