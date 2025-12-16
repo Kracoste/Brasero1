@@ -220,19 +220,22 @@ const FiltersContent = ({
   );
 };
 
+type MaterialOption = "corten" | "acier" | "inox" | "brut";
+
 const CategorySection = ({
   values,
   onChange,
 }: {
-  values: string[];
-  onChange: (val?: string[]) => void;
+  values: MaterialOption[];
+  onChange: (val?: MaterialOption[]) => void;
 }) => {
-  const categories = [
+  const categories: { label: string; value: MaterialOption }[] = [
     { label: "Braséro Corten", value: "corten" },
     { label: "Braséro Acier", value: "acier" },
     { label: "Braséro Inox", value: "inox" },
+    { label: "Braséro Acier Brut", value: "brut" },
   ];
-  const handleToggle = (nextValue: string) => {
+  const handleToggle = (nextValue: MaterialOption) => {
     const next = values.includes(nextValue)
       ? values.filter((entry) => entry !== nextValue)
       : [...values, nextValue];
