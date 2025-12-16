@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useTransition } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -11,6 +11,7 @@ function ConnexionPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [isNavigating, startTransition] = useTransition();
   const searchParams = useSearchParams();
   const supabase = createClient();
 
@@ -36,10 +37,13 @@ function ConnexionPageContent() {
       const redirectFromQuery = searchParams?.get('redirectTo');
       const target = redirectFromQuery || (isAdmin ? '/admin' : '/');
 
-      router.replace(target);
-      router.refresh();
+      startTransition(() => {
+        router.replace(target);
+        router.refresh();
+      });
     } catch (error: any) {
       setError(error?.message || 'Une erreur est survenue');
+    } finally {
       setLoading(false);
     }
   };
@@ -103,10 +107,10 @@ function ConnexionPageContent() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isNavigating}
               className="group relative flex w-full justify-center rounded-full bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 mt-4"
             >
-              {loading ? 'Connexion en cours...' : 'Se connecter'}
+              {loading || isNavigating ? 'Connexion en cours...' : 'Se connecter'}
             </button>
           </div>
 
