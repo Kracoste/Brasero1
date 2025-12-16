@@ -7,6 +7,8 @@ import {
   type SiteSettings,
 } from '@/lib/site-settings-defaults';
 
+export type { SiteSettings } from '@/lib/site-settings-defaults';
+
 const SETTINGS_FILE = path.join(process.cwd(), 'data', `${STORE_SETTINGS_ID}-settings.json`);
 
 const sanitizeSettings = (input: Record<string, unknown>): SiteSettings => {
