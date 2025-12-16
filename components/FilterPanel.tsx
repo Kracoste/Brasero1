@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import type { FilterState } from '@/lib/utils';
-import { CustomDualRange } from './CustomDualRange';
+import { ensureArray, type FilterState } from "@/lib/utils";
+import { CustomDualRange } from "./CustomDualRange";
 
 interface FilterPanelProps {
   minPrice: number;
@@ -16,6 +16,8 @@ interface FilterPanelProps {
   variant?: "default" | "fendeur";
   showPromoFilters?: boolean;
   diameters?: number[];
+  showFormatAndDimensions?: boolean;
+  showAccessoryFilters?: boolean;
 }
 
 export const FilterPanel = ({
@@ -29,6 +31,8 @@ export const FilterPanel = ({
   variant = "default",
   showPromoFilters = false,
   diameters,
+  showFormatAndDimensions = true,
+  showAccessoryFilters = false,
 }: FilterPanelProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -49,10 +53,10 @@ export const FilterPanel = ({
     onChange({ ...value, priceMin: nextMin, priceMax: nextMax });
   };
 
-const content = (
+  const content =
     variant === "fendeur" ? (
       <FendeurTypeSection
-        value={value.fendeurType}
+        values={ensureArray(value.fendeurType)}
         onChange={(fendeurType) => onChange({ ...value, fendeurType })}
       />
     ) : (
@@ -67,12 +71,16 @@ const content = (
         onMaterialChange={(material) => onChange({ ...value, material })}
         format={value.format}
         onFormatChange={(format) => onChange({ ...value, format })}
+        accessoryType={value.accessoryType}
+        onAccessoryTypeChange={(type) => onChange({ ...value, accessoryType: type })}
         diameter={value.diameter}
         onDiameterChange={(diameter) => onChange({ ...value, diameter })}
         showPromo={showPromoFilters}
         promoValue={value.promo ?? false}
         onPromoChange={(promo) => onChange({ ...value, promo })}
         diameters={diameters}
+        showFormatAndDimensions={showFormatAndDimensions}
+        showAccessoryFilters={showAccessoryFilters}
         onMinChange={(next) => {
           setPriceMin(next);
           commitPrice(next, priceMax);
@@ -82,8 +90,7 @@ const content = (
           commitPrice(priceMin, next);
         }}
       />
-    )
-  );
+    );
 
   if (inline) {
     return <div className="space-y-8 pr-4">{content}</div>;
@@ -110,12 +117,16 @@ interface FiltersContentProps {
   minPrice: number;
   maxPrice: number;
   showCategories: boolean;
-  material?: string;
-  onMaterialChange: (value?: string) => void;
-  format?: "hexagonal" | "rond" | "carre";
-  onFormatChange: (value?: "hexagonal" | "rond" | "carre") => void;
-  diameter?: string;
-  onDiameterChange: (val?: string) => void;
+  showFormatAndDimensions: boolean;
+  showAccessoryFilters: boolean;
+  material?: FilterState["material"];
+  onMaterialChange: (value?: FilterState["material"]) => void;
+  format?: FilterState["format"];
+  onFormatChange: (value?: FilterState["format"]) => void;
+  accessoryType?: FilterState["accessoryType"];
+  onAccessoryTypeChange: (value?: FilterState["accessoryType"]) => void;
+  diameter?: FilterState["diameter"];
+  onDiameterChange: (val?: FilterState["diameter"]) => void;
   showPromo?: boolean;
   promoValue?: boolean;
   onPromoChange?: (val: boolean) => void;
@@ -131,10 +142,14 @@ const FiltersContent = ({
   minPrice,
   maxPrice,
   showCategories,
+  showFormatAndDimensions,
+  showAccessoryFilters,
   material,
   onMaterialChange,
   format,
   onFormatChange,
+  accessoryType,
+  onAccessoryTypeChange,
   diameter,
   onDiameterChange,
   showPromo,
@@ -143,51 +158,86 @@ const FiltersContent = ({
   diameters,
   onMinChange,
   onMaxChange,
-}: FiltersContentProps) => (
-  <div className="space-y-6">
-    {showCategories && <CategorySection value={material} onChange={onMaterialChange} />}
-    <FormatSection value={format} onChange={onFormatChange} />
-    <DimensionSection diameter={diameter} onChange={onDiameterChange} diameters={diameters} />
-    {showPromo && (
-      <div className="border-t border-slate-200 pt-6">
-        <h3 className="text-base font-bold text-slate-900 mb-4">Promotions</h3>
-        <label className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900">
-          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
-            <input
-              type="checkbox"
-              checked={promoValue}
-              onChange={(e) => onPromoChange?.(e.target.checked)}
-              className="peer sr-only"
-            />
-            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-          </div>
-          <span>Afficher uniquement les promotions</span>
-        </label>
-      </div>
-    )}
-    <PriceSection
-      priceMin={priceMin}
-      priceMax={priceMax}
-      minPrice={minPrice}
-      maxPrice={maxPrice}
-      onMinChange={onMinChange}
-      onMaxChange={onMaxChange}
-    />
-  </div>
-);
+}: FiltersContentProps) => {
+  const materialValues = ensureArray(material);
+  const formatValues = ensureArray(format);
+  const accessoryValues = ensureArray(accessoryType);
+  const diameterValues = ensureArray(diameter);
+
+  return (
+    <div className="space-y-6">
+      {showCategories && (
+        <CategorySection
+          values={materialValues}
+          onChange={(next) => onMaterialChange(next && next.length ? next : undefined)}
+        />
+      )}
+      {showAccessoryFilters && (
+        <AccessorySection
+          values={accessoryValues}
+          onChange={(next) => onAccessoryTypeChange(next && next.length ? next : undefined)}
+        />
+      )}
+      {showFormatAndDimensions && (
+        <>
+          <FormatSection
+            values={formatValues}
+            onChange={(next) => onFormatChange(next && next.length ? next : undefined)}
+          />
+          <DimensionSection
+            values={diameterValues}
+            onChange={(next) => onDiameterChange(next && next.length ? next : undefined)}
+            diameters={diameters}
+          />
+        </>
+      )}
+      {showPromo && (
+        <div className="border-t border-slate-200 pt-6">
+          <h3 className="text-base font-bold text-slate-900 mb-4">Promotions</h3>
+          <label className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900">
+            <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+              <input
+                type="checkbox"
+                checked={promoValue}
+                onChange={(e) => onPromoChange?.(e.target.checked)}
+                className="peer sr-only"
+              />
+              <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+            </div>
+            <span>Afficher uniquement les promotions</span>
+          </label>
+        </div>
+      )}
+      <PriceSection
+        priceMin={priceMin}
+        priceMax={priceMax}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        onMinChange={onMinChange}
+        onMaxChange={onMaxChange}
+      />
+    </div>
+  );
+};
 
 const CategorySection = ({
-  value,
+  values,
   onChange,
 }: {
-  value?: string;
-  onChange: (val?: string) => void;
+  values: string[];
+  onChange: (val?: string[]) => void;
 }) => {
   const categories = [
     { label: "Braséro Corten", value: "corten" },
     { label: "Braséro Acier", value: "acier" },
     { label: "Braséro Inox", value: "inox" },
   ];
+  const handleToggle = (nextValue: string) => {
+    const next = values.includes(nextValue)
+      ? values.filter((entry) => entry !== nextValue)
+      : [...values, nextValue];
+    onChange(next.length ? next : undefined);
+  };
 
   return (
     <div>
@@ -201,8 +251,8 @@ const CategorySection = ({
             <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
               <input
                 type="checkbox"
-                checked={value === category.value}
-                onChange={(event) => onChange(event.target.checked ? category.value : undefined)}
+                checked={values.includes(category.value)}
+                onChange={() => handleToggle(category.value)}
                 className="peer sr-only"
               />
               <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
@@ -215,52 +265,126 @@ const CategorySection = ({
   );
 };
 
-const FendeurTypeSection = ({
-  value,
+const AccessorySection = ({
+  values,
   onChange,
 }: {
-  value?: "manuel" | "electrique";
-  onChange: (val?: "manuel" | "electrique") => void;
-}) => (
-  <div>
-    <h3 className="text-base font-bold text-slate-900 mb-4">Fendeurs à bûches</h3>
-    <div className="space-y-3">
-      {[
-        { label: "Fendeur à bûches manuelle", value: "manuel" as const },
-        { label: "Fendeur à bûches électriques", value: "electrique" as const },
-      ].map((item) => (
-        <label
-          key={item.value}
-          className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
-        >
-          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
-            <input
-              type="checkbox"
-              checked={value === item.value}
-              onChange={(e) => onChange(e.target.checked ? item.value : undefined)}
-              className="peer sr-only"
-            />
-            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-          </div>
-          <span>{item.label}</span>
-        </label>
-      ))}
+  values: (
+    | "spatule"
+    | "couvercle"
+    | "grille"
+    | "allume-feu"
+    | "housse"
+    | "fendeur"
+    | "range-buches"
+  )[];
+  onChange: (val?: ("spatule" | "couvercle" | "grille" | "allume-feu" | "housse" | "fendeur" | "range-buches")[]) => void;
+}) => {
+  const options = [
+    { label: "Spatule", value: "spatule" as const },
+    { label: "Couvercle", value: "couvercle" as const },
+    { label: "Grille", value: "grille" as const },
+    { label: "Allume Feu", value: "allume-feu" as const },
+    { label: "Housse de Protection", value: "housse" as const },
+    { label: "Fendeur à Bûches", value: "fendeur" as const },
+    { label: "Ranges-Bûches", value: "range-buches" as const },
+  ];
+  const handleToggle = (
+    option: "spatule" | "couvercle" | "grille" | "allume-feu" | "housse" | "fendeur" | "range-buches",
+  ) => {
+    const next = values.includes(option)
+      ? values.filter((entry) => entry !== option)
+      : [...values, option];
+    onChange(next.length ? next : undefined);
+  };
+
+  return (
+    <div className="border-t border-slate-200 pt-6">
+      <h3 className="text-base font-bold text-slate-900 mb-4">Catégorie Accessoire</h3>
+      <div className="space-y-3">
+        {options.map((option) => (
+          <label
+            key={option.value}
+            className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+          >
+            <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+              <input
+                type="checkbox"
+                checked={values.includes(option.value)}
+                onChange={() => handleToggle(option.value)}
+                className="peer sr-only"
+              />
+              <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+            </div>
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+const FendeurTypeSection = ({
+  values,
+  onChange,
+}: {
+  values: ("manuel" | "electrique")[];
+  onChange: (val?: ("manuel" | "electrique")[]) => void;
+}) => {
+  const toggleValue = (target: "manuel" | "electrique") => {
+    const next = values.includes(target)
+      ? values.filter((entry) => entry !== target)
+      : [...values, target];
+    onChange(next.length ? next : undefined);
+  };
+
+  return (
+    <div>
+      <h3 className="text-base font-bold text-slate-900 mb-4">Fendeurs à bûches</h3>
+      <div className="space-y-3">
+        {[
+          { label: "Fendeur à bûches manuelle", value: "manuel" as const },
+          { label: "Fendeur à bûches électriques", value: "electrique" as const },
+        ].map((item) => (
+          <label
+            key={item.value}
+            className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+          >
+            <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+              <input
+                type="checkbox"
+                checked={values.includes(item.value)}
+                onChange={() => toggleValue(item.value)}
+                className="peer sr-only"
+              />
+              <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+            </div>
+            <span>{item.label}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const FormatSection = ({
-  value,
+  values,
   onChange,
 }: {
-  value?: "hexagonal" | "rond" | "carre";
-  onChange: (val?: "hexagonal" | "rond" | "carre") => void;
+  values: ("hexagonal" | "rond" | "carre")[];
+  onChange: (val?: ("hexagonal" | "rond" | "carre")[]) => void;
 }) => {
   const formats: { label: string; value: "hexagonal" | "rond" | "carre" }[] = [
     { label: "Hexagonal", value: "hexagonal" },
     { label: "Rond", value: "rond" },
     { label: "Carré", value: "carre" },
   ];
+  const toggleValue = (target: "hexagonal" | "rond" | "carre") => {
+    const next = values.includes(target)
+      ? values.filter((entry) => entry !== target)
+      : [...values, target];
+    onChange(next.length ? next : undefined);
+  };
 
   return (
     <div className="border-t border-slate-200 pt-6">
@@ -274,8 +398,8 @@ const FormatSection = ({
             <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
               <input
                 type="checkbox"
-                checked={value === formatOption.value}
-                onChange={(event) => onChange(event.target.checked ? formatOption.value : undefined)}
+                checked={values.includes(formatOption.value)}
+                onChange={() => toggleValue(formatOption.value)}
                 className="peer sr-only"
               />
               <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
@@ -299,56 +423,61 @@ const DeliverySection = () => (
 );
 
 const DimensionSection = ({
-  diameter,
+  values,
   onChange,
   diameters,
 }: {
-  diameter?: string;
-  onChange: (val?: string) => void;
+  values: string[];
+  onChange: (val?: string[]) => void;
   diameters?: number[];
-}) => (
-  <div className="border-t border-slate-200 pt-6">
-    <h3 className="text-base font-bold text-slate-900 mb-4">Dimensions Braséro</h3>
-    <div className="space-y-3">
-      <label className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900">
-        <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
-          <input
-            type="radio"
-            name="diameter-filter"
-            checked={!diameter}
-            onChange={(e) => e.target.checked && onChange(undefined)}
-            className="peer sr-only"
-          />
-          <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-        </div>
+}) => {
+  const toggleValue = (target: string) => {
+    const next = values.includes(target)
+      ? values.filter((entry) => entry !== target)
+      : [...values, target];
+    onChange(next.length ? next : undefined);
+  };
+
+  return (
+    <div className="border-t border-slate-200 pt-6">
+      <h3 className="text-base font-bold text-slate-900 mb-4">Dimensions Braséro</h3>
+      <div className="space-y-3">
+        <label className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900">
+          <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+            <input
+              type="checkbox"
+              checked={values.length === 0}
+              onChange={() => onChange(undefined)}
+              className="peer sr-only"
+            />
+            <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+          </div>
           <span>Tous les diamètres</span>
         </label>
 
-      {(diameters && diameters.length ? diameters : [45, 50, 55, 60, 65, 70, 75, 80, 90, 100])
-        .sort((a, b) => a - b)
-        .map((size) => (
-          <label
-            key={size}
-            className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
-          >
-            <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
-              <input
-                type="radio"
-                name="diameter-filter"
-                checked={diameter === String(size)}
-                onChange={() =>
-                  onChange(diameter === String(size) ? undefined : String(size))
-                }
-                className="peer sr-only"
-              />
-              <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-            </div>
-            <span>Ø {size}cm</span>
-          </label>
-        ))}
+        {(diameters && diameters.length ? diameters : [45, 50, 55, 60, 65, 70, 75, 80, 90, 100])
+          .sort((a, b) => a - b)
+          .map((size) => (
+            <label
+              key={size}
+              className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+            >
+              <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+                <input
+                  type="checkbox"
+                  checked={values.includes(String(size))}
+                  onChange={() => toggleValue(String(size))}
+                  className="peer sr-only"
+                />
+                <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+              </div>
+              <span>Ø {size}cm</span>
+            </label>
+          ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface PriceSectionProps {
   priceMin: number;

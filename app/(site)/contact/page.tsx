@@ -4,14 +4,16 @@ import { ContactForm } from "@/components/ContactForm";
 import { Container } from "@/components/Container";
 import { LeafletMap } from "@/components/LeafletMap";
 import { Section } from "@/components/Section";
-import { siteConfig } from "@/lib/site";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Écrivez-nous pour un devis sur mesure ou prenez rendez-vous à l'atelier.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const siteSettings = await getSiteSettings();
+
   return (
     <Section className="pb-24">
       <Container className="space-y-10">
@@ -28,26 +30,26 @@ export default function ContactPage() {
           <div className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
               <h2 className="text-lg font-semibold text-slate-900">Coordonnées</h2>
-              <p className="mt-2 text-sm text-slate-600">{siteConfig.address}</p>
+              <p className="mt-2 text-sm text-slate-600">{siteSettings.storeAddress}</p>
               <p className="mt-2 text-sm text-slate-600">
-                {siteConfig.phone}
+                {siteSettings.storePhone}
                 <br />
-                {siteConfig.email}
+                {siteSettings.storeEmail}
               </p>
               <div className="mt-4">
                 <p className="text-xs uppercase text-slate-500">Horaires</p>
                 <ul className="mt-2 space-y-1 text-sm text-slate-600">
-                  {siteConfig.schedules.map((line) => (
+                  {siteSettings.schedules.map((line) => (
                     <li key={line}>{line}</li>
                   ))}
                 </ul>
               </div>
             </div>
             <LeafletMap
-              lat={siteConfig.atelier.lat}
-              lng={siteConfig.atelier.lng}
+              lat={siteSettings.atelier.lat}
+              lng={siteSettings.atelier.lng}
               zoom={13}
-              markerLabel="Brasero Atelier"
+              markerLabel={siteSettings.storeName}
               className="h-[260px]"
             />
           </div>

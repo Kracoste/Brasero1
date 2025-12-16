@@ -1,41 +1,70 @@
 'use client';
 
-import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Settings, Store, Truck, CreditCard, Bell, Shield, Save, Check } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Store, Truck, CreditCard, Bell, Shield, Save, Check } from 'lucide-react';
+import {
+  DEFAULT_SITE_SETTINGS,
+  type SiteSettings,
+} from '@/lib/site-settings-defaults';
+
+type UiSettings = SiteSettings & {
+  emailOnNewOrder: boolean;
+  emailOnLowStock: boolean;
+  lowStockThreshold: number;
+};
+
+const DEFAULT_UI_SETTINGS: UiSettings = {
+  ...DEFAULT_SITE_SETTINGS,
+  emailOnNewOrder: true,
+  emailOnLowStock: true,
+  lowStockThreshold: 5,
+};
 
 export default function ParametresPage() {
   const [activeTab, setActiveTab] = useState('general');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const supabase = createClient();
 
   // États pour les paramètres
-  const [settings, setSettings] = useState({
-    // Général
-    storeName: 'Brasero Atelier',
-    storeEmail: 'contact@braseroatelier.fr',
-    storePhone: '05 49 XX XX XX',
-    storeAddress: 'Moncoutant, 79320 France',
-    
-    // Livraison
-    freeShippingThreshold: 500,
-    standardShippingCost: 29.90,
-    expressShippingCost: 49.90,
-    
-    // Notifications
-    emailOnNewOrder: true,
-    emailOnLowStock: true,
-    lowStockThreshold: 5,
-  });
+  const [settings, setSettings] = useState<UiSettings>(DEFAULT_UI_SETTINGS);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/site-settings', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Impossible de charger les paramètres');
+        const data = (await response.json()) as SiteSettings;
+        setSettings((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      } catch (error) {
+        console.error('Erreur chargement paramètres:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
-    // Simuler la sauvegarde (à implémenter avec Supabase si besoin)
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    const { emailOnNewOrder, emailOnLowStock, lowStockThreshold, ...siteSettings } = settings;
+    try {
+      const response = await fetch('/api/site-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(siteSettings),
+      });
+      if (!response.ok) throw new Error('Impossible de sauvegarder les paramètres');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      console.error('Erreur sauvegarde paramètres:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const tabs = [
@@ -45,6 +74,17 @@ export default function ParametresPage() {
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'security', label: 'Sécurité', icon: Shield },
   ];
+
+  if (initialLoading) {
+    return (
+      <div className="p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-56 rounded bg-slate-200" />
+          <div className="h-64 rounded-3xl bg-slate-200" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">

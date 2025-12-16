@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Users, Mail, Calendar, ShoppingBag, Search } from 'lucide-react';
+import { Users, Mail, Calendar, ShoppingBag, Search, Trash2 } from 'lucide-react';
 
 type Client = {
   id: string;
@@ -19,6 +19,8 @@ export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -53,6 +55,43 @@ export default function ClientsPage() {
     client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleRoleChange = async (clientId: string, nextRole: string) => {
+    if (!nextRole) return;
+    setUpdatingRole(clientId);
+    const previousClients = clients;
+    setClients(prev =>
+      prev.map(client => (client.id === clientId ? { ...client, role: nextRole } : client)),
+    );
+
+    const { error } = await supabase.from('profiles').update({ role: nextRole }).eq('id', clientId);
+    if (error) {
+      console.error('Erreur mise à jour rôle:', error);
+      setClients(previousClients);
+    }
+    setUpdatingRole(null);
+  };
+
+  const handleDelete = async (clientId: string) => {
+    const confirmDelete = window.confirm(
+      "Supprimer ce client ? Cette action supprimera aussi ses favoris.",
+    );
+    if (!confirmDelete) return;
+
+    setDeletingId(clientId);
+    const previousClients = clients;
+    setClients(prev => prev.filter(client => client.id !== clientId));
+
+    const { error: favError } = await supabase.from('favorites').delete().eq('user_id', clientId);
+    if (favError) console.error('Erreur suppression favoris:', favError);
+
+    const { error } = await supabase.from('profiles').delete().eq('id', clientId);
+    if (error) {
+      console.error('Erreur suppression client:', error);
+      setClients(previousClients);
+    }
+    setDeletingId(null);
+  };
 
   if (loading) {
     return (
@@ -149,6 +188,7 @@ export default function ClientsPage() {
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Téléphone</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Inscrit le</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Rôle</th>
+                <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -182,13 +222,35 @@ export default function ClientsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      client.role === 'admin' 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-slate-100 text-slate-800'
-                    }`}>
-                      {client.role === 'admin' ? 'Admin' : 'Client'}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                        client.role === 'admin' 
+                          ? 'bg-purple-100 text-purple-800' 
+                          : 'bg-slate-100 text-slate-800'
+                      }`}>
+                        {client.role === 'admin' ? 'Admin' : 'Client'}
+                      </span>
+                      <select
+                        value={client.role}
+                        onChange={(e) => handleRoleChange(client.id, e.target.value)}
+                        className="rounded-lg border border-slate-200 px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+                        disabled={updatingRole === client.id || deletingId === client.id}
+                      >
+                        <option value="user">Client</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(client.id)}
+                      className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                      disabled={deletingId === client.id}
+                    >
+                      <Trash2 size={16} />
+                      {deletingId === client.id ? 'Suppression...' : 'Supprimer'}
+                    </button>
                   </td>
                 </tr>
               ))}

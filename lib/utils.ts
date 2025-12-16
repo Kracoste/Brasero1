@@ -64,15 +64,36 @@ export const resolveDiameter = (source: Record<string, unknown>) => {
   return undefined;
 };
 
+type FormatOption = "hexagonal" | "rond" | "carre";
+type AccessoryType =
+  | "spatule"
+  | "couvercle"
+  | "grille"
+  | "allume-feu"
+  | "housse"
+  | "fendeur"
+  | "range-buches";
+type FendeurType = "manuel" | "electrique";
+
+export type MaybeArray<T> = T | T[];
+
+export const ensureArray = <T>(value?: MaybeArray<T>): T[] => {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return value !== undefined ? [value] : [];
+};
+
 export type FilterState = {
-  diameter?: string;
-  material?: string;
-  format?: "hexagonal" | "rond" | "carre";
+  diameter?: MaybeArray<string>;
+  material?: MaybeArray<"corten" | "acier" | "inox">;
+  format?: MaybeArray<FormatOption>;
+  accessoryType?: MaybeArray<AccessoryType>;
   price?: string;
   sort?: "price-asc" | "price-desc" | "popular";
   priceMin?: number;
   priceMax?: number;
-  fendeurType?: "manuel" | "electrique";
+  fendeurType?: MaybeArray<FendeurType>;
   promo?: boolean;
 };
 
@@ -99,7 +120,7 @@ const gatherProductText = (product: Product) => {
     .join(" ");
 };
 
-const inferFormat = (product: Product): "hexagonal" | "rond" | "carre" | undefined => {
+const inferFormat = (product: Product): FormatOption | undefined => {
   const text = gatherProductText(product);
   if (text.includes("hex")) return "hexagonal";
   if (text.includes("carre") || text.includes("square")) return "carre";
@@ -114,6 +135,25 @@ const inferMaterial = (product: Product): "corten" | "acier" | "inox" | undefine
   if (text.includes("acier") || text.includes("steel") || text.includes("thermolaque")) {
     return "acier";
   }
+  return undefined;
+};
+
+const inferAccessoryType = (product: Product): AccessoryType | undefined => {
+  const text = gatherProductText(product);
+  if (text.includes("spatule")) return "spatule";
+  if (text.includes("couvercle") || text.includes("cloche")) return "couvercle";
+  if (text.includes("allume") || text.includes("allumefeu")) return "allume-feu";
+  if (text.includes("grille")) return "grille";
+  if (text.includes("housse") || text.includes("protection")) return "housse";
+  if (text.includes("fendeur") || text.includes("buches")) return "fendeur";
+  if ((text.includes("range") && text.includes("buch")) || text.includes("range-buche")) return "range-buches";
+  return undefined;
+};
+
+const inferFendeurType = (product: Product): FendeurType | undefined => {
+  const text = gatherProductText(product);
+  if (text.includes("electrique")) return "electrique";
+  if (text.includes("manuel")) return "manuel";
   return undefined;
 };
 
@@ -151,10 +191,14 @@ export const productFilterOptions = {
 };
 
 export const applyFilters = (products: Product[], filters: FilterState) => {
-  const diameterFilter =
-    filters.diameter !== undefined ? Number.parseFloat(filters.diameter) : undefined;
-  const hasDiameterFilter =
-    typeof diameterFilter === "number" && Number.isFinite(diameterFilter);
+  const diameterSelections = ensureArray(filters.diameter)
+    .map((value) => Number.parseFloat(value))
+    .filter((value) => Number.isFinite(value));
+  const hasDiameterFilter = diameterSelections.length > 0;
+  const materialSelections = ensureArray(filters.material);
+  const formatSelections = ensureArray(filters.format);
+  const accessorySelections = ensureArray(filters.accessoryType);
+  const fendeurSelections = ensureArray(filters.fendeurType);
 
   const filtered = products.filter((product) => {
     const productDiameter = resolveDiameter(product as Record<string, unknown>);
@@ -162,21 +206,50 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
     if (filters.promo) {
       return typeof product.discountPercent === "number" && product.discountPercent > 0;
     }
-    if (hasDiameterFilter && diameterFilter !== undefined) {
-      if (!productDiameter || Math.round(productDiameter) !== Math.round(diameterFilter)) {
+
+    if (hasDiameterFilter) {
+      if (!productDiameter) {
+        return false;
+      }
+      const roundedProductDiameter = Math.round(productDiameter);
+      const matchesDiameter = diameterSelections.some(
+        (selection) => Math.round(selection) === roundedProductDiameter,
+      );
+      if (!matchesDiameter) {
         return false;
       }
     }
 
-    if (filters.material && filters.material !== "all") {
+    if (materialSelections.length) {
       const materialType = inferMaterial(product);
-      if (materialType !== filters.material) {
+      if (!materialType || !materialSelections.includes(materialType)) {
         return false;
       }
     }
 
-    if (filters.format) {
-      if (inferFormat(product) !== filters.format) {
+    if (formatSelections.length) {
+      const formatType = inferFormat(product);
+      if (!formatType || !formatSelections.includes(formatType)) {
+        return false;
+      }
+    }
+
+    if (accessorySelections.length) {
+      if (product.category !== "accessoire") {
+        return false;
+      }
+      const accessoryType = inferAccessoryType(product);
+      if (!accessoryType || !accessorySelections.includes(accessoryType)) {
+        return false;
+      }
+    }
+
+    if (fendeurSelections.length) {
+      if (product.category !== "fendeur") {
+        return false;
+      }
+      const fendeurType = inferFendeurType(product);
+      if (!fendeurType || !fendeurSelections.includes(fendeurType)) {
         return false;
       }
     }
@@ -201,7 +274,6 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
     case "price-desc":
       return [...filtered].sort((a, b) => b.price - a.price);
     default: {
-      // Si un diamètre est sélectionné, on trie par diamètre pour refléter ce filtre
       if (hasDiameterFilter) {
         return [...filtered].sort(
           (a, b) =>

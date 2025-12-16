@@ -1,24 +1,28 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
+
+const formatCurrency = (value: number) =>
+  value.toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
 
 type PageConfig = {
   title: string;
   content: React.ReactNode;
 };
 
-const pages: Record<string, PageConfig> = {
+const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
   // ============ SERVICE À LA CLIENTÈLE ============
   "service-clientele": {
     title: "Service à la clientèle",
     content: (
       <div className="space-y-6">
         <p>
-          Chez Brasero Atelier, votre satisfaction est notre priorité. Notre équipe est à votre disposition pour répondre à toutes vos questions et vous accompagner dans votre expérience d&apos;achat.
+          Chez {settings.storeName}, votre satisfaction est notre priorité. Notre équipe est à votre disposition pour répondre à toutes vos questions et vous accompagner dans votre expérience d&apos;achat.
         </p>
         <h2 className="text-xl font-semibold">Comment nous contacter ?</h2>
         <ul className="list-disc pl-6 space-y-2">
-          <li><strong>Par email :</strong> contact@braseroatelier.fr (réponse sous 24h)</li>
-          <li><strong>Par téléphone :</strong> 05 49 XX XX XX (du lundi au vendredi, 9h-18h)</li>
+          <li><strong>Par email :</strong> {settings.storeEmail} (réponse sous 24h)</li>
+          <li><strong>Par téléphone :</strong> {settings.storePhone} (du lundi au vendredi, 9h-18h)</li>
           <li><strong>Via le formulaire de contact</strong> sur notre site</li>
         </ul>
         <h2 className="text-xl font-semibold">Nos engagements</h2>
@@ -36,7 +40,7 @@ const pages: Record<string, PageConfig> = {
     content: (
       <div className="space-y-6">
         <p>
-          Commander sur Brasero Atelier est simple et sécurisé. Voici les étapes pour passer votre commande :
+          Commander sur {settings.storeName} est simple et sécurisé. Voici les étapes pour passer votre commande :
         </p>
         <h2 className="text-xl font-semibold">Étape 1 : Choisissez vos produits</h2>
         <p>
@@ -97,7 +101,7 @@ const pages: Record<string, PageConfig> = {
         </ul>
         <h2 className="text-xl font-semibold">Frais de livraison</h2>
         <p>
-          Les frais de livraison sont calculés en fonction du poids et de la destination. <strong>Livraison gratuite en France métropolitaine à partir de 500€ d&apos;achat.</strong>
+          Les frais de livraison sont calculés en fonction du poids et de la destination. <strong>Livraison gratuite en France métropolitaine à partir de {formatCurrency(settings.freeShippingThreshold)} d&apos;achat.</strong>
         </p>
         <h2 className="text-xl font-semibold">Suivi de commande</h2>
         <p>
@@ -142,7 +146,7 @@ const pages: Record<string, PageConfig> = {
     content: (
       <div className="space-y-6">
         <p>
-          La protection de vos données personnelles est une priorité pour Brasero Atelier. Cette page vous informe sur la manière dont nous collectons et utilisons vos données.
+          La protection de vos données personnelles est une priorité pour {settings.storeName}. Cette page vous informe sur la manière dont nous collectons et utilisons vos données.
         </p>
         <h2 className="text-xl font-semibold">Données collectées</h2>
         <p>Nous collectons uniquement les données nécessaires au traitement de vos commandes :</p>
@@ -162,7 +166,7 @@ const pages: Record<string, PageConfig> = {
         </ul>
         <h2 className="text-xl font-semibold">Vos droits</h2>
         <p>
-          Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de modification et de suppression de vos données. Contactez-nous à contact@braseroatelier.fr pour exercer ces droits.
+          Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de modification et de suppression de vos données. Contactez-nous à {settings.storeEmail} pour exercer ces droits.
         </p>
       </div>
     ),
@@ -176,10 +180,10 @@ const pages: Record<string, PageConfig> = {
         </p>
         <h2 className="text-xl font-semibold">Nos coordonnées</h2>
         <div className="bg-gray-50 p-6 rounded-lg space-y-3">
-          <p><strong>Brasero Atelier</strong></p>
-          <p>📍 Moncoutant, 79320 France</p>
-          <p>📧 contact@braseroatelier.fr</p>
-          <p>📞 05 49 XX XX XX</p>
+          <p><strong>{settings.storeName}</strong></p>
+          <p>📍 {settings.storeAddress}</p>
+          <p>📧 {settings.storeEmail}</p>
+          <p>📞 {settings.storePhone}</p>
         </div>
         <h2 className="text-xl font-semibold">Horaires</h2>
         <p>Du lundi au vendredi : 9h00 - 18h00</p>
@@ -300,7 +304,7 @@ const pages: Record<string, PageConfig> = {
     content: (
       <div className="space-y-6">
         <p>
-          Brasero Atelier accompagne les professionnels dans leurs projets d&apos;aménagement extérieur : hôtels, restaurants, collectivités, architectes paysagistes...
+          {settings.storeName} accompagne les professionnels dans leurs projets d&apos;aménagement extérieur : hôtels, restaurants, collectivités, architectes paysagistes...
         </p>
         <h2 className="text-xl font-semibold">Nos services pour les professionnels</h2>
         <ul className="list-disc pl-6 space-y-2">
@@ -316,7 +320,7 @@ const pages: Record<string, PageConfig> = {
         </p>
         <h2 className="text-xl font-semibold">Demander un devis</h2>
         <p>
-          Contactez-nous à <strong>pro@braseroatelier.fr</strong> ou au <strong>05 49 XX XX XX</strong> pour discuter de votre projet.
+          Contactez-nous à <strong>{settings.storeEmail}</strong> ou au <strong>{settings.storePhone}</strong> pour discuter de votre projet.
         </p>
       </div>
     ),
@@ -352,15 +356,15 @@ const pages: Record<string, PageConfig> = {
 
   // ============ À PROPOS ============
   "a-propos-de-nous": {
-    title: "À propos de Brasero Atelier",
+    title: `À propos de ${settings.storeName}`,
     content: (
       <div className="space-y-6">
         <p className="text-lg">
-          Brasero Atelier est né de la passion pour le feu, la convivialité et le savoir-faire artisanal français.
+          {settings.storeName} est né de la passion pour le feu, la convivialité et le savoir-faire artisanal français.
         </p>
         <h2 className="text-xl font-semibold">Notre histoire</h2>
         <p>
-          Installés à Moncoutant, au cœur des Deux-Sèvres (79), nous avons créé Brasero Atelier avec une conviction : le brasero est bien plus qu&apos;un simple objet de chauffage. C&apos;est un point de rassemblement, un créateur de souvenirs, un art de vivre.
+          Installés à {settings.atelier.city}, au cœur des Deux-Sèvres (79), nous avons créé {settings.storeName} avec une conviction : le brasero est bien plus qu&apos;un simple objet de chauffage. C&apos;est un point de rassemblement, un créateur de souvenirs, un art de vivre.
         </p>
         <h2 className="text-xl font-semibold">Notre savoir-faire</h2>
         <p>
@@ -382,19 +386,19 @@ const pages: Record<string, PageConfig> = {
       <div className="space-y-6">
         <h2 className="text-xl font-semibold">Informations sur l&apos;entreprise</h2>
         <div className="bg-gray-50 p-6 rounded-lg space-y-2">
-          <p><strong>Raison sociale :</strong> Brasero Atelier</p>
+          <p><strong>Raison sociale :</strong> {settings.storeName}</p>
           <p><strong>Forme juridique :</strong> SAS</p>
-          <p><strong>Siège social :</strong> Moncoutant, 79320 France</p>
+          <p><strong>Siège social :</strong> {settings.storeAddress}</p>
           <p><strong>SIRET :</strong> XXX XXX XXX XXXXX</p>
           <p><strong>TVA Intracommunautaire :</strong> FR XX XXX XXX XXX</p>
           <p><strong>Capital social :</strong> XX XXX €</p>
         </div>
         <h2 className="text-xl font-semibold">Coordonnées</h2>
         <div className="bg-gray-50 p-6 rounded-lg space-y-2">
-          <p><strong>Email général :</strong> contact@braseroatelier.fr</p>
-          <p><strong>Email professionnel :</strong> pro@braseroatelier.fr</p>
-          <p><strong>Téléphone :</strong> 05 49 XX XX XX</p>
-          <p><strong>Adresse :</strong> Moncoutant, 79320 France</p>
+          <p><strong>Email général :</strong> {settings.storeEmail}</p>
+          <p><strong>Email professionnel :</strong> {settings.storeEmail}</p>
+          <p><strong>Téléphone :</strong> {settings.storePhone}</p>
+          <p><strong>Adresse :</strong> {settings.storeAddress}</p>
         </div>
         <h2 className="text-xl font-semibold">Hébergement du site</h2>
         <p>
@@ -408,7 +412,7 @@ const pages: Record<string, PageConfig> = {
     content: (
       <div className="space-y-6">
         <p>
-          Restez informé des dernières nouveautés, promotions exclusives et conseils autour du brasero en vous inscrivant à notre newsletter.
+          Restez informé des dernières nouveautés, promotions exclusives et conseils autour du brasero en vous inscrivant à la newsletter de {settings.storeName}.
         </p>
         <h2 className="text-xl font-semibold">Ce que vous recevrez</h2>
         <ul className="list-disc pl-6 space-y-2">
@@ -466,7 +470,7 @@ const pages: Record<string, PageConfig> = {
     content: (
       <div className="space-y-6">
         <p>
-          Bienvenue sur le blog de Brasero Atelier ! Retrouvez ici nos articles, inspirations et actualités autour de l&apos;univers du feu et de la convivialité extérieure.
+          Bienvenue sur le blog de {settings.storeName} ! Retrouvez ici nos articles, inspirations et actualités autour de l&apos;univers du feu et de la convivialité extérieure.
         </p>
         <h2 className="text-xl font-semibold">Nos derniers articles</h2>
         <div className="space-y-4">
@@ -622,16 +626,17 @@ const pages: Record<string, PageConfig> = {
           <p><strong>Dimanche :</strong> Fermé</p>
         </div>
         <p>
-          Pour visiter notre atelier, merci de prendre rendez-vous au préalable au 05 49 XX XX XX.
+          Pour visiter notre atelier, merci de prendre rendez-vous au préalable au {settings.storePhone}.
         </p>
       </div>
     ),
   },
-};
+});
 
 export default async function InfoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const page = pages[slug];
+  const settings = await getSiteSettings();
+  const page = createPages(settings)[slug];
 
   if (!page) {
     return notFound();
@@ -646,7 +651,7 @@ export default async function InfoPage({ params }: { params: Promise<{ slug: str
         </div>
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            Une question ? Contactez-nous à <a href="mailto:contact@braseroatelier.fr" className="text-orange-600 hover:underline">contact@braseroatelier.fr</a>
+            Une question ? Contactez-nous à <a href={`mailto:${settings.storeEmail}`} className="text-orange-600 hover:underline">{settings.storeEmail}</a>
           </p>
         </div>
       </div>

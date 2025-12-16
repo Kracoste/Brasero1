@@ -1,6 +1,9 @@
+'use client';
+
 import Link from "next/link";
 
 import { Container } from "@/components/Container";
+import { useSiteSettings } from "@/components/SiteSettingsProvider";
 
 const serviceLinks = [
   { href: "/info/service-clientele", label: "Service à la clientèle" },
@@ -31,65 +34,69 @@ const categoryLinks = [
   { href: "/accessoires", label: "Accessoires" },
 ];
 
-export const Footer = () => (
-  <footer className="border-t border-gray-200 bg-white text-gray-800">
-    <Container className="py-12">
-      <div className="grid gap-10 md:grid-cols-4">
-        <div>
-          <p className="font-semibold text-lg text-gray-900">Service à la clientèle</p>
-          <ul className="mt-3 space-y-2 text-sm text-gray-700">
-            {serviceLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="transition hover:text-gray-900">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+export const Footer = () => {
+  const settings = useSiteSettings();
 
-        <div>
-          <p className="font-semibold text-lg text-gray-900">Catégories</p>
-          <ul className="mt-3 space-y-2 text-sm text-gray-700">
-            {categoryLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="transition hover:text-gray-900">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+  return (
+    <footer className="border-t border-gray-200 bg-white text-gray-800">
+      <Container className="py-12">
+        <div className="grid gap-10 md:grid-cols-4">
+          <div>
+            <p className="font-semibold text-lg text-gray-900">Service à la clientèle</p>
+            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+              {serviceLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="transition hover:text-gray-900">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div>
-          <p className="font-semibold text-lg text-gray-900">Entreprises</p>
-          <ul className="mt-3 space-y-2 text-sm text-gray-700">
-            {proLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="transition hover:text-gray-900">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div>
+            <p className="font-semibold text-lg text-gray-900">Catégories</p>
+            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+              {categoryLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="transition hover:text-gray-900">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div>
-          <p className="font-semibold text-lg text-gray-900">À propos de Brasero Atelier</p>
-          <ul className="mt-3 space-y-2 text-sm text-gray-700">
-            {aboutLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="transition hover:text-gray-900">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div>
+            <p className="font-semibold text-lg text-gray-900">Entreprises</p>
+            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+              {proLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="transition hover:text-gray-900">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="font-semibold text-lg text-gray-900">À propos de {settings.storeName}</p>
+            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+              {aboutLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="transition hover:text-gray-900">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
+      </Container>
+      <div className="border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+        © {new Date().getFullYear()} {settings.storeName} — Fabriqué à {settings.atelier.city} (79)
       </div>
-    </Container>
-    <div className="border-t border-gray-200 py-4 text-center text-xs text-gray-500">
-      © {new Date().getFullYear()} Brasero Atelier — Fabriqué à Moncoutant (79)
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};

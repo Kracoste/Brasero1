@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/Container";
 import { LeafletMap } from "@/components/LeafletMap";
 import { Section } from "@/components/Section";
-import { siteConfig } from "@/lib/site";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
   title: "Atelier & savoir-faire",
@@ -26,7 +26,9 @@ const atelierImages = [
   },
 ];
 
-export default function AtelierPage() {
+export default async function AtelierPage() {
+  const siteSettings = await getSiteSettings();
+
   return (
     <div className="pb-24">
       <Section className="pt-10">
@@ -84,8 +86,8 @@ export default function AtelierPage() {
             </ul>
           </div>
           <LeafletMap
-            lat={siteConfig.atelier.lat}
-            lng={siteConfig.atelier.lng}
+            lat={siteSettings.atelier.lat}
+            lng={siteSettings.atelier.lng}
             zoom={14}
             markerLabel="Visitez l'atelier Brasero"
             className="h-[420px]"
@@ -99,11 +101,11 @@ export default function AtelierPage() {
             Venir à Moncoutant
           </h3>
           <p className="text-sm text-slate-600">
-            {siteConfig.address} — Prise de rendez-vous au {siteConfig.phone}. Accès par la N149,
+            {siteSettings.storeAddress} — Prise de rendez-vous au {siteSettings.storePhone}. Accès par la N149,
             parking visiteur sur place.
           </p>
           <a
-            href={`https://www.google.com/maps/dir/?api=1&destination=${siteConfig.atelier.lat},${siteConfig.atelier.lng}`}
+            href={`https://www.google.com/maps/dir/?api=1&destination=${siteSettings.atelier.lat},${siteSettings.atelier.lng}`}
             target="_blank"
             rel="noreferrer"
             className="inline-flex w-fit items-center rounded-full bg-clay-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"

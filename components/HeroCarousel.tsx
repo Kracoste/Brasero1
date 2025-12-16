@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 
 import { LeafletMap } from "@/components/LeafletMap";
 import { Price } from "@/components/Price";
-import { siteConfig } from "@/lib/site";
+import { useSiteSettings } from "@/components/SiteSettingsProvider";
 import { cn } from "@/lib/utils";
 
 type ProductType = {
@@ -44,6 +44,7 @@ type HeroCarouselProps = {
 };
 
 export const HeroCarousel = ({ braseros }: HeroCarouselProps) => {
+  const settings = useSiteSettings();
   const productSlides: Slide[] = braseros.map((product) => ({
     id: product.slug,
     type: "product",
@@ -99,15 +100,15 @@ export const HeroCarousel = ({ braseros }: HeroCarouselProps) => {
                     <ShieldCheck size={16} /> Fabriqué en France
                   </p>
                   <p className="mt-2 text-base font-semibold">
-                    Moncoutant (Deux-Sèvres) — {siteConfig.address}
+                    {settings.atelier.city} ({settings.atelier.department}) — {settings.storeAddress}
                   </p>
                 </div>
                 <div className="h-40 overflow-hidden rounded-2xl border border-white/20 bg-black/10">
                   <LeafletMap
-                    lat={siteConfig.atelier.lat}
-                    lng={siteConfig.atelier.lng}
+                    lat={settings.atelier.lat}
+                    lng={settings.atelier.lng}
                     zoom={13}
-                    markerLabel="Atelier Brasero"
+                    markerLabel={settings.storeName}
                     className="h-full"
                   />
                 </div>

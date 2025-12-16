@@ -2,8 +2,7 @@
 
 import { useTransition } from "react";
 
-import { productFilterOptions, type FilterState } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { cn, productFilterOptions, type FilterState } from "@/lib/utils";
 
 type ProductFiltersProps = {
   value: FilterState;
@@ -13,6 +12,7 @@ type ProductFiltersProps = {
 
 export const ProductFilters = ({ value, onChange, total }: ProductFiltersProps) => {
   const [pending, startTransition] = useTransition();
+  const getSingleValue = <T,>(input?: T | T[]) => (Array.isArray(input) ? input[0] : input);
 
   const handleSelect = (key: keyof FilterState, optionValue: string | undefined) => {
     startTransition(() => {
@@ -43,7 +43,7 @@ export const ProductFilters = ({ value, onChange, total }: ProductFiltersProps) 
           <label className="text-xs uppercase text-slate-400">Diamètre</label>
           <select
             className={selectClasses}
-            value={value.diameter ?? "all"}
+            value={getSingleValue(value.diameter) ?? "all"}
             onChange={(event) => handleSelect("diameter", event.target.value)}
           >
             {productFilterOptions.diameter.map((option) => (
@@ -57,7 +57,7 @@ export const ProductFilters = ({ value, onChange, total }: ProductFiltersProps) 
           <label className="text-xs uppercase text-slate-400">Acier</label>
           <select
             className={selectClasses}
-            value={value.material ?? "all"}
+            value={getSingleValue(value.material) ?? "all"}
             onChange={(event) => handleSelect("material", event.target.value)}
           >
             {productFilterOptions.material.map((option) => (
