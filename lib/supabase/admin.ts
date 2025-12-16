@@ -1,15 +1,19 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !serviceRoleKey) {
-  throw new Error("Supabase admin credentials are missing. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
-}
+const missingCredentials = !supabaseUrl || !serviceRoleKey;
 
-export const supabaseAdminClient = createClient(supabaseUrl, serviceRoleKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
+export const supabaseAdminClient: SupabaseClient | null = !missingCredentials
+  ? createClient(supabaseUrl!, serviceRoleKey!, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    })
+  : null;
+
+export const hasSupabaseAdminCredentials = () => !missingCredentials;
+
+export const getSupabaseAdminClient = () => supabaseAdminClient;
