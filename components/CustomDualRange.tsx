@@ -32,13 +32,8 @@ export function CustomDualRange({
   useEffect(() => {
     const updateMetrics = () => {
       if (!wrapperRef.current) return;
-      const styles = getComputedStyle(wrapperRef.current);
-      const thumbSize = parseFloat(styles.getPropertyValue("--dual-thumb-size")) || 24;
-      // offset = distance from edge to center of thumb
-      const offset = thumbSize / 2;
-      // width = total available width minus the thumb radiuses on both sides
-      const width = Math.max(wrapperRef.current.clientWidth - thumbSize, 0);
-      setTrackMetrics({ offset, width });
+      const totalWidth = wrapperRef.current.clientWidth;
+      setTrackMetrics({ offset: 0, width: totalWidth });
     };
 
     updateMetrics();
@@ -48,8 +43,19 @@ export function CustomDualRange({
 
   const percentMin = getPercent(minVal);
   const percentMax = getPercent(maxVal);
-  const activeLeftPx = trackMetrics.offset + trackMetrics.width * percentMin;
-  const activeWidthPx = Math.max(trackMetrics.width * (percentMax - percentMin), 0);
+
+  const thumbSize = 24;
+  const thumbRadius = thumbSize / 2; // 12px
+
+  // Les thumbs natifs se déplacent de thumbRadius à (width - thumbRadius)
+  // Position du centre de chaque thumb
+  const sliderWidth = trackMetrics.width - thumbSize; // espace de déplacement réel
+  const minThumbCenter = thumbRadius + sliderWidth * percentMin;
+  const maxThumbCenter = thumbRadius + sliderWidth * percentMax;
+
+  // La barre va du bord droit du thumb gauche au bord gauche du thumb droit
+  const activeLeftPx = minThumbCenter + thumbRadius;
+  const activeWidthPx = Math.max((maxThumbCenter - thumbRadius) - activeLeftPx, 0);
 
   const activeTrackStyle: React.CSSProperties & {
     "--active-left"?: string;

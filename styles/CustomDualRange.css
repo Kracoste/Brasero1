@@ -13,8 +13,8 @@
 .dual-range-track-bg {
   position: absolute;
   top: 50%;
-  left: calc(var(--dual-thumb-size, 24px) / 2);
-  right: calc(var(--dual-thumb-size, 24px) / 2);
+  left: var(--dual-thumb-size, 24px);
+  right: var(--dual-thumb-size, 24px);
   height: var(--dual-track-height, 4px);
   background: #f5e9d7;
   border-radius: 3px;

@@ -325,7 +325,7 @@ const PriceSection = ({
         Budget ({minPrice.toLocaleString('fr-FR')}€ — {maxPrice.toLocaleString('fr-FR')}€)
       </h3>
       <div className="space-y-4">
-        <div className="flex items-center gap-3 text-base text-slate-600">
+        <div className="flex items-center justify-between text-base text-slate-600">
           <input
             type="number"
             min={minPrice}
