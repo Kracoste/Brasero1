@@ -97,22 +97,21 @@ export const Header = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async (e: React.MouseEvent) => {
+  const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     if (loggingOut) return;
     setLoggingOut(true);
     
-    try {
-      const supabase = supabaseRef.current;
-      await supabase.auth.signOut();
-    } catch (error) {
+    const supabase = supabaseRef.current;
+
+    void supabase.auth.signOut().catch((error) => {
       console.error('Erreur déconnexion:', error);
-    } finally {
-      // Toujours recharger la page, même en cas d'erreur
-      window.location.href = '/';
-    }
+    });
+
+    router.replace('/');
+    router.refresh();
   };
 
   const toggle = () => setOpen((prev) => !prev);
@@ -269,14 +268,16 @@ export const Header = () => {
                       <p className="text-xs text-slate-500">Connecté en tant que</p>
                       <p className="text-sm font-medium text-slate-900 truncate">{user.email}</p>
                     </div>
-                    <Link
-                      href="/admin"
-                      className="px-4 py-2 text-sm font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 flex items-center gap-2 border-b border-slate-100"
-                      onClick={() => setAccountMenuOpen(false)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M14 9h2"/><path d="M14 14h4"/></svg>
-                      Dashboard Admin
-                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="px-4 py-2 text-sm font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 flex items-center gap-2 border-b border-slate-100"
+                        onClick={() => setAccountMenuOpen(false)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M14 9h2"/><path d="M14 14h4"/></svg>
+                        Dashboard Admin
+                      </Link>
+                    )}
                     <Link
                       href="/mon-compte"
                       className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"

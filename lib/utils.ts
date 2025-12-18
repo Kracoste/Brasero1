@@ -166,10 +166,8 @@ const pricePredicates: Record<string, Predicate> = {
 export const productFilterOptions = {
   diameter: [
     { label: "Tous les diamètres", value: "all" },
-    { label: "Ø 60 cm", value: "60" },
-    { label: "Ø 75 cm", value: "75" },
+    { label: "Ø 50 cm", value: "50" },
     { label: "Ø 80 cm", value: "80" },
-    { label: "Ø 90 cm", value: "90" },
     { label: "Ø 100 cm", value: "100" },
   ],
   material: [

@@ -22,16 +22,9 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category }
   const priceValues = useMemo(() => products.map((product) => product.price), [products]);
   const minPrice = priceValues.length ? Math.min(...priceValues) : 0;
   const maxPrice = priceValues.length ? Math.max(...priceValues) : 0;
-  const availableDiameters = useMemo(() => {
-    const set = new Set<number>();
-    products.forEach((product) => {
-      const diameter = resolveDiameter(product as Record<string, unknown>);
-      if (typeof diameter === "number" && Number.isFinite(diameter)) {
-        set.add(Math.round(diameter));
-      }
-    });
-    return Array.from(set).sort((a, b) => a - b);
-  }, [products]);
+
+  // On force les diamètres disponibles à 50, 80, 100
+  const availableDiameters = [50, 80, 100];
 
   return (
     <div className="flex flex-col gap-8">

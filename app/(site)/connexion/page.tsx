@@ -1,49 +1,62 @@
 'use client';
 
-import { Suspense, useState, useTransition } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 function ConnexionPageContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const [isNavigating, startTransition] = useTransition();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
+
+  const adminEmails = ['allouhugo@gmail.com'];
+
+  const getRedirectTarget = (userEmail: string | undefined) => {
+    const emailLower = userEmail?.toLowerCase() || '';
+    const isAdmin = adminEmails.includes(emailLower);
+    const redirectFromQuery = searchParams?.get('redirectTo');
+    return redirectFromQuery || (isAdmin ? '/admin' : '/');
+  };
+
+  // Écouter les changements d'authentification et rediriger si connecté
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, session?.user?.email);
+      if (event === 'SIGNED_IN' && session?.user && !isRedirecting) {
+        setIsRedirecting(true);
+        const target = getRedirectTarget(session.user.email);
+        console.log('Redirection vers:', target);
+        // Attendre que la session soit bien persistée avant de rediriger
+        await new Promise(resolve => setTimeout(resolve, 500));
+        window.location.href = target;
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [isRedirecting]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const adminEmails = ['allouhugo@gmail.com'];
-
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error || !data.user) {
-        throw error || new Error('Erreur de connexion');
+      if (error) {
+        throw error;
       }
-
-      const emailLower = data.user.email?.toLowerCase() || '';
-      const isAdmin = adminEmails.includes(emailLower);
-      const redirectFromQuery = searchParams?.get('redirectTo');
-      const target = redirectFromQuery || (isAdmin ? '/admin' : '/');
-
-      startTransition(() => {
-        router.replace(target);
-        router.refresh();
-      });
+      // La redirection sera gérée par onAuthStateChange
     } catch (error: any) {
       setError(error?.message || 'Une erreur est survenue');
-    } finally {
       setLoading(false);
     }
   };
@@ -107,10 +120,10 @@ function ConnexionPageContent() {
 
             <button
               type="submit"
-              disabled={loading || isNavigating}
+              disabled={loading}
               className="group relative flex w-full justify-center rounded-full bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 mt-4"
             >
-              {loading || isNavigating ? 'Connexion en cours...' : 'Se connecter'}
+              {loading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
           </div>
 
