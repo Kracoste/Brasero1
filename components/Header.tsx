@@ -12,28 +12,12 @@ import { navLinks } from '@/components/navigation';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from "@/lib/favorites-context";
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
-
-const categoryMenu = [
-  {
-    label: 'Braséros',
-    href: '/produits?category=brasero',
-    description: 'Vasques corten de 60 à 100 cm fabriquées à Moncoutant.',
-  },
-  {
-    label: 'Fendeur à bûches',
-    href: '/produits?category=fendeur',
-    description: 'Accessoire manuel premium pour recharger vos feux.',
-  },
-] as const;
 
 export const Header = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const { itemCount } = useCart();
   const { favoriteCount } = useFavorites();
   const [open, setOpen] = useState(false);
-  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [accessoriesOpen, setAccessoriesOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -129,31 +113,23 @@ export const Header = () => {
     const supabase = supabaseRef.current;
 
     try {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
       if (error) {
         console.error('Erreur déconnexion:', error);
       }
+      // Mettre à jour l'état immédiatement
+      setUser(null);
+      setIsAdmin(false);
     } catch (error) {
       console.error('Exception déconnexion:', error);
     }
 
-    setUser(null);
-    setIsAdmin(false);
     setLoggingOut(false);
-    router.replace('/');
-    router.refresh();
+    // Force un rechargement complet de la page pour nettoyer tous les états
+    window.location.href = '/';
   };
 
   const toggle = () => setOpen((prev) => !prev);
-  const toggleCategories = () => setCategoriesOpen((prev) => !prev);
-
-  const openCategories = () => {
-    setCategoriesOpen(true);
-  };
-  
-  const closeCategories = () => {
-    setCategoriesOpen(false);
-  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white shadow-sm">
