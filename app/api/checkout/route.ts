@@ -42,13 +42,27 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
+    // Déterminer l'URL de base
+    const origin = request.headers.get('origin') || 'https://atelier-lbf.fr';
+
+    // Fonction pour convertir les URLs relatives en URLs absolues
+    const getAbsoluteImageUrl = (imageUrl: string | null): string[] => {
+      if (!imageUrl) return [];
+      // Si l'URL est déjà absolue, la retourner telle quelle
+      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return [imageUrl];
+      }
+      // Sinon, construire l'URL absolue
+      return [`${origin}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`];
+    };
+
     // Créer les line items pour Stripe
     const lineItems = items.map((item) => ({
       price_data: {
         currency: 'eur',
         product_data: {
           name: item.product_name,
-          images: item.product_image ? [item.product_image] : [],
+          images: getAbsoluteImageUrl(item.product_image),
           metadata: {
             slug: item.product_slug,
           },
@@ -57,9 +71,6 @@ export async function POST(request: NextRequest) {
       },
       quantity: item.quantity,
     }));
-
-    // Déterminer l'URL de base
-    const origin = request.headers.get('origin') || 'http://localhost:3000';
 
     // Créer la session de checkout Stripe
     const session = await stripe.checkout.sessions.create({
