@@ -46,20 +46,30 @@ export const Header = () => {
   useEffect(() => {
     const supabase = supabaseRef.current;
 
-    const fetchRole = async (userId: string) => {
+    const fetchRole = async (userId: string, userEmail: string | undefined) => {
+      // Liste des emails admin (même logique que dans le layout admin)
+      const adminEmails = ['allouhugo@gmail.com'];
+      const isAdminByEmail = adminEmails.includes(userEmail?.toLowerCase() || '');
+
+      if (isAdminByEmail) {
+        console.log('Admin par email:', userEmail);
+        setIsAdmin(true);
+        return;
+      }
+
       try {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', userId)
           .single();
-        
+
         if (error) {
           console.error('Erreur récupération profil:', error);
           setIsAdmin(false);
           return;
         }
-        
+
         const isAdminUser = profile?.role === 'admin';
         console.log('Role utilisateur:', profile?.role, 'isAdmin:', isAdminUser);
         setIsAdmin(isAdminUser);
@@ -73,7 +83,7 @@ export const Header = () => {
       console.log('syncUser appelé avec:', nextUser?.email);
       setUser(nextUser);
       if (nextUser) {
-        await fetchRole(nextUser.id);
+        await fetchRole(nextUser.id, nextUser.email);
       } else {
         setIsAdmin(false);
       }
@@ -97,19 +107,28 @@ export const Header = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = (e: React.MouseEvent) => {
+  const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (loggingOut) return;
     setLoggingOut(true);
-    
+    setAccountMenuOpen(false);
+
     const supabase = supabaseRef.current;
 
-    void supabase.auth.signOut().catch((error) => {
-      console.error('Erreur déconnexion:', error);
-    });
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Erreur déconnexion:', error);
+      }
+    } catch (error) {
+      console.error('Exception déconnexion:', error);
+    }
 
+    setUser(null);
+    setIsAdmin(false);
+    setLoggingOut(false);
     router.replace('/');
     router.refresh();
   };
