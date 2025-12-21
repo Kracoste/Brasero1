@@ -124,7 +124,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Charger l'utilisateur et le panier
   useEffect(() => {
     const initCart = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Essayer d'abord getSession puis getUser
+      const { data: { session } } = await supabase.auth.getSession();
+      let user = session?.user ?? null;
+      
+      if (!user) {
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
+      }
+      
       setUser(user);
 
       if (user) {

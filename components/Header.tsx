@@ -90,12 +90,23 @@ export const Header = () => {
     };
 
     const init = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error('Erreur getUser:', error);
+      // Essayer d'abord getSession puis getUser
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error('Erreur getSession:', sessionError);
       }
-      console.log('Init user:', user?.email);
-      await syncUser(user);
+      
+      if (session?.user) {
+        console.log('Init user from session:', session.user.email);
+        await syncUser(session.user);
+      } else {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Erreur getUser:', error);
+        }
+        console.log('Init user from getUser:', user?.email);
+        await syncUser(user);
+      }
     };
     void init();
 
