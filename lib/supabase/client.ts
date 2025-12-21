@@ -3,22 +3,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 let client: SupabaseClient | null = null
 
-export function createClient() {
-  // Éviter de créer le client pendant le pre-rendering côté serveur
-  if (typeof window === 'undefined') {
-    // Retourner un client factice pour le SSR/build
-    return null as unknown as SupabaseClient
-  }
-
+export function createClient(): SupabaseClient {
   if (client) return client
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!url || !key) {
-    console.warn('Supabase credentials not available')
-    return null as unknown as SupabaseClient
-  }
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
   client = createBrowserClient(url, key, {
     cookieOptions: {
