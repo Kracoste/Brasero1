@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 
@@ -59,20 +59,33 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [guestFavorites, setGuestFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createClient();
+  const supabaseRef = useRef(createClient());
+  const supabase = supabaseRef.current;
 
   useEffect(() => {
-    const initFavorites = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-      if (user) {
-        await loadFavorites();
-      } else {
-        const guestFavs = readGuestFavorites();
-        setGuestFavorites(guestFavs);
-      }
+    // Ne pas exécuter si supabase n'est pas disponible (SSR/build)
+    if (!supabase) {
       setLoading(false);
+      return;
+    }
+
+    const initFavorites = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+
+        if (user) {
+          await loadFavorites();
+        } else {
+          const guestFavs = readGuestFavorites();
+          setGuestFavorites(guestFavs);
+        }
+      } catch (error) {
+        console.error('Error initializing favorites:', error);
+        setGuestFavorites(readGuestFavorites());
+      } finally {
+        setLoading(false);
+      }
     };
 
     initFavorites();
@@ -80,7 +93,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const newUser = session?.user ?? null;
       setUser(newUser);
-      
+
       if (newUser) {
         await loadFavorites();
       } else {
