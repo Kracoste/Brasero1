@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { stripe, hasStripeCredentials } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
 
 type CartItem = {
@@ -28,6 +28,13 @@ type CheckoutBody = {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!hasStripeCredentials() || !stripe) {
+      return NextResponse.json(
+        { error: 'Le paiement n\'est pas configuré. Veuillez contacter l\'administrateur.' },
+        { status: 503 }
+      );
+    }
+
     const body: CheckoutBody = await request.json();
     const { items, customerInfo, deliveryMessage } = body;
 

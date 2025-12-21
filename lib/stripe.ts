@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set');
-}
+// Stripe client - will be null if STRIPE_SECRET_KEY is not set
+export const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
+  : null;
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const hasStripeCredentials = () => !!process.env.STRIPE_SECRET_KEY;
