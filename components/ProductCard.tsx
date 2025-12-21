@@ -108,7 +108,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={adding || loading}
+              disabled={adding}
               className="product-card__btn product-card__btn--primary"
             >
               {adding ? "Ajouté au panier" : "Ajouter au panier"}

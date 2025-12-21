@@ -124,24 +124,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Charger l'utilisateur et le panier
   useEffect(() => {
     const initCart = async () => {
-      // Essayer d'abord getSession puis getUser
-      const { data: { session } } = await supabase.auth.getSession();
-      let user = session?.user ?? null;
-      
-      if (!user) {
-        const { data } = await supabase.auth.getUser();
-        user = data.user;
-      }
-      
-      setUser(user);
+      try {
+        // Essayer d'abord getSession puis getUser
+        const { data: { session } } = await supabase.auth.getSession();
+        let user = session?.user ?? null;
+        
+        if (!user) {
+          const { data } = await supabase.auth.getUser();
+          user = data.user;
+        }
+        
+        setUser(user);
 
-      if (user) {
-        await loadCart(user.id);
-      } else {
+        if (user) {
+          await loadCart(user.id);
+        } else {
+          const guestItems = readGuestCart();
+          setItems(guestItems);
+        }
+      } catch (error) {
+        console.error('Error initializing cart:', error);
+        // En cas d'erreur, charger le panier guest
         const guestItems = readGuestCart();
         setItems(guestItems);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initCart();
