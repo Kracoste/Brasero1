@@ -90,6 +90,11 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  if (!stripe) {
+    console.error("❌ Stripe client non configuré");
+    return;
+  }
+
   const supabase = getSupabaseAdminClient();
   if (!supabase) {
     console.error("❌ Supabase admin client non configuré");
