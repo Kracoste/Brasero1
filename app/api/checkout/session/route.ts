@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { stripe, hasStripeCredentials } from '@/lib/stripe';
 
 export async function GET(request: NextRequest) {
+  if (!hasStripeCredentials() || !stripe) {
+    return NextResponse.json(
+      { error: 'Stripe non configuré' },
+      { status: 503 }
+    );
+  }
+
   const sessionId = request.nextUrl.searchParams.get('session_id');
 
   if (!sessionId) {
