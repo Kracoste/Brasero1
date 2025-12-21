@@ -10,9 +10,6 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        // Utiliser les options par défaut mais avec sameSite: 'lax' pour la compatibilité
-      },
       cookieOptions: {
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
