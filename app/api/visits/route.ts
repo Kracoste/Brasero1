@@ -16,13 +16,8 @@ const sanitizeText = (value?: string | null) => {
 export async function POST(request: Request) {
   const adminClient = getSupabaseAdminClient();
   if (!hasSupabaseAdminCredentials() || !adminClient) {
-    console.error("Supabase admin credentials are missing for visit tracking.");
-    return NextResponse.json(
-      {
-        error: "Supabase admin credentials are missing. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
-      },
-      { status: 500 },
-    );
+    // Silently skip visit tracking if credentials are missing
+    return NextResponse.json({ success: true, skipped: true }, { status: 200 });
   }
 
   try {
