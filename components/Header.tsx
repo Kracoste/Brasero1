@@ -16,23 +16,15 @@ export const Header = () => {
   const pathname = usePathname();
   const { itemCount } = useCart();
   const { favoriteCount } = useFavorites();
-  const { user, isAdmin, signOut, isLoading } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const [accessoriesOpen, setAccessoriesOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
   const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
   const accountTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const handleLogout = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (loggingOut) return;
-    setLoggingOut(true);
+  const handleLogout = () => {
     setAccountMenuOpen(false);
-
-    // signOut() gère la redirection, pas besoin d'attendre
     signOut();
   };
 
@@ -201,11 +193,10 @@ export const Header = () => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      disabled={loggingOut}
-                      className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left disabled:opacity-50 cursor-pointer"
+                      className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left cursor-pointer"
                     >
                       <LogOut size={16} />
-                      {loggingOut ? 'Déconnexion...' : 'Déconnexion'}
+                      Déconnexion
                     </button>
                   </>
                 ) : (

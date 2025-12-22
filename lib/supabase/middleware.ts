@@ -24,9 +24,7 @@ export async function updateSession(request: NextRequest) {
               ...options,
               path: '/',
               sameSite: 'lax',
-              secure: true,
-              // Permettre le partage entre www et non-www
-              domain: process.env.NODE_ENV === 'production' ? '.atelier-lbf.fr' : undefined,
+              secure: process.env.NODE_ENV === 'production',
             })
           )
         },
