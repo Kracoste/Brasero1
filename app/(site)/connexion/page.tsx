@@ -40,21 +40,22 @@ function ConnexionPageContent() {
     setLoading(true);
 
     try {
-      // Utiliser l'API route pour la connexion côté serveur
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const supabase = createClient();
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur de connexion');
+      if (signInError) {
+        throw signInError;
       }
 
-      // Redirection après connexion réussie
-      doRedirect(data.redirectTo || '/');
+      // Attendre un peu pour que les cookies soient bien définis
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Redirection avec rechargement complet
+      const isAdmin = email.toLowerCase() === 'allouhugo@gmail.com';
+      window.location.href = isAdmin ? '/admin' : '/';
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);

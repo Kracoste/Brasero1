@@ -6,6 +6,9 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json()
     const cookieStore = await cookies()
+    
+    // Collecter les cookies à définir
+    const cookiesToSet: { name: string; value: string; options: any }[] = []
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,9 +18,9 @@ export async function POST(request: Request) {
           getAll() {
             return cookieStore.getAll()
           },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options)
+          setAll(cookies) {
+            cookies.forEach((cookie) => {
+              cookiesToSet.push(cookie)
             })
           },
         },
@@ -35,11 +38,25 @@ export async function POST(request: Request) {
 
     const redirectTo = email.toLowerCase() === 'allouhugo@gmail.com' ? '/admin' : '/'
 
-    return NextResponse.json({ 
+    // Créer la réponse avec les cookies
+    const response = NextResponse.json({ 
       success: true, 
       user: data.user,
       redirectTo
     })
+
+    // Ajouter les cookies à la réponse
+    cookiesToSet.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, {
+        ...options,
+        path: '/',
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+      })
+    })
+
+    return response
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
   }
