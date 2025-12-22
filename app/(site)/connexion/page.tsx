@@ -18,7 +18,8 @@ function ConnexionPageContent() {
   const hasRedirected = useRef(false);
   const supabase = useMemo(() => createClient(), []);
 
-  const resolveRedirectTarget = useCallback((fallback: string) => {
+  // Fonction pour obtenir la cible de redirection
+  const getRedirectTarget = useCallback((fallback: string) => {
     const redirectFromQuery = searchParams?.get(REDIRECT_PARAM);
     if (!redirectFromQuery) return fallback;
     if (!redirectFromQuery.startsWith('/')) return fallback;
@@ -31,24 +32,30 @@ function ConnexionPageContent() {
     return redirectFromQuery;
   }, [searchParams]);
 
-  const doRedirect = useCallback((redirectTo: string) => {
-    if (hasRedirected.current || isRedirecting) return;
+  // Effectuer la redirection de manière impérative
+  const performRedirect = useCallback((target: string) => {
+    if (hasRedirected.current) return;
     hasRedirected.current = true;
     setIsRedirecting(true);
-    const target = resolveRedirectTarget(redirectTo);
     
-    // Utiliser setTimeout pour s'assurer que le state est mis à jour avant la redirection
-    setTimeout(() => {
-      window.location.replace(target);
-    }, 50);
-  }, [isRedirecting, resolveRedirectTarget]);
+    // Force redirect avec plusieurs méthodes de fallback
+    const finalTarget = getRedirectTarget(target);
+    console.log('Redirection vers:', finalTarget);
+    
+    // Essayer window.location.href d'abord (plus fiable)
+    window.location.href = finalTarget;
+  }, [getRedirectTarget]);
 
+  // Rediriger si déjà connecté
   useEffect(() => {
     if (authLoading) return;
     if (!user) return;
+    if (hasRedirected.current) return;
+    
     const isAdminUser = isAdmin || isAdminEmail(user.email);
-    doRedirect(isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
-  }, [authLoading, user, isAdmin, doRedirect]);
+    const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
+    performRedirect(target);
+  }, [authLoading, user, isAdmin, performRedirect]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +73,14 @@ function ConnexionPageContent() {
       }
 
       // Attendre un peu pour que les cookies soient bien définis
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       await refreshUser();
 
-      // Redirection via doRedirect pour gérer le paramètre redirectTo
+      // Redirection directe
       const isAdminUser = isAdminEmail(email.trim());
-      doRedirect(isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
+      const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
+      performRedirect(target);
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);
