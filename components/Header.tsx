@@ -73,19 +73,26 @@ export const Header = () => {
     };
 
     const init = async () => {
-      // Utiliser getSession() d'abord, puis getUser() comme fallback
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        console.log('Init Header user from session:', session.user.email);
-        await syncUser(session.user);
-      } else {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error('Erreur getUser:', error);
-        }
-        console.log('Init Header user from getUser:', user?.email);
-        await syncUser(user);
+      // Debug: vérifier ce que retourne chaque méthode
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      console.log('Header getSession result:', { 
+        user: sessionData?.session?.user?.email, 
+        hasSession: !!sessionData?.session,
+        error: sessionError?.message 
+      });
+      
+      if (sessionData?.session?.user) {
+        await syncUser(sessionData.session.user);
+        return;
       }
+      
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      console.log('Header getUser result:', { 
+        user: userData?.user?.email, 
+        error: userError?.message 
+      });
+      
+      await syncUser(userData?.user ?? null);
     };
     void init();
 
