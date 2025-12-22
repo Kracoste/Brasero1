@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
@@ -11,25 +11,49 @@ export function UserNav() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
+
+  const checkUser = useCallback(async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-    };
+    // Vérifier l'utilisateur au montage
+    checkUser();
 
-    getUser();
-
+    // Écouter les changements d'état d'authentification
+    const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('UserNav auth state change:', _event, session?.user?.email);
       setUser(session?.user ?? null);
+      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    // Également vérifier quand la fenêtre reprend le focus (retour sur l'onglet)
+    const handleFocus = () => {
+      checkUser();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    // Et vérifier quand on revient sur la page (visibilité)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkUser();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [checkUser]);
 
   const handleLogout = async () => {
+    const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
     router.push('/');

@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
       // Vérifier que la session est bien créée
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        return NextResponse.redirect(`${origin}${next}`)
+        // Créer la réponse de redirection
+        const redirectUrl = new URL(next, origin)
+        const response = NextResponse.redirect(redirectUrl)
+        
+        // Forcer le navigateur à ne pas mettre en cache cette réponse
+        response.headers.set('Cache-Control', 'no-store, max-age=0')
+        
+        return response
       }
     }
     console.error('Auth callback error:', error)

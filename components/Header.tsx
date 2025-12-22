@@ -25,10 +25,9 @@ export const Header = () => {
   const [loggingOut, setLoggingOut] = useState(false);
   const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
   const accountTimer = useRef<NodeJS.Timeout | null>(null);
-  const supabaseRef = useRef(createClient());
 
   useEffect(() => {
-    const supabase = supabaseRef.current;
+    const supabase = createClient();
 
     const fetchRole = async (userId: string, userEmail: string | undefined) => {
       // Liste des emails admin (même logique que dans le layout admin)
@@ -74,32 +73,44 @@ export const Header = () => {
     };
 
     const init = async () => {
-      // Essayer d'abord getSession puis getUser
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.error('Erreur getSession:', sessionError);
+      // Utiliser getUser() qui est plus fiable en production
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Erreur getUser:', error);
       }
-      
-      if (session?.user) {
-        console.log('Init user from session:', session.user.email);
-        await syncUser(session.user);
-      } else {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error('Erreur getUser:', error);
-        }
-        console.log('Init user from getUser:', user?.email);
-        await syncUser(user);
-      }
+      console.log('Init Header user:', user?.email);
+      await syncUser(user);
     };
     void init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session?.user?.email);
+      console.log('Header Auth state change:', event, session?.user?.email);
       await syncUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    // Également écouter les changements de visibilité de la page
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        await syncUser(user);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Et le focus de la fenêtre
+    const handleFocus = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await syncUser(user);
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const handleLogout = async (e: React.MouseEvent) => {
@@ -110,7 +121,7 @@ export const Header = () => {
     setLoggingOut(true);
     setAccountMenuOpen(false);
 
-    const supabase = supabaseRef.current;
+    const supabase = createClient();
 
     try {
       const { error } = await supabase.auth.signOut({ scope: 'global' });

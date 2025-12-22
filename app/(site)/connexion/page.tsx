@@ -1,9 +1,9 @@
 'use client';
 
-import { Suspense, useState, useEffect, useMemo } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function ConnexionPageContent() {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ function ConnexionPageContent() {
   const [loading, setLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
-  const supabase = useMemo(() => createClient(), []);
+  const router = useRouter();
 
   const adminEmails = ['allouhugo@gmail.com'];
 
@@ -23,22 +23,20 @@ function ConnexionPageContent() {
     return redirectFromQuery || (isAdmin ? '/admin' : '/');
   };
 
-  // Écouter les changements d'authentification et rediriger si connecté
+  // Vérifier si déjà connecté au chargement
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth event:', event, session?.user?.email);
-      if (event === 'SIGNED_IN' && session?.user && !isRedirecting) {
+    const checkExistingSession = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && !isRedirecting) {
         setIsRedirecting(true);
-        const target = getRedirectTarget(session.user.email);
-        console.log('Redirection vers:', target);
-        // Attendre que la session soit bien persistée avant de rediriger
-        await new Promise(resolve => setTimeout(resolve, 500));
-        window.location.href = target;
+        const target = getRedirectTarget(user.email);
+        router.push(target);
+        router.refresh();
       }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [isRedirecting]);
+    };
+    checkExistingSession();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +44,8 @@ function ConnexionPageContent() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -54,7 +53,15 @@ function ConnexionPageContent() {
       if (error) {
         throw error;
       }
-      // La redirection sera gérée par onAuthStateChange
+
+      if (data.user) {
+        setIsRedirecting(true);
+        const target = getRedirectTarget(data.user.email);
+        console.log('Connexion réussie, redirection vers:', target);
+        // Utiliser router.push + refresh pour mettre à jour l'état côté serveur
+        router.push(target);
+        router.refresh();
+      }
     } catch (error: any) {
       setError(error?.message || 'Une erreur est survenue');
       setLoading(false);

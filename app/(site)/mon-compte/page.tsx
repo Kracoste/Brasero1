@@ -26,10 +26,10 @@ export default function MonComptePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     const getUser = async () => {
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -54,13 +54,14 @@ export default function MonComptePage() {
     };
 
     getUser();
-  }, [supabase, router]);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
 
+    const supabase = createClient();
     const formData = new FormData(e.currentTarget);
     const updates = {
       id: user!.id,
