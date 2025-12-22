@@ -191,18 +191,13 @@ export const Header = () => {
                       <User size={16} />
                       Mon profil
                     </Link>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleLogout();
-                      }}
+                    <a
+                      href="/api/auth/logout-redirect"
                       className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left cursor-pointer"
                     >
                       <LogOut size={16} />
                       Déconnexion
-                    </button>
+                    </a>
                   </>
                 ) : (
                   <>
