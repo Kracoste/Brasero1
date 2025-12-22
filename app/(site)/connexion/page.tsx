@@ -55,20 +55,27 @@ function ConnexionPageContent() {
         throw signInError;
       }
 
-      // Vérifier que la session est bien créée
+      // La connexion a réussi si on a une session
+      if (data?.session) {
+        const target = getRedirectTarget(data.user?.email);
+        console.log('Session créée, redirection vers:', target);
+        setIsRedirecting(true);
+        
+        // Utiliser une redirection immédiate
+        window.location.href = target;
+        return;
+      }
+      
+      // Fallback: vérifier avec getUser
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
         const target = getRedirectTarget(user.email);
-        console.log('Redirection vers:', target);
+        console.log('User trouvé via getUser, redirection vers:', target);
         setIsRedirecting(true);
-        
-        // Forcer la redirection avec un délai minimal
-        setTimeout(() => {
-          window.location.href = target;
-        }, 50);
+        window.location.href = target;
       } else {
-        throw new Error('Utilisateur non trouvé après connexion');
+        throw new Error('Session non créée');
       }
     } catch (error: any) {
       console.error('Erreur connexion:', error);
