@@ -23,9 +23,9 @@ export const Header = () => {
   const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
   const accountTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const handleLogout = () => {
-    setAccountMenuOpen(false);
-    signOut();
+  const handleLogout = async () => {
+    // Appeler signOut directement - il gère la redirection
+    await signOut();
   };
 
   const toggle = () => setOpen((prev) => !prev);
@@ -192,7 +192,12 @@ export const Header = () => {
                       Mon profil
                     </Link>
                     <button
-                      onClick={handleLogout}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleLogout();
+                      }}
                       className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left cursor-pointer"
                     >
                       <LogOut size={16} />
