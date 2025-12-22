@@ -145,18 +145,15 @@ export const Header = () => {
     setAccountMenuOpen(false);
 
     try {
-      const supabase = createClient();
-      
-      // Tenter la déconnexion avec un timeout court
-      const signOutPromise = supabase.auth.signOut();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 1500)
-      );
-      
-      await Promise.race([signOutPromise, timeoutPromise]).catch(() => {
-        console.log('SignOut timeout ou erreur, nettoyage manuel...');
+      // Appel explicite à l'API REST de Supabase pour supprimer le cookie httpOnly côté serveur
+      await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/logout`, {
+        method: 'POST',
+        headers: {
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+        },
+        credentials: 'include',
       });
-      
+
       // Nettoyer manuellement le localStorage (où Supabase stocke la session)
       const keysToRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
@@ -166,15 +163,15 @@ export const Header = () => {
         }
       }
       keysToRemove.forEach(key => localStorage.removeItem(key));
-      
+
       // Mettre à jour l'état
       setUser(null);
       setIsAdmin(false);
-      
+
     } catch (error) {
       console.error('Exception déconnexion:', error);
     }
-    
+
     // Toujours rediriger à la fin
     window.location.href = '/';
   };
