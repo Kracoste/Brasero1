@@ -44,28 +44,31 @@ function ConnexionPageContent() {
 
     try {
       const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        throw error;
+      console.log('SignIn result:', { user: data?.user?.email, session: !!data?.session, error: signInError });
+
+      if (signInError) {
+        throw signInError;
       }
 
-      if (data.user && data.session) {
-        setIsRedirecting(true);
-        const target = getRedirectTarget(data.user.email);
-        console.log('Connexion réussie, session:', data.session.access_token?.substring(0, 20));
+      // Vérifier que la session est bien créée
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const target = getRedirectTarget(user.email);
         console.log('Redirection vers:', target);
+        setIsRedirecting(true);
         
-        // Attendre un court instant pour que les cookies soient bien écrits
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Forcer la redirection
-        window.location.replace(target);
+        // Forcer la redirection avec un délai minimal
+        setTimeout(() => {
+          window.location.href = target;
+        }, 50);
       } else {
-        throw new Error('Session non créée');
+        throw new Error('Utilisateur non trouvé après connexion');
       }
     } catch (error: any) {
       console.error('Erreur connexion:', error);
