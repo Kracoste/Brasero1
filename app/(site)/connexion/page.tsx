@@ -1,9 +1,9 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 function ConnexionPageContent() {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ function ConnexionPageContent() {
   const [loading, setLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const hasRedirected = useRef(false);
 
   const adminEmails = ['allouhugo@gmail.com'];
 
@@ -23,18 +23,35 @@ function ConnexionPageContent() {
     return redirectFromQuery || (isAdmin ? '/admin' : '/');
   };
 
-  // Vérifier si déjà connecté au chargement
+  const doRedirect = (userEmail: string | undefined) => {
+    if (hasRedirected.current) return;
+    hasRedirected.current = true;
+    setIsRedirecting(true);
+    const target = getRedirectTarget(userEmail);
+    console.log('Redirection vers:', target);
+    window.location.href = target;
+  };
+
+  // Écouter les changements d'authentification pour rediriger automatiquement
   useEffect(() => {
-    const checkExistingSession = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user && !isRedirecting) {
-        setIsRedirecting(true);
-        const target = getRedirectTarget(user.email);
-        window.location.href = target;
+    const supabase = createClient();
+    
+    // Vérifier si déjà connecté
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        doRedirect(user.email);
       }
-    };
-    checkExistingSession();
+    });
+
+    // Écouter les événements de connexion
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Connexion page auth event:', event);
+      if (event === 'SIGNED_IN' && session?.user) {
+        doRedirect(session.user.email);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -42,44 +59,27 @@ function ConnexionPageContent() {
     setError(null);
     setLoading(true);
 
-    const supabase = createClient();
-    
-    // Timeout de sécurité: si après 5 secondes on n'a pas de réponse, vérifier manuellement
-    const timeoutId = setTimeout(async () => {
-      console.log('Timeout atteint, vérification de la session...');
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const target = getRedirectTarget(user.email);
-        console.log('Session trouvée après timeout, redirection vers:', target);
-        window.location.href = target;
-      }
-    }, 3000);
-
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      clearTimeout(timeoutId);
-      console.log('SignIn result:', { user: data?.user?.email, session: !!data?.session, error: signInError });
-
       if (signInError) {
         throw signInError;
       }
-
-      // La connexion a réussi si on a une session ou un user
-      if (data?.session || data?.user) {
-        const target = getRedirectTarget(data.user?.email);
-        console.log('Session créée, redirection vers:', target);
-        setIsRedirecting(true);
-        window.location.href = target;
-        return;
-      }
       
-      throw new Error('Session non créée');
+      // Si on arrive ici sans erreur, onAuthStateChange devrait gérer la redirection
+      // Mais on met un timeout de sécurité
+      setTimeout(() => {
+        if (!hasRedirected.current) {
+          console.log('Timeout: forçage de la redirection');
+          doRedirect(email);
+        }
+      }, 2000);
+      
     } catch (error: any) {
-      clearTimeout(timeoutId);
       console.error('Erreur connexion:', error);
       setError(error?.message || 'Une erreur est survenue');
       setLoading(false);
