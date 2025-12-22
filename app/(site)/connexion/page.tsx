@@ -53,18 +53,38 @@ function ConnexionPageContent() {
         throw error;
       }
 
-      if (data.user) {
+      if (data.user && data.session) {
         setIsRedirecting(true);
         const target = getRedirectTarget(data.user.email);
-        console.log('Connexion réussie, redirection vers:', target);
-        // Utiliser window.location.href pour une redirection complète
-        window.location.href = target;
+        console.log('Connexion réussie, session:', data.session.access_token?.substring(0, 20));
+        console.log('Redirection vers:', target);
+        
+        // Attendre un court instant pour que les cookies soient bien écrits
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Forcer la redirection
+        window.location.replace(target);
+      } else {
+        throw new Error('Session non créée');
       }
     } catch (error: any) {
+      console.error('Erreur connexion:', error);
       setError(error?.message || 'Une erreur est survenue');
       setLoading(false);
+      setIsRedirecting(false);
     }
   };
+
+  if (isRedirecting) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12">
+        <div className="text-center">
+          <div className="h-8 w-8 mx-auto animate-spin rounded-full border-4 border-slate-300 border-t-slate-900"></div>
+          <p className="mt-4 text-slate-600">Redirection en cours...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12 sm:px-6 lg:px-8">
