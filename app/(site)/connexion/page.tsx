@@ -14,44 +14,24 @@ function ConnexionPageContent() {
   const searchParams = useSearchParams();
   const hasRedirected = useRef(false);
 
-  const adminEmails = ['allouhugo@gmail.com'];
-
-  const getRedirectTarget = (userEmail: string | undefined) => {
-    const emailLower = userEmail?.toLowerCase() || '';
-    const isAdmin = adminEmails.includes(emailLower);
-    const redirectFromQuery = searchParams?.get('redirectTo');
-    return redirectFromQuery || (isAdmin ? '/admin' : '/');
-  };
-
-  const doRedirect = (userEmail: string | undefined) => {
+  const doRedirect = (redirectTo: string) => {
     if (hasRedirected.current) return;
     hasRedirected.current = true;
     setIsRedirecting(true);
-    const target = getRedirectTarget(userEmail);
-    console.log('Redirection vers:', target);
+    const redirectFromQuery = searchParams?.get('redirectTo');
+    const target = redirectFromQuery || redirectTo;
     window.location.href = target;
   };
 
-  // Écouter les changements d'authentification pour rediriger automatiquement
+  // Vérifier si déjà connecté au chargement
   useEffect(() => {
     const supabase = createClient();
-    
-    // Vérifier si déjà connecté
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
-        doRedirect(user.email);
+        const isAdmin = user.email?.toLowerCase() === 'allouhugo@gmail.com';
+        doRedirect(isAdmin ? '/admin' : '/');
       }
     });
-
-    // Écouter les événements de connexion
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Connexion page auth event:', event);
-      if (event === 'SIGNED_IN' && session?.user) {
-        doRedirect(session.user.email);
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -60,24 +40,21 @@ function ConnexionPageContent() {
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Utiliser l'API route pour la connexion côté serveur
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (signInError) {
-        throw signInError;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur de connexion');
       }
-      
-      // Si on arrive ici sans erreur, onAuthStateChange devrait gérer la redirection
-      // Mais on met un timeout de sécurité
-      setTimeout(() => {
-        if (!hasRedirected.current) {
-          console.log('Timeout: forçage de la redirection');
-          doRedirect(email);
-        }
-      }, 2000);
+
+      // Redirection après connexion réussie
+      doRedirect(data.redirectTo || '/');
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);

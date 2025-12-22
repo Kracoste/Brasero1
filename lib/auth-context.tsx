@@ -65,6 +65,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
+      // Utiliser l'API route pour la déconnexion côté serveur
+      await fetch('/api/auth/logout', { method: 'POST' });
+      
+      // Aussi déconnecter côté client
       await supabase.auth.signOut();
       
       // Réinitialiser l'état
