@@ -31,8 +31,7 @@ function ConnexionPageContent() {
       if (user && !isRedirecting) {
         setIsRedirecting(true);
         const target = getRedirectTarget(user.email);
-        router.push(target);
-        router.refresh();
+        window.location.href = target;
       }
     };
     checkExistingSession();
@@ -58,9 +57,8 @@ function ConnexionPageContent() {
         setIsRedirecting(true);
         const target = getRedirectTarget(data.user.email);
         console.log('Connexion réussie, redirection vers:', target);
-        // Utiliser router.push + refresh pour mettre à jour l'état côté serveur
-        router.push(target);
-        router.refresh();
+        // Utiliser window.location.href pour une redirection complète
+        window.location.href = target;
       }
     } catch (error: any) {
       setError(error?.message || 'Une erreur est survenue');
