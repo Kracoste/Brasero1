@@ -121,21 +121,28 @@ export const Header = () => {
     setLoggingOut(true);
     setAccountMenuOpen(false);
 
+    const supabase = createClient();
+    
+    // Timeout de sécurité: rediriger après 2 secondes max
+    const timeoutId = setTimeout(() => {
+      console.log('Logout timeout, redirection forcée');
+      window.location.href = '/';
+    }, 2000);
+
     try {
-      const supabase = createClient();
       await supabase.auth.signOut();
+      clearTimeout(timeoutId);
       
       // Mettre à jour l'état immédiatement
       setUser(null);
       setIsAdmin(false);
-      setLoggingOut(false);
       
-      // Force un rechargement complet de la page pour nettoyer tous les états
+      // Force un rechargement complet de la page
       window.location.href = '/';
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error('Exception déconnexion:', error);
-      setLoggingOut(false);
-      // Même en cas d'erreur, on redirige vers l'accueil
+      // Même en cas d'erreur, on redirige
       window.location.href = '/';
     }
   };

@@ -42,42 +42,44 @@ function ConnexionPageContent() {
     setError(null);
     setLoading(true);
 
+    const supabase = createClient();
+    
+    // Timeout de sécurité: si après 5 secondes on n'a pas de réponse, vérifier manuellement
+    const timeoutId = setTimeout(async () => {
+      console.log('Timeout atteint, vérification de la session...');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const target = getRedirectTarget(user.email);
+        console.log('Session trouvée après timeout, redirection vers:', target);
+        window.location.href = target;
+      }
+    }, 3000);
+
     try {
-      const supabase = createClient();
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+      clearTimeout(timeoutId);
       console.log('SignIn result:', { user: data?.user?.email, session: !!data?.session, error: signInError });
 
       if (signInError) {
         throw signInError;
       }
 
-      // La connexion a réussi si on a une session
-      if (data?.session) {
+      // La connexion a réussi si on a une session ou un user
+      if (data?.session || data?.user) {
         const target = getRedirectTarget(data.user?.email);
         console.log('Session créée, redirection vers:', target);
         setIsRedirecting(true);
-        
-        // Utiliser une redirection immédiate
         window.location.href = target;
         return;
       }
       
-      // Fallback: vérifier avec getUser
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const target = getRedirectTarget(user.email);
-        console.log('User trouvé via getUser, redirection vers:', target);
-        setIsRedirecting(true);
-        window.location.href = target;
-      } else {
-        throw new Error('Session non créée');
-      }
+      throw new Error('Session non créée');
     } catch (error: any) {
+      clearTimeout(timeoutId);
       console.error('Erreur connexion:', error);
       setError(error?.message || 'Une erreur est survenue');
       setLoading(false);
