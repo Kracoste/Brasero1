@@ -35,7 +35,6 @@ export const Header = () => {
       const isAdminByEmail = adminEmails.includes(userEmail?.toLowerCase() || '');
 
       if (isAdminByEmail) {
-        console.log('Admin par email:', userEmail);
         setIsAdmin(true);
         return;
       }
@@ -54,7 +53,6 @@ export const Header = () => {
         }
 
         const isAdminUser = profile?.role === 'admin';
-        console.log('Role utilisateur:', profile?.role, 'isAdmin:', isAdminUser);
         setIsAdmin(isAdminUser);
       } catch (err) {
         console.error('Exception fetchRole:', err);
@@ -63,7 +61,6 @@ export const Header = () => {
     };
 
     const syncUser = async (nextUser: SupabaseUser | null) => {
-      console.log('syncUser appelé avec:', nextUser?.email);
       setUser(nextUser);
       if (nextUser) {
         await fetchRole(nextUser.id, nextUser.email);
@@ -73,48 +70,25 @@ export const Header = () => {
     };
 
     const init = async () => {
-      // Debug: vérifier le localStorage
-      const storageKeys = Object.keys(localStorage).filter(k => k.startsWith('sb-') || k.includes('supabase'));
-      console.log('LocalStorage Supabase keys:', storageKeys);
-      if (storageKeys.length > 0) {
-        storageKeys.forEach(key => {
-          const value = localStorage.getItem(key);
-          console.log(`  ${key}:`, value?.substring(0, 100) + '...');
-        });
+      // Utiliser getUser() qui vérifie avec le serveur - plus fiable que getSession()
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error) {
+        console.error('Header init getUser error:', error.message);
       }
       
-      // Debug: vérifier ce que retourne chaque méthode
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      console.log('Header getSession result:', { 
-        user: sessionData?.session?.user?.email, 
-        hasSession: !!sessionData?.session,
-        error: sessionError?.message 
-      });
-      
-      if (sessionData?.session?.user) {
-        await syncUser(sessionData.session.user);
-        return;
-      }
-      
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      console.log('Header getUser result:', { 
-        user: userData?.user?.email, 
-        error: userError?.message 
-      });
-      
-      await syncUser(userData?.user ?? null);
+      await syncUser(user ?? null);
     };
     void init();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Header Auth state change:', event, session?.user?.email);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      // Synchroniser l'utilisateur sur tous les événements d'auth
       await syncUser(session?.user ?? null);
     });
 
     // Également écouter les changements de visibilité de la page
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         await syncUser(user);
       }
@@ -123,7 +97,6 @@ export const Header = () => {
 
     // Et le focus de la fenêtre
     const handleFocus = async () => {
-      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       await syncUser(user);
     };

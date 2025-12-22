@@ -11,22 +11,20 @@ export function UserNav() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const supabase = createClient();
 
   const checkUser = useCallback(async () => {
-    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
     setLoading(false);
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     // Vérifier l'utilisateur au montage
     checkUser();
 
     // Écouter les changements d'état d'authentification
-    const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('UserNav auth state change:', _event, session?.user?.email);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -50,7 +48,7 @@ export function UserNav() {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [checkUser]);
+  }, [checkUser, supabase]);
 
   const handleLogout = async () => {
     const supabase = createClient();
