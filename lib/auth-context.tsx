@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
-import { createClient, resetClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -69,9 +69,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Réinitialiser l'état
       setUser(null);
       setIsAdmin(false);
-      
-      // Réinitialiser le client singleton
-      resetClient();
       
       // Rediriger avec un rechargement complet pour nettoyer tout l'état
       window.location.href = '/';

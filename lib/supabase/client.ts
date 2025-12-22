@@ -17,38 +17,10 @@ export function createClient() {
     return browserClient
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-  browserClient = createBrowserClient(url, key, {
-    auth: {
-      persistSession: true,
-      detectSessionInUrl: true,
-      flowType: 'pkce',
-      storageKey: 'sb-auth-token',
-      storage: {
-        getItem: (key) => {
-          if (typeof window === 'undefined') return null
-          return window.localStorage.getItem(key)
-        },
-        setItem: (key, value) => {
-          if (typeof window !== 'undefined') {
-            window.localStorage.setItem(key, value)
-          }
-        },
-        removeItem: (key) => {
-          if (typeof window !== 'undefined') {
-            window.localStorage.removeItem(key)
-          }
-        },
-      },
-    },
-  })
+  browserClient = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 
   return browserClient
-}
-
-// Fonction pour réinitialiser le client (après déconnexion)
-export function resetClient() {
-  browserClient = null
 }
