@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -37,7 +38,7 @@ export default function InscriptionPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}${AUTH_ROUTES.callback}`,
         },
       });
 
@@ -65,7 +66,7 @@ export default function InscriptionPage() {
             </p>
             <div className="mt-6">
               <Link
-                href="/connexion"
+                href={AUTH_ROUTES.login}
                 className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800"
               >
                 Aller à la connexion

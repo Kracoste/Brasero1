@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { AUTH_ROUTES } from '@/lib/auth';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { Container } from '@/components/Container';
@@ -33,7 +34,7 @@ export default function MonComptePage() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        router.push('/connexion');
+        router.push(AUTH_ROUTES.login);
         return;
       }
 

@@ -5,6 +5,7 @@ import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ChevronLeft } 
 
 import { createClient } from '@/lib/supabase/server';
 import { AdminSignOutButton } from '@/components/AdminSignOutButton';
+import { isAdminEmail, AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
 
 // Vérification serveur pour éviter le loader bloquant côté client
 export const dynamic = 'force-dynamic';
@@ -21,12 +22,11 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    redirect('/connexion?redirect=/admin');
+    redirect(`${AUTH_ROUTES.login}?${REDIRECT_PARAM}=${AUTH_ROUTES.admin}`);
   }
 
-  // Liste des emails admin
-  const adminEmails = ['allouhugo@gmail.com'];
-  const isAdminByEmail = adminEmails.includes(user.email?.toLowerCase() || '');
+  // Vérifier si admin par email (config centralisée)
+  const isAdminByEmail = isAdminEmail(user.email);
 
   // Vérifier aussi le profil en base (mais ne pas bloquer si erreur)
   let isAdminByProfile = false;

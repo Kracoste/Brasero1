@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { isAdminEmail, AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -18,7 +19,7 @@ function ConnexionPageContent() {
     if (hasRedirected.current) return;
     hasRedirected.current = true;
     setIsRedirecting(true);
-    const redirectFromQuery = searchParams?.get('redirectTo');
+    const redirectFromQuery = searchParams?.get(REDIRECT_PARAM);
     const target = redirectFromQuery || redirectTo;
     window.location.href = target;
   };
@@ -28,8 +29,8 @@ function ConnexionPageContent() {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
-        const isAdmin = user.email?.toLowerCase() === 'allouhugo@gmail.com';
-        doRedirect(isAdmin ? '/admin' : '/');
+        const isAdmin = isAdminEmail(user.email);
+        doRedirect(isAdmin ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
       }
     });
   }, []);
@@ -54,8 +55,8 @@ function ConnexionPageContent() {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Redirection avec rechargement complet
-      const isAdmin = email.toLowerCase() === 'allouhugo@gmail.com';
-      window.location.href = isAdmin ? '/admin' : '/';
+      const isAdmin = isAdminEmail(email);
+      window.location.href = isAdmin ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);

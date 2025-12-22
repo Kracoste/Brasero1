@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { isAdminEmail, AUTH_ROUTES } from '@/lib/auth';
 import type { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -13,8 +14,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const ADMIN_EMAILS = ['allouhugo@gmail.com'];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Créer le client une seule fois au montage
@@ -30,16 +29,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Vérifier par email d'abord
-    if (ADMIN_EMAILS.includes(currentUser.email?.toLowerCase() || '')) {
+    // Vérifier par email d'abord (config centralisée)
+    if (isAdminEmail(currentUser.email)) {
       setIsAdmin(true);
       return;
     }
 
     // Sinon vérifier dans la base de données
     try {
-      const supabaseClient = createClient();
-      const { data: profile } = await supabaseClient
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', currentUser.id)
@@ -49,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       setIsAdmin(false);
     }
-  }, []);
+  }, [supabase]);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -65,8 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
-      // Utiliser l'API route pour la déconnexion côté serveur
-      await fetch('/api/auth/logout', { method: 'POST' });
+      // Utiliser l'API route pour la déconnexion côté serveur (nettoie les cookies)
+      await fetch(AUTH_ROUTES.logout, { method: 'POST' });
       
       // Aussi déconnecter côté client
       await supabase.auth.signOut();
@@ -76,11 +74,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAdmin(false);
       
       // Rediriger avec un rechargement complet pour nettoyer tout l'état
-      window.location.href = '/';
+      window.location.href = AUTH_ROUTES.home;
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
       // Forcer la redirection même en cas d'erreur
-      window.location.href = '/';
+      window.location.href = AUTH_ROUTES.home;
     }
   }, [supabase]);
 
