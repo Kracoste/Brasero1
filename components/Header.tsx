@@ -3,111 +3,26 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { Heart, Menu, ShoppingBag, User, X, LogOut } from 'lucide-react';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 import { cn } from '@/lib/utils';
 import { navLinks } from '@/components/navigation';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from "@/lib/favorites-context";
-import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/auth-context';
 
 export const Header = () => {
   const pathname = usePathname();
   const { itemCount } = useCart();
   const { favoriteCount } = useFavorites();
+  const { user, isAdmin, signOut, isLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const [accessoriesOpen, setAccessoriesOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
   const accountTimer = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    const fetchRole = async (userId: string, userEmail: string | undefined) => {
-      // Liste des emails admin (même logique que dans le layout admin)
-      const adminEmails = ['allouhugo@gmail.com'];
-      const isAdminByEmail = adminEmails.includes(userEmail?.toLowerCase() || '');
-
-      if (isAdminByEmail) {
-        setIsAdmin(true);
-        return;
-      }
-
-      try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', userId)
-          .single();
-
-        if (error) {
-          console.error('Erreur récupération profil:', error);
-          setIsAdmin(false);
-          return;
-        }
-
-        const isAdminUser = profile?.role === 'admin';
-        setIsAdmin(isAdminUser);
-      } catch (err) {
-        console.error('Exception fetchRole:', err);
-        setIsAdmin(false);
-      }
-    };
-
-    const syncUser = async (nextUser: SupabaseUser | null) => {
-      setUser(nextUser);
-      if (nextUser) {
-        await fetchRole(nextUser.id, nextUser.email);
-      } else {
-        setIsAdmin(false);
-      }
-    };
-
-    const init = async () => {
-      // Utiliser getUser() qui vérifie avec le serveur - plus fiable que getSession()
-      const { data: { user }, error } = await supabase.auth.getUser();
-      
-      if (error) {
-        console.error('Header init getUser error:', error.message);
-      }
-      
-      await syncUser(user ?? null);
-    };
-    void init();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      // Synchroniser l'utilisateur sur tous les événements d'auth
-      await syncUser(session?.user ?? null);
-    });
-
-    // Également écouter les changements de visibilité de la page
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible') {
-        const { data: { user } } = await supabase.auth.getUser();
-        await syncUser(user);
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Et le focus de la fenêtre
-    const handleFocus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      await syncUser(user);
-    };
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      subscription.unsubscribe();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, []);
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -117,24 +32,7 @@ export const Header = () => {
     setLoggingOut(true);
     setAccountMenuOpen(false);
 
-    try {
-      const supabase = createClient();
-      
-      // Utiliser signOut du client Supabase pour une déconnexion propre
-      await supabase.auth.signOut();
-
-      // Mettre à jour l'état local
-      setUser(null);
-      setIsAdmin(false);
-
-    } catch (error) {
-      console.error('Exception déconnexion:', error);
-    } finally {
-      setLoggingOut(false);
-    }
-
-    // Rediriger vers l'accueil avec un rafraîchissement complet
-    window.location.href = '/';
+    await signOut();
   };
 
   const toggle = () => setOpen((prev) => !prev);

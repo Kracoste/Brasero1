@@ -5,6 +5,14 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 let browserClient: SupabaseClient | null = null
 
 export function createClient() {
+  if (typeof window === 'undefined') {
+    // Côté serveur, créer une nouvelle instance à chaque fois
+    return createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+  }
+
   if (browserClient) {
     return browserClient
   }
@@ -17,8 +25,30 @@ export function createClient() {
       persistSession: true,
       detectSessionInUrl: true,
       flowType: 'pkce',
+      storageKey: 'sb-auth-token',
+      storage: {
+        getItem: (key) => {
+          if (typeof window === 'undefined') return null
+          return window.localStorage.getItem(key)
+        },
+        setItem: (key, value) => {
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(key, value)
+          }
+        },
+        removeItem: (key) => {
+          if (typeof window !== 'undefined') {
+            window.localStorage.removeItem(key)
+          }
+        },
+      },
     },
   })
 
   return browserClient
+}
+
+// Fonction pour réinitialiser le client (après déconnexion)
+export function resetClient() {
+  browserClient = null
 }

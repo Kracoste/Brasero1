@@ -1,64 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { LogOut, User as UserIcon } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
 export function UserNav() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const supabase = createClient();
+  const { user, isLoading, signOut } = useAuth();
 
-  const checkUser = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-    setLoading(false);
-  }, [supabase]);
-
-  useEffect(() => {
-    // Vérifier l'utilisateur au montage
-    checkUser();
-
-    // Écouter les changements d'état d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Également vérifier quand la fenêtre reprend le focus (retour sur l'onglet)
-    const handleFocus = () => {
-      checkUser();
-    };
-    window.addEventListener('focus', handleFocus);
-
-    // Et vérifier quand on revient sur la page (visibilité)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        checkUser();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      subscription.unsubscribe();
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [checkUser, supabase]);
-
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setUser(null);
-    router.push('/');
-    router.refresh();
-  };
-
-  if (loading) {
+  if (isLoading) {
     return <div className="h-8 w-8 animate-pulse rounded-full bg-black/20"></div>;
   }
 
@@ -73,7 +22,7 @@ export function UserNav() {
           <span className="hidden sm:inline">{user.email?.split('@')[0]}</span>
         </Link>
         <button
-          onClick={handleLogout}
+          onClick={signOut}
           className="flex items-center gap-2 rounded-full border border-white/30 bg-black/10 px-3 py-1.5 text-sm text-white transition hover:bg-black/20"
           title="Se déconnecter"
         >
