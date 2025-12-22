@@ -118,34 +118,22 @@ export const Header = () => {
     setAccountMenuOpen(false);
 
     try {
-      // Appel explicite à l'API REST de Supabase pour supprimer le cookie httpOnly côté serveur
-      await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/logout`, {
-        method: 'POST',
-        headers: {
-          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-        },
-        credentials: 'include',
-      });
+      const supabase = createClient();
+      
+      // Utiliser signOut du client Supabase pour une déconnexion propre
+      await supabase.auth.signOut();
 
-      // Nettoyer manuellement le localStorage (où Supabase stocke la session)
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-
-      // Mettre à jour l'état
+      // Mettre à jour l'état local
       setUser(null);
       setIsAdmin(false);
 
     } catch (error) {
       console.error('Exception déconnexion:', error);
+    } finally {
+      setLoggingOut(false);
     }
 
-    // Toujours rediriger à la fin
+    // Rediriger vers l'accueil avec un rafraîchissement complet
     window.location.href = '/';
   };
 
