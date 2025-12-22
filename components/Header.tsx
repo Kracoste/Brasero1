@@ -134,30 +134,39 @@ export const Header = () => {
     setLoggingOut(true);
     setAccountMenuOpen(false);
 
-    const supabase = createClient();
-    
-    // Timeout de sécurité: rediriger après 2 secondes max
-    const timeoutId = setTimeout(() => {
-      console.log('Logout timeout, redirection forcée');
-      window.location.href = '/';
-    }, 2000);
-
     try {
-      await supabase.auth.signOut();
-      clearTimeout(timeoutId);
+      const supabase = createClient();
       
-      // Mettre à jour l'état immédiatement
+      // Tenter la déconnexion avec un timeout court
+      const signOutPromise = supabase.auth.signOut();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 1500)
+      );
+      
+      await Promise.race([signOutPromise, timeoutPromise]).catch(() => {
+        console.log('SignOut timeout ou erreur, nettoyage manuel...');
+      });
+      
+      // Nettoyer manuellement le localStorage (où Supabase stocke la session)
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Mettre à jour l'état
       setUser(null);
       setIsAdmin(false);
       
-      // Force un rechargement complet de la page
-      window.location.href = '/';
     } catch (error) {
-      clearTimeout(timeoutId);
       console.error('Exception déconnexion:', error);
-      // Même en cas d'erreur, on redirige
-      window.location.href = '/';
     }
+    
+    // Toujours rediriger à la fin
+    window.location.href = '/';
   };
 
   const toggle = () => setOpen((prev) => !prev);
