@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
@@ -17,6 +17,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ADMIN_EMAILS = ['allouhugo@gmail.com'];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // Créer le client une seule fois au montage
+  const supabase = useMemo(() => createClient(), []);
+  
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -35,8 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Sinon vérifier dans la base de données
     try {
-      const supabase = createClient();
-      const { data: profile } = await supabase
+      const supabaseClient = createClient();
+      const { data: profile } = await supabaseClient
         .from('profiles')
         .select('role')
         .eq('id', currentUser.id)
@@ -50,7 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const supabase = createClient();
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       setUser(currentUser);
       await checkIsAdmin(currentUser);
@@ -59,11 +61,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setIsAdmin(false);
     }
-  }, [checkIsAdmin]);
+  }, [supabase, checkIsAdmin]);
 
   const signOut = useCallback(async () => {
     try {
-      const supabase = createClient();
       await supabase.auth.signOut();
       
       // Réinitialiser l'état
@@ -77,18 +78,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Forcer la redirection même en cas d'erreur
       window.location.href = '/';
     }
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
-    const supabase = createClient();
-    
-    // Initialisation
+    // Initialisation - forcer une vérification serveur
     const init = async () => {
       setIsLoading(true);
       try {
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
-        setUser(currentUser);
-        await checkIsAdmin(currentUser);
+        // getUser() vérifie avec le serveur Supabase, pas le cache local
+        const { data: { user: currentUser }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          // Si erreur (token invalide, expiré, etc.), l'utilisateur n'est pas connecté
+          setUser(null);
+          setIsAdmin(false);
+        } else {
+          setUser(currentUser);
+          await checkIsAdmin(currentUser);
+        }
       } catch (error) {
         console.error('Erreur initialisation auth:', error);
         setUser(null);
@@ -103,6 +110,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Ignorer l'événement INITIAL_SESSION car on gère déjà l'init
+        if (event === 'INITIAL_SESSION') return;
+        
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         await checkIsAdmin(currentUser);
@@ -129,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [checkIsAdmin, refreshUser]);
+  }, [supabase, checkIsAdmin, refreshUser]);
 
   return (
     <AuthContext.Provider value={{ user, isLoading, isAdmin, signOut, refreshUser }}>
