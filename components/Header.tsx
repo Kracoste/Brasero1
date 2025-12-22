@@ -73,6 +73,16 @@ export const Header = () => {
     };
 
     const init = async () => {
+      // Debug: vérifier le localStorage
+      const storageKeys = Object.keys(localStorage).filter(k => k.startsWith('sb-') || k.includes('supabase'));
+      console.log('LocalStorage Supabase keys:', storageKeys);
+      if (storageKeys.length > 0) {
+        storageKeys.forEach(key => {
+          const value = localStorage.getItem(key);
+          console.log(`  ${key}:`, value?.substring(0, 100) + '...');
+        });
+      }
+      
       // Debug: vérifier ce que retourne chaque méthode
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       console.log('Header getSession result:', { 
