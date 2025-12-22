@@ -4,10 +4,10 @@ import { type NextRequest, NextResponse } from 'next/server'
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
   
-  // Rediriger www vers non-www pour éviter les problèmes de cookies
-  if (hostname.startsWith('www.')) {
+  // Rediriger non-www vers www pour éviter les problèmes de cookies
+  if (hostname === 'atelier-lbf.fr') {
     const newUrl = new URL(request.url);
-    newUrl.host = hostname.replace('www.', '');
+    newUrl.host = 'www.atelier-lbf.fr';
     return NextResponse.redirect(newUrl, 301);
   }
   
