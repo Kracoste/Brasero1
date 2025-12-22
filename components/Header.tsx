@@ -121,23 +121,23 @@ export const Header = () => {
     setLoggingOut(true);
     setAccountMenuOpen(false);
 
-    const supabase = createClient();
-
     try {
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
-      if (error) {
-        console.error('Erreur déconnexion:', error);
-      }
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      
       // Mettre à jour l'état immédiatement
       setUser(null);
       setIsAdmin(false);
+      setLoggingOut(false);
+      
+      // Force un rechargement complet de la page pour nettoyer tous les états
+      window.location.href = '/';
     } catch (error) {
       console.error('Exception déconnexion:', error);
+      setLoggingOut(false);
+      // Même en cas d'erreur, on redirige vers l'accueil
+      window.location.href = '/';
     }
-
-    setLoggingOut(false);
-    // Force un rechargement complet de la page pour nettoyer tous les états
-    window.location.href = '/';
   };
 
   const toggle = () => setOpen((prev) => !prev);
