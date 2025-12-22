@@ -32,7 +32,8 @@ export const Header = () => {
     setLoggingOut(true);
     setAccountMenuOpen(false);
 
-    await signOut();
+    // signOut() gère la redirection, pas besoin d'attendre
+    signOut();
   };
 
   const toggle = () => setOpen((prev) => !prev);
@@ -199,7 +200,7 @@ export const Header = () => {
                       Mon profil
                     </Link>
                     <button
-                      onMouseDown={handleLogout}
+                      onClick={handleLogout}
                       disabled={loggingOut}
                       className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left disabled:opacity-50 cursor-pointer"
                     >
