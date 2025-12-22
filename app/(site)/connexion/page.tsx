@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense, useState, useEffect, useRef } from 'react';
+import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail, AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 
 function ConnexionPageContent() {
   const [email, setEmail] = useState('');
@@ -13,31 +14,41 @@ function ConnexionPageContent() {
   const [loading, setLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
+  const { user, isAdmin, isLoading: authLoading, refreshUser } = useAuth();
   const hasRedirected = useRef(false);
+  const supabase = useMemo(() => createClient(), []);
 
-  const doRedirect = (redirectTo: string) => {
+  const resolveRedirectTarget = useCallback((fallback: string) => {
+    const redirectFromQuery = searchParams?.get(REDIRECT_PARAM);
+    if (!redirectFromQuery) return fallback;
+    if (!redirectFromQuery.startsWith('/')) return fallback;
+    if (
+      redirectFromQuery.startsWith(AUTH_ROUTES.login) ||
+      redirectFromQuery.startsWith(AUTH_ROUTES.register)
+    ) {
+      return fallback;
+    }
+    return redirectFromQuery;
+  }, [searchParams]);
+
+  const doRedirect = useCallback((redirectTo: string) => {
     if (hasRedirected.current || isRedirecting) return;
     hasRedirected.current = true;
     setIsRedirecting(true);
-    const redirectFromQuery = searchParams?.get(REDIRECT_PARAM);
-    const target = redirectFromQuery || redirectTo;
+    const target = resolveRedirectTarget(redirectTo);
     
     // Utiliser setTimeout pour s'assurer que le state est mis à jour avant la redirection
     setTimeout(() => {
       window.location.replace(target);
     }, 50);
-  };
+  }, [isRedirecting, resolveRedirectTarget]);
 
-  // Vérifier si déjà connecté au chargement
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        const isAdmin = isAdminEmail(user.email);
-        doRedirect(isAdmin ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
-      }
-    });
-  }, []);
+    if (authLoading) return;
+    if (!user) return;
+    const isAdminUser = isAdmin || isAdminEmail(user.email);
+    doRedirect(isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
+  }, [authLoading, user, isAdmin, doRedirect]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +56,7 @@ function ConnexionPageContent() {
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -58,15 +68,22 @@ function ConnexionPageContent() {
       // Attendre un peu pour que les cookies soient bien définis
       await new Promise(resolve => setTimeout(resolve, 200));
 
+      await refreshUser();
+
       // Redirection via doRedirect pour gérer le paramètre redirectTo
-      const isAdmin = isAdminEmail(email);
-      doRedirect(isAdmin ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
+      const isAdminUser = isAdminEmail(email.trim());
+      doRedirect(isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);
       setError(error?.message || 'Une erreur est survenue');
       setLoading(false);
       setIsRedirecting(false);
+      hasRedirected.current = false;
+    } finally {
+      if (!hasRedirected.current) {
+        setLoading(false);
+      }
     }
   };
 
