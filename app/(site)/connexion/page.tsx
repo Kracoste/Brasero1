@@ -16,12 +16,16 @@ function ConnexionPageContent() {
   const hasRedirected = useRef(false);
 
   const doRedirect = (redirectTo: string) => {
-    if (hasRedirected.current) return;
+    if (hasRedirected.current || isRedirecting) return;
     hasRedirected.current = true;
     setIsRedirecting(true);
     const redirectFromQuery = searchParams?.get(REDIRECT_PARAM);
     const target = redirectFromQuery || redirectTo;
-    window.location.href = target;
+    
+    // Utiliser setTimeout pour s'assurer que le state est mis à jour avant la redirection
+    setTimeout(() => {
+      window.location.replace(target);
+    }, 50);
   };
 
   // Vérifier si déjà connecté au chargement
@@ -52,11 +56,11 @@ function ConnexionPageContent() {
       }
 
       // Attendre un peu pour que les cookies soient bien définis
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-      // Redirection avec rechargement complet
+      // Redirection via doRedirect pour gérer le paramètre redirectTo
       const isAdmin = isAdminEmail(email);
-      window.location.href = isAdmin ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
+      doRedirect(isAdmin ? AUTH_ROUTES.admin : AUTH_ROUTES.home);
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);
