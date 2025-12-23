@@ -268,6 +268,45 @@ export default function AdminDashboard() {
     };
 
     fetchStats();
+
+    // Rafraîchissement automatique toutes les 15 secondes
+    const intervalId = setInterval(() => {
+      fetchStats();
+    }, 15000);
+
+    // Abonnement temps réel aux nouvelles visites
+    const supabase = supabaseRef.current;
+    const visitsChannel = supabase
+      .channel('realtime-visits')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'visits' },
+        () => {
+          // Une nouvelle visite a été enregistrée, rafraîchir les stats
+          fetchStats();
+        }
+      )
+      .subscribe();
+
+    // Abonnement temps réel aux nouvelles commandes
+    const ordersChannel = supabase
+      .channel('realtime-orders')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          // Une commande a été créée/modifiée, rafraîchir les stats
+          fetchStats();
+        }
+      )
+      .subscribe();
+
+    // Cleanup
+    return () => {
+      clearInterval(intervalId);
+      supabase.removeChannel(visitsChannel);
+      supabase.removeChannel(ordersChannel);
+    };
   }, []);
 
   const formatCurrency = (amount: number) => {
