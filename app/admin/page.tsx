@@ -81,6 +81,7 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [dailyDataLoaded, setDailyDataLoaded] = useState(false);
   const supabaseRef = useRef(createClient());
 
   // Fonction pour forcer le rafraîchissement
@@ -88,6 +89,59 @@ export default function AdminDashboard() {
     setRefreshKey(prev => prev + 1);
   }, []);
 
+  // Charger les données journalières une seule fois (pour les graphiques)
+  useEffect(() => {
+    const loadDailyData = async () => {
+      if (dailyDataLoaded) return;
+      
+      const supabase = supabaseRef.current;
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      
+      try {
+        const [visitsDaily, ordersDaily] = await Promise.all([
+          supabase
+            .from('visits')
+            .select('created_at')
+            .gte('created_at', oneYearAgo.toISOString()),
+          supabase
+            .from('orders')
+            .select('created_at, total')
+            .gte('created_at', oneYearAgo.toISOString())
+        ]);
+        
+        const dailyMap = new Map<string, DailyData>();
+        
+        (visitsDaily.data || []).forEach((v: { created_at: string }) => {
+          const date = v.created_at.split('T')[0];
+          if (!dailyMap.has(date)) {
+            dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0, customers: 0 });
+          }
+          dailyMap.get(date)!.visits++;
+        });
+        
+        (ordersDaily.data || []).forEach((o: { created_at: string; total?: number }) => {
+          const date = o.created_at.split('T')[0];
+          if (!dailyMap.has(date)) {
+            dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0, customers: 0 });
+          }
+          const day = dailyMap.get(date)!;
+          day.sales++;
+          day.revenue += o.total || 0;
+        });
+        
+        const dailyData = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+        setStats(prev => ({ ...prev, dailyData }));
+        setDailyDataLoaded(true);
+      } catch (error) {
+        console.error('Error loading daily data:', error);
+      }
+    };
+    
+    loadDailyData();
+  }, [dailyDataLoaded]);
+
+  // Charger les stats principales (léger, peut être rafraîchi souvent)
   useEffect(() => {
     const fetchStats = async () => {
       const supabase = supabaseRef.current;
@@ -224,48 +278,8 @@ export default function AdminDashboard() {
             date: new Date(order.created_at).toLocaleDateString('fr-FR'),
             status: order.status || 'pending',
           })),
-          dailyData: [], // Sera rempli par une autre requête
+          dailyData: stats.dailyData, // Garder les données journalières existantes
         });
-        
-        // Récupérer les données journalières pour les graphiques (derniers 365 jours)
-        const oneYearAgo = new Date();
-        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        
-        const [visitsDaily, ordersDaily] = await Promise.all([
-          supabase
-            .from('visits')
-            .select('created_at')
-            .gte('created_at', oneYearAgo.toISOString()),
-          supabase
-            .from('orders')
-            .select('created_at, total')
-            .gte('created_at', oneYearAgo.toISOString())
-        ]);
-        
-        // Agréger par jour
-        const dailyMap = new Map<string, DailyData>();
-        
-        (visitsDaily.data || []).forEach((v: { created_at: string }) => {
-          const date = v.created_at.split('T')[0];
-          if (!dailyMap.has(date)) {
-            dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0, customers: 0 });
-          }
-          dailyMap.get(date)!.visits++;
-        });
-        
-        (ordersDaily.data || []).forEach((o: { created_at: string; total?: number }) => {
-          const date = o.created_at.split('T')[0];
-          if (!dailyMap.has(date)) {
-            dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0, customers: 0 });
-          }
-          const day = dailyMap.get(date)!;
-          day.sales++;
-          day.revenue += o.total || 0;
-        });
-        
-        const dailyData = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
-        
-        setStats(prev => ({ ...prev, dailyData }));
       } catch (error) {
         console.error('Error fetching stats:', error);
       } finally {
@@ -274,14 +288,14 @@ export default function AdminDashboard() {
     };
 
     fetchStats();
-  }, [refreshKey]);
+  }, [refreshKey, stats.dailyData]);
 
   // Rafraîchissement automatique et abonnements Realtime
   useEffect(() => {
-    // Rafraîchissement automatique toutes les 10 secondes
+    // Rafraîchissement automatique toutes les 30 secondes
     const intervalId = setInterval(() => {
       triggerRefresh();
-    }, 10000);
+    }, 30000);
 
     // Abonnement temps réel aux nouvelles visites
     const supabase = supabaseRef.current;
