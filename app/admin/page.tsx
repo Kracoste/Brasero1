@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 type Metric = 'visites' | 'ca' | 'ventes' | 'clients';
@@ -80,7 +80,13 @@ export default function AdminDashboard() {
     dailyData: [],
   });
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const supabaseRef = useRef(createClient());
+
+  // Fonction pour forcer le rafraîchissement
+  const triggerRefresh = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -268,38 +274,46 @@ export default function AdminDashboard() {
     };
 
     fetchStats();
+  }, [refreshKey]);
 
-    // Rafraîchissement automatique toutes les 15 secondes
+  // Rafraîchissement automatique et abonnements Realtime
+  useEffect(() => {
+    // Rafraîchissement automatique toutes les 10 secondes
     const intervalId = setInterval(() => {
-      fetchStats();
-    }, 15000);
+      triggerRefresh();
+    }, 10000);
 
     // Abonnement temps réel aux nouvelles visites
     const supabase = supabaseRef.current;
+    
     const visitsChannel = supabase
-      .channel('realtime-visits')
+      .channel('admin-visits-channel')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'visits' },
-        () => {
-          // Une nouvelle visite a été enregistrée, rafraîchir les stats
-          fetchStats();
+        (payload) => {
+          console.log('Nouvelle visite détectée:', payload);
+          triggerRefresh();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Visits channel status:', status);
+      });
 
     // Abonnement temps réel aux nouvelles commandes
     const ordersChannel = supabase
-      .channel('realtime-orders')
+      .channel('admin-orders-channel')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'orders' },
-        () => {
-          // Une commande a été créée/modifiée, rafraîchir les stats
-          fetchStats();
+        (payload) => {
+          console.log('Changement commande détecté:', payload);
+          triggerRefresh();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Orders channel status:', status);
+      });
 
     // Cleanup
     return () => {
@@ -307,7 +321,7 @@ export default function AdminDashboard() {
       supabase.removeChannel(visitsChannel);
       supabase.removeChannel(ordersChannel);
     };
-  }, []);
+  }, [triggerRefresh]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
