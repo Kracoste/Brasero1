@@ -148,7 +148,7 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
 const PromoTile = () => (
   <div className="relative overflow-hidden rounded-2xl bg-black text-white shadow-lg lg:col-span-2">
     <img
-      src="/braserobanner.jpg"
+      src="/Braserobanner.jpg"
       alt="Promotion brasero"
       className="absolute inset-0 h-full w-full object-cover brightness-125"
     />
