@@ -89,10 +89,14 @@ export default async function ProductsPage({ searchParams }: Props) {
   
   const filteredProducts =
     category === "promotions"
-      ? allProducts.filter((product) => typeof product.discountPercent === "number" && product.discountPercent > 0)
+      ? allProducts
+          .filter((product) => typeof product.discountPercent === "number" && product.discountPercent > 0)
+          .sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0))
+      : category === "accessoire"
+      ? allProducts.filter((product) => product.category === category && (!product.discountPercent || product.discountPercent === 0))
       : category
       ? allProducts.filter((product) => product.category === category)
-      : allProducts;
+      : allProducts.filter((product) => !product.discountPercent || product.discountPercent === 0);
 
   const title = category === "brasero"
     ? "Nos Braséros"

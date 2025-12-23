@@ -20,7 +20,7 @@ export function FloatingCart() {
       {/* Bouton flottant */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-clay-900 text-white shadow-2xl transition hover:scale-110 hover:bg-clay-800"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white shadow-2xl transition hover:scale-110 hover:brightness-110"
         aria-label="Ouvrir le panier"
       >
         <ShoppingCart size={24} />
@@ -39,21 +39,21 @@ export function FloatingCart() {
           />
 
           {/* Panneau coulissant */}
-          <div className="fixed bottom-0 right-0 z-50 flex h-[80vh] w-full flex-col bg-black shadow-2xl sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-2xl">
+          <div className="fixed bottom-0 right-0 z-50 flex h-[80vh] w-full flex-col bg-white shadow-2xl sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-700 p-4">
+            <div className="flex items-center justify-between border-b border-slate-200 p-4">
               <div>
-                <h3 className="font-semibold text-clay-900">Mon panier</h3>
-                <p className="text-sm text-slate-400">
+                <h3 className="font-semibold text-slate-900">Mon panier</h3>
+                <p className="text-sm text-slate-600">
                   {itemCount} article{itemCount > 1 ? 's' : ''}
                 </p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="rounded-full p-2 transition hover:bg-slate-800"
+                className="rounded-full p-2 transition hover:bg-slate-100"
                 aria-label="Fermer"
               >
-                <X size={20} className="text-slate-400" />
+                <X size={20} className="text-slate-600" />
               </button>
             </div>
 
@@ -63,10 +63,10 @@ export function FloatingCart() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex gap-3 rounded-lg border border-slate-700 bg-slate-900 p-3"
+                    className="flex gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
                   >
                     {/* Image */}
-                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-black">
+                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-white">
                       {item.product_image && (
                         <Image
                           src={item.product_image}
@@ -83,18 +83,18 @@ export function FloatingCart() {
                         <Link
                           href={`/produits/${item.product_slug}`}
                           onClick={() => setIsOpen(false)}
-                          className="text-sm font-semibold text-clay-900 hover:text-clay-700"
+                          className="text-sm font-semibold text-slate-900 hover:text-slate-700"
                         >
                           {item.product_name}
                         </Link>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-slate-600">
                           Quantité: {item.quantity}
                         </p>
                       </div>
                       <div className="flex items-center justify-between">
                         <Price
                           amount={item.product_price * item.quantity}
-                          className="text-sm font-bold text-clay-900"
+                          className="text-sm font-bold text-slate-900"
                         />
                         <button
                           onClick={() => removeItem(item.id)}
@@ -111,15 +111,15 @@ export function FloatingCart() {
             </div>
 
             {/* Footer avec total et bouton */}
-            <div className="border-t border-slate-700 p-4">
+            <div className="border-t border-slate-200 p-4">
               <div className="mb-4 flex items-center justify-between">
-                <span className="font-semibold text-clay-900">Total</span>
-                <Price amount={totalPrice} className="text-xl font-bold text-clay-900" />
+                <span className="font-semibold text-slate-900">Total</span>
+                <Price amount={totalPrice} className="text-xl font-bold text-slate-900" />
               </div>
               <Link
                 href="/panier"
                 onClick={() => setIsOpen(false)}
-                className="block w-full rounded-full bg-clay-900 py-3 text-center font-semibold text-white transition hover:bg-clay-800"
+                className="block w-full rounded-full bg-gradient-to-br from-[#8B4513] to-[#CD853F] py-3 text-center font-semibold text-white transition hover:brightness-110"
               >
                 Voir le panier complet
               </Link>

@@ -68,7 +68,7 @@ export default async function HomePage() {
               <CategoryTile
                 title="Nos Accessoires"
                 cta="Voir tous"
-                image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
+                image="/accesoiresbrasero.jpg"
                 href="/produits?category=accessoire"
                 compact
               />
@@ -148,21 +148,21 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
 const PromoTile = () => (
   <div className="relative overflow-hidden rounded-2xl bg-black text-white shadow-lg lg:col-span-2">
     <img
-      src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=1600&q=80"
+      src="/braserobanner.jpg"
       alt="Promotion brasero"
-      className="absolute inset-0 h-full w-full object-cover"
+      className="absolute inset-0 h-full w-full object-cover brightness-125"
     />
-    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
     <div className="relative flex h-full flex-col items-start justify-center gap-4 px-8 py-12 sm:px-12">
-      <p className="text-lg font-semibold text-[#d0ff52]">Nos promotions</p>
+      <p className="text-lg font-semibold text-[#D2691E]">Nos promotions</p>
       <h3 className="text-4xl font-black leading-tight sm:text-5xl">
         PROMOTIONS <br /> JUSQU&apos;À 40%
       </h3>
-      <p className="text-lg text-[#c5f74e]">
+      <p className="text-lg text-[#CD853F]">
         Promotions pouvant aller jusqu&apos;à 40% sur nos braséros et accessoires.
       </p>
       <a
-        href="/produits"
+        href="/produits?category=promotions"
         className="mt-2 inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow transition hover:scale-[1.02]"
       >
         J&apos;en profite

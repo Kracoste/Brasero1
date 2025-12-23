@@ -60,29 +60,36 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const supabaseRef = useRef(createClient());
-  const supabase = supabaseRef.current;
+  const [mounted, setMounted] = useState(false);
+
+  // Initialiser les favoris invités après le montage
+  useEffect(() => {
+    setMounted(true);
+    const guestFavs = readGuestFavorites();
+    setGuestFavorites(guestFavs);
+  }, []);
 
   useEffect(() => {
-    // Ne pas exécuter si supabase n'est pas disponible (SSR/build)
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
+    if (!mounted) return;
+    
+    const supabase = supabaseRef.current;
+    
     const initFavorites = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
 
         if (user) {
-          await loadFavorites();
-        } else {
-          const guestFavs = readGuestFavorites();
-          setGuestFavorites(guestFavs);
+          const { data, error } = await supabase
+            .from('favorites')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (!error && data) {
+            setFavorites(data);
+          }
         }
       } catch (error) {
         console.error('Error initializing favorites:', error);
-        setGuestFavorites(readGuestFavorites());
       } finally {
         setLoading(false);
       }
@@ -95,7 +102,13 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       setUser(newUser);
 
       if (newUser) {
-        await loadFavorites();
+        const { data, error } = await supabase
+          .from('favorites')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          setFavorites(data);
+        }
       } else {
         setFavorites([]);
         setGuestFavorites(readGuestFavorites());
@@ -103,21 +116,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  const loadFavorites = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('favorites')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setFavorites(data || []);
-    } catch (error) {
-      console.error('Error loading favorites:', error);
-    }
-  };
+  }, [mounted]);
 
   const isFavorite = (productSlug: string): boolean => {
     if (user) {
@@ -132,6 +131,8 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     price: number;
     image?: string;
   }) => {
+    const supabase = supabaseRef.current;
+    
     if (!user) {
       // Mode invité - localStorage
       const newGuestFavorites = new Set(guestFavorites);
@@ -168,6 +169,8 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   };
 
   const removeFavorite = async (productSlug: string) => {
+    const supabase = supabaseRef.current;
+    
     if (!user) {
       // Mode invité - localStorage
       const newGuestFavorites = new Set(guestFavorites);

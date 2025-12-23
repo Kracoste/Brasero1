@@ -220,7 +220,7 @@ const FiltersContent = ({
   );
 };
 
-type MaterialOption = "corten" | "acier" | "inox" | "brut";
+type MaterialOption = "corten" | "acier" | "inox" | "brut" | "fendeur" | "accessoire" | "gant" | "grille" | "housse";
 
 const CategorySection = ({
   values,
@@ -234,6 +234,11 @@ const CategorySection = ({
     { label: "Braséro Acier", value: "acier" },
     { label: "Braséro Inox", value: "inox" },
     { label: "Braséro Acier Brut", value: "brut" },
+    { label: "Fendeur à Bûches", value: "fendeur" },
+    { label: "Accessoires", value: "accessoire" },
+    { label: "Gants", value: "gant" },
+    { label: "Grilles", value: "grille" },
+    { label: "Housses", value: "housse" },
   ];
   const handleToggle = (nextValue: MaterialOption) => {
     const next = values.includes(nextValue)

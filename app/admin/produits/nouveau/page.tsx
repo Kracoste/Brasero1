@@ -47,6 +47,8 @@ export default function NewProduct() {
     weight: '',
     inStock: true,
     format: '',
+    numberOfGuests: '',
+    fuelType: [] as string[],
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -79,6 +81,15 @@ export default function NewProduct() {
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleFuelTypeChange = (fuel: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      fuelType: prev.fuelType.includes(fuel)
+        ? prev.fuelType.filter((f) => f !== fuel)
+        : [...prev.fuelType, fuel],
     }));
   };
 
@@ -181,7 +192,10 @@ export default function NewProduct() {
       }
 
       // Créer le produit dans la base de données
-      const specsPayload = formData.format ? { format: formData.format } : null;
+      const specsPayload: any = {};
+      if (formData.format) specsPayload.format = formData.format;
+      if (formData.numberOfGuests) specsPayload.numberOfGuests = formData.numberOfGuests;
+      if (formData.fuelType.length > 0) specsPayload.fuelType = formData.fuelType;
 
       const productData = {
         name: formData.name,
@@ -200,7 +214,7 @@ export default function NewProduct() {
         baseThickness: formData.baseThickness ? parseFloat(formData.baseThickness) : null,
         weight: formData.weight || null,
         material: formData.material,
-        specs: specsPayload,
+        specs: Object.keys(specsPayload).length > 0 ? specsPayload : null,
         inStock: formData.inStock,
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
@@ -650,6 +664,48 @@ export default function NewProduct() {
             </div>
           </div>
         </div>
+
+        {/* Informations spécifiques aux braséros */}
+        {formData.category === 'brasero' && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Informations spécifiques au braséro</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Nombre de convives
+                </label>
+                <input
+                  type="text"
+                  name="numberOfGuests"
+                  value={formData.numberOfGuests}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  placeholder="6 à 8 personnes"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">
+                  Type de combustibles
+                </label>
+                <div className="space-y-2">
+                  {['Bois', 'Charbon', 'Pellets'].map((fuel) => (
+                    <label key={fuel} className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.fuelType.includes(fuel)}
+                        onChange={() => handleFuelTypeChange(fuel)}
+                        className="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500"
+                      />
+                      <span className="text-sm text-slate-700">{fuel}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-4">

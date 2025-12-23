@@ -76,7 +76,7 @@ export default function PanierPage() {
                   {/* Image du produit */}
                   <Link
                     href={`/produits/${item.product_slug}`}
-                    className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-slate-900"
+                    className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-white"
                   >
                     {item.product_image && (
                       <Image

@@ -118,7 +118,7 @@ export const Header = () => {
               })}
               <Link
                 href="/recettes"
-                className="rounded-md bg-[#d97744] px-4 py-2 text-[0.85rem] font-semibold uppercase tracking-[0.25em] text-white transition hover:bg-[#c96a3a] mx-6"
+                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-4 py-2 text-[0.85rem] font-semibold uppercase tracking-[0.25em] text-white transition hover:brightness-110 mx-6"
               >
                 Recettes
               </Link>
