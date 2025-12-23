@@ -38,12 +38,15 @@ function ConnexionPageContent() {
     hasRedirected.current = true;
     setIsRedirecting(true);
     
-    // Force redirect avec plusieurs méthodes de fallback
+    // Force redirect avec URL absolue
     const finalTarget = getRedirectTarget(target);
-    console.log('Redirection vers:', finalTarget);
+    const absoluteUrl = new URL(finalTarget, window.location.origin).href;
+    console.log('Redirection vers:', absoluteUrl);
     
-    // Essayer window.location.href d'abord (plus fiable)
-    window.location.href = finalTarget;
+    // Utiliser setTimeout pour s'assurer que le state est bien mis à jour
+    setTimeout(() => {
+      window.location.href = absoluteUrl;
+    }, 100);
   }, [getRedirectTarget]);
 
   // Rediriger si déjà connecté
@@ -80,9 +83,6 @@ function ConnexionPageContent() {
       setIsRedirecting(true);
       hasRedirected.current = true;
 
-      // Attendre un peu pour que les cookies soient bien définis
-      await new Promise(resolve => setTimeout(resolve, 500));
-
       // Déterminer la cible de redirection
       const isAdminUser = isAdminEmail(email.trim());
       const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
@@ -90,8 +90,14 @@ function ConnexionPageContent() {
       
       console.log('Connexion réussie, redirection vers:', finalTarget);
 
-      // Forcer la redirection avec location.replace pour éviter le retour arrière
-      window.location.replace(finalTarget);
+      // Construire l'URL absolue pour la redirection
+      const absoluteUrl = new URL(finalTarget, window.location.origin).href;
+      console.log('URL absolue:', absoluteUrl);
+
+      // Forcer la redirection après un court délai pour les cookies
+      setTimeout(() => {
+        window.location.href = absoluteUrl;
+      }, 100);
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);
