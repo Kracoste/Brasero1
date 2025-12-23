@@ -3,6 +3,13 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 
+type DailyData = {
+  date: string;
+  visits: number;
+  revenue: number;
+  sales: number;
+};
+
 export async function GET() {
   try {
     // Vérifier que l'utilisateur est admin
@@ -28,6 +35,10 @@ export async function GET() {
     startOfWeekDate.setHours(0, 0, 0, 0);
     startOfWeekDate.setDate(startOfWeekDate.getDate() - (day - 1));
     const startOfWeek = startOfWeekDate.toISOString();
+    
+    // Date pour les données journalières (1 an)
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
     // Récupérer toutes les stats en parallèle avec le client admin
     const [
@@ -40,6 +51,8 @@ export async function GET() {
       recentOrdersResult,
       productsResult,
       customersResult,
+      visitsDaily,
+      ordersDaily,
     ] = await Promise.all([
       adminClient.from('visits').select('*', { count: 'exact', head: true }),
       adminClient.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay),
@@ -50,6 +63,9 @@ export async function GET() {
       adminClient.from('orders').select('id, customer_name, total, created_at, status').order('created_at', { ascending: false }).limit(5),
       adminClient.from('products').select('*', { count: 'exact', head: true }),
       adminClient.from('profiles').select('*', { count: 'exact', head: true }),
+      // Données journalières pour les graphiques
+      adminClient.from('visits').select('created_at').gte('created_at', oneYearAgo.toISOString()),
+      adminClient.from('orders').select('created_at, total').gte('created_at', oneYearAgo.toISOString()),
     ]);
 
     const orders = ordersResult.data || [];
@@ -62,6 +78,29 @@ export async function GET() {
       status: order.status || 'pending',
     }));
 
+    // Agréger les données journalières
+    const dailyMap = new Map<string, DailyData>();
+    
+    (visitsDaily.data || []).forEach((v: { created_at: string }) => {
+      const date = v.created_at.split('T')[0];
+      if (!dailyMap.has(date)) {
+        dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0 });
+      }
+      dailyMap.get(date)!.visits++;
+    });
+    
+    (ordersDaily.data || []).forEach((o: { created_at: string; total?: number }) => {
+      const date = o.created_at.split('T')[0];
+      if (!dailyMap.has(date)) {
+        dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0 });
+      }
+      const dayData = dailyMap.get(date)!;
+      dayData.sales++;
+      dayData.revenue += o.total || 0;
+    });
+    
+    const dailyData = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+
     return NextResponse.json({
       totalVisits: visitsResult.count || 0,
       visitsToday: visitsTodayResult.count || 0,
@@ -73,6 +112,7 @@ export async function GET() {
       totalProducts: productsResult.count || 0,
       totalCustomers: customersResult.count || 0,
       recentOrders,
+      dailyData,
     });
   } catch (error) {
     console.error('Error fetching admin stats:', error);

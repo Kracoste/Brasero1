@@ -81,65 +81,12 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [dailyDataLoaded, setDailyDataLoaded] = useState(false);
   const supabaseRef = useRef(createClient());
 
   // Fonction pour forcer le rafraîchissement
   const triggerRefresh = useCallback(() => {
     setRefreshKey(prev => prev + 1);
   }, []);
-
-  // Charger les données journalières une seule fois (pour les graphiques)
-  useEffect(() => {
-    const loadDailyData = async () => {
-      if (dailyDataLoaded) return;
-      
-      const supabase = supabaseRef.current;
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-      
-      try {
-        const [visitsDaily, ordersDaily] = await Promise.all([
-          supabase
-            .from('visits')
-            .select('created_at')
-            .gte('created_at', oneYearAgo.toISOString()),
-          supabase
-            .from('orders')
-            .select('created_at, total')
-            .gte('created_at', oneYearAgo.toISOString())
-        ]);
-        
-        const dailyMap = new Map<string, DailyData>();
-        
-        (visitsDaily.data || []).forEach((v: { created_at: string }) => {
-          const date = v.created_at.split('T')[0];
-          if (!dailyMap.has(date)) {
-            dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0, customers: 0 });
-          }
-          dailyMap.get(date)!.visits++;
-        });
-        
-        (ordersDaily.data || []).forEach((o: { created_at: string; total?: number }) => {
-          const date = o.created_at.split('T')[0];
-          if (!dailyMap.has(date)) {
-            dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0, customers: 0 });
-          }
-          const day = dailyMap.get(date)!;
-          day.sales++;
-          day.revenue += o.total || 0;
-        });
-        
-        const dailyData = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
-        setStats(prev => ({ ...prev, dailyData }));
-        setDailyDataLoaded(true);
-      } catch (error) {
-        console.error('Error loading daily data:', error);
-      }
-    };
-    
-    loadDailyData();
-  }, [dailyDataLoaded]);
 
   // Charger les stats via l'API (rapide, utilise le service role)
   useEffect(() => {
@@ -163,6 +110,7 @@ export default function AdminDashboard() {
           totalProducts: data.totalProducts || 0,
           totalCustomers: data.totalCustomers || 0,
           recentOrders: data.recentOrders || [],
+          dailyData: data.dailyData || [],
         }));
       } catch (error) {
         console.error('Error fetching stats:', error);
