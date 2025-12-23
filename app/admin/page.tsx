@@ -141,81 +141,32 @@ export default function AdminDashboard() {
     loadDailyData();
   }, [dailyDataLoaded]);
 
-  // Charger les stats principales (léger, peut être rafraîchi souvent)
+  // Charger les stats via l'API (rapide, utilise le service role)
   useEffect(() => {
     const fetchStats = async () => {
-      const supabase = supabaseRef.current;
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
-      const startOfWeekDate = new Date(now);
-      const day = startOfWeekDate.getDay() || 7;
-      startOfWeekDate.setHours(0, 0, 0, 0);
-      startOfWeekDate.setDate(startOfWeekDate.getDate() - (day - 1));
-      const startOfWeek = startOfWeekDate.toISOString();
-
       try {
-        // Charger en 3 groupes séquentiels pour éviter de surcharger
-        // Groupe 1: Visites (les plus importantes)
-        const [visitsResult, visitsTodayResult] = await Promise.all([
-          supabase.from('visits').select('*', { count: 'exact', head: true }),
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay),
-        ]);
-
-        // Mettre à jour immédiatement avec les premières données
+        const response = await fetch('/api/admin/stats');
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des stats');
+        }
+        const data = await response.json();
+        
         setStats(prev => ({
           ...prev,
-          totalVisits: visitsResult.count || 0,
-          visitsToday: visitsTodayResult.count || 0,
+          totalVisits: data.totalVisits || 0,
+          visitsToday: data.visitsToday || 0,
+          visitsThisWeek: data.visitsThisWeek || 0,
+          visitsThisMonth: data.visitsThisMonth || 0,
+          visitsThisYear: data.visitsThisYear || 0,
+          totalSales: data.totalSales || 0,
+          totalRevenue: data.totalRevenue || 0,
+          totalProducts: data.totalProducts || 0,
+          totalCustomers: data.totalCustomers || 0,
+          recentOrders: data.recentOrders || [],
         }));
-        setLoading(false); // Afficher le dashboard dès que possible
-
-        // Groupe 2: Plus de stats visites + commandes basiques
-        const [visitsWeekResult, visitsMonthResult, totalOrdersCount, recentOrdersResult] = await Promise.all([
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfWeek),
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth),
-          supabase.from('orders').select('id', { count: 'exact', head: true }),
-          supabase.from('orders').select('id, customer_name, total, created_at, status').order('created_at', { ascending: false }).limit(5),
-        ]);
-
-        const recentOrders = recentOrdersResult.data || [];
-
-        setStats(prev => ({
-          ...prev,
-          visitsThisWeek: visitsWeekResult.count || 0,
-          visitsThisMonth: visitsMonthResult.count || 0,
-          totalSales: totalOrdersCount.count || 0,
-          recentOrders: recentOrders.map((order: { id: string; customer_name?: string; total?: number; created_at: string; status?: string }) => ({
-            id: order.id,
-            customer: order.customer_name || 'Client',
-            amount: order.total || 0,
-            date: new Date(order.created_at).toLocaleDateString('fr-FR'),
-            status: order.status || 'pending',
-          })),
-        }));
-
-        // Groupe 3: Stats supplémentaires (moins urgentes)
-        const [visitsYearResult, productsResult, customersResult, totalRevenueResult] = await Promise.all([
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfYear),
-          supabase.from('products').select('*', { count: 'exact', head: true }),
-          supabase.from('profiles').select('*', { count: 'exact', head: true }),
-          supabase.from('orders').select('total').then(res => ({
-            data: { total_sum: (res.data || []).reduce((sum: number, o: { total?: number }) => sum + (o.total || 0), 0) }
-          })),
-        ]);
-
-        setStats(prev => ({
-          ...prev,
-          visitsThisYear: visitsYearResult.count || 0,
-          totalProducts: productsResult.count || 0,
-          totalCustomers: customersResult.count || 0,
-          totalRevenue: totalRevenueResult.data?.total_sum || 0,
-          dailyData: prev.dailyData,
-        }));
-
       } catch (error) {
         console.error('Error fetching stats:', error);
+      } finally {
         setLoading(false);
       }
     };
