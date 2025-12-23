@@ -150,127 +150,42 @@ export default function AdminDashboard() {
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
       const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
       const startOfWeekDate = new Date(now);
-      const day = startOfWeekDate.getDay() || 7; // lundi = 1
+      const day = startOfWeekDate.getDay() || 7;
       startOfWeekDate.setHours(0, 0, 0, 0);
       startOfWeekDate.setDate(startOfWeekDate.getDate() - (day - 1));
       const startOfWeek = startOfWeekDate.toISOString();
 
-      const countOrders = (from?: string) => {
-        let query = supabase.from('orders').select('id', { count: 'exact', head: true });
-        if (from) query = query.gte('created_at', from);
-        return query;
-      };
-
-      const sumOrders = (from?: string) => {
-        let query = supabase.from('orders').select('total_sum:sum(total)');
-        if (from) query = query.gte('created_at', from);
-        return query.single();
-      };
-
-      const countDistinctVisitors = async () => {
-        try {
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-          if (!supabaseUrl || !supabaseAnonKey) return 0;
-
-          const url = new URL(`${supabaseUrl}/rest/v1/visits`);
-          url.searchParams.set('select', 'visitor_id');
-          url.searchParams.set('distinct', 'visitor_id');
-
-          const response = await fetch(url.toString(), {
-            method: 'HEAD',
-            headers: {
-              apikey: supabaseAnonKey,
-              Authorization: `Bearer ${supabaseAnonKey}`,
-              Prefer: 'count=exact',
-            },
-          });
-
-          const contentRange = response.headers.get('content-range');
-          const total = contentRange?.split('/')?.[1];
-          return total ? Number(total) : 0;
-        } catch (error) {
-          console.error('Error counting unique visitors:', error);
-          return 0;
-        }
-      };
-
       try {
-        // Récupérer toutes les stats en parallèle
-        const [
-          visitsResult,
-          visitsTodayResult,
-          visitsWeekResult,
-          visitsMonthResult,
-          visitsYearResult,
-          uniqueVisitors,
-          totalOrdersCount,
-          ordersTodayCount,
-          ordersWeekCount,
-          ordersMonthCount,
-          ordersYearCount,
-          totalRevenueResult,
-          revenueTodayResult,
-          revenueWeekResult,
-          revenueMonthResult,
-          revenueYearResult,
-          recentOrdersResult,
-          productsResult,
-          customersResult
-        ] = await Promise.all([
-          // Visites totales
+        // Charger en 3 groupes séquentiels pour éviter de surcharger
+        // Groupe 1: Visites (les plus importantes)
+        const [visitsResult, visitsTodayResult] = await Promise.all([
           supabase.from('visits').select('*', { count: 'exact', head: true }),
-          // Visites aujourd'hui
           supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay),
-          // Visites semaine
+        ]);
+
+        // Mettre à jour immédiatement avec les premières données
+        setStats(prev => ({
+          ...prev,
+          totalVisits: visitsResult.count || 0,
+          visitsToday: visitsTodayResult.count || 0,
+        }));
+        setLoading(false); // Afficher le dashboard dès que possible
+
+        // Groupe 2: Plus de stats visites + commandes basiques
+        const [visitsWeekResult, visitsMonthResult, totalOrdersCount, recentOrdersResult] = await Promise.all([
           supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfWeek),
-          // Visites ce mois
           supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth),
-          // Visites cette année
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfYear),
-          // Visiteurs uniques (count distinct via HEAD)
-          countDistinctVisitors(),
-          // Commandes - uniquement les compteurs
-          countOrders(),
-          countOrders(startOfDay),
-          countOrders(startOfWeek),
-          countOrders(startOfMonth),
-          countOrders(startOfYear),
-          // Revenus agrégés
-          sumOrders(),
-          sumOrders(startOfDay),
-          sumOrders(startOfWeek),
-          sumOrders(startOfMonth),
-          sumOrders(startOfYear),
-          // Dernières commandes affichées
+          supabase.from('orders').select('id', { count: 'exact', head: true }),
           supabase.from('orders').select('id, customer_name, total, created_at, status').order('created_at', { ascending: false }).limit(5),
-          // Produits
-          supabase.from('products').select('*', { count: 'exact', head: true }),
-          // Clients
-          supabase.from('profiles').select('*', { count: 'exact', head: true })
         ]);
 
         const recentOrders = recentOrdersResult.data || [];
 
-        setStats({
-          totalVisits: visitsResult.count || 0,
-          uniqueVisitors: typeof uniqueVisitors === 'number' ? uniqueVisitors : 0,
-          visitsToday: visitsTodayResult.count || 0,
+        setStats(prev => ({
+          ...prev,
           visitsThisWeek: visitsWeekResult.count || 0,
           visitsThisMonth: visitsMonthResult.count || 0,
-          visitsThisYear: visitsYearResult.count || 0,
           totalSales: totalOrdersCount.count || 0,
-          salesToday: ordersTodayCount.count || 0,
-          salesThisWeek: ordersWeekCount.count || 0,
-          salesThisMonth: ordersMonthCount.count || 0,
-          salesThisYear: ordersYearCount.count || 0,
-          totalRevenue: Number(totalRevenueResult.data?.total_sum) || 0,
-          revenueToday: Number(revenueTodayResult.data?.total_sum) || 0,
-          revenueThisWeek: Number(revenueWeekResult.data?.total_sum) || 0,
-          revenueThisMonth: Number(revenueMonthResult.data?.total_sum) || 0,
-          revenueThisYear: Number(revenueYearResult.data?.total_sum) || 0,
-          totalProducts: productsResult.count || 0,
-          totalCustomers: customersResult.count || 0,
           recentOrders: recentOrders.map((order: { id: string; customer_name?: string; total?: number; created_at: string; status?: string }) => ({
             id: order.id,
             customer: order.customer_name || 'Client',
@@ -278,17 +193,35 @@ export default function AdminDashboard() {
             date: new Date(order.created_at).toLocaleDateString('fr-FR'),
             status: order.status || 'pending',
           })),
-          dailyData: stats.dailyData, // Garder les données journalières existantes
-        });
+        }));
+
+        // Groupe 3: Stats supplémentaires (moins urgentes)
+        const [visitsYearResult, productsResult, customersResult, totalRevenueResult] = await Promise.all([
+          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfYear),
+          supabase.from('products').select('*', { count: 'exact', head: true }),
+          supabase.from('profiles').select('*', { count: 'exact', head: true }),
+          supabase.from('orders').select('total').then(res => ({
+            data: { total_sum: (res.data || []).reduce((sum: number, o: { total?: number }) => sum + (o.total || 0), 0) }
+          })),
+        ]);
+
+        setStats(prev => ({
+          ...prev,
+          visitsThisYear: visitsYearResult.count || 0,
+          totalProducts: productsResult.count || 0,
+          totalCustomers: customersResult.count || 0,
+          totalRevenue: totalRevenueResult.data?.total_sum || 0,
+          dailyData: prev.dailyData,
+        }));
+
       } catch (error) {
         console.error('Error fetching stats:', error);
-      } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
-  }, [refreshKey, stats.dailyData]);
+  }, [refreshKey]);
 
   // Rafraîchissement automatique et abonnements Realtime
   useEffect(() => {
