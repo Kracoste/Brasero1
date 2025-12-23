@@ -121,38 +121,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Calculer le prix total
   const totalPrice = items.reduce((sum, item) => sum + item.product_price * item.quantity, 0);
 
-  // Charger l'utilisateur et le panier
+  // Charger immédiatement le panier local, puis synchroniser avec Supabase
   useEffect(() => {
-    const initCart = async () => {
+    // Charger immédiatement le panier local (ultra rapide)
+    const guestItems = readGuestCart();
+    setItems(guestItems);
+    setLoading(false); // Afficher le panier immédiatement
+    
+    // Ensuite, synchroniser avec Supabase en arrière-plan
+    const syncWithSupabase = async () => {
       try {
-        // Essayer d'abord getSession puis getUser
-        const { data: { session } } = await supabase.auth.getSession();
-        let user = session?.user ?? null;
-        
-        if (!user) {
-          const { data } = await supabase.auth.getUser();
-          user = data.user;
-        }
-        
-        setUser(user);
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        setUser(currentUser);
 
-        if (user) {
-          await loadCart(user.id);
-        } else {
-          const guestItems = readGuestCart();
-          setItems(guestItems);
+        if (currentUser) {
+          // Utilisateur connecté - charger son panier depuis la DB
+          const cartFromDb = await loadCart(currentUser.id);
+          // Si l'utilisateur a des items guest, les migrer vers la DB
+          if (guestItems.length > 0 && cartFromDb) {
+            // Migrer les items guest vers le panier DB
+            for (const guestItem of guestItems) {
+              try {
+                await supabase.from('cart_items').insert({
+                  cart_id: cartFromDb,
+                  product_slug: guestItem.product_slug,
+                  product_name: guestItem.product_name,
+                  product_price: guestItem.product_price,
+                  product_image: guestItem.product_image,
+                  quantity: guestItem.quantity,
+                });
+              } catch {
+                // Ignorer les erreurs de migration
+              }
+            }
+            // Vider le panier local après migration
+            persistGuestCart([]);
+            // Recharger le panier depuis la DB
+            await loadCart(currentUser.id);
+          }
         }
       } catch (error) {
-        console.error('Error initializing cart:', error);
-        // En cas d'erreur, charger le panier guest
-        const guestItems = readGuestCart();
-        setItems(guestItems);
-      } finally {
-        setLoading(false);
+        console.error('Error syncing cart:', error);
+        // En cas d'erreur, on garde le panier local
       }
     };
 
-    initCart();
+    syncWithSupabase();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const newUser = session?.user ?? null;
@@ -216,52 +230,43 @@ export function CartProvider({ children }: { children: ReactNode }) {
     product: { slug: string; name: string; price: number; image?: string },
     quantity: number = 1
   ) => {
-    if (!user) {
-      addGuestItem(product, quantity);
-      return;
-    }
+    // Toujours ajouter d'abord localement pour une réponse instantanée
+    addGuestItem(product, quantity);
+    
+    // Si l'utilisateur est connecté, synchroniser avec la DB en arrière-plan
+    if (user) {
+      const ensuredCartId = cartId ?? (await loadCart(user.id));
+      if (ensuredCartId) {
+        try {
+          const existingItem = items.find(
+            item => !isGuestItem(item) && item.product_slug === product.slug
+          );
 
-    const ensuredCartId = cartId ?? (await loadCart(user.id));
-
-    if (!ensuredCartId) {
-      addGuestItem(product, quantity);
-      return;
-    }
-
-    try {
-      const existingItem = items.find(
-        item => !isGuestItem(item) && item.product_slug === product.slug
-      );
-
-      if (existingItem) {
-        const newQuantity = existingItem.quantity + quantity;
-        await updateQuantity(existingItem.id, newQuantity);
-      } else {
-        const { data, error } = await supabase
-          .from('cart_items')
-          .insert({
-            cart_id: ensuredCartId,
-            product_slug: product.slug,
-            product_name: product.name,
-            product_price: product.price,
-            product_image: product.image || null,
-            quantity,
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        setItems(prev => [
-          ...prev.filter(item => !(isGuestItem(item) && item.product_slug === product.slug)),
-          data,
-        ]);
+          if (existingItem) {
+            const newQuantity = existingItem.quantity + quantity;
+            await supabase
+              .from('cart_items')
+              .update({ quantity: newQuantity })
+              .eq('id', existingItem.id);
+          } else {
+            await supabase
+              .from('cart_items')
+              .insert({
+                cart_id: ensuredCartId,
+                product_slug: product.slug,
+                product_name: product.name,
+                product_price: product.price,
+                product_image: product.image || null,
+                quantity,
+              });
+          }
+          // Recharger le panier depuis la DB pour synchroniser
+          await loadCart(user.id);
+        } catch (error) {
+          console.error('Error syncing item to DB:', error);
+          // L'item est déjà dans le panier local, donc pas de problème
+        }
       }
-    } catch (error) {
-      console.error('Error adding item:', error);
-      addGuestItem(product, quantity);
-      // Ne pas remonter l'erreur pour ne pas interrompre le flux d'ajout
-      return;
     }
   };
 
