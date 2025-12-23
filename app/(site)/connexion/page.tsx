@@ -38,15 +38,10 @@ function ConnexionPageContent() {
     hasRedirected.current = true;
     setIsRedirecting(true);
     
-    // Force redirect avec URL absolue
+    // Force redirect direct
     const finalTarget = getRedirectTarget(target);
-    const absoluteUrl = new URL(finalTarget, window.location.origin).href;
-    console.log('Redirection vers:', absoluteUrl);
-    
-    // Utiliser setTimeout pour s'assurer que le state est bien mis à jour
-    setTimeout(() => {
-      window.location.href = absoluteUrl;
-    }, 100);
+    console.log('Redirection vers:', finalTarget);
+    window.location.href = finalTarget;
   }, [getRedirectTarget]);
 
   // Rediriger si déjà connecté
@@ -90,14 +85,8 @@ function ConnexionPageContent() {
       
       console.log('Connexion réussie, redirection vers:', finalTarget);
 
-      // Construire l'URL absolue pour la redirection
-      const absoluteUrl = new URL(finalTarget, window.location.origin).href;
-      console.log('URL absolue:', absoluteUrl);
-
-      // Forcer la redirection après un court délai pour les cookies
-      setTimeout(() => {
-        window.location.href = absoluteUrl;
-      }, 100);
+      // Redirection directe et immédiate
+      window.location.href = finalTarget;
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);
