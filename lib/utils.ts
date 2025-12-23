@@ -86,7 +86,7 @@ export const ensureArray = <T>(value?: MaybeArray<T>): T[] => {
 
 export type FilterState = {
   diameter?: MaybeArray<string>;
-  material?: MaybeArray<"corten" | "acier" | "inox" | "brut">;
+  material?: MaybeArray<"corten" | "acier" | "inox" | "brut" | "fendeur" | "accessoire" | "gant" | "grille" | "housse">;
   format?: MaybeArray<FormatOption>;
   accessoryType?: MaybeArray<AccessoryType>;
   price?: string;
