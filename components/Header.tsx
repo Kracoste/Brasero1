@@ -16,17 +16,12 @@ export const Header = () => {
   const pathname = usePathname();
   const { itemCount } = useCart();
   const { favoriteCount } = useFavorites();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const [accessoriesOpen, setAccessoriesOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accessoriesTimer = useRef<NodeJS.Timeout | null>(null);
   const accountTimer = useRef<NodeJS.Timeout | null>(null);
-
-  const handleLogout = async () => {
-    // Appeler signOut directement - il gère la redirection
-    await signOut();
-  };
 
   const toggle = () => setOpen((prev) => !prev);
 
@@ -191,16 +186,14 @@ export const Header = () => {
                       <User size={16} />
                       Mon profil
                     </Link>
-                    <button
-                      onClick={() => {
-                        setAccountMenuOpen(false);
-                        handleLogout();
-                      }}
+                    <a
+                      href="/api/auth/logout-redirect"
+                      onClick={() => setAccountMenuOpen(false)}
                       className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left cursor-pointer"
                     >
                       <LogOut size={16} />
                       Déconnexion
-                    </button>
+                    </a>
                   </>
                 ) : (
                   <>
