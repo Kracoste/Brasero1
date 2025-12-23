@@ -63,7 +63,7 @@ function ConnexionPageContent() {
     setLoading(true);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -72,15 +72,26 @@ function ConnexionPageContent() {
         throw signInError;
       }
 
+      if (!data.session) {
+        throw new Error('Connexion échouée - pas de session');
+      }
+
+      // Marquer la redirection immédiatement
+      setIsRedirecting(true);
+      hasRedirected.current = true;
+
       // Attendre un peu pour que les cookies soient bien définis
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      await refreshUser();
-
-      // Redirection directe
+      // Déterminer la cible de redirection
       const isAdminUser = isAdminEmail(email.trim());
       const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
-      performRedirect(target);
+      const finalTarget = getRedirectTarget(target);
+      
+      console.log('Connexion réussie, redirection vers:', finalTarget);
+
+      // Forcer la redirection avec location.replace pour éviter le retour arrière
+      window.location.replace(finalTarget);
       
     } catch (error: any) {
       console.error('Erreur connexion:', error);
@@ -88,10 +99,6 @@ function ConnexionPageContent() {
       setLoading(false);
       setIsRedirecting(false);
       hasRedirected.current = false;
-    } finally {
-      if (!hasRedirected.current) {
-        setLoading(false);
-      }
     }
   };
 
