@@ -29,25 +29,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Vérifier par email d'abord (config centralisée)
+    // Vérifier par email uniquement (config centralisée)
+    // Évite les problèmes de RLS recursion sur la table profiles
     if (isAdminEmail(currentUser.email)) {
       setIsAdmin(true);
       return;
     }
 
-    // Sinon vérifier dans la base de données
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', currentUser.id)
-        .single();
-
-      setIsAdmin(profile?.role === 'admin');
-    } catch {
-      setIsAdmin(false);
-    }
-  }, [supabase]);
+    // Par défaut, non admin
+    setIsAdmin(false);
+  }, []);
 
   const refreshUser = useCallback(async () => {
     try {
