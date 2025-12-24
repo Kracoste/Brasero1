@@ -37,30 +37,18 @@ export function AddToFavoritesButton({ product, className = "", size = "default"
 
   const isInFavorites = isFavorite(product.slug);
 
-  const padding = size === "compact" ? "px-3 py-2 text-sm" : "px-6 py-3";
   return (
     <button
       type="button"
       onClick={handleToggle}
       disabled={loading}
-      className={`flex items-center justify-center gap-2 rounded-full border ${padding} font-semibold transition ${
-        isInFavorites
-          ? "border-transparent bg-gradient-to-r from-[#f4e1c1] via-[#c18f52] to-[#7a4b1f] text-white hover:brightness-110"
-          : "border-transparent bg-gradient-to-r from-[#f4e1c1] via-[#c18f52] to-[#7a4b1f] text-white hover:brightness-110"
-      } shadow-lg shadow-amber-700/20 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      aria-label={isInFavorites ? "Retirer des favoris" : "Ajouter aux favoris"}
+      className={`flex items-center justify-center p-2 transition hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${className}`}
     >
-      <div className="relative">
-        <Heart
-          size={20}
-          className={isInFavorites ? "text-white" : "text-white"}
-        />
-        {favoriteCount > 0 && (
-          <span className="absolute -right-2 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
-            {favoriteCount}
-          </span>
-        )}
-      </div>
-      <span className="text-white">{isInFavorites ? "Retirer des favoris" : "Ajouter aux favoris"}</span>
+      <Heart
+        size={24}
+        className={`pointer-events-none ${isInFavorites ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-red-400"}`}
+      />
     </button>
   );
 }

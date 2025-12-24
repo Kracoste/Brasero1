@@ -27,8 +27,8 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white shadow-sm">
-      <div className="w-full px-3 sm:px-5 lg:px-6">
-        <div className="flex items-center py-0 gap-4">
+      <div className="w-full px-2 sm:px-4 lg:px-6">
+        <div className="flex items-center py-0 gap-2 sm:gap-4">
           {/* Logo à gauche */}
           <Link href="/" className="flex-shrink-0">
           <Image
@@ -36,7 +36,7 @@ export const Header = () => {
             alt="Atelier LBF Logo"
             width={1400}
             height={500}
-            className="w-auto max-h-20 sm:max-h-24"
+            className="w-auto max-h-14 sm:max-h-20 lg:max-h-24"
             style={{ objectFit: "contain" }}
             priority
           />
@@ -44,7 +44,7 @@ export const Header = () => {
           
           {/* Navigation centrée */}
           <div className="flex-1 flex justify-center">
-            <div className="hidden items-center gap-6 md:flex">
+            <div className="hidden items-center gap-2 lg:gap-4 xl:gap-6 lg:flex">
               {navLinks.map((link) => {
                 if (link.label === "Accessoires") {
                   const isActive =
@@ -54,7 +54,7 @@ export const Header = () => {
                   return (
                     <div
                       key={link.href}
-                      className="relative mx-6 flex items-center"
+                      className="relative mx-2 lg:mx-4 flex items-center"
                       onMouseEnter={() => {
                         if (accessoriesTimer.current) clearTimeout(accessoriesTimer.current);
                         setAccessoriesOpen(true);
@@ -67,7 +67,7 @@ export const Header = () => {
                       <Link
                         href={link.href}
                         className={cn(
-                          "nav-link-hover text-[0.85rem] font-semibold uppercase tracking-[0.25em] transition relative pb-1 inline-flex items-center",
+                          "nav-link-hover text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 inline-flex items-center",
                           isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                         )}
                       >
@@ -108,7 +108,7 @@ export const Header = () => {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "nav-link-hover text-[0.85rem] font-semibold uppercase tracking-[0.25em] transition relative pb-1 mx-6",
+                      "nav-link-hover text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 mx-2 lg:mx-3 xl:mx-6",
                       isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                     )}
                   >
@@ -118,7 +118,7 @@ export const Header = () => {
               })}
               <Link
                 href="/recettes"
-                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-4 py-2 text-[0.85rem] font-semibold uppercase tracking-[0.25em] text-white transition hover:brightness-110 mx-6"
+                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-3 lg:px-4 py-1.5 lg:py-2 text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.15em] xl:tracking-[0.25em] text-white transition hover:brightness-110 mx-2 lg:mx-3 xl:mx-6"
               >
                 Recettes
               </Link>
@@ -126,7 +126,7 @@ export const Header = () => {
           </div>
           
           {/* Icônes à droite */}
-          <div className="flex items-center gap-6 mr-24">
+          <div className="flex items-center gap-4 sm:gap-6">
             {/* Favoris */}
             <Link href="/favoris" className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition">
               <span className="relative">

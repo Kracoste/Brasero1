@@ -6,6 +6,7 @@ import { isAdminEmail } from '@/lib/auth';
 type DailyData = {
   date: string;
   visits: number;
+  uniqueVisitors: number;
   revenue: number;
   sales: number;
 };
@@ -47,6 +48,11 @@ export async function GET() {
       visitsWeekResult,
       visitsMonthResult,
       visitsYearResult,
+      uniqueVisitorsResult,
+      uniqueVisitorsTodayResult,
+      uniqueVisitorsWeekResult,
+      uniqueVisitorsMonthResult,
+      uniqueVisitorsYearResult,
       ordersResult,
       recentOrdersResult,
       productsResult,
@@ -59,12 +65,18 @@ export async function GET() {
       adminClient.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfWeek),
       adminClient.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth),
       adminClient.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfYear),
+      // Visiteurs uniques
+      adminClient.from('visits').select('visitor_id'),
+      adminClient.from('visits').select('visitor_id').gte('created_at', startOfDay),
+      adminClient.from('visits').select('visitor_id').gte('created_at', startOfWeek),
+      adminClient.from('visits').select('visitor_id').gte('created_at', startOfMonth),
+      adminClient.from('visits').select('visitor_id').gte('created_at', startOfYear),
       adminClient.from('orders').select('id, total', { count: 'exact' }),
       adminClient.from('orders').select('id, customer_name, total, created_at, status').order('created_at', { ascending: false }).limit(5),
       adminClient.from('products').select('*', { count: 'exact', head: true }),
       adminClient.from('profiles').select('*', { count: 'exact', head: true }),
       // Données journalières pour les graphiques
-      adminClient.from('visits').select('created_at').gte('created_at', oneYearAgo.toISOString()),
+      adminClient.from('visits').select('created_at, visitor_id').gte('created_at', oneYearAgo.toISOString()),
       adminClient.from('orders').select('created_at, total').gte('created_at', oneYearAgo.toISOString()),
     ]);
 
@@ -78,28 +90,46 @@ export async function GET() {
       status: order.status || 'pending',
     }));
 
+    // Calculer les visiteurs uniques
+    const countUnique = (data: { visitor_id: string }[] | null) => {
+      if (!data) return 0;
+      return new Set(data.map(v => v.visitor_id)).size;
+    };
+
+    const uniqueVisitors = countUnique(uniqueVisitorsResult.data);
+    const uniqueVisitorsToday = countUnique(uniqueVisitorsTodayResult.data);
+    const uniqueVisitorsThisWeek = countUnique(uniqueVisitorsWeekResult.data);
+    const uniqueVisitorsThisMonth = countUnique(uniqueVisitorsMonthResult.data);
+    const uniqueVisitorsThisYear = countUnique(uniqueVisitorsYearResult.data);
+
     // Agréger les données journalières
     const dailyMap = new Map<string, DailyData>();
     
-    (visitsDaily.data || []).forEach((v: { created_at: string }) => {
+    (visitsDaily.data || []).forEach((v: { created_at: string; visitor_id: string }) => {
       const date = v.created_at.split('T')[0];
       if (!dailyMap.has(date)) {
-        dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0 });
+        dailyMap.set(date, { date, visits: 0, uniqueVisitors: 0, revenue: 0, sales: 0, visitorIds: new Set() });
       }
-      dailyMap.get(date)!.visits++;
+      const dayData = dailyMap.get(date)! as any;
+      dayData.visits++;
+      dayData.visitorIds.add(v.visitor_id);
+      dayData.uniqueVisitors = dayData.visitorIds.size;
     });
     
     (ordersDaily.data || []).forEach((o: { created_at: string; total?: number }) => {
       const date = o.created_at.split('T')[0];
       if (!dailyMap.has(date)) {
-        dailyMap.set(date, { date, visits: 0, revenue: 0, sales: 0 });
+        dailyMap.set(date, { date, visits: 0, uniqueVisitors: 0, revenue: 0, sales: 0, visitorIds: new Set() });
       }
-      const dayData = dailyMap.get(date)!;
+      const dayData = dailyMap.get(date)! as any;
       dayData.sales++;
       dayData.revenue += o.total || 0;
     });
     
-    const dailyData = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+    // Nettoyer les visitorIds avant l'envoi
+    const dailyData = Array.from(dailyMap.values())
+      .map(d => ({ date: d.date, visits: d.visits, uniqueVisitors: (d as any).uniqueVisitors || 0, revenue: d.revenue, sales: d.sales }))
+      .sort((a, b) => a.date.localeCompare(b.date));
 
     return NextResponse.json({
       totalVisits: visitsResult.count || 0,
@@ -107,6 +137,11 @@ export async function GET() {
       visitsThisWeek: visitsWeekResult.count || 0,
       visitsThisMonth: visitsMonthResult.count || 0,
       visitsThisYear: visitsYearResult.count || 0,
+      uniqueVisitors,
+      uniqueVisitorsToday,
+      uniqueVisitorsThisWeek,
+      uniqueVisitorsThisMonth,
+      uniqueVisitorsThisYear,
       totalSales: ordersResult.count || 0,
       totalRevenue,
       totalProducts: productsResult.count || 0,

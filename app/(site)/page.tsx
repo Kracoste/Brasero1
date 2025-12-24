@@ -48,44 +48,50 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="bg-[#f6f1e9] py-10">
-        <div className="mx-auto grid max-w-[1600px] gap-6 px-4 sm:px-8 lg:px-16 lg:grid-cols-3">
-          <div className="grid gap-4 lg:col-span-1">
-            <CategoryTile
-              title="Nos braséros"
-              cta="Découvrir nos braséro"
-              image="/acceuil/acceuil1.jpg"
-              href="/produits?category=brasero"
-            />
-            <div className="grid grid-cols-2 gap-4">
+      <section className="bg-[#f6f1e9] py-6 sm:py-10">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-16">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
+            {/* Colonne gauche - Catégories */}
+            <div className="grid gap-4 grid-cols-1">
               <CategoryTile
-                title="Nos Fendeur A Buches"
-                cta="Voir tous"
-                image="/acceuil/Fendeur-Buches.png"
-                href="/produits?category=fendeur"
-                compact
+                title="Nos braséros"
+                cta="Découvrir nos braséro"
+                image="/acceuil/acceuil1.jpg"
+                href="/produits?category=brasero"
               />
-              <CategoryTile
-                title="Nos Accessoires"
-                cta="Voir tous"
-                image="/accesoiresbrasero.jpg"
-                href="/produits?category=accessoire"
-                compact
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <CategoryTile
+                  title="Nos Fendeur A Buches"
+                  cta="Voir tous"
+                  image="/acceuil/Fendeur-Buches.png"
+                  href="/produits?category=fendeur"
+                  compact
+                />
+                <CategoryTile
+                  title="Nos Accessoires"
+                  cta="Voir tous"
+                  image="/accesoiresbrasero.jpg"
+                  href="/produits?category=accessoire"
+                  compact
+                />
+              </div>
+            </div>
+            {/* Colonne droite - Promo (prend 2 colonnes sur lg) */}
+            <div className="lg:col-span-2">
+              <PromoTile />
             </div>
           </div>
-          <PromoTile />
         </div>
       </section>
 
-      <section className="pb-12 pt-8 bg-white">
-        <div className="w-full space-y-6 px-4 sm:px-8 lg:px-16 max-w-[1600px] mx-auto">
+      <section className="pb-8 sm:pb-12 pt-6 sm:pt-8 bg-white">
+        <div className="w-full space-y-4 sm:space-y-6 px-4 sm:px-6 lg:px-8 xl:px-16 max-w-[1600px] mx-auto">
           <div className="flex flex-col gap-2 text-center">
-            <h2 className="font-display text-3xl font-semibold text-[#2d2d2d]">
+            <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-semibold text-[#2d2d2d]">
               Nos produits les plus vendus
             </h2>
           </div>
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr">
+          <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-2 lg:grid-cols-4 auto-rows-fr">
             {braseros.map((product, index) => {
               return (
                 <ProductCard
@@ -99,7 +105,7 @@ export default async function HomePage() {
           <div className="flex justify-center">
             <a
               href="/produits"
-              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-8 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
             >
               Voir notre catalogue
             </a>
@@ -125,8 +131,10 @@ type CategoryTileProps = {
 const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTileProps) => (
   <a
     href={href}
-    className="relative block overflow-hidden rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl"
-    style={{ aspectRatio: compact ? "1 / 0.85" : "4 / 3" }}
+    className={`relative block overflow-hidden rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${
+      compact ? 'min-h-[140px] sm:min-h-[160px]' : 'min-h-[180px] sm:min-h-[220px] lg:min-h-[240px]'
+    }`}
+    style={{ aspectRatio: compact ? "1 / 0.9" : "4 / 3" }}
   >
     <div className="absolute inset-0">
       <img
@@ -136,9 +144,9 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
       />
     </div>
     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-      <h3 className="text-lg font-semibold drop-shadow">{title}</h3>
-      <span className="mt-3 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow">
+    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-3 sm:px-4">
+      <h3 className={`font-semibold drop-shadow ${compact ? 'text-sm sm:text-base' : 'text-base sm:text-lg'}`}>{title}</h3>
+      <span className={`mt-2 sm:mt-3 rounded-full bg-white/90 px-3 sm:px-4 py-1.5 sm:py-2 font-semibold text-slate-900 shadow ${compact ? 'text-xs sm:text-sm' : 'text-xs sm:text-sm'}`}>
         {cta}
       </span>
     </div>
@@ -146,24 +154,24 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
 );
 
 const PromoTile = () => (
-  <div className="relative overflow-hidden rounded-2xl bg-black text-white shadow-lg lg:col-span-2">
+  <div className="relative overflow-hidden rounded-2xl bg-black text-white shadow-lg h-full min-h-[300px] sm:min-h-[350px] lg:min-h-[400px]">
     <img
       src="/Braserobanner.jpg"
       alt="Promotion brasero"
       className="absolute inset-0 h-full w-full object-cover brightness-125"
     />
-    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
-    <div className="relative flex h-full flex-col items-start justify-center gap-4 px-8 py-12 sm:px-12">
-      <p className="text-lg font-semibold text-[#D2691E]">Nos promotions</p>
-      <h3 className="text-4xl font-black leading-tight sm:text-5xl">
+    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+    <div className="relative flex h-full flex-col items-start justify-center gap-3 sm:gap-4 px-6 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
+      <p className="text-base sm:text-lg font-semibold text-[#D2691E]">Nos promotions</p>
+      <h3 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black leading-tight">
         PROMOTIONS <br /> JUSQU&apos;À 40%
       </h3>
-      <p className="text-lg text-[#CD853F]">
+      <p className="text-sm sm:text-base lg:text-lg text-[#CD853F] max-w-md">
         Promotions pouvant aller jusqu&apos;à 40% sur nos braséros et accessoires.
       </p>
       <a
         href="/produits?category=promotions"
-        className="mt-2 inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow transition hover:scale-[1.02]"
+        className="mt-2 inline-flex items-center justify-center rounded-full bg-white px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-slate-900 shadow transition hover:scale-[1.02]"
       >
         J&apos;en profite
       </a>

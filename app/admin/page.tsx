@@ -15,6 +15,7 @@ type ChartSeries = {
 type DailyData = {
   date: string;
   visits: number;
+  uniqueVisitors: number;
   revenue: number;
   sales: number;
   customers: number;
@@ -28,6 +29,10 @@ type Stats = {
   visitsThisWeek: number;
   visitsThisMonth: number;
   visitsThisYear: number;
+  uniqueVisitorsToday: number;
+  uniqueVisitorsThisWeek: number;
+  uniqueVisitorsThisMonth: number;
+  uniqueVisitorsThisYear: number;
   // Ventes
   totalSales: number;
   salesToday: number;
@@ -64,6 +69,10 @@ export default function AdminDashboard() {
     visitsThisWeek: 0,
     visitsThisMonth: 0,
     visitsThisYear: 0,
+    uniqueVisitorsToday: 0,
+    uniqueVisitorsThisWeek: 0,
+    uniqueVisitorsThisMonth: 0,
+    uniqueVisitorsThisYear: 0,
     totalSales: 0,
     salesToday: 0,
     salesThisWeek: 0,
@@ -101,10 +110,15 @@ export default function AdminDashboard() {
         setStats(prev => ({
           ...prev,
           totalVisits: data.totalVisits || 0,
+          uniqueVisitors: data.uniqueVisitors || 0,
           visitsToday: data.visitsToday || 0,
           visitsThisWeek: data.visitsThisWeek || 0,
           visitsThisMonth: data.visitsThisMonth || 0,
           visitsThisYear: data.visitsThisYear || 0,
+          uniqueVisitorsToday: data.uniqueVisitorsToday || 0,
+          uniqueVisitorsThisWeek: data.uniqueVisitorsThisWeek || 0,
+          uniqueVisitorsThisMonth: data.uniqueVisitorsThisMonth || 0,
+          uniqueVisitorsThisYear: data.uniqueVisitorsThisYear || 0,
           totalSales: data.totalSales || 0,
           totalRevenue: data.totalRevenue || 0,
           totalProducts: data.totalProducts || 0,
@@ -206,7 +220,7 @@ export default function AdminDashboard() {
       // 7 derniers jours
       const labels: string[] = [];
       const dates: string[] = [];
-      const values: { visits: number; revenue: number; sales: number }[] = [];
+      const values: { visits: number; uniqueVisitors: number; revenue: number; sales: number }[] = [];
       
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now);
@@ -220,6 +234,7 @@ export default function AdminDashboard() {
         const dayData = dailyData.find(d => d.date === dateStr);
         values.push({
           visits: dayData?.visits || 0,
+          uniqueVisitors: dayData?.uniqueVisitors || 0,
           revenue: dayData?.revenue || 0,
           sales: dayData?.sales || 0,
         });
@@ -231,7 +246,7 @@ export default function AdminDashboard() {
       // 4 dernières semaines
       const labels: string[] = [];
       const dates: string[] = [];
-      const values: { visits: number; revenue: number; sales: number }[] = [];
+      const values: { visits: number; uniqueVisitors: number; revenue: number; sales: number }[] = [];
       
       for (let w = 3; w >= 0; w--) {
         const weekStart = new Date(now);
@@ -245,16 +260,17 @@ export default function AdminDashboard() {
         labels.push(`Sem. ${4 - w}`);
         dates.push(`${startStr} - ${endStr}`);
         
-        let visits = 0, revenue = 0, sales = 0;
+        let visits = 0, uniqueVisitors = 0, revenue = 0, sales = 0;
         dailyData.forEach(d => {
           const date = new Date(d.date);
           if (date >= weekStart && date <= weekEnd) {
             visits += d.visits;
+            uniqueVisitors += d.uniqueVisitors || 0;
             revenue += d.revenue;
             sales += d.sales;
           }
         });
-        values.push({ visits, revenue, sales });
+        values.push({ visits, uniqueVisitors, revenue, sales });
       }
       return { chartLabels: labels, chartValues: values, chartDates: dates };
     }
@@ -262,7 +278,7 @@ export default function AdminDashboard() {
     // Cette année - 12 derniers mois
     const labels: string[] = [];
     const dates: string[] = [];
-    const values: { visits: number; revenue: number; sales: number }[] = [];
+    const values: { visits: number; uniqueVisitors: number; revenue: number; sales: number }[] = [];
     
     for (let m = 11; m >= 0; m--) {
       const date = new Date(now.getFullYear(), now.getMonth() - m, 1);
@@ -273,15 +289,16 @@ export default function AdminDashboard() {
       
       const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
-      let visits = 0, revenue = 0, sales = 0;
+      let visits = 0, uniqueVisitors = 0, revenue = 0, sales = 0;
       dailyData.forEach(d => {
         if (d.date.startsWith(monthStr)) {
           visits += d.visits;
+          uniqueVisitors += d.uniqueVisitors || 0;
           revenue += d.revenue;
           sales += d.sales;
         }
       });
-      values.push({ visits, revenue, sales });
+      values.push({ visits, uniqueVisitors, revenue, sales });
     }
     return { chartLabels: labels, chartValues: values, chartDates: dates };
   }, [selectedPeriod, stats.dailyData]);
@@ -302,6 +319,19 @@ export default function AdminDashboard() {
     }
   }, [selectedMetric, selectedPeriod, stats]);
 
+  const uniqueVisitorsForPeriod = useMemo(() => {
+    switch (selectedPeriod) {
+      case 'week':
+        return stats.uniqueVisitorsThisWeek;
+      case 'month':
+        return stats.uniqueVisitorsThisMonth;
+      case 'year':
+        return stats.uniqueVisitorsThisYear;
+      default:
+        return stats.uniqueVisitors;
+    }
+  }, [selectedPeriod, stats]);
+
   const chartSeries = useMemo<ChartSeries[]>(() => {
     if (!stats || chartValues.length === 0) return [];
 
@@ -309,9 +339,14 @@ export default function AdminDashboard() {
       case 'visites':
         return [
           {
-            label: 'Visites',
+            label: 'Visites totales',
             color: '#10b981',
             values: chartValues.map(v => v.visits),
+          },
+          {
+            label: 'Visiteurs uniques',
+            color: '#0ea5e9',
+            values: chartValues.map(v => v.uniqueVisitors),
           },
         ];
       case 'ca':
@@ -442,11 +477,30 @@ export default function AdminDashboard() {
         </div>
         
         {/* Valeur totale */}
-        <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-bold text-slate-900">
-            {selectedMetric === 'ca' ? formatCurrency(totalForMetric) : totalForMetric.toLocaleString('fr-FR')}
-          </span>
-          <span className="text-slate-500">{periodLabel.toLowerCase()}</span>
+        <div className="flex flex-wrap items-baseline gap-4">
+          {selectedMetric === 'visites' ? (
+            <>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-[#10b981]">
+                  {totalForMetric.toLocaleString('fr-FR')}
+                </span>
+                <span className="text-slate-500">visites totales</span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-[#0ea5e9]">
+                  {uniqueVisitorsForPeriod.toLocaleString('fr-FR')}
+                </span>
+                <span className="text-slate-500">visiteurs uniques</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-slate-900">
+                {selectedMetric === 'ca' ? formatCurrency(totalForMetric) : totalForMetric.toLocaleString('fr-FR')}
+              </span>
+              <span className="text-slate-500">{periodLabel.toLowerCase()}</span>
+            </div>
+          )}
         </div>
 
         <LargeSparkline series={chartSeries} xLabels={chartLabels} xDates={chartDates} formatValue={formatValue} />

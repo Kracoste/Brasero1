@@ -118,13 +118,13 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Découvrez nos offres limitées et promotions exceptionnelles jusqu'à 40%."
     : "Diamètres de 55 à 100 cm, aciers corten ou thermolaqués et accessoires prêts à rejoindre votre terrasse. Filtres et tri vous permettent de comparer en un coup d'œil.";
 
-  const containerClass = 'space-y-10 w-full max-w-[1600px] px-0 sm:px-4 lg:px-0';
+  const containerClass = 'space-y-6 sm:space-y-10 w-full max-w-[1600px] px-3 sm:px-4 lg:px-0';
 
   return (
     <Section className="pb-24 bg-white">
       <Container className={containerClass}>
-        <h1 className="text-4xl font-bold text-[#2d2d2d] mb-8 px-4 sm:px-0">{title.toUpperCase()}</h1>
-        <div className="px-4 sm:px-0">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2d2d2d] mb-4 sm:mb-8">{title.toUpperCase()}</h1>
+        <div>
           <CatalogueView
             products={filteredProducts}
             showCategoryFilters={category !== "accessoire" && category !== "promotions"}

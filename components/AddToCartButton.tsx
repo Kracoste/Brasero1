@@ -1,9 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { ShoppingCart, Check, Minus, Plus } from 'lucide-react';
 import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
+import { createClient } from '@/lib/supabase/client';
+
+const SELECTED_ACCESSORIES_KEY = "brasero:selected-accessories";
+
+const readSelectedAccessories = (): Set<string> => {
+  if (typeof window === "undefined") return new Set<string>();
+  try {
+    const raw = window.localStorage.getItem(SELECTED_ACCESSORIES_KEY);
+    if (!raw) return new Set<string>();
+    const parsed = JSON.parse(raw);
+    return new Set(Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === "string") : []);
+  } catch {
+    return new Set<string>();
+  }
+};
+
+const clearSelectedAccessories = () => {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(SELECTED_ACCESSORIES_KEY);
+};
 
 type AddToCartButtonProps = {
   product: {
@@ -20,10 +40,36 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
+  const [accessoriesData, setAccessoriesData] = useState<Map<string, { name: string; price: number; image: string }>>(new Map());
+
+  // Charger les données des accessoires depuis Supabase
+  useEffect(() => {
+    const loadAccessories = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('products')
+        .select('slug, name, price, images')
+        .eq('category', 'accessoire');
+      
+      if (data) {
+        const map = new Map<string, { name: string; price: number; image: string }>();
+        data.forEach((p: any) => {
+          map.set(p.slug, {
+            name: p.name,
+            price: p.price,
+            image: p.images?.[0]?.src || '',
+          });
+        });
+        setAccessoriesData(map);
+      }
+    };
+    loadAccessories();
+  }, []);
 
   const handleAddToCart = async () => {
     setAdding(true);
     try {
+      // Ajouter le produit principal
       await addItem(
         {
           slug: product.slug,
@@ -33,6 +79,27 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
         },
         quantity
       );
+
+      // Récupérer et ajouter les accessoires sélectionnés
+      const selectedAccessories = readSelectedAccessories();
+      for (const slug of selectedAccessories) {
+        const accessory = accessoriesData.get(slug);
+        if (accessory) {
+          await addItem(
+            {
+              slug,
+              name: accessory.name,
+              price: accessory.price,
+              image: accessory.image,
+            },
+            1
+          );
+        }
+      }
+
+      // Effacer les accessoires sélectionnés après ajout
+      clearSelectedAccessories();
+
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);
     } catch (error) {
@@ -70,7 +137,7 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
             </button>
           </div>
         </div>
-        <AddToFavoritesButton product={product} size="compact" className="shrink-0 border-slate-300 bg-white text-slate-700 hover:border-red-500 hover:text-red-500" />
+        <AddToFavoritesButton product={product} size="compact" />
       </div>
 
       {/* Bouton Ajouter au panier */}

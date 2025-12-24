@@ -146,19 +146,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="bg-[#f9f6f1] pb-24">
-      <Section className="pt-10">
-        <Container className="max-w-6xl">
-          <div className="grid gap-10 lg:grid-cols-[minmax(320px,1fr)_minmax(420px,1fr)] items-start">
-            <div className="space-y-16">
+      <Section className="pt-6 sm:pt-10">
+        <Container className="max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-6 sm:gap-10 lg:grid-cols-2 items-start">
+            <div className="space-y-8 sm:space-y-16">
               <ProductGallery key={product.slug} product={product} />
             </div>
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
                   <span>France Braseros</span>
                   <Badge>{product.badge}</Badge>
                 </div>
-                <h1 className="font-display text-4xl font-semibold text-slate-900">{product.name}</h1>
+                <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900">{product.name}</h1>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
                   <span className="font-semibold">
                     Référence&nbsp;: <span className="font-mono text-slate-900">{reference}</span>
@@ -171,59 +171,59 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
 
               {product.category !== "accessoire" && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                      <Users className="h-5 w-5 text-red-600" />
+                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                     </div>
-                    <div>
-                      <span className="text-sm font-semibold text-slate-800">Nombre de convives : </span>
-                      <span className="text-sm text-slate-600">{product.diameter <= 50 ? "4 à 6" : product.diameter <= 70 ? "6 à 8" : product.diameter <= 90 ? "10 à 12" : "12 à 16"} personnes</span>
+                    <div className="min-w-0">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Convives : </span>
+                      <span className="text-xs sm:text-sm text-slate-600">{product.diameter <= 50 ? "4 à 6" : product.diameter <= 70 ? "6 à 8" : product.diameter <= 90 ? "10 à 12" : "12 à 16"} pers.</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                      <Flame className="h-5 w-5 text-red-600" />
+                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                      <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                     </div>
-                    <div>
-                      <span className="text-sm font-semibold text-slate-800">Type de combustible : </span>
-                      <span className="text-sm text-slate-600">Bois</span>
+                    <div className="min-w-0">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Combustible : </span>
+                      <span className="text-xs sm:text-sm text-slate-600">Bois</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                      <Box className="h-5 w-5 text-red-600" />
+                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                      <Box className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                     </div>
-                    <div>
-                      <span className="text-sm font-semibold text-slate-800">Matière : </span>
-                      <span className="text-sm text-slate-600">{product.material}</span>
+                    <div className="min-w-0">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Matière : </span>
+                      <span className="text-xs sm:text-sm text-slate-600">{product.material}</span>
                     </div>
                   </div>
                   {product.specs?.dimensions && (
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                        <Ruler className="h-5 w-5 text-red-600" />
+                      <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                        <Ruler className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                       </div>
-                      <div>
-                        <span className="text-sm font-semibold text-slate-800">Dimensions : </span>
-                        <span className="text-sm text-slate-600">{product.specs.dimensions}</span>
+                      <div className="min-w-0">
+                        <span className="text-xs sm:text-sm font-semibold text-slate-800">Dimensions : </span>
+                        <span className="text-xs sm:text-sm text-slate-600">{product.specs.dimensions}</span>
                       </div>
                     </div>
                   )}
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                      <Weight className="h-5 w-5 text-red-600" />
+                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                      <Weight className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                     </div>
-                    <div>
-                      <span className="text-sm font-semibold text-slate-800">Poids : </span>
-                      <span className="text-sm text-slate-600">{product.weight} kg</span>
+                    <div className="min-w-0">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Poids : </span>
+                      <span className="text-xs sm:text-sm text-slate-600">{product.weight} kg</span>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-4">
-                <Price amount={product.price} className="text-4xl font-bold" />
+              <div className="space-y-3 sm:space-y-4">
+                <Price amount={product.price} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
                 <AddToCartButton product={product} />
               </div>
             </div>
@@ -232,7 +232,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </Section>
 
       <Section className="py-0 sm:py-4">
-        <Container className="space-y-2">
+        <Container className="space-y-2 px-4 sm:px-6">
           <ProductTabs product={product} accessories={compatibleAccessories} />
         </Container>
       </Section>

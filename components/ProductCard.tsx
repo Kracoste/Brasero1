@@ -62,14 +62,21 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
     <article className={`product-card ${className ?? ""}`}>
       <div className="product-card__body">
         <div className="product-card__image">
-          <Image
-            src={image.src}
-            alt={image.alt}
-            fill
-            placeholder={image.blurDataURL ? "blur" : "empty"}
-            blurDataURL={image.blurDataURL}
-            className="product-card__image-el"
-          />
+          {image?.src ? (
+            <Image
+              src={image.src}
+              alt={image.alt || product.name}
+              fill
+              sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+              placeholder={image.blurDataURL ? "blur" : "empty"}
+              blurDataURL={image.blurDataURL}
+              className="product-card__image-el"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full bg-gray-100 text-gray-400 text-sm">
+              Image non disponible
+            </div>
+          )}
           {isPromo && (
             <span className="product-card__promo-ribbon">-{product.discountPercent}%</span>
           )}

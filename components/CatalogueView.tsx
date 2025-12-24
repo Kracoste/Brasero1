@@ -31,9 +31,9 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category }
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex items-start gap-8">
+      <div className="flex flex-col lg:flex-row items-start gap-4 lg:gap-8">
         {/* Panneau des filtres */}
-        <div className="flex-shrink-0">
+        <div className="w-full lg:w-auto lg:flex-shrink-0">
           <FilterPanel
             minPrice={minPrice}
             maxPrice={maxPrice}
@@ -66,10 +66,10 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category }
               </button>
             )}
           </div>
-          <div className={`grid gap-6 transition-all duration-300 ${
+          <div className={`grid gap-3 sm:gap-4 lg:gap-6 transition-all duration-300 ${
             filtersOpen 
-              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-              : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+              ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+              : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
           }`} style={{ maxWidth: filtersOpen ? 'none' : '100%' }}>
           {((category === "brasero" || !category)
             ? sortOrder === "asc"
