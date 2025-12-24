@@ -9,6 +9,7 @@ type DailyData = {
   uniqueVisitors: number;
   revenue: number;
   sales: number;
+  visitorIds?: Set<string>;
 };
 
 export async function GET() {
