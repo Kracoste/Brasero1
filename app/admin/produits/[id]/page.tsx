@@ -208,7 +208,12 @@ export default function EditProduct() {
       for (const image of images) {
         if (image.file) {
           // Nouvelle image à uploader
-          const fileName = `${formData.slug}-${Date.now()}-${image.file.name}`;
+          // Normaliser le nom du fichier pour supprimer les accents et caractères spéciaux
+          const sanitizedFileName = image.file.name
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+            .replace(/[^a-zA-Z0-9._-]/g, '_'); // Remplacer les caractères spéciaux par _
+          const fileName = `${formData.slug}-${Date.now()}-${sanitizedFileName}`;
           const { error: uploadError } = await supabase.storage
             .from('products')
             .upload(fileName, image.file);
