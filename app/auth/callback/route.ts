@@ -13,7 +13,13 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error && data.session) {
       // La session est bien créée, on redirige
-      const redirectUrl = new URL(next, origin)
+      // Utiliser www. en production pour la cohérence des cookies
+      let redirectOrigin = origin
+      if (process.env.NODE_ENV === 'production' && origin.includes('atelier-lbf.fr') && !origin.includes('www.')) {
+        redirectOrigin = origin.replace('atelier-lbf.fr', 'www.atelier-lbf.fr')
+      }
+      
+      const redirectUrl = new URL(next, redirectOrigin)
       const response = NextResponse.redirect(redirectUrl)
       
       // Forcer le navigateur à ne pas mettre en cache cette réponse

@@ -87,16 +87,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const init = async () => {
       setIsLoading(true);
       try {
-        // getUser() vérifie avec le serveur Supabase, pas le cache local
-        const { data: { user: currentUser }, error } = await supabase.auth.getUser();
+        // D'abord essayer getSession() qui est plus rapide
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (error) {
-          // Si erreur (token invalide, expiré, etc.), l'utilisateur n'est pas connecté
+        if (sessionError) {
+          console.error('Session error:', sessionError);
           setUser(null);
           setIsAdmin(false);
+          setIsLoading(false);
+          return;
+        }
+
+        if (session?.user) {
+          setUser(session.user);
+          await checkIsAdmin(session.user);
         } else {
-          setUser(currentUser);
-          await checkIsAdmin(currentUser);
+          // Si pas de session locale, vérifier avec le serveur
+          const { data: { user: currentUser }, error } = await supabase.auth.getUser();
+          
+          if (error) {
+            setUser(null);
+            setIsAdmin(false);
+          } else {
+            setUser(currentUser);
+            await checkIsAdmin(currentUser);
+          }
         }
       } catch (error) {
         console.error('Erreur initialisation auth:', error);
@@ -112,13 +127,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Ignorer l'événement INITIAL_SESSION car on gère déjà l'init
-        if (event === 'INITIAL_SESSION') return;
+        console.log('Auth state change:', event, session?.user?.email);
         
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         await checkIsAdmin(currentUser);
-        setIsLoading(false);
+        
+        // Marquer comme chargé seulement après le premier événement
+        if (isLoading) {
+          setIsLoading(false);
+        }
       }
     );
 
