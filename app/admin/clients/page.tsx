@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { Users, Mail, Calendar, ShoppingBag, Search, Trash2 } from 'lucide-react';
 
 type Client = {
@@ -21,18 +20,18 @@ export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setClients(data || []);
+        const response = await fetch('/api/admin/clients');
+        const data = await response.json();
+        
+        if (response.ok) {
+          setClients(data.clients || []);
+        } else {
+          console.error('Erreur lors du chargement des clients:', data.error);
+        }
       } catch (error) {
         console.error('Erreur lors du chargement des clients:', error);
       } finally {
@@ -41,7 +40,7 @@ export default function ClientsPage() {
     };
 
     fetchClients();
-  }, [supabase]);
+  }, []);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -64,8 +63,19 @@ export default function ClientsPage() {
       prev.map(client => (client.id === clientId ? { ...client, role: nextRole } : client)),
     );
 
-    const { error } = await supabase.from('profiles').update({ role: nextRole }).eq('id', clientId);
-    if (error) {
+    try {
+      const response = await fetch('/api/admin/clients', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, role: nextRole }),
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Erreur mise à jour rôle:', data.error);
+        setClients(previousClients);
+      }
+    } catch (error) {
       console.error('Erreur mise à jour rôle:', error);
       setClients(previousClients);
     }
@@ -82,11 +92,17 @@ export default function ClientsPage() {
     const previousClients = clients;
     setClients(prev => prev.filter(client => client.id !== clientId));
 
-    const { error: favError } = await supabase.from('favorites').delete().eq('user_id', clientId);
-    if (favError) console.error('Erreur suppression favoris:', favError);
-
-    const { error } = await supabase.from('profiles').delete().eq('id', clientId);
-    if (error) {
+    try {
+      const response = await fetch(`/api/admin/clients?clientId=${clientId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Erreur suppression client:', data.error);
+        setClients(previousClients);
+      }
+    } catch (error) {
       console.error('Erreur suppression client:', error);
       setClients(previousClients);
     }

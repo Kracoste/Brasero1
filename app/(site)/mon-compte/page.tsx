@@ -40,15 +40,15 @@ export default function MonComptePage() {
 
       setUser(user);
 
-      // Récupérer le profil
-      const { data: profileData, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (profileData) {
-        setProfile(profileData);
+      // Récupérer le profil via l'API (évite les problèmes RLS)
+      try {
+        const response = await fetch('/api/profile');
+        const data = await response.json();
+        if (data.profile) {
+          setProfile(data.profile);
+        }
+      } catch (error) {
+        console.error('Erreur chargement profil:', error);
       }
 
       setLoading(false);
@@ -62,10 +62,8 @@ export default function MonComptePage() {
     setSaving(true);
     setMessage(null);
 
-    const supabase = createClient();
     const formData = new FormData(e.currentTarget);
     const updates = {
-      id: user!.id,
       first_name: formData.get('first_name') as string,
       last_name: formData.get('last_name') as string,
       phone: formData.get('phone') as string,
@@ -75,15 +73,23 @@ export default function MonComptePage() {
       country: formData.get('country') as string,
     };
 
-    const { error } = await supabase
-      .from('profiles')
-      .upsert(updates);
-
-    if (error) {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
+        setProfile(data.profile);
+      } else {
+        setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde' });
+      }
+    } catch (error) {
       setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde' });
-    } else {
-      setMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
-      setProfile({ ...profile, ...updates } as Profile);
     }
 
     setSaving(false);

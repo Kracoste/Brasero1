@@ -69,25 +69,38 @@ export default function CheckoutPage() {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('alias,first_name,last_name,phone,address,address_line2,postal_code,city,country')
-          .eq('id', user.id)
-          .single();
+        try {
+          const response = await fetch('/api/profile');
+          const data = await response.json();
+          const profile = data.profile;
 
-        setCheckoutForm((prev) => ({
-          ...prev,
-          email: user.email ?? prev.email,
-          alias: profile?.alias ?? prev.alias,
-          first_name: profile?.first_name ?? prev.first_name,
-          last_name: profile?.last_name ?? prev.last_name,
-          phone: profile?.phone ?? prev.phone,
-          address: profile?.address ?? prev.address,
-          address_line2: profile?.address_line2 ?? prev.address_line2,
-          postal_code: profile?.postal_code ?? prev.postal_code,
-          city: profile?.city ?? prev.city,
-          country: profile?.country ?? prev.country,
-        }));
+          if (profile) {
+            setCheckoutForm((prev) => ({
+              ...prev,
+              email: user.email ?? prev.email,
+              alias: profile?.alias ?? prev.alias,
+              first_name: profile?.first_name ?? prev.first_name,
+              last_name: profile?.last_name ?? prev.last_name,
+              phone: profile?.phone ?? prev.phone,
+              address: profile?.address ?? prev.address,
+              address_line2: profile?.address_line2 ?? prev.address_line2,
+              postal_code: profile?.postal_code ?? prev.postal_code,
+              city: profile?.city ?? prev.city,
+              country: profile?.country ?? prev.country,
+            }));
+          } else {
+            setCheckoutForm((prev) => ({
+              ...prev,
+              email: user.email ?? prev.email,
+            }));
+          }
+        } catch (error) {
+          console.error('Erreur chargement profil:', error);
+          setCheckoutForm((prev) => ({
+            ...prev,
+            email: user.email ?? prev.email,
+          }));
+        }
       }
 
       setProfileLoading(false);

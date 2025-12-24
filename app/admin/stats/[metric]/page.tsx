@@ -96,7 +96,17 @@ export default function MetricPage() {
       };
 
       try {
-        const [
+        const countCustomers = async () => {
+        try {
+          const response = await fetch('/api/admin/clients');
+          const data = await response.json();
+          return { count: data.clients?.length || 0 };
+        } catch {
+          return { count: 0 };
+        }
+      };
+
+      const [
           visitsResult,
           visitsTodayResult,
           visitsWeekResult,
@@ -133,7 +143,7 @@ export default function MetricPage() {
           sumOrders(startOfMonth),
           sumOrders(startOfYear),
           supabase.from('products').select('*', { count: 'exact', head: true }),
-          supabase.from('profiles').select('*', { count: 'exact', head: true }),
+          countCustomers(),
         ]);
 
         setStats({

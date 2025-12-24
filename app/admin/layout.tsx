@@ -25,24 +25,11 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     redirect(`${AUTH_ROUTES.login}?${REDIRECT_PARAM}=${AUTH_ROUTES.admin}`);
   }
 
-  // Vérifier si admin par email (config centralisée)
-  const isAdminByEmail = isAdminEmail(user.email);
+  // Vérifier si admin par email uniquement (config centralisée)
+  // Évite les problèmes de RLS recursion sur la table profiles
+  const isAdmin = isAdminEmail(user.email);
 
-  // Vérifier aussi le profil en base (mais ne pas bloquer si erreur)
-  let isAdminByProfile = false;
-  try {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    isAdminByProfile = profile?.role === 'admin';
-  } catch {
-    // Ignorer les erreurs de profil
-  }
-
-  // Admin si email dans la liste OU role admin dans profiles
-  if (!isAdminByEmail && !isAdminByProfile) {
+  if (!isAdmin) {
     redirect('/');
   }
 
