@@ -206,10 +206,23 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     price: number;
     image?: string;
   }) => {
-    if (isFavorite(product.slug)) {
-      await removeFavorite(product.slug);
-    } else {
-      await addFavorite(product);
+    try {
+      if (isFavorite(product.slug)) {
+        await removeFavorite(product.slug);
+      } else {
+        await addFavorite(product);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Fallback sur localStorage en cas d'erreur
+      const newGuestFavorites = new Set(guestFavorites);
+      if (newGuestFavorites.has(product.slug)) {
+        newGuestFavorites.delete(product.slug);
+      } else {
+        newGuestFavorites.add(product.slug);
+      }
+      setGuestFavorites(newGuestFavorites);
+      persistGuestFavorites(newGuestFavorites);
     }
   };
 

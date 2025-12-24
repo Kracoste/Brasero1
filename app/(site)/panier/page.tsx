@@ -58,7 +58,13 @@ export default function PanierPage() {
               </p>
             </div>
             <button
-              onClick={clearCart}
+              onClick={async () => {
+                try {
+                  await clearCart();
+                } catch (error) {
+                  console.error('Error clearing cart:', error);
+                }
+              }}
               className="text-sm font-medium text-red-600 hover:text-red-700"
             >
               Vider le panier

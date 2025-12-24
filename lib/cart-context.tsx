@@ -337,14 +337,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Vider le panier
   const clearCart = async () => {
+    // Toujours vider localement d'abord pour une réponse instantanée
+    setItems([]);
+    persistGuestCart([]);
+    
     if (!user) {
-      clearGuestCart();
       return;
     }
 
     const ensuredCartId = cartId ?? (await loadCart(user.id));
     if (!ensuredCartId) {
-      clearGuestCart();
       return;
     }
 
@@ -354,13 +356,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         .delete()
         .eq('cart_id', ensuredCartId);
 
-      if (error) throw error;
-
-      setItems([]);
+      if (error) {
+        console.error('Error clearing cart in DB:', error);
+        // Pas de throw, on a déjà vidé localement
+      }
     } catch (error) {
       console.error('Error clearing cart:', error);
-      clearGuestCart();
-      throw error;
+      // Pas de throw, on a déjà vidé localement
     }
   };
 
