@@ -51,6 +51,8 @@ export default function EditProduct() {
     weight: '',
     inStock: true,
     onDemand: false,
+    isFeatured: false,
+    featuredOrder: '999',
     format: '',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
@@ -108,6 +110,8 @@ export default function EditProduct() {
         weight: product.weight?.toString() || '',
         inStock: product.inStock ?? product.in_stock ?? true,
         onDemand: product.onDemand ?? product.on_demand ?? false,
+        isFeatured: product.isFeatured ?? product.is_featured ?? false,
+        featuredOrder: (product.featuredOrder ?? product.featured_order ?? 999).toString(),
         format: parsedSpecs?.format || product.format || '',
       });
 
@@ -295,6 +299,8 @@ export default function EditProduct() {
         specs: Object.keys(nextSpecs).length ? nextSpecs : null,
         inStock: formData.inStock,
         on_demand: formData.onDemand,
+        is_featured: formData.isFeatured,
+        featured_order: parseInt(formData.featuredOrder),
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
@@ -569,7 +575,36 @@ export default function EditProduct() {
                 />
                 <span className="text-sm font-medium text-slate-700">Ce produit est sur demande</span>
               </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={formData.isFeatured}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                />
+                <span className="text-sm font-medium text-slate-700">Produit vedette (page d'accueil)</span>
+              </label>
             </div>
+
+            {formData.isFeatured && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Ordre d'affichage
+                </label>
+                <input
+                  type="number"
+                  name="featuredOrder"
+                  value={formData.featuredOrder}
+                  onChange={handleInputChange}
+                  min="1"
+                  step="1"
+                  placeholder="1 = premier, 2 = deuxième, etc."
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                />
+                <p className="text-xs text-slate-500 mt-1">Plus le nombre est petit, plus le produit apparaît en premier</p>
+              </div>
+            )}
 
             {formData.hasPromotion && (
               <div>

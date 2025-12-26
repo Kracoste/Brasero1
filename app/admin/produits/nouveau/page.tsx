@@ -47,6 +47,8 @@ export default function NewProduct() {
     weight: '',
     inStock: true,
     onDemand: false,
+    isFeatured: false,
+    featuredOrder: '999',
     format: '',
     numberOfGuests: '',
     fuelType: [] as string[],
@@ -229,6 +231,8 @@ export default function NewProduct() {
         specs: Object.keys(specsPayload).length ? specsPayload : null,
         inStock: formData.inStock,
         on_demand: formData.onDemand,
+        is_featured: formData.isFeatured,
+        featured_order: parseInt(formData.featuredOrder),
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
@@ -498,7 +502,36 @@ export default function NewProduct() {
                 />
                 <span className="text-sm font-medium text-slate-700">Ce produit est sur demande</span>
               </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={formData.isFeatured}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                />
+                <span className="text-sm font-medium text-slate-700">Produit vedette (page d'accueil)</span>
+              </label>
             </div>
+
+            {formData.isFeatured && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Ordre d'affichage
+                </label>
+                <input
+                  type="number"
+                  name="featuredOrder"
+                  value={formData.featuredOrder}
+                  onChange={handleInputChange}
+                  min="1"
+                  step="1"
+                  placeholder="1 = premier, 2 = deuxième, etc."
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                />
+                <p className="text-xs text-slate-500 mt-1">Plus le nombre est petit, plus le produit apparaît en premier</p>
+              </div>
+            )}
 
             {formData.hasPromotion && (
               <>

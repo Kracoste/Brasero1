@@ -8,16 +8,31 @@ export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  // Récupérer les braséros depuis Supabase
+  // Récupérer les produits vedettes depuis Supabase (priorité aux produits marqués is_featured)
   const supabase = await createClient();
   const { data: braseroProduits } = await supabase
     .from('products')
     .select('*')
     .eq('category', 'brasero')
-    .order('popularScore', { ascending: false })
+    .eq('is_featured', true)
+    .order('featured_order', { ascending: true })
     .limit(4);
 
-  const braseros = (braseroProduits || []).map((p: any) => ({
+  // Si moins de 4 produits vedettes, compléter avec les plus populaires
+  let allProducts = braseroProduits || [];
+  if (allProducts.length < 4) {
+    const { data: moreProducts } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category', 'brasero')
+      .eq('is_featured', false)
+      .order('popularScore', { ascending: false })
+      .limit(4 - allProducts.length);
+    
+    allProducts = [...allProducts, ...(moreProducts || [])];
+  }
+
+  const braseros = allProducts.map((p: any) => ({
     slug: p.slug,
     name: p.name,
     shortDescription: p.shortDescription || p.short_description || '',
