@@ -29,6 +29,7 @@ export default async function HomePage() {
     badge: p.badge || '',
     images: p.images || [],
     popularScore: p.popularScore || p.popular_score || 50,
+    onDemand: p.onDemand ?? p.on_demand ?? false,
     madeIn: 'France' as const,
     material: p.material || '',
     diameter: p.diameter || 0,

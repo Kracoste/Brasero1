@@ -78,6 +78,7 @@ export default async function ProductsPage({ searchParams }: Props) {
       shipping: p.shipping,
       popularScore: p.popularScore || p.popular_score || 50,
       inStock: p.inStock ?? p.in_stock ?? true,
+      onDemand: p.onDemand ?? p.on_demand ?? false,
       specs: specs || {},
       highlights: p.highlights || [],
       features: p.features || [],
