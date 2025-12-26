@@ -13,7 +13,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+    <form onSubmit={handleSubmit} className="space-y-4 border border-slate-200 bg-white p-6 shadow-lg">
       <div>
         <label htmlFor="name" className="text-sm font-semibold text-slate-900">
           Nom complet
@@ -22,7 +22,7 @@ export const ContactForm = () => {
           id="name"
           name="name"
           required
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
+          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
         />
       </div>
       <div>
@@ -34,7 +34,7 @@ export const ContactForm = () => {
           name="email"
           type="email"
           required
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
+          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
         />
       </div>
       <div>
@@ -46,12 +46,12 @@ export const ContactForm = () => {
           name="message"
           rows={4}
           required
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
+          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
         />
       </div>
       <button
         type="submit"
-        className="w-full rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+        className="w-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
       >
         Envoyer
       </button>

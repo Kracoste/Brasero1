@@ -28,7 +28,7 @@ export default async function ContactPage() {
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <ContactForm />
           <div className="space-y-6">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+            <div className="border border-slate-200 bg-white p-6 shadow-lg">
               <h2 className="text-lg font-semibold text-slate-900">Coordonnées</h2>
               <p className="mt-2 text-sm text-slate-600">{siteSettings.storeAddress}</p>
               <p className="mt-2 text-sm text-slate-600">
