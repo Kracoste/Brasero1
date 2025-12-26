@@ -40,31 +40,6 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
-  const [accessoriesData, setAccessoriesData] = useState<Map<string, { name: string; price: number; image: string }>>(new Map());
-
-  // Charger les données des accessoires depuis Supabase
-  useEffect(() => {
-    const loadAccessories = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('products')
-        .select('slug, name, price, images')
-        .eq('category', 'accessoire');
-      
-      if (data) {
-        const map = new Map<string, { name: string; price: number; image: string }>();
-        data.forEach((p: any) => {
-          map.set(p.slug, {
-            name: p.name,
-            price: p.price,
-            image: p.images?.[0]?.src || '',
-          });
-        });
-        setAccessoriesData(map);
-      }
-    };
-    loadAccessories();
-  }, []);
 
   const handleAddToCart = async () => {
     setAdding(true);
@@ -82,18 +57,26 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
 
       // Récupérer et ajouter les accessoires sélectionnés
       const selectedAccessories = readSelectedAccessories();
-      for (const slug of selectedAccessories) {
-        const accessory = accessoriesData.get(slug);
-        if (accessory) {
-          await addItem(
-            {
-              slug,
-              name: accessory.name,
-              price: accessory.price,
-              image: accessory.image,
-            },
-            1
-          );
+      if (selectedAccessories.size > 0) {
+        // Récupérer les données des accessoires sélectionnés depuis Supabase
+        const supabase = createClient();
+        const { data: accessories } = await supabase
+          .from('products')
+          .select('slug, name, price, images')
+          .in('slug', Array.from(selectedAccessories));
+        
+        if (accessories) {
+          for (const accessory of accessories) {
+            await addItem(
+              {
+                slug: accessory.slug,
+                name: accessory.name,
+                price: accessory.price,
+                image: accessory.images?.[0]?.src || '',
+              },
+              1
+            );
+          }
         }
       }
 
