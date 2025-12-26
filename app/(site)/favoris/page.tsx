@@ -112,14 +112,20 @@ export default function FavorisPage() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.from('products').select('*');
-      if (!error && data) {
-        setProducts(data.map(mapProduct));
-      } else {
+      try {
+        // Utiliser fetch pour récupérer les produits (pas de RLS sur SELECT products)
+        const response = await fetch('/api/admin/products');
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data.map(mapProduct));
+        } else {
+          console.error('Error loading products for favorites');
+        }
+      } catch (error) {
         console.error('Error loading products for favorites:', error);
+      } finally {
+        setProductsLoading(false);
       }
-      setProductsLoading(false);
     };
 
     fetchProducts();

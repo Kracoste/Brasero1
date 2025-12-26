@@ -90,7 +90,7 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-  const supabaseRef = useRef(createClient());
+  const supabase = useMemo(() => createClient(), []);
 
   // Fonction pour forcer le rafraîchissement
   const triggerRefresh = useCallback(() => {
@@ -144,8 +144,6 @@ export default function AdminDashboard() {
     }, 30000);
 
     // Abonnement temps réel aux nouvelles visites
-    const supabase = supabaseRef.current;
-    
     const visitsChannel = supabase
       .channel('admin-visits-channel')
       .on(
@@ -181,7 +179,7 @@ export default function AdminDashboard() {
       supabase.removeChannel(visitsChannel);
       supabase.removeChannel(ordersChannel);
     };
-  }, [triggerRefresh]);
+  }, [triggerRefresh, supabase]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {

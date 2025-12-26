@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { Package, Eye, Truck, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 type Order = {
@@ -30,17 +29,16 @@ export default function CommandesPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
+        // Utiliser l'API route pour bypass RLS
+        const response = await fetch('/api/admin/orders');
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des commandes');
+        }
+        const data = await response.json();
         setOrders(data || []);
       } catch (error) {
         console.error('Erreur lors du chargement des commandes:', error);
@@ -50,16 +48,20 @@ export default function CommandesPage() {
     };
 
     fetchOrders();
-  }, [supabase]);
+  }, []);
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', orderId);
+      // Utiliser l'API route pour bypass RLS
+      const response = await fetch(`/api/admin/orders?id=${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Erreur lors de la mise à jour');
+      }
 
       setOrders(orders.map(order => 
         order.id === orderId ? { ...order, status: newStatus as Order['status'] } : order
