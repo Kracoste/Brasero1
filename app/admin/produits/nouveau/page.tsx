@@ -228,7 +228,7 @@ export default function NewProduct() {
         material: formData.material,
         specs: Object.keys(specsPayload).length ? specsPayload : null,
         inStock: formData.inStock,
-        onDemand: formData.onDemand,
+        on_demand: formData.onDemand,
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };

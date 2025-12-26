@@ -294,7 +294,7 @@ export default function EditProduct() {
         material: formData.material,
         specs: Object.keys(nextSpecs).length ? nextSpecs : null,
         inStock: formData.inStock,
-        onDemand: formData.onDemand,
+        on_demand: formData.onDemand,
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
