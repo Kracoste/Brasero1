@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { Plus, Search, Edit, Trash2, Image as ImageIcon, Package, Database } from 'lucide-react';
 import Link from 'next/link';
 
@@ -23,7 +22,6 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const supabase = createClient();
 
   useEffect(() => {
     fetchProducts();
@@ -31,29 +29,28 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching products:', error);
+      // Utiliser l'API route pour bypass RLS
+      const response = await fetch('/api/admin/products');
+      if (!response.ok) {
+        console.error('Error fetching products:', await response.text());
         setProducts([]);
-      } else {
-        const mappedProducts: Product[] = (data || []).map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          slug: p.slug,
-          category: p.category,
-          price: p.price,
-          comparePrice: p.comparePrice || p.compare_price,
-          discountPercent: p.discountPercent || p.discount_percent,
-          cardImage: p.cardImage || p.card_image || p.images?.[0]?.src || '',
-          inStock: p.inStock ?? p.in_stock ?? true,
-          created_at: p.created_at,
-        }));
-        setProducts(mappedProducts);
+        return;
       }
+      const data = await response.json();
+
+      const mappedProducts: Product[] = (data || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        category: p.category,
+        price: p.price,
+        comparePrice: p.comparePrice || p.compare_price,
+        discountPercent: p.discountPercent || p.discount_percent,
+        cardImage: p.cardImage || p.card_image || p.images?.[0]?.src || '',
+        inStock: p.inStock ?? p.in_stock ?? true,
+        created_at: p.created_at,
+      }));
+      setProducts(mappedProducts);
     } catch (error) {
       console.error('Error fetching products:', error);
       setProducts([]);
@@ -66,12 +63,15 @@ export default function AdminProducts() {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) return;
 
     try {
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', id);
+      // Utiliser l'API route pour bypass RLS
+      const response = await fetch(`/api/admin/products?id=${id}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression');
+      }
+
       setProducts(products.filter((p) => p.id !== id));
     } catch (error) {
       console.error('Error deleting product:', error);

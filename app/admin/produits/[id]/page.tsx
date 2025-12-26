@@ -56,20 +56,24 @@ export default function EditProduct() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Charger le produit existant
+  // Charger le produit existant via API route (bypass RLS)
   useEffect(() => {
     const fetchProduct = async () => {
-      const { data: product, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
-        .single();
+      try {
+        const response = await fetch(`/api/admin/products?id=${productId}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          setSubmitError(errorData.error || 'Produit non trouvé');
+          setLoadingProduct(false);
+          return;
+        }
+        const product = await response.json();
 
-      if (error || !product) {
-        setSubmitError('Produit non trouvé');
-        setLoadingProduct(false);
-        return;
-      }
+        if (!product) {
+          setSubmitError('Produit non trouvé');
+          setLoadingProduct(false);
+          return;
+        }
 
       const parsedSpecs =
         typeof product.specs === 'string'
@@ -118,10 +122,15 @@ export default function EditProduct() {
       }
 
       setLoadingProduct(false);
+      } catch (error: any) {
+        console.error('Erreur chargement produit:', error);
+        setSubmitError(`Erreur: ${error?.message || 'Erreur inconnue'}`);
+        setLoadingProduct(false);
+      }
     };
 
     fetchProduct();
-  }, [productId, supabase]);
+  }, [productId]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
@@ -282,14 +291,17 @@ export default function EditProduct() {
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
 
-      const { error: updateError } = await supabase
-        .from('products')
-        .update(productData)
-        .eq('id', productId);
+      // Utiliser l'API route pour bypass RLS
+      const response = await fetch(`/api/admin/products?id=${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData),
+      });
 
-      if (updateError) {
-        setSubmitError(`Erreur base de données: ${updateError.message}`);
-        throw updateError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        setSubmitError(`Erreur base de données: ${errorData.error}`);
+        throw new Error(errorData.error);
       }
 
       router.push('/admin/produits');

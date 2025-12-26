@@ -225,11 +225,17 @@ export default function NewProduct() {
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
 
-      const { error: insertError } = await supabase.from('products').insert(productData);
+      // Utiliser l'API route pour bypass RLS
+      const response = await fetch('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData),
+      });
 
-      if (insertError) {
-        setSubmitError(`Erreur base de données: ${insertError.message}`);
-        throw insertError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        setSubmitError(`Erreur base de données: ${errorData.error}`);
+        throw new Error(errorData.error);
       }
 
       router.push('/admin/produits');
