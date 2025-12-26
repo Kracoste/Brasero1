@@ -100,11 +100,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             </button>
           </div>
           <p className="product-card__description">{product.shortDescription}</p>
-          {product.onDemand ? (
-            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-center">
-              <span className="text-sm font-semibold text-amber-900">Sur demande</span>
-            </div>
-          ) : isPromo ? (
+          {isPromo ? (
             <div className="product-card__promo-pricing">
               <div className="product-card__promo-current">
                 <span>{formatCurrency(product.price)}</span>
@@ -112,28 +108,33 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               </div>
               <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} TTC</span>
             </div>
-          ) : (
+          ) : !product.onDemand ? (
             <Price amount={product.price} className="product-card__price" tone="light" />
-          )}
+          ) : null}
           <div className="product-card__actions">
             {product.onDemand ? (
-              <Link href={`/produits/${product.slug}`} className="product-card__btn product-card__btn--primary">
-                Voir les détails
-              </Link>
+              <>
+                <Link href="/contact" className="product-card__btn product-card__btn--primary">
+                  Sur demande
+                </Link>
+                <Link href={`/produits/${product.slug}`} className="product-card__cta">
+                  Voir les détails
+                </Link>
+              </>
             ) : (
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                disabled={adding}
-                className="product-card__btn product-card__btn--primary"
-              >
-                {adding ? "Ajouté au panier" : "Ajouter au panier"}
-              </button>
-            )}
-            {!product.onDemand && (
-              <Link href={`/produits/${product.slug}`} className="product-card__cta">
-                Voir les détails
-              </Link>
+              <>
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={adding}
+                  className="product-card__btn product-card__btn--primary"
+                >
+                  {adding ? "Ajouté au panier" : "Ajouter au panier"}
+                </button>
+                <Link href={`/produits/${product.slug}`} className="product-card__cta">
+                  Voir les détails
+                </Link>
+              </>
             )}
           </div>
         </div>
