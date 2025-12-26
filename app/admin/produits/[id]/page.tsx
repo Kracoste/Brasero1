@@ -50,6 +50,7 @@ export default function EditProduct() {
     material: 'corten',
     weight: '',
     inStock: true,
+    onDemand: false,
     format: '',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
@@ -106,6 +107,7 @@ export default function EditProduct() {
         material: product.material || 'corten',
         weight: product.weight?.toString() || '',
         inStock: product.inStock ?? product.in_stock ?? true,
+        onDemand: product.onDemand ?? product.on_demand ?? false,
         format: parsedSpecs?.format || product.format || '',
       });
 
@@ -292,6 +294,7 @@ export default function EditProduct() {
         material: formData.material,
         specs: Object.keys(nextSpecs).length ? nextSpecs : null,
         inStock: formData.inStock,
+        onDemand: formData.onDemand,
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
@@ -545,7 +548,7 @@ export default function EditProduct() {
               {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
             </div>
 
-            <div className="flex items-center">
+            <div className="flex flex-col gap-3">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -555,6 +558,16 @@ export default function EditProduct() {
                   className="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500"
                 />
                 <span className="text-sm font-medium text-slate-700">Ce produit est en promotion</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="onDemand"
+                  checked={formData.onDemand}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-slate-700">Ce produit est sur demande</span>
               </label>
             </div>
 
