@@ -159,27 +159,33 @@ export default function NewProduct() {
 
       for (const image of images) {
         if (image.file) {
-          // Normaliser le nom du fichier pour supprimer les accents et caractères spéciaux
+          // Upload via API admin
           const sanitizedFileName = image.file.name
             .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
-            .replace(/[^a-zA-Z0-9._-]/g, '_'); // Remplacer les caractères spéciaux par _
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9._-]/g, '_');
           const fileName = `${formData.slug}-${Date.now()}-${sanitizedFileName}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('products')
-            .upload(fileName, image.file);
+          
+          const uploadFormData = new FormData();
+          uploadFormData.append('file', image.file);
+          uploadFormData.append('fileName', fileName);
+          uploadFormData.append('bucket', 'products');
 
-          if (uploadError) {
-            setSubmitError(`Erreur upload image: ${uploadError.message}`);
-            throw uploadError;
+          const uploadResponse = await fetch('/api/admin/storage/upload', {
+            method: 'POST',
+            body: uploadFormData,
+          });
+
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            setSubmitError(`Erreur upload image: ${errorData.error}`);
+            throw new Error(errorData.error);
           }
 
-          const { data: urlData } = supabase.storage
-            .from('products')
-            .getPublicUrl(fileName);
+          const { publicUrl } = await uploadResponse.json();
 
           uploadedImages.push({
-            src: urlData.publicUrl,
+            src: publicUrl,
             alt: formData.name,
             isCard: image.isCardImage,
           });
