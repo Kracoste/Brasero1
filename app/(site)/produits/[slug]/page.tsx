@@ -224,7 +224,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               )}
 
               <div className="space-y-3 sm:space-y-4">
-                <Price amount={product.price} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
+                {!product.onDemand && (
+                  <Price amount={product.price} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
+                )}
                 <AddToCartButton product={product} />
               </div>
             </div>

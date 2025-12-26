@@ -46,12 +46,17 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
   if (product.onDemand) {
     return (
       <div className={`space-y-4 ${className}`}>
-        <div className="rounded-lg bg-amber-50 border border-amber-200 p-6 text-center">
-          <h3 className="text-xl font-semibold text-amber-900 mb-2">Produit sur demande</h3>
-          <p className="text-amber-700">
-            Ce produit n'est pas disponible à l'achat en ligne. 
-            Contactez-nous pour obtenir un devis personnalisé.
+        <div className="rounded-lg bg-amber-50 border-2 border-amber-300 p-6 text-center">
+          <h3 className="text-xl font-bold text-amber-900 mb-3">Produit sur demande</h3>
+          <p className="text-amber-800 mb-4">
+            Ce produit n'est pas disponible à l'achat en ligne.
           </p>
+          <a
+            href="/contact"
+            className="inline-flex items-center justify-center gap-2 rounded-md px-6 py-3 font-semibold shadow-lg transition bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110"
+          >
+            Demander un devis
+          </a>
         </div>
         <AddToFavoritesButton product={product} size="compact" />
       </div>
