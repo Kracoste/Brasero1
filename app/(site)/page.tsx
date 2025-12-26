@@ -1,5 +1,6 @@
 import { HeroMenu } from "@/components/HeroMenu";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductCarousel } from "@/components/ProductCarousel";
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/lib/schema";
 
@@ -107,17 +108,7 @@ export default async function HomePage() {
               Nos produits les plus vendus
             </h2>
           </div>
-          <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-2 lg:grid-cols-4 auto-rows-fr">
-            {braseros.map((product, index) => {
-              return (
-                <ProductCard
-                  key={product.slug}
-                  product={product}
-                  className="home-highlight-card"
-                />
-              );
-            })}
-          </div>
+          <ProductCarousel products={braseros} />
           <div className="flex justify-center">
             <a
               href="/produits"

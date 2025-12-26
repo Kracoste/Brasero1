@@ -110,7 +110,9 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
             </div>
           ) : !product.onDemand ? (
             <Price amount={product.price} className="product-card__price" tone="light" />
-          ) : null}
+          ) : (
+            <div className="product-card__price-placeholder" style={{ height: '2.5rem' }} />
+          )}
           <div className="product-card__actions">
             {product.onDemand ? (
               <>
