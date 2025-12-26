@@ -517,7 +517,7 @@ export default function NewProduct() {
             {formData.isFeatured && (
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Ordre d'affichage
+                  Ordre d'affichage (1 à 4)
                 </label>
                 <input
                   type="number"
@@ -525,11 +525,12 @@ export default function NewProduct() {
                   value={formData.featuredOrder}
                   onChange={handleInputChange}
                   min="1"
+                  max="4"
                   step="1"
                   placeholder="1 = premier, 2 = deuxième, etc."
                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
                 />
-                <p className="text-xs text-slate-500 mt-1">Plus le nombre est petit, plus le produit apparaît en premier</p>
+                <p className="text-xs text-slate-500 mt-1">Choisir entre 1 (premier) et 4 (quatrième)</p>
               </div>
             )}
 
