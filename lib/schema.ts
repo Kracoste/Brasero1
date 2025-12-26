@@ -43,6 +43,7 @@ export const productSchema = z.object({
   shipping: z.string(),
   popularScore: z.number(),
   badge: z.string(),
+  onDemand: z.boolean().optional(),
   specs: specSchema,
   highlights: z.array(z.string()),
   features: z.array(

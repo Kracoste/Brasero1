@@ -31,6 +31,7 @@ type AddToCartButtonProps = {
     name: string;
     price: number;
     images: { src: string }[];
+    onDemand?: boolean;
   };
   className?: string;
 };
@@ -40,6 +41,22 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
+
+  // Si le produit est sur demande, afficher uniquement le message
+  if (product.onDemand) {
+    return (
+      <div className={`space-y-4 ${className}`}>
+        <div className="rounded-lg bg-amber-50 border border-amber-200 p-6 text-center">
+          <h3 className="text-xl font-semibold text-amber-900 mb-2">Produit sur demande</h3>
+          <p className="text-amber-700">
+            Ce produit n'est pas disponible à l'achat en ligne. 
+            Contactez-nous pour obtenir un devis personnalisé.
+          </p>
+        </div>
+        <AddToFavoritesButton product={product} size="compact" />
+      </div>
+    );
+  }
 
   const handleAddToCart = async () => {
     setAdding(true);
