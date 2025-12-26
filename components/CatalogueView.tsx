@@ -46,6 +46,7 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category }
             diameters={availableDiameters}
             showFormatAndDimensions={category !== "accessoire" && category !== "promotions"}
             showAccessoryFilters={category === "accessoire"}
+            currentCategory={category}
           />
         </div>
 

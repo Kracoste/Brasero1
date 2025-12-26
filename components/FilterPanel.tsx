@@ -18,6 +18,7 @@ interface FilterPanelProps {
   diameters?: number[];
   showFormatAndDimensions?: boolean;
   showAccessoryFilters?: boolean;
+  currentCategory?: string;
 }
 
 export const FilterPanel = ({
@@ -33,6 +34,7 @@ export const FilterPanel = ({
   diameters,
   showFormatAndDimensions = true,
   showAccessoryFilters = false,
+  currentCategory,
 }: FilterPanelProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -81,6 +83,7 @@ export const FilterPanel = ({
         diameters={diameters}
         showFormatAndDimensions={showFormatAndDimensions}
         showAccessoryFilters={showAccessoryFilters}
+        currentCategory={currentCategory}
         onMinChange={(next) => {
           setPriceMin(next);
           commitPrice(next, priceMax);
@@ -131,6 +134,7 @@ interface FiltersContentProps {
   promoValue?: boolean;
   onPromoChange?: (val: boolean) => void;
   diameters?: number[];
+  currentCategory?: string;
   onMinChange: (value: number) => void;
   onMaxChange: (value: number) => void;
 }
@@ -156,6 +160,7 @@ const FiltersContent = ({
   promoValue,
   onPromoChange,
   diameters,
+  currentCategory,
   onMinChange,
   onMaxChange,
 }: FiltersContentProps) => {
@@ -170,6 +175,7 @@ const FiltersContent = ({
         <CategorySection
           values={materialValues}
           onChange={(next) => onMaterialChange(next && next.length ? next : undefined)}
+          currentCategory={currentCategory}
         />
       )}
       {showAccessoryFilters && (
@@ -225,11 +231,13 @@ type MaterialOption = "corten" | "acier" | "inox" | "brut" | "fendeur" | "access
 const CategorySection = ({
   values,
   onChange,
+  currentCategory,
 }: {
   values: MaterialOption[];
   onChange: (val?: MaterialOption[]) => void;
+  currentCategory?: string;
 }) => {
-  const categories: { label: string; value: MaterialOption }[] = [
+  const allCategories: { label: string; value: MaterialOption }[] = [
     { label: "Braséro Corten", value: "corten" },
     { label: "Braséro Acier", value: "acier" },
     { label: "Braséro Inox", value: "inox" },
@@ -240,6 +248,11 @@ const CategorySection = ({
     { label: "Grilles", value: "grille" },
     { label: "Housses", value: "housse" },
   ];
+  
+  // Si on est dans l'onglet braséro, filtrer les catégories non-braséro
+  const categories = currentCategory === "brasero"
+    ? allCategories.filter(cat => ["corten", "acier", "inox", "brut"].includes(cat.value))
+    : allCategories;
   const handleToggle = (nextValue: MaterialOption) => {
     const next = values.includes(nextValue)
       ? values.filter((entry) => entry !== nextValue)
