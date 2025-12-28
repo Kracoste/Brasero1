@@ -26,7 +26,7 @@ export const Header = () => {
   const toggle = () => setOpen((prev) => !prev);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-[#f6f1e9] shadow-sm overflow-hidden">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-[#f6f1e9] shadow-sm overflow-visible">
       <div className="w-full px-2 sm:px-4 lg:px-6">
         <div className="flex items-center py-0 gap-1 sm:gap-2 lg:gap-4">
           {/* Logo à gauche */}

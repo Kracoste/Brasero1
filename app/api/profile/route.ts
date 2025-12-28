@@ -2,6 +2,46 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 
+const ALLOWED_PROFILE_FIELDS = [
+  'first_name',
+  'last_name',
+  'phone',
+  'address',
+  'postal_code',
+  'city',
+  'country',
+] as const;
+
+type ProfileUpdates = Partial<Record<(typeof ALLOWED_PROFILE_FIELDS)[number], string | null>>;
+
+const MAX_PROFILE_FIELD_LENGTH = 256;
+
+const sanitizeProfileUpdates = (input: unknown): ProfileUpdates => {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    return {};
+  }
+
+  const payload = input as Record<string, unknown>;
+  const updates: ProfileUpdates = {};
+
+  for (const field of ALLOWED_PROFILE_FIELDS) {
+    const value = payload[field];
+    if (value === undefined) {
+      continue;
+    }
+    if (value === null) {
+      updates[field] = null;
+      continue;
+    }
+    if (typeof value !== 'string') {
+      continue;
+    }
+    updates[field] = value.trim().slice(0, MAX_PROFILE_FIELD_LENGTH);
+  }
+
+  return updates;
+};
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -19,7 +59,7 @@ export async function GET() {
 
     const { data: profile, error } = await adminClient
       .from('profiles')
-      .select('*')
+      .select('id, email, first_name, last_name, phone, address, postal_code, city, country')
       .eq('id', user.id)
       .single();
 
@@ -44,7 +84,10 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Non connecté' }, { status: 401 });
     }
 
-    const updates = await request.json();
+    const updates = sanitizeProfileUpdates(await request.json());
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'Aucune mise a jour valide' }, { status: 400 });
+    }
 
     // Utiliser le client admin pour bypasser RLS
     const adminClient = getSupabaseAdminClient();
@@ -55,7 +98,7 @@ export async function PUT(request: Request) {
     const { data, error } = await adminClient
       .from('profiles')
       .upsert({ id: user.id, ...updates })
-      .select()
+      .select('id, email, first_name, last_name, phone, address, postal_code, city, country')
       .single();
 
     if (error) {

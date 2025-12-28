@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, hasStripeCredentials } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
+import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 
 type CartItem = {
   product_slug: string;
@@ -26,6 +27,14 @@ type CheckoutBody = {
   deliveryMessage?: string;
 };
 
+const parseQuantity = (value: unknown) => {
+  const numeric = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  const intValue = Math.floor(numeric);
+  if (intValue < 1 || intValue > 99) return null;
+  return intValue;
+};
+
 export async function POST(request: NextRequest) {
   try {
     if (!hasStripeCredentials() || !stripe) {
@@ -38,9 +47,23 @@ export async function POST(request: NextRequest) {
     const body: CheckoutBody = await request.json();
     const { items, customerInfo, deliveryMessage } = body;
 
-    if (!items || items.length === 0) {
+    if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: 'Le panier est vide' },
+        { status: 400 }
+      );
+    }
+
+    const normalizedItems = items
+      .map((item) => ({
+        slug: typeof item.product_slug === 'string' ? item.product_slug.trim() : '',
+        quantity: parseQuantity(item.quantity),
+      }))
+      .filter((item) => item.slug && item.quantity);
+
+    if (normalizedItems.length !== items.length) {
+      return NextResponse.json(
+        { error: 'Articles invalides' },
         { status: 400 }
       );
     }
@@ -51,6 +74,32 @@ export async function POST(request: NextRequest) {
 
     // Déterminer l'URL de base
     const origin = request.headers.get('origin') || 'https://atelier-lbf.fr';
+
+    const productSlugs = Array.from(new Set(normalizedItems.map((item) => item.slug)));
+    const productClient = getSupabaseAdminClient() ?? supabase;
+    const { data: products, error: productsError } = await productClient
+      .from('products')
+      .select('slug, name, price, images')
+      .in('slug', productSlugs);
+
+    if (productsError) {
+      return NextResponse.json(
+        { error: 'Erreur chargement produits' },
+        { status: 500 }
+      );
+    }
+
+    const productsBySlug = new Map(
+      (products || []).map((product: any) => [product.slug, product])
+    );
+
+    const missingSlugs = productSlugs.filter((slug) => !productsBySlug.has(slug));
+    if (missingSlugs.length > 0) {
+      return NextResponse.json(
+        { error: 'Produit introuvable', details: missingSlugs },
+        { status: 400 }
+      );
+    }
 
     // Fonction pour convertir les URLs relatives en URLs absolues
     const getAbsoluteImageUrl = (imageUrl: string | null): string[] => {
@@ -63,21 +112,40 @@ export async function POST(request: NextRequest) {
       return [`${origin}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`];
     };
 
-    // Créer les line items pour Stripe
-    const lineItems = items.map((item) => ({
-      price_data: {
-        currency: 'eur',
-        product_data: {
-          name: item.product_name,
-          images: getAbsoluteImageUrl(item.product_image),
-          metadata: {
-            slug: item.product_slug,
+    // Créer les line items pour Stripe avec les prix venant de la base
+    const lineItems = [];
+    for (const item of normalizedItems) {
+      const product = productsBySlug.get(item.slug);
+      const price = Number(product?.price ?? 0);
+
+      if (!Number.isFinite(price) || price <= 0) {
+        return NextResponse.json(
+          { error: `Prix invalide pour ${item.slug}` },
+          { status: 400 }
+        );
+      }
+
+      const images = Array.isArray(product?.images) ? product.images : [];
+      const firstImage =
+        typeof images[0] === 'string'
+          ? images[0]
+          : images[0]?.src ?? null;
+
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: product?.name || 'Produit',
+            images: getAbsoluteImageUrl(firstImage),
+            metadata: {
+              slug: item.slug,
+            },
           },
+          unit_amount: Math.round(price * 100), // Stripe utilise les centimes
         },
-        unit_amount: Math.round(item.product_price * 100), // Stripe utilise les centimes
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity as number,
+      });
+    }
 
     // Créer la session de checkout Stripe
     const session = await stripe.checkout.sessions.create({

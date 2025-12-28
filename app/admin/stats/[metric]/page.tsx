@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { ArrowLeft, Eye, Euro, ShoppingCart, Users, Package } from 'lucide-react';
 
 type Metric = 'visites' | 'ca' | 'ventes' | 'clients' | 'catalogue';
@@ -38,132 +37,67 @@ type Stats = {
 export default function MetricPage() {
   const { metric } = useParams<{ metric: Metric }>();
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
       const startOfWeekDate = new Date(now);
       const day = startOfWeekDate.getDay() || 7;
       startOfWeekDate.setHours(0, 0, 0, 0);
       startOfWeekDate.setDate(startOfWeekDate.getDate() - (day - 1));
-      const startOfWeek = startOfWeekDate.toISOString();
-
-      const countOrders = (from?: string) => {
-        let query = supabase.from('orders').select('id', { count: 'exact', head: true });
-        if (from) query = query.gte('created_at', from);
-        return query;
-      };
-
-      const sumOrders = (from?: string) => {
-        let query = supabase.from('orders').select('total_sum:sum(total)');
-        if (from) query = query.gte('created_at', from);
-        return query.single();
-      };
-
-      const countDistinctVisitors = async () => {
-        try {
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-          if (!supabaseUrl || !supabaseAnonKey) return 0;
-
-          const url = new URL(`${supabaseUrl}/rest/v1/visits`);
-          url.searchParams.set('select', 'visitor_id');
-          url.searchParams.set('distinct', 'visitor_id');
-
-          const response = await fetch(url.toString(), {
-            method: 'HEAD',
-            headers: {
-              apikey: supabaseAnonKey,
-              Authorization: `Bearer ${supabaseAnonKey}`,
-              Prefer: 'count=exact',
-            },
-          });
-
-          const contentRange = response.headers.get('content-range');
-          const total = contentRange?.split('/')?.[1];
-          return total ? Number(total) : 0;
-        } catch (error) {
-          console.error('Error counting unique visitors:', error);
-          return 0;
-        }
-      };
 
       try {
-        const countCustomers = async () => {
-        try {
-          const response = await fetch('/api/admin/clients');
-          const data = await response.json();
-          return { count: data.clients?.length || 0 };
-        } catch {
-          return { count: 0 };
+        const response = await fetch('/api/admin/stats', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des stats');
         }
-      };
+        const data = await response.json();
 
-      const [
-          visitsResult,
-          visitsTodayResult,
-          visitsWeekResult,
-          visitsMonthResult,
-          visitsYearResult,
-          uniqueVisitors,
-          totalOrdersCount,
-          ordersTodayCount,
-          ordersWeekCount,
-          ordersMonthCount,
-          ordersYearCount,
-          totalRevenueResult,
-          revenueTodayResult,
-          revenueWeekResult,
-          revenueMonthResult,
-          revenueYearResult,
-          productsResult,
-          customersResult,
-        ] = await Promise.all([
-          supabase.from('visits').select('*', { count: 'exact', head: true }),
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay),
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfWeek),
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth),
-          supabase.from('visits').select('*', { count: 'exact', head: true }).gte('created_at', startOfYear),
-          countDistinctVisitors(),
-          countOrders(),
-          countOrders(startOfDay),
-          countOrders(startOfWeek),
-          countOrders(startOfMonth),
-          countOrders(startOfYear),
-          sumOrders(),
-          sumOrders(startOfDay),
-          sumOrders(startOfWeek),
-          sumOrders(startOfMonth),
-          sumOrders(startOfYear),
-          supabase.from('products').select('*', { count: 'exact', head: true }),
-          countCustomers(),
-        ]);
+        const dateKey = (value: Date) => value.toISOString().split('T')[0];
+        const startOfDayKey = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+        const startOfWeekKey = dateKey(startOfWeekDate);
+        const startOfMonthKey = dateKey(new Date(now.getFullYear(), now.getMonth(), 1));
+        const startOfYearKey = dateKey(new Date(now.getFullYear(), 0, 1));
+
+        const dailyData = Array.isArray(data.dailyData) ? data.dailyData : [];
+        const sumFrom = (startKey: string) => {
+          return dailyData.reduce(
+            (acc: { sales: number; revenue: number }, entry: any) => {
+              if (!entry?.date || entry.date < startKey) return acc;
+              acc.sales += Number(entry.sales || 0);
+              acc.revenue += Number(entry.revenue || 0);
+              return acc;
+            },
+            { sales: 0, revenue: 0 }
+          );
+        };
+
+        const salesTodayData = sumFrom(startOfDayKey);
+        const salesWeekData = sumFrom(startOfWeekKey);
+        const salesMonthData = sumFrom(startOfMonthKey);
+        const salesYearData = sumFrom(startOfYearKey);
 
         setStats({
-          totalVisits: visitsResult.count || 0,
-          uniqueVisitors: typeof uniqueVisitors === 'number' ? uniqueVisitors : 0,
-          visitsToday: visitsTodayResult.count || 0,
-          visitsThisWeek: visitsWeekResult.count || 0,
-          visitsThisMonth: visitsMonthResult.count || 0,
-          visitsThisYear: visitsYearResult.count || 0,
-          totalSales: totalOrdersCount.count || 0,
-          salesToday: ordersTodayCount.count || 0,
-          salesThisWeek: ordersWeekCount.count || 0,
-          salesThisMonth: ordersMonthCount.count || 0,
-          salesThisYear: ordersYearCount.count || 0,
-          totalRevenue: Number(totalRevenueResult.data?.total_sum) || 0,
-          revenueToday: Number(revenueTodayResult.data?.total_sum) || 0,
-          revenueThisWeek: Number(revenueWeekResult.data?.total_sum) || 0,
-          revenueThisMonth: Number(revenueMonthResult.data?.total_sum) || 0,
-          revenueThisYear: Number(revenueYearResult.data?.total_sum) || 0,
-          totalProducts: productsResult.count || 0,
-          totalCustomers: customersResult.count || 0,
+          totalVisits: Number(data.totalVisits || 0),
+          uniqueVisitors: Number(data.uniqueVisitors || 0),
+          visitsToday: Number(data.visitsToday || 0),
+          visitsThisWeek: Number(data.visitsThisWeek || 0),
+          visitsThisMonth: Number(data.visitsThisMonth || 0),
+          visitsThisYear: Number(data.visitsThisYear || 0),
+          totalSales: Number(data.totalSales || 0),
+          salesToday: salesTodayData.sales,
+          salesThisWeek: salesWeekData.sales,
+          salesThisMonth: salesMonthData.sales,
+          salesThisYear: salesYearData.sales,
+          totalRevenue: Number(data.totalRevenue || 0),
+          revenueToday: salesTodayData.revenue,
+          revenueThisWeek: salesWeekData.revenue,
+          revenueThisMonth: salesMonthData.revenue,
+          revenueThisYear: salesYearData.revenue,
+          totalProducts: Number(data.totalProducts || 0),
+          totalCustomers: Number(data.totalCustomers || 0),
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
