@@ -38,9 +38,9 @@ export const Footer = () => {
   const settings = useSiteSettings();
 
   return (
-    <footer className="border-t border-gray-200 bg-white text-gray-800">
+    <footer className="border-t border-gray-200 bg-[#f6f1e9] text-gray-800">
       <Container className="py-8 sm:py-12">
-        <div className="grid gap-8 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="font-semibold text-lg text-gray-900">Service à la clientèle</p>
             <ul className="mt-3 space-y-2 text-sm text-gray-700">

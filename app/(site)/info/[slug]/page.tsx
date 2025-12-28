@@ -643,7 +643,7 @@ export default async function InfoPage({ params }: { params: Promise<{ slug: str
   }
 
   return (
-    <main className="bg-white text-gray-900">
+    <main className="bg-[var(--background)] text-gray-900">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold tracking-tight mb-8">{page.title}</h1>
         <div className="prose prose-gray max-w-none">

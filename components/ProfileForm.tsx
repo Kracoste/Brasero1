@@ -64,7 +64,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
       {/* Message de succès/erreur */}
       {message && (
         <div
-          className={`rounded-lg p-4 ${
+          className={`rounded-none p-4 ${
             message.type === 'success'
               ? 'bg-emerald-50 text-emerald-800'
               : 'bg-red-50 text-red-800'
@@ -77,7 +77,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
       {/* Formulaire */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Informations de connexion */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-900">Informations de connexion</h2>
           <div className="space-y-4">
             <div>
@@ -86,7 +86,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                 type="email"
                 value={user.email || ''}
                 disabled
-                className="mt-1 block w-full rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-slate-500"
+                className="mt-1 block w-full rounded-none border border-slate-300 bg-slate-100 px-3 py-2 text-slate-500"
               />
               <p className="mt-1 text-xs text-slate-500">L'email ne peut pas être modifié</p>
             </div>
@@ -94,7 +94,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
         </div>
 
         {/* Informations personnelles */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-900">Informations personnelles</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -106,7 +106,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                 id="first_name"
                 name="first_name"
                 defaultValue={initialProfile?.first_name || ''}
-                className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
               />
             </div>
             <div>
@@ -118,7 +118,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                 id="last_name"
                 name="last_name"
                 defaultValue={initialProfile?.last_name || ''}
-                className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
               />
             </div>
             <div className="sm:col-span-2">
@@ -130,7 +130,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                 id="phone"
                 name="phone"
                 defaultValue={initialProfile?.phone || ''}
-                className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
                 placeholder="06 12 34 56 78"
               />
             </div>
@@ -138,7 +138,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
         </div>
 
         {/* Adresse de livraison */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-900">Adresse de livraison</h2>
           <div className="space-y-4">
             <div>
@@ -150,7 +150,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                 id="address"
                 name="address"
                 defaultValue={initialProfile?.address || ''}
-                className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
                 placeholder="12 rue de la République"
               />
             </div>
@@ -164,7 +164,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                   id="postal_code"
                   name="postal_code"
                   defaultValue={initialProfile?.postal_code || ''}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                  className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
                   placeholder="75001"
                 />
               </div>
@@ -177,7 +177,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                   id="city"
                   name="city"
                   defaultValue={initialProfile?.city || ''}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                  className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
                   placeholder="Paris"
                 />
               </div>
@@ -191,7 +191,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                 id="country"
                 name="country"
                 defaultValue={initialProfile?.country || 'France'}
-                className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
+                className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
               />
             </div>
           </div>

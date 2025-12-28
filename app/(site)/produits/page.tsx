@@ -122,7 +122,7 @@ export default async function ProductsPage({ searchParams }: Props) {
   const containerClass = 'space-y-6 sm:space-y-10 w-full max-w-[1600px] px-3 sm:px-4 lg:px-0';
 
   return (
-    <Section className="pb-24 bg-white">
+    <Section className="pb-24 bg-[var(--background)]">
       <Container className={containerClass}>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2d2d2d] mb-4 sm:mb-8">{title.toUpperCase()}</h1>
         <div>

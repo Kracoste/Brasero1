@@ -90,7 +90,7 @@ export default function InscriptionPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12 sm:px-6 lg:px-8">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 text-center">
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8">
             <h2 className="font-display text-2xl font-semibold text-emerald-900">
@@ -115,7 +115,7 @@ export default function InscriptionPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-lg space-y-8">
         <div>
           <h2 className="mt-6 text-center font-display text-3xl font-semibold text-slate-900">

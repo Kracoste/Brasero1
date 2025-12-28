@@ -115,7 +115,7 @@ function SuccessPageContent() {
 
 export default function SuccessPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)]" />}>
       <SuccessPageContent />
     </Suspense>
   );

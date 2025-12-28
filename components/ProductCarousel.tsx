@@ -52,8 +52,8 @@ export function ProductCarousel({ products, className = '' }: ProductCarouselPro
 
   return (
     <div className={`relative ${className}`}>
-      {/* Carousel container - visible only on mobile */}
-      <div className="lg:hidden">
+      {/* Carousel container - visible only on mobile/small tablet */}
+      <div className="md:hidden">
         <div
           ref={scrollRef}
           onScroll={checkScroll}
@@ -107,7 +107,18 @@ export function ProductCarousel({ products, className = '' }: ProductCarouselPro
         </div>
       </div>
 
-      {/* Grid layout - visible only on desktop */}
+      {/* Grid layout 2 cols - visible on tablet */}
+      <div className="hidden md:grid lg:hidden gap-6 grid-cols-2">
+        {products.map((product) => (
+          <ProductCard
+            key={product.slug}
+            product={product}
+            className="home-highlight-card"
+          />
+        ))}
+      </div>
+
+      {/* Grid layout 4 cols - visible only on desktop */}
       <div className="hidden lg:grid gap-6 grid-cols-4">
         {products.map((product) => (
           <ProductCard

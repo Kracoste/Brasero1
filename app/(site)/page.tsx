@@ -65,11 +65,12 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="bg-[#f6f1e9] py-6 sm:py-10">
+      <section className="py-6 sm:py-10 overflow-hidden">
         <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-16">
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
+          {/* Mobile & Tablet: Stack vertical | Desktop: 3 colonnes */}
+          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Colonne gauche - Catégories */}
-            <div className="grid gap-4 grid-cols-1">
+            <div className="flex flex-col gap-4">
               <CategoryTile
                 title="Nos braséros"
                 cta="Découvrir nos braséro"
@@ -101,7 +102,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="pb-8 sm:pb-12 pt-6 sm:pt-8 bg-white">
+      <section className="pb-8 sm:pb-12 pt-6 sm:pt-8">
         <div className="w-full space-y-4 sm:space-y-6 px-4 sm:px-6 lg:px-8 xl:px-16 max-w-[1600px] mx-auto">
           <div className="flex flex-col gap-2 text-center">
             <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-semibold text-[#2d2d2d]">

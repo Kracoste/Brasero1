@@ -99,7 +99,7 @@ function ConnexionPageContent() {
 
   if (isRedirecting) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4 py-12">
         <div className="text-center">
           <div className="h-8 w-8 mx-auto animate-spin rounded-full border-4 border-slate-300 border-t-slate-900"></div>
           <p className="mt-4 text-slate-600">Redirection en cours...</p>
@@ -109,7 +109,7 @@ function ConnexionPageContent() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center font-display text-3xl font-semibold text-slate-900">
@@ -190,7 +190,7 @@ function ConnexionPageContent() {
 
 export default function ConnexionPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)]" />}>
       <ConnexionPageContent />
     </Suspense>
   );

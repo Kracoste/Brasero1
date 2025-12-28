@@ -26,9 +26,9 @@ export const Header = () => {
   const toggle = () => setOpen((prev) => !prev);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white shadow-sm">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-[#f6f1e9] shadow-sm overflow-hidden">
       <div className="w-full px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center py-0 gap-2 sm:gap-4">
+        <div className="flex items-center py-0 gap-1 sm:gap-2 lg:gap-4">
           {/* Logo à gauche */}
           <Link href="/" className="flex-shrink-0">
           <Image
@@ -36,7 +36,7 @@ export const Header = () => {
             alt="Atelier LBF Logo"
             width={1400}
             height={500}
-            className="w-auto max-h-14 sm:max-h-20 lg:max-h-24"
+            className="w-auto max-h-12 sm:max-h-14 md:max-h-16 lg:max-h-20 xl:max-h-24"
             style={{ objectFit: "contain" }}
             priority
           />
@@ -44,7 +44,7 @@ export const Header = () => {
           
           {/* Navigation centrée */}
           <div className="flex-1 flex justify-center">
-            <div className="hidden items-center gap-2 lg:gap-4 xl:gap-6 lg:flex">
+            <div className="hidden items-center gap-2 md:gap-3 lg:gap-4 xl:gap-6 md:flex">
               {navLinks.map((link) => {
                 if (link.label === "Accessoires") {
                   const isActive =
@@ -54,7 +54,7 @@ export const Header = () => {
                   return (
                     <div
                       key={link.href}
-                      className="relative mx-2 lg:mx-4 flex items-center"
+                      className="relative mx-1 md:mx-2 lg:mx-4 flex items-center"
                       onMouseEnter={() => {
                         if (accessoriesTimer.current) clearTimeout(accessoriesTimer.current);
                         setAccessoriesOpen(true);
@@ -67,7 +67,7 @@ export const Header = () => {
                       <Link
                         href={link.href}
                         className={cn(
-                          "nav-link-hover text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 inline-flex items-center",
+                          "nav-link-hover text-[0.65rem] md:text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 inline-flex items-center",
                           isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                         )}
                       >
@@ -108,7 +108,7 @@ export const Header = () => {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "nav-link-hover text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 mx-2 lg:mx-3 xl:mx-6",
+                      "nav-link-hover text-[0.65rem] md:text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 mx-1 md:mx-2 lg:mx-3 xl:mx-6",
                       isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                     )}
                   >
@@ -118,7 +118,7 @@ export const Header = () => {
               })}
               <Link
                 href="/recettes"
-                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-3 lg:px-4 py-1.5 lg:py-2 text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.15em] xl:tracking-[0.25em] text-white transition hover:brightness-110 mx-2 lg:mx-3 xl:mx-6"
+                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-2 md:px-3 lg:px-4 py-1 md:py-1.5 lg:py-2 text-[0.65rem] md:text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] text-white transition hover:brightness-110 mx-1 md:mx-2 lg:mx-3 xl:mx-6"
               >
                 Recettes
               </Link>
@@ -255,6 +255,25 @@ export const Header = () => {
                 {link.label}
               </Link>
             ))}
+            {/* Liens Favoris et Panier pour mobile */}
+            <div className="flex gap-3">
+              <Link
+                href="/favoris"
+                onClick={() => setOpen(false)}
+                className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-900"
+              >
+                <Heart size={16} />
+                Favoris {favoriteCount > 0 && `(${favoriteCount})`}
+              </Link>
+              <Link
+                href="/panier"
+                onClick={() => setOpen(false)}
+                className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-900"
+              >
+                <ShoppingBag size={16} />
+                Panier {itemCount > 0 && `(${itemCount})`}
+              </Link>
+            </div>
             {user && isAdmin && (
               <Link
                 href="/admin"
@@ -264,20 +283,40 @@ export const Header = () => {
                 Dashboard Admin
               </Link>
             )}
-            <Link
-              href="/connexion"
-              onClick={() => setOpen(false)}
-              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-sm font-semibold text-slate-900"
-            >
-              Connexion
-            </Link>
-            <Link
-              href="/inscription"
-              onClick={() => setOpen(false)}
-              className="rounded-lg bg-[#ff5751] px-3 py-2 text-center text-sm font-semibold text-white"
-            >
-              Inscription
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/mon-compte"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-sm font-semibold text-slate-900"
+                >
+                  Mon profil
+                </Link>
+                <a
+                  href="/api/auth/logout-redirect"
+                  className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-sm font-semibold text-red-600"
+                >
+                  Déconnexion
+                </a>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/connexion"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-sm font-semibold text-slate-900"
+                >
+                  Connexion
+                </Link>
+                <Link
+                  href="/inscription"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg bg-[#ff5751] px-3 py-2 text-center text-sm font-semibold text-white"
+                >
+                  Inscription
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
