@@ -75,13 +75,13 @@ export const Header = () => {
                       </Link>
                       <div
                         className={cn(
-                          "absolute left-0 top-full z-20 mt-2 w-56 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity",
+                          "absolute left-0 top-full z-20 mt-2 w-56 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity overflow-hidden",
                           accessoriesOpen ? "flex opacity-100" : "hidden opacity-0",
                         )}
                       >
                         <Link
-                          href="/produits?category=accessoire&section=range-buches"
-                          className="px-4 pt-4 text-[0.9rem] font-semibold text-[#8b2d2d] hover:bg-slate-50"
+                          href="/produits?category=range-buches"
+                          className="px-4 py-3 text-[0.9rem] font-semibold text-[#8b2d2d] hover:bg-slate-50 rounded-t-xl"
                         >
                           Range-bûches
                         </Link>
@@ -93,7 +93,7 @@ export const Header = () => {
                         </Link>
                         <Link
                           href="/produits?category=accessoire"
-                          className="px-4 pb-4 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50"
+                          className="px-4 py-3 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50 rounded-b-xl"
                         >
                           Tous nos accessoires
                         </Link>

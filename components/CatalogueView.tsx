@@ -13,10 +13,17 @@ type CatalogueViewProps = {
   products: Product[];
   showCategoryFilters?: boolean;
   category?: string;
+  initialSection?: string;
 };
 
-export const CatalogueView = ({ products, showCategoryFilters = true, category }: CatalogueViewProps) => {
-  const [filters, setFilters] = useState<FilterState>({ sort: "popular" });
+export const CatalogueView = ({ products, showCategoryFilters = true, category, initialSection }: CatalogueViewProps) => {
+  // Initialiser le filtre avec la section si fournie (ex: range-buches)
+  const initialFilters: FilterState = { sort: "popular" };
+  if (initialSection) {
+    initialFilters.accessoryType = [initialSection as "spatule" | "couvercle" | "grille" | "allume-feu" | "housse" | "fendeur" | "range-buches"];
+  }
+  
+  const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   

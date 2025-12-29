@@ -497,6 +497,7 @@ export default function EditProduct() {
               >
                 <option value="brasero">Braséro</option>
                 <option value="accessoire">Accessoire</option>
+                <option value="range-buches">Range bûches</option>
                 <option value="fendeur">Fendeur à bûches</option>
               </select>
             </div>
@@ -511,7 +512,7 @@ export default function EditProduct() {
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
               >
-                {formData.category === 'accessoire' ? (
+                {(formData.category === 'accessoire' || formData.category === 'range-buches') ? (
                   <>
                     <option value="acier">Acier</option>
                     <option value="inox">Acier inoxydable</option>
@@ -707,7 +708,7 @@ export default function EditProduct() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Champs spécifiques aux braséros */}
-            {formData.category !== 'accessoire' && (
+            {formData.category !== 'accessoire' && formData.category !== 'range-buches' && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -795,7 +796,7 @@ export default function EditProduct() {
             </div>
 
             {/* Champs spécifiques aux braséros */}
-            {formData.category !== 'accessoire' && (
+            {formData.category !== 'accessoire' && formData.category !== 'range-buches' && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -1005,7 +1006,7 @@ export default function EditProduct() {
         )}
 
         {/* Informations spécifiques aux accessoires */}
-        {formData.category === 'accessoire' && (
+        {(formData.category === 'accessoire' || formData.category === 'range-buches') && (
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Produits compatibles</h2>
             <p className="text-sm text-slate-600 mb-4">

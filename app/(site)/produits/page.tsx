@@ -29,6 +29,7 @@ export const dynamic = 'force-dynamic';
 
 type SearchParams = {
   category?: string;
+  section?: string;
 };
 
 type Props = {
@@ -38,6 +39,7 @@ type Props = {
 export default async function ProductsPage({ searchParams }: Props) {
   const params = await searchParams;
   const category = params.category;
+  const section = params.section;
   
   // Récupérer les produits depuis Supabase uniquement
   const supabase = await createClient();
@@ -105,6 +107,10 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Fendeur à bûches"
     : category === "promotions"
     ? "Nos Promotions"
+    : category === "range-buches"
+    ? "Ranges Bûches"
+    : category === "accessoire" && section === "range-buches"
+    ? "Ranges Bûches"
     : category === "accessoire"
     ? "Nos Accessoires"
     : "Nos créations";
@@ -113,6 +119,10 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Diamètres de 55 à 100 cm, aciers corten ou thermolaqués prêts à rejoindre votre terrasse."
     : category === "fendeur"
     ? "Préparez vos bûches en toute sécurité avec notre fendeur manuel fabriqué en France."
+    : category === "range-buches"
+    ? "Découvrez nos ranges bûches design et pratiques pour organiser votre bois."
+    : category === "accessoire" && section === "range-buches"
+    ? "Découvrez nos ranges bûches design et pratiques pour organiser votre bois."
     : category === "accessoire"
     ? "Accessoires compatibles et indispensables pour compléter votre braséro."
     : category === "promotions"
@@ -130,6 +140,7 @@ export default async function ProductsPage({ searchParams }: Props) {
             products={filteredProducts}
             showCategoryFilters={category !== "accessoire" && category !== "promotions"}
             category={category}
+            initialSection={section}
           />
         </div>
       </Container>

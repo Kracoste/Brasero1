@@ -32,7 +32,7 @@ const specSchema = z.object({
 export const productSchema = z.object({
   slug: z.string(),
   name: z.string(),
-  category: z.enum(["brasero", "fendeur", "accessoire"]),
+  category: z.enum(["brasero", "fendeur", "accessoire", "range-buches"]),
   price: z.number(),
   comparePrice: z.number().optional(),
   discountPercent: z.number().optional(),
