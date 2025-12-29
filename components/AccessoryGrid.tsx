@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Truck } from "lucide-react";
 
 import type { Product } from "@/lib/schema";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDimensions } from "@/lib/utils";
 
 const SELECTED_ACCESSORIES_KEY = "brasero:selected-accessories";
 
@@ -177,7 +177,7 @@ export const AccessoryGrid = ({
                     ))}
                   </div>
 
-                  <p>{product.specs?.dimensions || (product.diameter ? `Ø ${product.diameter} cm` : '')}</p>
+                  <p>{formatDimensions(product as any)}</p>
                   <p className="line-clamp-1 text-gray-500">{product.shortDescription}</p>
 
                   <div className="flex items-center gap-2 text-green-600">

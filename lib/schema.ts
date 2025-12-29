@@ -21,6 +21,12 @@ const specSchema = z.object({
   dimensions: z.string(),
   poids: z.string(),
   compatibilite: z.string().optional(),
+  numberOfGuests: z.string().optional(),
+  fuel: z.string().optional(),
+  fuelType: z.array(z.string()).optional(),
+  painting: z.string().optional(),
+  format: z.string().optional(),
+  compatibleAccessories: z.array(z.string()).optional(),
 });
 
 export const productSchema = z.object({
@@ -35,6 +41,8 @@ export const productSchema = z.object({
   madeIn: z.literal("France"),
   material: z.string(),
   diameter: z.number(),
+  length: z.number().optional(),
+  width: z.number().optional(),
   thickness: z.number(),
   height: z.number(),
   weight: z.number(),

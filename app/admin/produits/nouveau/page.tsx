@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ArrowLeft, Upload, X, Star, Image as ImageIcon, Trash2 } from 'lucide-react';
@@ -14,24 +14,11 @@ type ProductImage = {
   isCardImage: boolean;
 };
 
-const DIAMETER_OPTIONS = [45, 50, 55, 60, 65, 70, 75, 80, 90, 100];
+const DIAMETER_OPTIONS = [50, 80, 100];
 const FORMAT_OPTIONS = [
   { label: 'Rond', value: 'rond' },
   { label: 'Hexagonal', value: 'hexagonal' },
   { label: 'Carré', value: 'carre' },
-];
-const ACCESSORY_SUBCATEGORY_OPTIONS = [
-  { label: 'Spatule', value: 'spatule' },
-  { label: 'Couvercle', value: 'couvercle' },
-  { label: 'Grille', value: 'grille' },
-  { label: 'Allume Feu', value: 'allume-feu' },
-  { label: 'Housse de Protection', value: 'housse' },
-  { label: 'Fendeur à Bûches', value: 'fendeur-buches' },
-  { label: 'Ranges-Bûches', value: 'range-buches' },
-];
-const STEEL_TYPE_OPTIONS = [
-  { label: 'Inoxydable', value: 'inoxydable' },
-  { label: 'Brut', value: 'brut' },
 ];
 
 export default function NewProduct() {
@@ -40,6 +27,7 @@ export default function NewProduct() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
+  const [availableProducts, setAvailableProducts] = useState<{id: string, name: string, slug: string, images: any[], category: string}[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -65,12 +53,13 @@ export default function NewProduct() {
     format: '',
     numberOfGuests: '',
     fuelType: [] as string[],
-    accessorySubcategory: '',
-    steelType: '',
+    painting: '',
+    compatibleAccessories: [] as string[],
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [accessoryDropdownOpen, setAccessoryDropdownOpen] = useState(false);
 
   const generateSlug = (name: string) => {
     return name
@@ -110,6 +99,28 @@ export default function NewProduct() {
         : [...prev.fuelType, fuel],
     }));
   };
+
+  const handleAccessoryChange = (accessorySlug: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      compatibleAccessories: prev.compatibleAccessories.includes(accessorySlug)
+        ? prev.compatibleAccessories.filter((a) => a !== accessorySlug)
+        : [...prev.compatibleAccessories, accessorySlug],
+    }));
+  };
+
+  // Charger tous les produits disponibles (braséros et accessoires)
+  useEffect(() => {
+    const loadProducts = async () => {
+      const { data } = await supabase
+        .from('products')
+        .select('id, name, slug, images, category')
+        .in('category', ['brasero', 'accessoire'])
+        .order('name');
+      if (data) setAvailableProducts(data);
+    };
+    loadProducts();
+  }, [supabase]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -225,8 +236,8 @@ export default function NewProduct() {
       if (formData.format) specsPayload.format = formData.format;
       if (formData.numberOfGuests) specsPayload.numberOfGuests = formData.numberOfGuests;
       if (formData.fuelType.length > 0) specsPayload.fuelType = formData.fuelType;
-      if (formData.accessorySubcategory) specsPayload.accessorySubcategory = formData.accessorySubcategory;
-      if (formData.steelType) specsPayload.steelType = formData.steelType;
+      if (formData.painting) specsPayload.painting = formData.painting;
+      if (formData.compatibleAccessories.length > 0) specsPayload.compatibleAccessories = formData.compatibleAccessories;
 
       const productData = {
         name: formData.name,
@@ -384,65 +395,31 @@ export default function NewProduct() {
               </select>
             </div>
 
-            {formData.category === 'accessoire' && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Sous-catégorie d'accessoire *
-                  </label>
-                  <select
-                    name="accessorySubcategory"
-                    value={formData.accessorySubcategory}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  >
-                    <option value="">Sélectionnez une sous-catégorie</option>
-                    {ACCESSORY_SUBCATEGORY_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Type d'acier *
-                  </label>
-                  <select
-                    name="steelType"
-                    value={formData.steelType}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  >
-                    <option value="">Sélectionnez un type d'acier</option>
-                    {STEEL_TYPE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </>
-            )}
-
-            {formData.category !== 'accessoire' && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Matière *
-                </label>
-                <select
-                  name="material"
-                  value={formData.material}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                >
-                  <option value="corten">Braséro Corten</option>
-                  <option value="acier">Braséro Acier</option>
-                  <option value="inox">Braséro Inox</option>
-                </select>
-              </div>
-            )}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Matière *
+              </label>
+              <select
+                name="material"
+                value={formData.material}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+              >
+                {formData.category === 'accessoire' ? (
+                  <>
+                    <option value="acier">Acier</option>
+                    <option value="inox">Acier inoxydable</option>
+                    <option value="bois">Bois</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="corten">Braséro Corten</option>
+                    <option value="acier">Braséro Acier</option>
+                    <option value="inox">Braséro Inox</option>
+                  </>
+                )}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -642,85 +619,51 @@ export default function NewProduct() {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Dimensions et caractéristiques</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Champ Nombre de convives pour brasero */}
-            {formData.category === 'brasero' && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Nombre de convives
-                </label>
-                <input
-                  type="text"
-                  name="numberOfGuests"
-                  value={formData.numberOfGuests}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="6 à 8 personnes"
-                />
-              </div>
-            )}
-
-            {/* Champ Type de combustibles pour brasero */}
-            {formData.category === 'brasero' && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Type de combustibles
-                </label>
-                <div className="space-y-2">
-                  {['Bois', 'Charbon', 'Pellets'].map((fuel) => (
-                    <label key={fuel} className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.fuelType.includes(fuel)}
-                        onChange={() => handleFuelTypeChange(fuel)}
-                        className="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500"
-                      />
-                      <span className="text-sm text-slate-700">{fuel}</span>
-                    </label>
-                  ))}
+            {/* Champs spécifiques aux braséros */}
+            {formData.category !== 'accessoire' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Diamètre (cm) {formData.category === 'brasero' && <span className="text-red-500">*</span>}
+                  </label>
+                  <select
+                    name="diameter"
+                    value={formData.diameter}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
+                      errors.diameter ? 'border-red-500' : 'border-slate-200'
+                    }`}
+                  >
+                    <option value="">Sélectionnez un diamètre</option>
+                    {DIAMETER_OPTIONS.map((size) => (
+                      <option key={size} value={size}>
+                        Ø {size} cm
+                      </option>
+                    ))}
+                  </select>
+                  {errors.diameter && <p className="text-red-500 text-sm mt-1">{errors.diameter}</p>}
                 </div>
-              </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Forme du braséro
+                  </label>
+                  <select
+                    name="format"
+                    value={formData.format}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  >
+                    <option value="">Sélectionnez une forme</option>
+                    {FORMAT_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
             )}
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Diamètre (cm) {formData.category === 'brasero' && <span className="text-red-500">*</span>}
-              </label>
-              <select
-                name="diameter"
-                value={formData.diameter}
-                onChange={handleInputChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
-                  errors.diameter ? 'border-red-500' : 'border-slate-200'
-                }`}
-              >
-                <option value="">Sélectionnez un diamètre</option>
-                {DIAMETER_OPTIONS.map((size) => (
-                  <option key={size} value={size}>
-                    Ø {size} cm
-                  </option>
-                ))}
-              </select>
-              {errors.diameter && <p className="text-red-500 text-sm mt-1">{errors.diameter}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Forme du braséro
-              </label>
-              <select
-                name="format"
-                value={formData.format}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-              >
-                <option value="">Sélectionnez une forme</option>
-                {FORMAT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -767,51 +710,70 @@ export default function NewProduct() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Épaisseur du bol (mm)
-              </label>
-              <input
-                type="number"
-                name="bowlThickness"
-                value={formData.bowlThickness}
-                onChange={handleInputChange}
-                min="0"
-                step="0.1"
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                placeholder="3"
-              />
-            </div>
+            {/* Champs spécifiques aux braséros */}
+            {formData.category !== 'accessoire' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Épaisseur du bol (mm)
+                  </label>
+                  <input
+                    type="number"
+                    name="bowlThickness"
+                    value={formData.bowlThickness}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="0.1"
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="3"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Épaisseur du socle (mm)
-              </label>
-              <input
-                type="number"
-                name="baseThickness"
-                value={formData.baseThickness}
-                onChange={handleInputChange}
-                min="0"
-                step="0.1"
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                placeholder="5"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Épaisseur du socle (mm)
+                  </label>
+                  <input
+                    type="number"
+                    name="baseThickness"
+                    value={formData.baseThickness}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="0.1"
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="5"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Poids
-              </label>
-              <input
-                type="text"
-                name="weight"
-                value={formData.weight}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                placeholder="25 kg"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Poids
+                  </label>
+                  <input
+                    type="text"
+                    name="weight"
+                    value={formData.weight}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="25 kg"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Peinture
+                  </label>
+                  <input
+                    type="text"
+                    name="painting"
+                    value={formData.painting}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="Noir mat, Thermolaqué, etc."
+                  />
+                </div>
+              </>
+            )}
 
             <div className="flex items-center">
               <label className="flex items-center gap-3 cursor-pointer">
@@ -827,6 +789,262 @@ export default function NewProduct() {
             </div>
           </div>
         </div>
+
+        {/* Informations spécifiques aux braséros */}
+        {formData.category === 'brasero' && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Informations spécifiques au braséro</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Nombre de convives
+                </label>
+                <input
+                  type="text"
+                  name="numberOfGuests"
+                  value={formData.numberOfGuests}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  placeholder="6 à 8 personnes"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">
+                  Type de combustibles
+                </label>
+                <div className="space-y-2">
+                  {['Bois', 'Charbon', 'Pellets'].map((fuel) => (
+                    <label key={fuel} className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.fuelType.includes(fuel)}
+                        onChange={() => handleFuelTypeChange(fuel)}
+                        className="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500"
+                      />
+                      <span className="text-sm text-slate-700">{fuel}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Produits compatibles */}
+            <div className="mt-6">
+              <label className="block text-sm font-medium text-slate-700 mb-3">
+                Accessoires compatibles
+              </label>
+              
+              {/* Afficher les produits sélectionnés */}
+              {formData.compatibleAccessories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {formData.compatibleAccessories.map((slug) => {
+                    const product = availableProducts.find(a => a.slug === slug);
+                    if (!product) return null;
+                    const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                    return (
+                      <div key={slug} className="flex items-center gap-2 bg-green-50 border border-green-300 rounded-lg px-3 py-2">
+                        <img src={imageUrl} alt={product.name} className="w-8 h-8 object-contain rounded" />
+                        <span className="text-sm font-medium text-green-800">{product.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleAccessoryChange(slug)}
+                          className="text-green-600 hover:text-red-600 ml-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Menu déroulant */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setAccessoryDropdownOpen(!accessoryDropdownOpen)}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-white text-left flex items-center justify-between hover:border-slate-300 transition"
+                >
+                  <span className="text-slate-600">
+                    {formData.compatibleAccessories.length === 0 
+                      ? 'Sélectionner des accessoires...' 
+                      : `${formData.compatibleAccessories.length} produit(s) sélectionné(s)`}
+                  </span>
+                  <svg className={`w-5 h-5 text-slate-400 transition-transform ${accessoryDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {accessoryDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+                    {availableProducts.filter(p => p.category === 'accessoire').length === 0 ? (
+                      <p className="p-4 text-sm text-slate-500">Aucun accessoire disponible</p>
+                    ) : (
+                      availableProducts
+                        .filter(p => p.category === 'accessoire')
+                        .map((product) => {
+                          const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                          const isSelected = formData.compatibleAccessories.includes(product.slug);
+                          return (
+                            <button
+                              key={product.slug}
+                              type="button"
+                              onClick={() => handleAccessoryChange(product.slug)}
+                              className={`w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0 ${
+                                isSelected ? 'bg-green-50' : ''
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                                isSelected ? 'bg-green-500 border-green-500' : 'border-slate-300'
+                              }`}>
+                                {isSelected && (
+                                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                              <img
+                                src={imageUrl}
+                                alt={product.name}
+                                className="w-12 h-12 object-contain rounded-lg border border-slate-200 bg-white p-1"
+                              />
+                              <span className={`text-sm font-medium ${isSelected ? 'text-green-700' : 'text-slate-700'}`}>
+                                {product.name}
+                              </span>
+                            </button>
+                          );
+                        })
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Produits compatibles pour accessoires */}
+        {formData.category === 'accessoire' && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Produits compatibles</h2>
+            
+            {/* Afficher les produits sélectionnés */}
+            {formData.compatibleAccessories.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {formData.compatibleAccessories.map((slug) => {
+                  const product = availableProducts.find(a => a.slug === slug);
+                  if (!product) return null;
+                  const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                  return (
+                    <div key={slug} className="flex items-center gap-2 bg-green-50 border border-green-300 rounded-lg px-3 py-2">
+                      <img src={imageUrl} alt={product.name} className="w-8 h-8 object-contain rounded" />
+                      <span className="text-xs text-green-600 uppercase font-semibold">{product.category}</span>
+                      <span className="text-sm font-medium text-green-800">{product.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleAccessoryChange(slug)}
+                        className="text-green-600 hover:text-red-600 ml-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Menu déroulant */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setAccessoryDropdownOpen(!accessoryDropdownOpen)}
+                className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-white text-left flex items-center justify-between hover:border-slate-300 transition"
+              >
+                <span className="text-slate-600">
+                  {formData.compatibleAccessories.length === 0 
+                    ? 'Sélectionner des produits compatibles...' 
+                    : `${formData.compatibleAccessories.length} produit(s) sélectionné(s)`}
+                </span>
+                <svg className={`w-5 h-5 text-slate-400 transition-transform ${accessoryDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {accessoryDropdownOpen && (
+                <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+                  {availableProducts.length === 0 ? (
+                    <p className="p-4 text-sm text-slate-500">Aucun produit disponible</p>
+                  ) : (
+                    <>
+                      {/* Braséros */}
+                      <div className="px-4 py-2 bg-slate-100 text-xs font-semibold text-slate-600 uppercase">Braséros</div>
+                      {availableProducts
+                        .filter(p => p.category === 'brasero')
+                        .map((product) => {
+                          const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                          const isSelected = formData.compatibleAccessories.includes(product.slug);
+                          return (
+                            <button
+                              key={product.slug}
+                              type="button"
+                              onClick={() => handleAccessoryChange(product.slug)}
+                              className={`w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 ${
+                                isSelected ? 'bg-green-50' : ''
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                                isSelected ? 'bg-green-500 border-green-500' : 'border-slate-300'
+                              }`}>
+                                {isSelected && (
+                                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                              <img src={imageUrl} alt={product.name} className="w-12 h-12 object-contain rounded-lg border border-slate-200 bg-white p-1" />
+                              <span className={`text-sm font-medium ${isSelected ? 'text-green-700' : 'text-slate-700'}`}>{product.name}</span>
+                            </button>
+                          );
+                        })}
+                      
+                      {/* Accessoires */}
+                      <div className="px-4 py-2 bg-slate-100 text-xs font-semibold text-slate-600 uppercase">Accessoires</div>
+                      {availableProducts
+                        .filter(p => p.category === 'accessoire')
+                        .map((product) => {
+                          const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                          const isSelected = formData.compatibleAccessories.includes(product.slug);
+                          return (
+                            <button
+                              key={product.slug}
+                              type="button"
+                              onClick={() => handleAccessoryChange(product.slug)}
+                              className={`w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0 ${
+                                isSelected ? 'bg-green-50' : ''
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                                isSelected ? 'bg-green-500 border-green-500' : 'border-slate-300'
+                              }`}>
+                                {isSelected && (
+                                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                              <img src={imageUrl} alt={product.name} className="w-12 h-12 object-contain rounded-lg border border-slate-200 bg-white p-1" />
+                              <span className={`text-sm font-medium ${isSelected ? 'text-green-700' : 'text-slate-700'}`}>{product.name}</span>
+                            </button>
+                          );
+                        })}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-4">

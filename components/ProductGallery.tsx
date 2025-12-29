@@ -29,7 +29,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             blurDataURL={activeImage.blurDataURL}
             className={cn(
               "object-contain origin-center transition-transform duration-300",
-              isAccessory ? "scale-90 p-4 sm:p-6" : "scale-110 sm:scale-125"
+              isAccessory ? "scale-75 sm:scale-80 p-4 sm:p-8" : "scale-110 sm:scale-125"
             )}
             priority
           />
@@ -67,7 +67,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
               height={120}
               className={cn(
                 "h-16 w-20 sm:h-24 sm:w-32",
-                isAccessory ? "object-contain p-1" : "object-cover"
+                isAccessory ? "object-contain p-1 sm:p-2" : "object-cover"
               )}
               placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}

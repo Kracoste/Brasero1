@@ -2,19 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/Badge";
-import { AccessoryGrid } from "@/components/AccessoryGrid";
 import { Container } from "@/components/Container";
-import { FAQ } from "@/components/FAQ";
-import { LeafletMap } from "@/components/LeafletMap";
-import { Price } from "@/components/Price";
 import { ProductGallery } from "@/components/ProductGallery";
 import { Section } from "@/components/Section";
-import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductTabs } from "@/components/ProductTabs";
+import { ProductPurchaseSection } from "@/components/ProductPurchaseSection";
 import { createClient } from "@/lib/supabase/server";
 import { resolveDiameter } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
-import { Users, Flame, Box, Ruler, Weight } from "lucide-react";
 
 // Désactiver le cache pour toujours afficher les dernières données
 export const revalidate = 0;
@@ -54,7 +49,7 @@ const mapDbProductToProduct = (p: any): Product | null => {
     price: Number(p.price ?? 0),
     comparePrice: p.comparePrice || p.compare_price,
     discountPercent: p.discountPercent || p.discount_percent,
-    badge: p.badge || "",
+    badge: p.badge || "Nouveau",
     images: (p.images || []).map((img: any) => ({
       src: img.src,
       alt: img.alt || p.name || "Image produit",
@@ -65,6 +60,8 @@ const mapDbProductToProduct = (p: any): Product | null => {
     material: p.material || "Acier",
     madeIn: "France",
     diameter,
+    length: p.length || 0,
+    width: p.width || 0,
     thickness: p.thickness || 0,
     height: p.height || 0,
     weight: p.weight || 0,
@@ -97,20 +94,6 @@ async function getProduct(slug: string) {
   return mapDbProductToProduct(p);
 }
 
-// Récupérer tous les accessoires depuis Supabase
-async function getAccessories() {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('products')
-    .select('*')
-    .eq('category', 'accessoire')
-    .order('popularScore', { ascending: false });
-
-  return (data || [])
-    .map((p: any) => mapDbProductToProduct(p))
-    .filter((p): p is Product => Boolean(p));
-}
-
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
@@ -139,11 +122,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const reference = `REF-${product.slug.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
   
-  // Récupérer les accessoires depuis Supabase
-  const allAccessories = await getAccessories();
-  const compatibleAccessories = allAccessories
-    .filter((item) => item.slug !== product.slug)
-    .slice(0, 20);
+  // Récupérer les slugs des accessoires compatibles depuis les specs du produit
+  const compatibleAccessorySlugs: string[] = product.specs?.compatibleAccessories || [];
 
   return (
     <div className="bg-[#f9f6f1] pb-24">
@@ -157,7 +137,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
                   <span>Atelier LBF</span>
-                  {product.badge && <Badge>{product.badge}</Badge>}
+                  <Badge>{product.badge}</Badge>
                 </div>
                 <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900">{product.name}</h1>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
@@ -171,64 +151,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="text-base leading-relaxed text-slate-600">{product.description}</p>
               </div>
 
-              {product.category !== "accessoire" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
-                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Convives : </span>
-                      <span className="text-xs sm:text-sm text-slate-600">{product.diameter <= 50 ? "4 à 6" : product.diameter <= 70 ? "6 à 8" : product.diameter <= 90 ? "10 à 12" : "12 à 16"} pers.</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
-                      <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Combustible : </span>
-                      <span className="text-xs sm:text-sm text-slate-600">Bois</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
-                      <Box className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Matière : </span>
-                      <span className="text-xs sm:text-sm text-slate-600">{product.material}</span>
-                    </div>
-                  </div>
-                  {product.specs?.dimensions && (
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
-                        <Ruler className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-xs sm:text-sm font-semibold text-slate-800">Dimensions : </span>
-                        <span className="text-xs sm:text-sm text-slate-600">{product.specs.dimensions}</span>
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
-                      <Weight className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-xs sm:text-sm font-semibold text-slate-800">Poids : </span>
-                      <span className="text-xs sm:text-sm text-slate-600">{product.weight} kg</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-3 sm:space-y-4">
-                {!product.onDemand && (
-                  <Price amount={product.price} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
-                )}
-                <AddToCartButton product={product} />
-              </div>
+              <ProductPurchaseSection 
+                product={product} 
+                compatibleAccessorySlugs={compatibleAccessorySlugs}
+              />
             </div>
           </div>
         </Container>
@@ -236,7 +162,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <Section className="py-0 sm:py-4">
         <Container className="space-y-2 px-4 sm:px-6">
-          <ProductTabs product={product} accessories={compatibleAccessories} />
+          <ProductTabs product={product} accessories={[]} />
         </Container>
       </Section>
     </div>

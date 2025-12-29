@@ -1,28 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { ShoppingCart, Check, Minus, Plus } from 'lucide-react';
 import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
-import { createClient } from '@/lib/supabase/client';
 
-const SELECTED_ACCESSORIES_KEY = "brasero:selected-accessories";
-
-const readSelectedAccessories = (): Set<string> => {
-  if (typeof window === "undefined") return new Set<string>();
-  try {
-    const raw = window.localStorage.getItem(SELECTED_ACCESSORIES_KEY);
-    if (!raw) return new Set<string>();
-    const parsed = JSON.parse(raw);
-    return new Set(Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === "string") : []);
-  } catch {
-    return new Set<string>();
-  }
-};
-
-const clearSelectedAccessories = () => {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(SELECTED_ACCESSORIES_KEY);
+type SelectedAccessory = {
+  slug: string;
+  name: string;
+  price: number;
+  images?: any[];
 };
 
 type AddToCartButtonProps = {
@@ -33,10 +20,11 @@ type AddToCartButtonProps = {
     images: { src: string }[];
     onDemand?: boolean;
   };
+  selectedAccessories?: SelectedAccessory[];
   className?: string;
 };
 
-export function AddToCartButton({ product, className = '' }: AddToCartButtonProps) {
+export function AddToCartButton({ product, selectedAccessories = [], className = '' }: AddToCartButtonProps) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
@@ -77,33 +65,20 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
         quantity
       );
 
-      // Récupérer et ajouter les accessoires sélectionnés
-      const selectedAccessories = readSelectedAccessories();
-      if (selectedAccessories.size > 0) {
-        // Récupérer les données des accessoires sélectionnés depuis Supabase
-        const supabase = createClient();
-        const { data: accessories } = await supabase
-          .from('products')
-          .select('slug, name, price, images')
-          .in('slug', Array.from(selectedAccessories));
-        
-        if (accessories) {
-          for (const accessory of accessories) {
-            await addItem(
-              {
-                slug: accessory.slug,
-                name: accessory.name,
-                price: accessory.price,
-                image: accessory.images?.[0]?.src || '',
-              },
-              1
-            );
-          }
+      // Ajouter les accessoires sélectionnés
+      if (selectedAccessories.length > 0) {
+        for (const accessory of selectedAccessories) {
+          await addItem(
+            {
+              slug: accessory.slug,
+              name: accessory.name,
+              price: accessory.price,
+              image: accessory.images?.[0]?.src || '',
+            },
+            1
+          );
         }
       }
-
-      // Effacer les accessoires sélectionnés après ajout
-      clearSelectedAccessories();
 
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);

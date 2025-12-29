@@ -65,7 +65,7 @@ const promoProducts: Product[] = Array.from({ length: 20 }).map((_, index) => {
     location: moncoutant,
     faq: [{ question: "Quels braséros ?", answer: "Compatible avec toute notre gamme." }],
     customSpecs: [
-      { label: "Marque", value: "Atelier LBF" },
+      { label: "Marque", value: "France Braseros" },
       { label: "Promotion", value: `-${discountPercent}%` },
       { label: "Compatibilité", value: "Tous braséros" },
     ],
@@ -1410,7 +1410,7 @@ const rawProducts: Product[] = [
     location: moncoutant,
     faq: [{ question: "Lame flexible ?", answer: "Semi-rigide, idéale pour plancha." }],
     customSpecs: [
-      { label: "Marque", value: "Atelier LBF" },
+      { label: "Marque", value: "France Braseros" },
       { label: "Fabrication", value: "France" },
       { label: "Matière", value: "Inox / Bois" },
       { label: "Longueur", value: "40 cm" },

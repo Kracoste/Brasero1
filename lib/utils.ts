@@ -5,6 +5,50 @@ import type { Product } from "@/lib/schema";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
+/**
+ * Formate les dimensions d'un produit au format "L x l x h cm"
+ * L = Largeur (majuscule), l = Longueur (minuscule), h = Hauteur (minuscule)
+ */
+export const formatDimensions = (product: { 
+  width?: number; 
+  length?: number; 
+  height?: number; 
+  diameter?: number;
+  specs?: { dimensions?: string };
+}) => {
+  // Si des dimensions custom existent dans specs, les utiliser
+  if (product.specs?.dimensions) {
+    return product.specs.dimensions;
+  }
+  
+  const { width, length, height, diameter } = product;
+  
+  // Si on a largeur, longueur et hauteur
+  if (width && length && height) {
+    return `L${width} x l${length} x h${height} cm`;
+  }
+  
+  // Si on a largeur et longueur
+  if (width && length) {
+    return `L${width} x l${length} cm`;
+  }
+  
+  // Si on a seulement le diamètre (produits ronds)
+  if (diameter) {
+    if (height) {
+      return `Ø${diameter} x h${height} cm`;
+    }
+    return `Ø${diameter} cm`;
+  }
+  
+  // Si on a seulement hauteur
+  if (height) {
+    return `h${height} cm`;
+  }
+  
+  return "-";
+};
+
 export const formatCurrency = (value: number) =>
   new Intl.NumberFormat("fr-FR", {
     style: "currency",
