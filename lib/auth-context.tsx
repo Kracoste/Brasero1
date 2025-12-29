@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail, AUTH_ROUTES } from '@/lib/auth';
 import type { User } from '@supabase/supabase-js';
@@ -22,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const initialized = useRef(false);
 
   const checkIsAdmin = useCallback(async (currentUser: User | null) => {
     if (!currentUser) {
@@ -74,35 +75,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   useEffect(() => {
+    // Éviter la double initialisation en mode strict de React
+    if (initialized.current) return;
+    initialized.current = true;
+    
     // Initialisation - forcer une vérification serveur
     const init = async () => {
       setIsLoading(true);
       try {
-        // D'abord essayer getSession() qui est plus rapide
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        // Utiliser getUser() directement car c'est plus fiable que getSession()
+        // getUser() vérifie avec le serveur Supabase
+        const { data: { user: currentUser }, error } = await supabase.auth.getUser();
         
-        if (sessionError) {
-          console.error('Session error:', sessionError);
+        if (error) {
+          console.log('Init auth - pas de session:', error.message);
           setUser(null);
           setIsAdmin(false);
-          setIsLoading(false);
-          return;
-        }
-
-        if (session?.user) {
-          setUser(session.user);
-          await checkIsAdmin(session.user);
+        } else if (currentUser) {
+          console.log('Init auth - utilisateur trouvé:', currentUser.email);
+          setUser(currentUser);
+          await checkIsAdmin(currentUser);
         } else {
-          // Si pas de session locale, vérifier avec le serveur
-          const { data: { user: currentUser }, error } = await supabase.auth.getUser();
-          
-          if (error) {
-            setUser(null);
-            setIsAdmin(false);
-          } else {
-            setUser(currentUser);
-            await checkIsAdmin(currentUser);
-          }
+          setUser(null);
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error('Erreur initialisation auth:', error);
@@ -123,11 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         await checkIsAdmin(currentUser);
-        
-        // Marquer comme chargé seulement après le premier événement
-        if (isLoading) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     );
 
@@ -150,7 +141,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [supabase, checkIsAdmin, refreshUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Volontairement vide - on ne veut exécuter qu'une seule fois au montage
 
   return (
     <AuthContext.Provider value={{ user, isLoading, isAdmin, signOut, refreshUser }}>

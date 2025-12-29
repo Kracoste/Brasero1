@@ -1,8 +1,28 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
+
+// Fonction pour extraire le domaine racine pour les cookies
+function getCookieDomain(hostname: string): string | undefined {
+  // En développement local, ne pas spécifier de domaine
+  if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+    return undefined;
+  }
+  // Pour atelier-lbf.fr, utiliser le domaine racine pour partager les cookies
+  if (hostname.includes('atelier-lbf.fr')) {
+    return '.atelier-lbf.fr';
+  }
+  // Pour brasero-atelier.fr
+  if (hostname.includes('brasero-atelier.fr')) {
+    return '.brasero-atelier.fr';
+  }
+  return undefined;
+}
 
 export async function createClient() {
   const cookieStore = await cookies()
+  const headersList = await headers()
+  const hostname = headersList.get('host') || ''
+  const cookieDomain = getCookieDomain(hostname)
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,6 +40,7 @@ export async function createClient() {
                 path: '/',
                 sameSite: 'lax',
                 secure: process.env.NODE_ENV === 'production',
+                ...(cookieDomain ? { domain: cookieDomain } : {}),
               })
             )
           } catch {
