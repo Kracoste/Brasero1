@@ -93,7 +93,7 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
               <dl className="text-sm text-gray-700">
                 {(product.customSpecs ??
                   [
-                    { label: "Marque", value: "France Braseros" },
+                    { label: "Marque", value: "Atelier LBF" },
                     { label: "Fabrication", value: product.madeIn },
                     { label: "Matière", value: product.material },
                     { label: "Diamètre", value: `${product.diameter} cm` },

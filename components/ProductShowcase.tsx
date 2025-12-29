@@ -302,7 +302,7 @@ export const ProductShowcase = ({ animate = true, braseros = [] }: ProductShowca
             <div className="product-showcase__content">
               <div className="product-showcase__meta">
                 <span className="product-showcase__stock">En stock</span>
-                <span className="product-showcase__origin">France Braseros</span>
+                <span className="product-showcase__origin">Atelier LBF</span>
               </div>
               <h3 className="product-showcase__name">{card.product.name}</h3>
               <Price amount={card.product.price} className="product-showcase__price" tone="light" />

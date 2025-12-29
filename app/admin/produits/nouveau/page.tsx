@@ -642,6 +642,45 @@ export default function NewProduct() {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Dimensions et caractéristiques</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Champ Nombre de convives pour brasero */}
+            {formData.category === 'brasero' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Nombre de convives
+                </label>
+                <input
+                  type="text"
+                  name="numberOfGuests"
+                  value={formData.numberOfGuests}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  placeholder="6 à 8 personnes"
+                />
+              </div>
+            )}
+
+            {/* Champ Type de combustibles pour brasero */}
+            {formData.category === 'brasero' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Type de combustibles
+                </label>
+                <div className="space-y-2">
+                  {['Bois', 'Charbon', 'Pellets'].map((fuel) => (
+                    <label key={fuel} className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.fuelType.includes(fuel)}
+                        onChange={() => handleFuelTypeChange(fuel)}
+                        className="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500"
+                      />
+                      <span className="text-sm text-slate-700">{fuel}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Diamètre (cm) {formData.category === 'brasero' && <span className="text-red-500">*</span>}
@@ -788,48 +827,6 @@ export default function NewProduct() {
             </div>
           </div>
         </div>
-
-        {/* Informations spécifiques aux braséros */}
-        {formData.category === 'brasero' && (
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Informations spécifiques au braséro</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Nombre de convives
-                </label>
-                <input
-                  type="text"
-                  name="numberOfGuests"
-                  value={formData.numberOfGuests}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="6 à 8 personnes"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">
-                  Type de combustibles
-                </label>
-                <div className="space-y-2">
-                  {['Bois', 'Charbon', 'Pellets'].map((fuel) => (
-                    <label key={fuel} className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.fuelType.includes(fuel)}
-                        onChange={() => handleFuelTypeChange(fuel)}
-                        className="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500"
-                      />
-                      <span className="text-sm text-slate-700">{fuel}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-4">

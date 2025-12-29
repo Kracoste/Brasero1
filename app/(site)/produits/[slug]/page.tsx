@@ -54,7 +54,7 @@ const mapDbProductToProduct = (p: any): Product | null => {
     price: Number(p.price ?? 0),
     comparePrice: p.comparePrice || p.compare_price,
     discountPercent: p.discountPercent || p.discount_percent,
-    badge: p.badge || "Nouveau",
+    badge: p.badge || "",
     images: (p.images || []).map((img: any) => ({
       src: img.src,
       alt: img.alt || p.name || "Image produit",
@@ -156,8 +156,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="space-y-4 sm:space-y-6">
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-                  <span>France Braseros</span>
-                  <Badge>{product.badge}</Badge>
+                  <span>Atelier LBF</span>
+                  {product.badge && <Badge>{product.badge}</Badge>}
                 </div>
                 <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900">{product.name}</h1>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
