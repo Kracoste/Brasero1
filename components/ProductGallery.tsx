@@ -14,7 +14,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const activeImage = product.images[activeIndex];
-  const isWideAccessory = product.slug === "spatule-plancha-inox";
+  const isAccessory = product.category === 'accessoire';
 
   return (
     <div className="flex flex-col items-center lg:items-end">
@@ -29,7 +29,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             blurDataURL={activeImage.blurDataURL}
             className={cn(
               "object-contain origin-center transition-transform duration-300",
-              isWideAccessory ? "scale-100 p-4 sm:p-6" : "scale-110 sm:scale-125"
+              isAccessory ? "scale-90 p-4 sm:p-6" : "scale-110 sm:scale-125"
             )}
             priority
           />
@@ -65,7 +65,10 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
               alt={image.alt}
               width={160}
               height={120}
-              className="h-16 w-20 sm:h-24 sm:w-32 object-cover"
+              className={cn(
+                "h-16 w-20 sm:h-24 sm:w-32",
+                isAccessory ? "object-contain p-1" : "object-cover"
+              )}
               placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}
             />
