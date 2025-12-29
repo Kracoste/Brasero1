@@ -11,6 +11,7 @@ import { useFavorites } from '@/lib/favorites-context';
 import { createClient } from '@/lib/supabase/client';
 import type { Product } from '@/lib/schema';
 import { resolveDiameter } from '@/lib/utils';
+import { useRef } from 'react';
 
 type SupabaseProduct = {
   slug: string;
@@ -109,17 +110,22 @@ export default function FavorisPage() {
   const { loading: favoritesLoading, isFavorite } = useFavorites();
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
+  const supabaseRef = useRef(createClient());
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Utiliser fetch pour récupérer les produits (pas de RLS sur SELECT products)
-        const response = await fetch('/api/admin/products');
-        if (response.ok) {
-          const data = await response.json();
-          setProducts(data.map(mapProduct));
+        // Utiliser le client Supabase directement (RLS désactivé sur products pour lecture publique)
+        const supabase = supabaseRef.current;
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error loading products for favorites:', error);
         } else {
-          console.error('Error loading products for favorites');
+          setProducts((data || []).map(mapProduct));
         }
       } catch (error) {
         console.error('Error loading products for favorites:', error);

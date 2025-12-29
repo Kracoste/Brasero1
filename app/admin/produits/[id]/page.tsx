@@ -20,6 +20,19 @@ const FORMAT_OPTIONS = [
   { label: 'Hexagonal', value: 'hexagonal' },
   { label: 'Carré', value: 'carre' },
 ];
+const ACCESSORY_SUBCATEGORY_OPTIONS = [
+  { label: 'Spatule', value: 'spatule' },
+  { label: 'Couvercle', value: 'couvercle' },
+  { label: 'Grille', value: 'grille' },
+  { label: 'Allume Feu', value: 'allume-feu' },
+  { label: 'Housse de Protection', value: 'housse' },
+  { label: 'Fendeur à Bûches', value: 'fendeur-buches' },
+  { label: 'Ranges-Bûches', value: 'range-buches' },
+];
+const STEEL_TYPE_OPTIONS = [
+  { label: 'Inoxydable', value: 'inoxydable' },
+  { label: 'Brut', value: 'brut' },
+];
 
 export default function EditProduct() {
   const router = useRouter();
@@ -54,6 +67,8 @@ export default function EditProduct() {
     isFeatured: false,
     featuredOrder: '999',
     format: '',
+    accessorySubcategory: '',
+    steelType: '',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -113,6 +128,8 @@ export default function EditProduct() {
         isFeatured: product.isFeatured ?? product.is_featured ?? false,
         featuredOrder: (product.featuredOrder ?? product.featured_order ?? 999).toString(),
         format: parsedSpecs?.format || product.format || '',
+        accessorySubcategory: parsedSpecs?.accessorySubcategory || '',
+        steelType: parsedSpecs?.steelType || '',
       });
 
       // Charger les images existantes
@@ -276,6 +293,16 @@ export default function EditProduct() {
         nextSpecs.format = formData.format;
       } else {
         delete nextSpecs.format;
+      }
+      if (formData.accessorySubcategory) {
+        nextSpecs.accessorySubcategory = formData.accessorySubcategory;
+      } else {
+        delete nextSpecs.accessorySubcategory;
+      }
+      if (formData.steelType) {
+        nextSpecs.steelType = formData.steelType;
+      } else {
+        delete nextSpecs.steelType;
       }
       specsRef.current = nextSpecs;
 
@@ -441,21 +468,65 @@ export default function EditProduct() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Matière *
-              </label>
-              <select
-                name="material"
-                value={formData.material}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-              >
-                <option value="corten">Braséro Corten</option>
-                <option value="acier">Braséro Acier</option>
-                <option value="inox">Braséro Inox</option>
-              </select>
-            </div>
+            {formData.category === 'accessoire' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Sous-catégorie d'accessoire *
+                  </label>
+                  <select
+                    name="accessorySubcategory"
+                    value={formData.accessorySubcategory}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  >
+                    <option value="">Sélectionnez une sous-catégorie</option>
+                    {ACCESSORY_SUBCATEGORY_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Type d'acier *
+                  </label>
+                  <select
+                    name="steelType"
+                    value={formData.steelType}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  >
+                    <option value="">Sélectionnez un type d'acier</option>
+                    {STEEL_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+
+            {formData.category !== 'accessoire' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Matière *
+                </label>
+                <select
+                  name="material"
+                  value={formData.material}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                >
+                  <option value="corten">Braséro Corten</option>
+                  <option value="acier">Braséro Acier</option>
+                  <option value="inox">Braséro Inox</option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
 
