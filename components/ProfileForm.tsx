@@ -47,13 +47,17 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
         body: JSON.stringify(updates),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         setMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
       } else {
-        setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde' });
+        console.error('Erreur API:', data);
+        setMessage({ type: 'error', text: data.error || 'Erreur lors de la sauvegarde' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde' });
+      console.error('Erreur réseau:', error);
+      setMessage({ type: 'error', text: 'Erreur de connexion au serveur' });
     }
 
     setSaving(false);
@@ -186,13 +190,16 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
               <label htmlFor="country" className="block text-sm font-medium text-slate-700">
                 Pays
               </label>
-              <input
-                type="text"
+              <select
                 id="country"
                 name="country"
                 defaultValue={initialProfile?.country || 'France'}
-                className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-clay-900 focus:outline-none focus:ring-clay-900"
-              />
+                className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-slate-900"
+              >
+                <option value="France">France</option>
+                <option value="Belgique">Belgique</option>
+                <option value="Allemagne">Allemagne</option>
+              </select>
             </div>
           </div>
         </div>
@@ -202,7 +209,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-full bg-clay-900 px-6 py-3 text-sm font-semibold text-white hover:bg-clay-800 focus:outline-none focus:ring-2 focus:ring-clay-900 focus:ring-offset-2 disabled:opacity-50"
+            className="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50"
           >
             {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
           </button>

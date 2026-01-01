@@ -73,7 +73,7 @@ export const HeroMenu = () => {
   return (
     <div className="relative w-full overflow-hidden">
       {/* Image pleine largeur en arrière-plan */}
-      <div className="relative h-[500px] w-full lg:h-[650px]">
+      <div className="relative h-[400px] sm:h-[450px] md:h-[500px] w-full lg:h-[650px]">
         <Image
           key={activeItem.id}
           src={activeItem.image}
@@ -89,24 +89,24 @@ export const HeroMenu = () => {
 
       {/* Contenu superposé sur l'image */}
       <div className="absolute inset-0 flex items-center">
-        <div className="w-full px-8 sm:px-12 lg:px-16">
+        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16">
           <div className="mx-auto max-w-7xl">
-            <div className="max-w-2xl space-y-6 text-white">
+            <div className="max-w-2xl space-y-4 sm:space-y-6 text-white">
               <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/90">
                 Work light, LED, white
               </p>
               
-              <h1 className="font-display text-5xl font-bold leading-tight lg:text-6xl">
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-tight lg:text-6xl">
                 {activeItem.title}
               </h1>
               
-              <p className="text-lg leading-relaxed text-white/90 lg:text-xl">
+              <p className="text-base sm:text-lg leading-relaxed text-white/90 lg:text-xl">
                 {activeItem.description}
               </p>
               
               <Link
                 href="/produits"
-                className="inline-flex w-fit items-center rounded-full bg-black px-10 py-4 text-sm font-semibold uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-black/95"
+                className="inline-flex w-fit items-center rounded-full bg-black px-6 sm:px-10 py-3 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-black/95"
               >
                 Shop now
               </Link>

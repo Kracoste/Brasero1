@@ -126,7 +126,7 @@ export const Header = () => {
           </div>
           
           {/* Icônes à droite */}
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
             {/* Favoris */}
             <Link href="/favoris" className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition">
               <span className="relative">

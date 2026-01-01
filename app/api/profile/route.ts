@@ -97,7 +97,12 @@ export async function PUT(request: Request) {
 
     const { data, error } = await adminClient
       .from('profiles')
-      .upsert({ id: user.id, ...updates })
+      .upsert({ 
+        id: user.id, 
+        email: user.email,
+        updated_at: new Date().toISOString(),
+        ...updates 
+      })
       .select('id, email, first_name, last_name, phone, address, postal_code, city, country')
       .single();
 

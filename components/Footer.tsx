@@ -39,11 +39,11 @@ export const Footer = () => {
 
   return (
     <footer className="border-t border-gray-200 bg-[#f6f1e9] text-gray-800">
-      <Container className="py-8 sm:py-12">
-        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <Container className="py-6 sm:py-8 lg:py-12">
+        <div className="grid gap-6 sm:gap-8 grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="font-semibold text-lg text-gray-900">Service à la clientèle</p>
-            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Service à la clientèle</p>
+            <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {serviceLinks.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="transition hover:text-gray-900">
@@ -55,8 +55,8 @@ export const Footer = () => {
           </div>
 
           <div>
-            <p className="font-semibold text-lg text-gray-900">Catégories</p>
-            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Catégories</p>
+            <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {categoryLinks.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="transition hover:text-gray-900">
@@ -68,8 +68,8 @@ export const Footer = () => {
           </div>
 
           <div>
-            <p className="font-semibold text-lg text-gray-900">Entreprises</p>
-            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Entreprises</p>
+            <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {proLinks.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="transition hover:text-gray-900">
@@ -81,8 +81,8 @@ export const Footer = () => {
           </div>
 
           <div>
-            <p className="font-semibold text-lg text-gray-900">À propos de {settings.storeName}</p>
-            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">À propos de {settings.storeName}</p>
+            <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {aboutLinks.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="transition hover:text-gray-900">
@@ -94,7 +94,7 @@ export const Footer = () => {
           </div>
         </div>
       </Container>
-      <div className="border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+      <div className="border-t border-gray-200 py-3 sm:py-4 text-center text-[10px] sm:text-xs text-gray-500">
         © {new Date().getFullYear()} {settings.storeName} — Fabriqué à {settings.atelier.city} (79)
       </div>
     </footer>
