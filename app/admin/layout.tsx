@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ChevronLeft } from 'lucide-react';
+import { cookies } from 'next/headers';
 
 import { createClient } from '@/lib/supabase/server';
 import { AdminSignOutButton } from '@/components/AdminSignOutButton';
@@ -15,19 +16,34 @@ type AdminLayoutProps = {
 };
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
+  const cookieStore = await cookies();
+  
+  // Vérifier d'abord si on a des cookies Supabase
+  const allCookies = cookieStore.getAll();
+  const hasAuthCookies = allCookies.some(c => 
+    c.name.includes('sb-') && c.name.includes('-auth-token')
+  );
+  
   const supabase = await createClient();
   const {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) {
+  // Si pas d'utilisateur mais on a des cookies auth, essayer getSession
+  let finalUser = user;
+  if (!user && hasAuthCookies) {
+    const { data: { session } } = await supabase.auth.getSession();
+    finalUser = session?.user ?? null;
+  }
+
+  if (userError || !finalUser) {
     redirect(`${AUTH_ROUTES.login}?${REDIRECT_PARAM}=${AUTH_ROUTES.admin}`);
   }
 
   // Vérifier si admin par email uniquement (config centralisée)
   // Évite les problèmes de RLS recursion sur la table profiles
-  const isAdmin = isAdminEmail(user.email);
+  const isAdmin = isAdminEmail(finalUser.email);
 
   if (!isAdmin) {
     redirect('/');
