@@ -24,6 +24,10 @@ type ConversionFunnel = {
   purchaseRate: number;
 };
 
+// Cache simple en mémoire pour réduire les requêtes
+let analyticsCache: { data: any; timestamp: number } | null = null;
+const CACHE_TTL = 30000; // 30 secondes
+
 export async function GET() {
   try {
     // Vérifier que l'utilisateur est admin
@@ -32,6 +36,11 @@ export async function GET() {
     
     if (!user || !isAdminEmail(user.email)) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    }
+
+    // Retourner le cache s'il est encore valide
+    if (analyticsCache && Date.now() - analyticsCache.timestamp < CACHE_TTL) {
+      return NextResponse.json(analyticsCache.data);
     }
 
     const adminClient = getSupabaseAdminClient();
@@ -51,100 +60,69 @@ export async function GET() {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    // Requêtes parallèles pour les nouvelles tables analytics
+    // OPTIMISATION: Réduire à 8 requêtes principales au lieu de 27
     const [
-      // Sessions (exclut les admins)
-      sessionsTotal,
-      sessionsToday,
-      sessionsWeek,
-      sessionsMonth,
-      sessionsYear,
-      // Visiteurs uniques
-      uniqueVisitorsTotal,
-      uniqueVisitorsToday,
-      uniqueVisitorsWeek,
-      uniqueVisitorsMonth,
-      uniqueVisitorsYear,
-      // Métriques moyennes
-      avgMetrics,
-      // Événements de conversion ce mois
+      // 1. Toutes les sessions de l'année (on filtre côté JS)
+      allSessions,
+      // 2. Événements de conversion ce mois
       conversionEvents,
-      // Données journalières pour les graphiques
-      sessionsDaily,
-      ordersDaily,
-      pageViewsDaily,
-      // Top produits vus
-      topProductsViewed,
-      // Top produits ajoutés au panier
-      topProductsCarted,
-      // Ordres pour le revenue
-      ordersTotal,
-      ordersToday,
-      ordersWeek,
-      ordersMonth,
-      ordersYear,
-      // Commandes récentes
+      // 3. Toutes les commandes
+      allOrders,
+      // 4. Commandes récentes (5)
       recentOrders,
-      // Totaux
+      // 5. Page views de l'année
+      pageViewsYear,
+      // 6. Count produits
       productsCount,
+      // 7. Count clients
       customersCount,
     ] = await Promise.all([
-      // Sessions
-      adminClient.from('visitor_sessions').select('*', { count: 'exact', head: true }).eq('is_admin', false),
-      adminClient.from('visitor_sessions').select('*', { count: 'exact', head: true }).eq('is_admin', false).gte('started_at', startOfDay),
-      adminClient.from('visitor_sessions').select('*', { count: 'exact', head: true }).eq('is_admin', false).gte('started_at', startOfWeek),
-      adminClient.from('visitor_sessions').select('*', { count: 'exact', head: true }).eq('is_admin', false).gte('started_at', startOfMonth),
-      adminClient.from('visitor_sessions').select('*', { count: 'exact', head: true }).eq('is_admin', false).gte('started_at', startOfYear),
-      // Visiteurs uniques
-      adminClient.from('visitor_sessions').select('visitor_id').eq('is_admin', false),
-      adminClient.from('visitor_sessions').select('visitor_id').eq('is_admin', false).gte('started_at', startOfDay),
-      adminClient.from('visitor_sessions').select('visitor_id').eq('is_admin', false).gte('started_at', startOfWeek),
-      adminClient.from('visitor_sessions').select('visitor_id').eq('is_admin', false).gte('started_at', startOfMonth),
-      adminClient.from('visitor_sessions').select('visitor_id').eq('is_admin', false).gte('started_at', startOfYear),
-      // Métriques moyennes (ce mois)
-      adminClient.from('visitor_sessions').select('page_count, duration_seconds, is_bounce').eq('is_admin', false).gte('started_at', startOfMonth),
-      // Événements de conversion ce mois
-      adminClient.from('conversion_events').select('event_type, session_id').gte('created_at', startOfMonth),
-      // Données journalières
-      adminClient.from('visitor_sessions').select('started_at, visitor_id').eq('is_admin', false).gte('started_at', oneYearAgo.toISOString()),
-      adminClient.from('orders').select('created_at, total').gte('created_at', oneYearAgo.toISOString()),
-      adminClient.from('page_views').select('viewed_at').gte('viewed_at', oneYearAgo.toISOString()),
-      // Top produits
-      adminClient.from('conversion_events').select('product_slug, product_name').eq('event_type', 'product_view').not('product_slug', 'is', null).gte('created_at', startOfMonth),
-      adminClient.from('conversion_events').select('product_slug, product_name, quantity').eq('event_type', 'add_to_cart').not('product_slug', 'is', null).gte('created_at', startOfMonth),
-      // Commandes
-      adminClient.from('orders').select('id, total_amount', { count: 'exact' }),
-      adminClient.from('orders').select('id, total_amount').gte('created_at', startOfDay),
-      adminClient.from('orders').select('id, total_amount').gte('created_at', startOfWeek),
-      adminClient.from('orders').select('id, total_amount').gte('created_at', startOfMonth),
-      adminClient.from('orders').select('id, total_amount').gte('created_at', startOfYear),
-      // Commandes récentes
-      adminClient.from('orders').select('id, customer_name, total_amount, created_at, status').order('created_at', { ascending: false }).limit(5),
-      // Totaux
+      adminClient.from('visitor_sessions')
+        .select('id, visitor_id, started_at, page_count, duration_seconds, is_bounce, is_admin')
+        .eq('is_admin', false)
+        .gte('started_at', oneYearAgo.toISOString()),
+      adminClient.from('conversion_events')
+        .select('event_type, session_id, product_slug, product_name, quantity')
+        .gte('created_at', startOfMonth),
+      adminClient.from('orders')
+        .select('id, customer_name, total_amount, created_at, status'),
+      adminClient.from('orders')
+        .select('id, customer_name, total_amount, created_at, status')
+        .order('created_at', { ascending: false })
+        .limit(5),
+      adminClient.from('page_views')
+        .select('viewed_at')
+        .gte('viewed_at', oneYearAgo.toISOString()),
       adminClient.from('products').select('*', { count: 'exact', head: true }),
       adminClient.from('profiles').select('*', { count: 'exact', head: true }),
     ]);
 
-    // Calculer les visiteurs uniques
-    const countUnique = (data: { visitor_id: string }[] | null) => {
-      if (!data) return 0;
-      return new Set(data.map(v => v.visitor_id)).size;
-    };
+    const sessions = allSessions.data || [];
+    const orders = allOrders.data || [];
 
-    // Calculer les métriques moyennes
-    const metrics = avgMetrics.data || [];
-    const totalSessions = metrics.length;
-    const avgPagesPerSession = totalSessions > 0 
-      ? metrics.reduce((sum, m) => sum + (m.page_count || 0), 0) / totalSessions 
+    // Filtrer les sessions par période côté JS
+    const sessionsToday = sessions.filter(s => s.started_at >= startOfDay);
+    const sessionsWeek = sessions.filter(s => s.started_at >= startOfWeek);
+    const sessionsMonth = sessions.filter(s => s.started_at >= startOfMonth);
+    const sessionsYear = sessions.filter(s => s.started_at >= startOfYear);
+
+    // Calculer les visiteurs uniques
+    const countUnique = (data: { visitor_id: string }[]) => new Set(data.map(v => v.visitor_id)).size;
+
+    // Métriques moyennes (ce mois)
+    const monthMetrics = sessionsMonth;
+    const totalSessionsMonth = monthMetrics.length;
+    const avgPagesPerSession = totalSessionsMonth > 0 
+      ? monthMetrics.reduce((sum, m) => sum + (m.page_count || 0), 0) / totalSessionsMonth 
       : 0;
-    const sessionsWithDuration = metrics.filter(m => m.duration_seconds > 0);
+    const sessionsWithDuration = monthMetrics.filter(m => m.duration_seconds > 0);
     const avgSessionDuration = sessionsWithDuration.length > 0
       ? sessionsWithDuration.reduce((sum, m) => sum + m.duration_seconds, 0) / sessionsWithDuration.length
       : 0;
-    const bounceCount = metrics.filter(m => m.is_bounce).length;
-    const bounceRate = totalSessions > 0 ? (bounceCount / totalSessions) * 100 : 0;
+    const bounceCount = monthMetrics.filter(m => m.is_bounce).length;
+    const bounceRate = totalSessionsMonth > 0 ? (bounceCount / totalSessionsMonth) * 100 : 0;
 
-    // Calculer l'entonnoir de conversion
+    // Entonnoir de conversion
     const events = conversionEvents.data || [];
     const sessionEvents = new Map<string, Set<string>>();
     events.forEach(e => {
@@ -159,22 +137,23 @@ export async function GET() {
     const sessionsWithCheckout = Array.from(sessionEvents.values()).filter(s => s.has('checkout_start')).length;
     const sessionsWithPurchase = Array.from(sessionEvents.values()).filter(s => s.has('purchase')).length;
 
-    const monthSessions = sessionsMonth.count || 1;
+    const monthSessionCount = totalSessionsMonth || 1;
     const conversionFunnel: ConversionFunnel = {
-      totalSessions: monthSessions,
+      totalSessions: monthSessionCount,
       productViews: sessionsWithProductView,
       addToCart: sessionsWithAddToCart,
       checkoutStart: sessionsWithCheckout,
       purchases: sessionsWithPurchase,
-      viewRate: Math.round((sessionsWithProductView / monthSessions) * 100 * 10) / 10,
-      cartRate: Math.round((sessionsWithAddToCart / monthSessions) * 100 * 10) / 10,
-      checkoutRate: Math.round((sessionsWithCheckout / monthSessions) * 100 * 10) / 10,
-      purchaseRate: Math.round((sessionsWithPurchase / monthSessions) * 100 * 10) / 10,
+      viewRate: Math.round((sessionsWithProductView / monthSessionCount) * 100 * 10) / 10,
+      cartRate: Math.round((sessionsWithAddToCart / monthSessionCount) * 100 * 10) / 10,
+      checkoutRate: Math.round((sessionsWithCheckout / monthSessionCount) * 100 * 10) / 10,
+      purchaseRate: Math.round((sessionsWithPurchase / monthSessionCount) * 100 * 10) / 10,
     };
 
     // Top produits vus
+    const productViewEvents = events.filter(e => e.event_type === 'product_view' && e.product_slug);
     const productViewCounts = new Map<string, { slug: string; name: string; count: number }>();
-    (topProductsViewed.data || []).forEach((p: any) => {
+    productViewEvents.forEach((p: any) => {
       const key = p.product_slug;
       if (!productViewCounts.has(key)) {
         productViewCounts.set(key, { slug: key, name: p.product_name || key, count: 0 });
@@ -186,8 +165,9 @@ export async function GET() {
       .slice(0, 5);
 
     // Top produits ajoutés au panier
+    const cartEvents = events.filter(e => e.event_type === 'add_to_cart' && e.product_slug);
     const productCartCounts = new Map<string, { slug: string; name: string; count: number; quantity: number }>();
-    (topProductsCarted.data || []).forEach((p: any) => {
+    cartEvents.forEach((p: any) => {
       const key = p.product_slug;
       if (!productCartCounts.has(key)) {
         productCartCounts.set(key, { slug: key, name: p.product_name || key, count: 0, quantity: 0 });
@@ -199,12 +179,17 @@ export async function GET() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    // Revenue
-    const calcRevenue = (data: any[] | null) => (data || []).reduce((sum, o) => sum + (o.total_amount || o.total || 0), 0);
+    // Filtrer les commandes par période
+    const ordersToday = orders.filter(o => o.created_at >= startOfDay);
+    const ordersWeek = orders.filter(o => o.created_at >= startOfWeek);
+    const ordersMonth = orders.filter(o => o.created_at >= startOfMonth);
+    const ordersYear = orders.filter(o => o.created_at >= startOfYear);
+
+    const calcRevenue = (data: any[]) => data.reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
     // Données journalières
     const dailyMap = new Map<string, DailyData>();
-    (sessionsDaily.data || []).forEach((s: any) => {
+    sessions.forEach((s: any) => {
       const date = s.started_at.split('T')[0];
       if (!dailyMap.has(date)) {
         dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
@@ -214,7 +199,7 @@ export async function GET() {
 
     // Visiteurs uniques par jour
     const visitorsByDay = new Map<string, Set<string>>();
-    (sessionsDaily.data || []).forEach((s: any) => {
+    sessions.forEach((s: any) => {
       const date = s.started_at.split('T')[0];
       if (!visitorsByDay.has(date)) visitorsByDay.set(date, new Set());
       visitorsByDay.get(date)!.add(s.visitor_id);
@@ -225,25 +210,23 @@ export async function GET() {
       }
     });
 
-    (ordersDaily.data || []).forEach((o: any) => {
+    orders.forEach((o: any) => {
       const date = o.created_at.split('T')[0];
       if (!dailyMap.has(date)) {
         dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
       }
       dailyMap.get(date)!.sales++;
-      dailyMap.get(date)!.revenue += o.total || 0;
+      dailyMap.get(date)!.revenue += o.total_amount || 0;
     });
 
     // Page views par jour
-    const pageViewsByDay = new Map<string, number>();
-    (pageViewsDaily.data || []).forEach((p: any) => {
+    const pageViews = pageViewsYear.data || [];
+    pageViews.forEach((p: any) => {
       const date = p.viewed_at.split('T')[0];
-      pageViewsByDay.set(date, (pageViewsByDay.get(date) || 0) + 1);
-    });
-    pageViewsByDay.forEach((count, date) => {
-      if (dailyMap.has(date)) {
-        dailyMap.get(date)!.pageViews = count;
+      if (!dailyMap.has(date)) {
+        dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
       }
+      dailyMap.get(date)!.pageViews++;
     });
 
     const dailyData = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
@@ -257,20 +240,20 @@ export async function GET() {
       status: order.status || 'pending',
     }));
 
-    return NextResponse.json({
-      // Sessions (remplace les "visites")
-      totalSessions: sessionsTotal.count || 0,
-      sessionsToday: sessionsToday.count || 0,
-      sessionsThisWeek: sessionsWeek.count || 0,
-      sessionsThisMonth: sessionsMonth.count || 0,
-      sessionsThisYear: sessionsYear.count || 0,
+    const responseData = {
+      // Sessions
+      totalSessions: sessions.length,
+      sessionsToday: sessionsToday.length,
+      sessionsThisWeek: sessionsWeek.length,
+      sessionsThisMonth: sessionsMonth.length,
+      sessionsThisYear: sessionsYear.length,
       
       // Visiteurs uniques
-      uniqueVisitors: countUnique(uniqueVisitorsTotal.data),
-      uniqueVisitorsToday: countUnique(uniqueVisitorsToday.data),
-      uniqueVisitorsThisWeek: countUnique(uniqueVisitorsWeek.data),
-      uniqueVisitorsThisMonth: countUnique(uniqueVisitorsMonth.data),
-      uniqueVisitorsThisYear: countUnique(uniqueVisitorsYear.data),
+      uniqueVisitors: countUnique(sessions),
+      uniqueVisitorsToday: countUnique(sessionsToday),
+      uniqueVisitorsThisWeek: countUnique(sessionsWeek),
+      uniqueVisitorsThisMonth: countUnique(sessionsMonth),
+      uniqueVisitorsThisYear: countUnique(sessionsYear),
       
       // Métriques de qualité
       avgPagesPerSession: Math.round(avgPagesPerSession * 10) / 10,
@@ -285,27 +268,32 @@ export async function GET() {
       topProductsCarted: topCarted,
       
       // Ventes
-      totalSales: ordersTotal.count || 0,
-      salesToday: ordersToday.data?.length || 0,
-      salesThisWeek: ordersWeek.data?.length || 0,
-      salesThisMonth: ordersMonth.data?.length || 0,
-      salesThisYear: ordersYear.data?.length || 0,
+      totalSales: orders.length,
+      salesToday: ordersToday.length,
+      salesThisWeek: ordersWeek.length,
+      salesThisMonth: ordersMonth.length,
+      salesThisYear: ordersYear.length,
       
       // Revenue
-      totalRevenue: calcRevenue(ordersTotal.data),
-      revenueToday: calcRevenue(ordersToday.data),
-      revenueThisWeek: calcRevenue(ordersWeek.data),
-      revenueThisMonth: calcRevenue(ordersMonth.data),
-      revenueThisYear: calcRevenue(ordersYear.data),
+      totalRevenue: calcRevenue(orders),
+      revenueToday: calcRevenue(ordersToday),
+      revenueThisWeek: calcRevenue(ordersWeek),
+      revenueThisMonth: calcRevenue(ordersMonth),
+      revenueThisYear: calcRevenue(ordersYear),
       
       // Autres
       totalProducts: productsCount.count || 0,
       totalCustomers: customersCount.count || 0,
       recentOrders: formattedRecentOrders,
       
-      // Données journalières pour les graphiques
+      // Données journalières
       dailyData,
-    });
+    };
+
+    // Mettre en cache
+    analyticsCache = { data: responseData, timestamp: Date.now() };
+
+    return NextResponse.json(responseData);
 
   } catch (error) {
     console.error('Erreur récupération analytics:', error);
