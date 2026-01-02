@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail, AUTH_ROUTES } from '@/lib/auth';
-import type { User } from '@supabase/supabase-js';
+import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const initialized = useRef(false);
+  const lastValidUser = useRef<User | null>(null);
 
   const checkIsAdmin = useCallback(async (currentUser: User | null) => {
     if (!currentUser) {
@@ -43,13 +44,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      setUser(currentUser);
-      await checkIsAdmin(currentUser);
+      const { data: { user: currentUser }, error } = await supabase.auth.getUser();
+      if (!error && currentUser) {
+        lastValidUser.current = currentUser;
+        setUser(currentUser);
+        await checkIsAdmin(currentUser);
+      } else if (error) {
+        // Seulement si erreur réelle, pas juste session manquante
+        console.log('refreshUser error:', error.message);
+        // Ne pas effacer l'utilisateur si on a une erreur réseau
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          return; // Garder l'état actuel
+        }
+        setUser(null);
+        setIsAdmin(false);
+        lastValidUser.current = null;
+      }
     } catch (error) {
       console.error('Erreur lors du rafraîchissement utilisateur:', error);
-      setUser(null);
-      setIsAdmin(false);
+      // Ne pas effacer en cas d'erreur réseau
     }
   }, [supabase, checkIsAdmin]);
 
@@ -91,13 +104,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.log('Init auth - pas de session:', error.message);
           setUser(null);
           setIsAdmin(false);
+          lastValidUser.current = null;
         } else if (currentUser) {
           console.log('Init auth - utilisateur trouvé:', currentUser.email);
+          lastValidUser.current = currentUser;
           setUser(currentUser);
           await checkIsAdmin(currentUser);
         } else {
           setUser(null);
           setIsAdmin(false);
+          lastValidUser.current = null;
         }
       } catch (error) {
         console.error('Erreur initialisation auth:', error);
@@ -112,10 +128,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session: Session | null) => {
         console.log('Auth state change:', event, session?.user?.email);
         
+        // Ignorer les événements INITIAL_SESSION car on a déjà initialisé
+        if (event === 'INITIAL_SESSION') {
+          return;
+        }
+        
+        // Pour SIGNED_IN et TOKEN_REFRESHED, mettre à jour l'utilisateur
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          const currentUser = session?.user ?? null;
+          if (currentUser) {
+            lastValidUser.current = currentUser;
+            setUser(currentUser);
+            await checkIsAdmin(currentUser);
+          }
+          setIsLoading(false);
+          return;
+        }
+        
+        // Pour SIGNED_OUT, vérifier d'abord avec le serveur avant d'effacer
+        if (event === 'SIGNED_OUT') {
+          // Double vérification avec getUser() pour éviter les faux positifs
+          const { data: { user: serverUser } } = await supabase.auth.getUser();
+          if (!serverUser) {
+            // Vraiment déconnecté
+            setUser(null);
+            setIsAdmin(false);
+            lastValidUser.current = null;
+          } else {
+            // Faux positif - l'utilisateur est toujours connecté côté serveur
+            console.log('SIGNED_OUT ignoré - utilisateur toujours valide côté serveur');
+            setUser(serverUser);
+            await checkIsAdmin(serverUser);
+          }
+          setIsLoading(false);
+          return;
+        }
+        
+        // Pour les autres événements
         const currentUser = session?.user ?? null;
+        if (currentUser) {
+          lastValidUser.current = currentUser;
+        }
         setUser(currentUser);
         await checkIsAdmin(currentUser);
         setIsLoading(false);

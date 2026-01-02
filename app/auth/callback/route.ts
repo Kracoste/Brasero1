@@ -11,22 +11,30 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    
     if (!error && data.session) {
-      // La session est bien créée, on redirige
-      // Utiliser www. en production pour la cohérence des cookies
-      let redirectOrigin = origin
-      if (process.env.NODE_ENV === 'production' && origin.includes('atelier-lbf.fr') && !origin.includes('www.')) {
-        redirectOrigin = origin.replace('atelier-lbf.fr', 'www.atelier-lbf.fr')
+      // Vérifier que la session est bien établie
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        console.log('Auth callback - Session établie pour:', user.email);
+        
+        // Utiliser www. en production pour la cohérence des cookies
+        let redirectOrigin = origin
+        if (process.env.NODE_ENV === 'production' && origin.includes('atelier-lbf.fr') && !origin.includes('www.')) {
+          redirectOrigin = origin.replace('atelier-lbf.fr', 'www.atelier-lbf.fr')
+        }
+        
+        const redirectUrl = new URL(next, redirectOrigin)
+        const response = NextResponse.redirect(redirectUrl)
+        
+        // Forcer le navigateur à ne pas mettre en cache cette réponse
+        response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        response.headers.set('Pragma', 'no-cache')
+        response.headers.set('Expires', '0')
+        
+        return response
       }
-      
-      const redirectUrl = new URL(next, redirectOrigin)
-      const response = NextResponse.redirect(redirectUrl)
-      
-      // Forcer le navigateur à ne pas mettre en cache cette réponse
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-      response.headers.set('Pragma', 'no-cache')
-      
-      return response
     }
     console.error('Auth callback error:', error)
   }
