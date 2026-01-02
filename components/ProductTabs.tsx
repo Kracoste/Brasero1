@@ -79,12 +79,6 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
           <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(450px,1.2fr)]">
             <div className="space-y-4 text-gray-700">
               <p className="leading-relaxed text-[15px]">{product.description}</p>
-              <p className="leading-relaxed text-[15px]">
-                Ce braséro est entièrement fabriqué à la main dans notre atelier de Moncoutant, dans les Deux-Sèvres. Chaque pièce est unique et porte les marques du travail artisanal : soudures parfaitement exécutées, finitions soignées et contrôle qualité rigoureux avant expédition.
-              </p>
-              <p className="leading-relaxed text-[15px]">
-                L'acier utilisé développe naturellement une patine protectrice au fil du temps, lui conférant un aspect authentique et une résistance accrue aux intempéries. Idéal pour créer une ambiance chaleureuse lors de vos soirées en extérieur, ce braséro devient rapidement le point central de votre jardin ou terrasse.
-              </p>
             </div>
 
             <div className="rounded-lg border border-gray-200 bg-white shadow-sm h-fit">
