@@ -41,7 +41,7 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // Refresh session - augmenter le timeout pour laisser le temps à la session de se charger
+  // Refresh session - juste rafraîchir, pas de redirection
   try {
     await supabase.auth.getUser();
   } catch {

@@ -55,15 +55,25 @@ function ConnexionPageContent() {
   }, [getRedirectTarget]);
 
   // Rediriger si déjà connecté
+  // On redirige seulement si l'utilisateur arrive directement sur /connexion sans redirectTo
   useEffect(() => {
     if (authLoading) return;
     if (!user) return;
     if (hasRedirected.current) return;
     
-    const isAdminUser = isAdmin || isAdminEmail(user.email);
-    const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
-    performRedirect(target);
-  }, [authLoading, user, isAdmin, performRedirect]);
+    // Vérifier s'il y a un redirectTo valide
+    const redirectTarget = searchParams?.get(REDIRECT_PARAM);
+    
+    // Si pas de redirectTo, on peut rediriger automatiquement
+    // (l'utilisateur est allé sur /connexion alors qu'il est déjà connecté)
+    if (!redirectTarget) {
+      const isAdminUser = isAdmin || isAdminEmail(user.email);
+      const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
+      performRedirect(target);
+    }
+    // Si redirectTo est présent, l'utilisateur doit se reconnecter manuellement
+    // car sa session serveur n'est pas reconnue
+  }, [authLoading, user, isAdmin, performRedirect, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

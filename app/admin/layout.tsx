@@ -1,69 +1,36 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ChevronLeft } from 'lucide-react';
-import { cookies } from 'next/headers';
 
-import { createClient } from '@/lib/supabase/server';
 import { AdminSignOutButton } from '@/components/AdminSignOutButton';
-import { isAdminEmail, AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
+import { AuthRedirect } from '@/components/AuthRedirect';
+import { AuthProvider } from '@/lib/auth-context';
 
-// Vérification serveur pour éviter le loader bloquant côté client
+// Force dynamic pour éviter les problèmes de cache
 export const dynamic = 'force-dynamic';
 
 type AdminLayoutProps = {
   children: ReactNode;
 };
 
-export default async function AdminLayout({ children }: AdminLayoutProps) {
-  const cookieStore = await cookies();
-  
-  // Vérifier d'abord si on a des cookies Supabase
-  const allCookies = cookieStore.getAll();
-  const hasAuthCookies = allCookies.some(c => 
-    c.name.includes('sb-') && c.name.includes('-auth-token')
-  );
-  
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  // Si pas d'utilisateur mais on a des cookies auth, essayer getSession
-  let finalUser = user;
-  if (!user && hasAuthCookies) {
-    const { data: { session } } = await supabase.auth.getSession();
-    finalUser = session?.user ?? null;
-  }
-
-  if (userError || !finalUser) {
-    redirect(`${AUTH_ROUTES.login}?${REDIRECT_PARAM}=${AUTH_ROUTES.admin}`);
-  }
-
-  // Vérifier si admin par email uniquement (config centralisée)
-  // Évite les problèmes de RLS recursion sur la table profiles
-  const isAdmin = isAdminEmail(finalUser.email);
-
-  if (!isAdmin) {
-    redirect('/');
-  }
-
+export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="flex h-screen bg-slate-100">
-      {/* Sidebar */}
-      <aside className="w-64 text-white flex flex-col" style={{ background: 'linear-gradient(to bottom, #8B4513, #5D3A1A, #3D2314)' }}>
-        <div className="p-6 border-b border-white/20">
-          <h1 className="text-xl font-bold">Admin LBF</h1>
-          <p className="text-sm text-slate-400 mt-1">Panneau d'administration</p>
-        </div>
+    <AuthProvider>
+      <AuthRedirect requireAdmin={true}>
+        <div className="flex h-screen bg-slate-100">
+          {/* Sidebar */}
+          <aside className="w-64 text-white flex flex-col" style={{ background: 'linear-gradient(to bottom, #8B4513, #5D3A1A, #3D2314)' }}>
+            <div className="p-6 border-b border-white/20">
+              <h1 className="text-xl font-bold">Admin LBF</h1>
+              <p className="text-sm text-slate-400 mt-1">Panneau d'administration</p>
+            </div>
 
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            <li>
-              <Link
-                href="/admin"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
+            <nav className="flex-1 p-4">
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
               >
                 <LayoutDashboard size={20} />
                 Dashboard
@@ -123,5 +90,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main content */}
       <main className="flex-1 overflow-auto">{children}</main>
     </div>
+      </AuthRedirect>
+    </AuthProvider>
   );
 }
