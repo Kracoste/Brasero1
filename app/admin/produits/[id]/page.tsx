@@ -186,17 +186,21 @@ export default function EditProduct() {
     }));
   };
 
-  // Charger tous les produits disponibles (pour les produits compatibles)
+  // Charger tous les produits disponibles (pour les produits compatibles) via API admin
   useEffect(() => {
     const loadProducts = async () => {
-      const { data } = await supabase
-        .from('products')
-        .select('id, name, slug, images, category')
-        .order('name');
-      if (data) setAvailableProducts(data);
+      try {
+        const response = await fetch('/api/admin/products');
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableProducts(data);
+        }
+      } catch (error) {
+        console.error('Erreur chargement produits disponibles:', error);
+      }
     };
     loadProducts();
-  }, [supabase]);
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

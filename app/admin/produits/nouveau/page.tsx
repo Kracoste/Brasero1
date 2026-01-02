@@ -109,18 +109,23 @@ export default function NewProduct() {
     }));
   };
 
-  // Charger tous les produits disponibles (braséros et accessoires)
+  // Charger tous les produits disponibles (braséros et accessoires) via API admin
   useEffect(() => {
     const loadProducts = async () => {
-      const { data } = await supabase
-        .from('products')
-        .select('id, name, slug, images, category')
-        .in('category', ['brasero', 'accessoire'])
-        .order('name');
-      if (data) setAvailableProducts(data);
+      try {
+        const response = await fetch('/api/admin/products');
+        if (response.ok) {
+          const data = await response.json();
+          // Filtrer uniquement braséros et accessoires
+          const filtered = data.filter((p: any) => ['brasero', 'accessoire'].includes(p.category));
+          setAvailableProducts(filtered);
+        }
+      } catch (error) {
+        console.error('Erreur chargement produits disponibles:', error);
+      }
     };
     loadProducts();
-  }, [supabase]);
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
