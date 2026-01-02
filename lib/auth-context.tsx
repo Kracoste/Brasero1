@@ -15,19 +15,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Cache global pour persister l'état entre les navigations
+let cachedUser: User | null = null;
+let cachedIsAdmin: boolean = false;
+let isInitialized: boolean = false;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Créer le client une seule fois au montage
   const supabase = useMemo(() => createClient(), []);
   
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const initialized = useRef(false);
-  const lastValidUser = useRef<User | null>(null);
+  // Initialiser avec le cache si disponible
+  const [user, setUser] = useState<User | null>(cachedUser);
+  const [isLoading, setIsLoading] = useState(!isInitialized);
+  const [isAdmin, setIsAdmin] = useState(cachedIsAdmin);
+  const initInProgress = useRef(false);
 
-  const checkIsAdmin = useCallback(async (currentUser: User | null) => {
+  const checkIsAdmin = useCallback((currentUser: User | null) => {
     if (!currentUser) {
       setIsAdmin(false);
+      cachedIsAdmin = false;
       return;
     }
 
@@ -35,20 +41,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Évite les problèmes de RLS recursion sur la table profiles
     if (isAdminEmail(currentUser.email)) {
       setIsAdmin(true);
+      cachedIsAdmin = true;
       return;
     }
 
     // Par défaut, non admin
     setIsAdmin(false);
+    cachedIsAdmin = false;
   }, []);
+
+  const updateUser = useCallback((newUser: User | null) => {
+    cachedUser = newUser;
+    setUser(newUser);
+    checkIsAdmin(newUser);
+  }, [checkIsAdmin]);
 
   const refreshUser = useCallback(async () => {
     try {
       const { data: { user: currentUser }, error } = await supabase.auth.getUser();
       if (!error && currentUser) {
-        lastValidUser.current = currentUser;
-        setUser(currentUser);
-        await checkIsAdmin(currentUser);
+        updateUser(currentUser);
       } else if (error) {
         // Seulement si erreur réelle, pas juste session manquante
         console.log('refreshUser error:', error.message);
@@ -56,18 +68,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error.message.includes('network') || error.message.includes('fetch')) {
           return; // Garder l'état actuel
         }
-        setUser(null);
-        setIsAdmin(false);
-        lastValidUser.current = null;
+        updateUser(null);
       }
     } catch (error) {
       console.error('Erreur lors du rafraîchissement utilisateur:', error);
       // Ne pas effacer en cas d'erreur réseau
     }
-  }, [supabase, checkIsAdmin]);
+  }, [supabase, updateUser]);
 
   const signOut = useCallback(async () => {
     try {
+      // Réinitialiser le cache immédiatement
+      cachedUser = null;
+      cachedIsAdmin = false;
+      isInitialized = false;
+      
       // Utiliser l'API route pour la déconnexion côté serveur (nettoie les cookies)
       await fetch(AUTH_ROUTES.logout, { method: 'POST' });
       
@@ -88,9 +103,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   useEffect(() => {
-    // Éviter la double initialisation en mode strict de React
-    if (initialized.current) return;
-    initialized.current = true;
+    // Éviter les initialisations multiples en parallèle
+    if (initInProgress.current) return;
+    
+    // Si déjà initialisé et on a un utilisateur en cache, ne pas re-fetcher
+    if (isInitialized && cachedUser) {
+      setIsLoading(false);
+      return;
+    }
+    
+    initInProgress.current = true;
     
     // Initialisation - forcer une vérification serveur
     const init = async () => {
@@ -102,25 +124,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (error) {
           console.log('Init auth - pas de session:', error.message);
-          setUser(null);
-          setIsAdmin(false);
-          lastValidUser.current = null;
+          // Ne pas effacer le cache si c'est juste une erreur réseau
+          if (!error.message.includes('network') && !error.message.includes('fetch')) {
+            updateUser(null);
+          }
         } else if (currentUser) {
           console.log('Init auth - utilisateur trouvé:', currentUser.email);
-          lastValidUser.current = currentUser;
-          setUser(currentUser);
-          await checkIsAdmin(currentUser);
+          updateUser(currentUser);
         } else {
-          setUser(null);
-          setIsAdmin(false);
-          lastValidUser.current = null;
+          updateUser(null);
         }
+        
+        isInitialized = true;
       } catch (error) {
         console.error('Erreur initialisation auth:', error);
-        setUser(null);
-        setIsAdmin(false);
+        // Garder le cache en cas d'erreur
       } finally {
         setIsLoading(false);
+        initInProgress.current = false;
       }
     };
 
@@ -140,9 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           const currentUser = session?.user ?? null;
           if (currentUser) {
-            lastValidUser.current = currentUser;
-            setUser(currentUser);
-            await checkIsAdmin(currentUser);
+            updateUser(currentUser);
           }
           setIsLoading(false);
           return;
@@ -154,14 +173,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const { data: { user: serverUser } } = await supabase.auth.getUser();
           if (!serverUser) {
             // Vraiment déconnecté
-            setUser(null);
-            setIsAdmin(false);
-            lastValidUser.current = null;
+            updateUser(null);
+            isInitialized = false;
           } else {
             // Faux positif - l'utilisateur est toujours connecté côté serveur
             console.log('SIGNED_OUT ignoré - utilisateur toujours valide côté serveur');
-            setUser(serverUser);
-            await checkIsAdmin(serverUser);
+            updateUser(serverUser);
           }
           setIsLoading(false);
           return;
@@ -169,11 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // Pour les autres événements
         const currentUser = session?.user ?? null;
-        if (currentUser) {
-          lastValidUser.current = currentUser;
-        }
-        setUser(currentUser);
-        await checkIsAdmin(currentUser);
+        updateUser(currentUser);
         setIsLoading(false);
       }
     );

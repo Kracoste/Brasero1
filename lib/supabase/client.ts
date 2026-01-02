@@ -14,8 +14,12 @@ export function createClient() {
         // Assurer la persistance de la session
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
+        // Désactiver detectSessionInUrl car on gère ça via le callback
+        detectSessionInUrl: false,
         flowType: 'pkce',
+        // Stocker dans localStorage pour une meilleure persistance
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+        storageKey: 'sb-auth-token',
       },
     }
   );
