@@ -65,28 +65,30 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="py-6 sm:py-10 overflow-hidden">
-        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-16">
-          {/* Mobile & Tablet: Stack vertical | Desktop: 3 colonnes */}
-          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Colonne gauche - Catégories */}
-            <div className="flex flex-col gap-4">
+      <section className="py-4 sm:py-6 lg:py-10 overflow-hidden">
+        <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 xl:px-16">
+          {/* Layout simple et fiable */}
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6">
+            {/* Colonne gauche */}
+            <div className="w-full lg:w-1/3 flex flex-col gap-3 sm:gap-4">
+              {/* Braséros */}
               <CategoryTile
                 title="Nos braséros"
                 cta="Découvrir nos braséro"
                 image="/acceuil/acceuil1.jpg"
                 href="/produits?category=brasero"
               />
-              <div className="grid grid-cols-2 gap-4">
+              {/* Fendeur et Accessoires côte à côte */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <CategoryTile
-                  title="Nos Fendeur A Buches"
+                  title="Fendeur A Bûches"
                   cta="Voir tous"
                   image="/acceuil/Fendeur-Buches.png"
                   href="/produits?category=fendeur"
                   compact
                 />
                 <CategoryTile
-                  title="Nos Accessoires"
+                  title="Accessoires"
                   cta="Voir tous"
                   image="/accesoiresbrasero.jpg"
                   href="/produits?category=accessoire"
@@ -94,8 +96,8 @@ export default async function HomePage() {
                 />
               </div>
             </div>
-            {/* Colonne droite - Promo (prend 2 colonnes sur lg) */}
-            <div className="lg:col-span-2">
+            {/* Colonne droite - Promo */}
+            <div className="w-full lg:w-2/3">
               <PromoTile />
             </div>
           </div>
@@ -139,10 +141,9 @@ type CategoryTileProps = {
 const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTileProps) => (
   <a
     href={href}
-    className={`relative block overflow-hidden rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${
-      compact ? 'min-h-[140px] sm:min-h-[160px]' : 'min-h-[180px] sm:min-h-[220px] lg:min-h-[240px]'
+    className={`relative block overflow-hidden rounded-xl sm:rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${
+      compact ? 'h-[120px] sm:h-[140px] lg:h-[160px]' : 'h-[180px] sm:h-[200px] lg:h-[240px]'
     }`}
-    style={{ aspectRatio: compact ? "1 / 0.9" : "4 / 3" }}
   >
     <div className="absolute inset-0">
       <img
@@ -152,9 +153,9 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
       />
     </div>
     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-3 sm:px-4">
-      <h3 className={`font-semibold drop-shadow ${compact ? 'text-sm sm:text-base' : 'text-base sm:text-lg'}`}>{title}</h3>
-      <span className={`mt-2 sm:mt-3 rounded-full bg-white/90 px-3 sm:px-4 py-1.5 sm:py-2 font-semibold text-slate-900 shadow ${compact ? 'text-xs sm:text-sm' : 'text-xs sm:text-sm'}`}>
+    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-2 sm:px-3 lg:px-4">
+      <h3 className={`font-semibold drop-shadow leading-tight ${compact ? 'text-xs sm:text-sm lg:text-base' : 'text-sm sm:text-base lg:text-lg'}`}>{title}</h3>
+      <span className={`mt-1.5 sm:mt-2 lg:mt-3 rounded-full bg-white/90 px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 font-semibold text-slate-900 shadow ${compact ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm'}`}>
         {cta}
       </span>
     </div>
@@ -162,24 +163,24 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
 );
 
 const PromoTile = () => (
-  <div className="relative overflow-hidden rounded-2xl bg-black text-white shadow-lg h-full min-h-[300px] sm:min-h-[350px] lg:min-h-[400px]">
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-black text-white shadow-lg h-[320px] sm:h-[360px] lg:h-full lg:min-h-[420px]">
     <img
       src="/Braserobanner.jpg"
       alt="Promotion brasero"
       className="absolute inset-0 h-full w-full object-cover brightness-125"
     />
     <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
-    <div className="relative flex h-full flex-col items-start justify-center gap-3 sm:gap-4 px-6 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
-      <p className="text-base sm:text-lg font-semibold text-[#D2691E]">Nos promotions</p>
-      <h3 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black leading-tight">
+    <div className="relative flex h-full flex-col items-start justify-center gap-2 sm:gap-3 lg:gap-4 px-4 py-6 sm:px-6 sm:py-8 lg:px-12 lg:py-12">
+      <p className="text-sm sm:text-base lg:text-lg font-semibold text-[#D2691E]">Nos promotions</p>
+      <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black leading-tight">
         PROMOTIONS <br /> JUSQU&apos;À 40%
       </h3>
-      <p className="text-sm sm:text-base lg:text-lg text-[#CD853F] max-w-md">
+      <p className="text-xs sm:text-sm lg:text-base text-[#CD853F] max-w-md">
         Promotions pouvant aller jusqu&apos;à 40% sur nos braséros et accessoires.
       </p>
       <a
         href="/produits?category=promotions"
-        className="mt-2 inline-flex items-center justify-center rounded-full bg-white px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-slate-900 shadow transition hover:scale-[1.02]"
+        className="mt-1 sm:mt-2 inline-flex items-center justify-center rounded-full bg-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 lg:py-3 text-[10px] sm:text-xs lg:text-sm font-semibold text-slate-900 shadow transition hover:scale-[1.02]"
       >
         J&apos;en profite
       </a>

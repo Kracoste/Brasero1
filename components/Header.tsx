@@ -28,7 +28,7 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-[#f6f1e9] shadow-sm overflow-visible">
       <div className="w-full px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center py-0 gap-1 sm:gap-2 lg:gap-4">
+        <div className="flex items-center justify-between py-1 gap-2">
           {/* Logo à gauche */}
           <Link href="/" className="flex-shrink-0">
           <Image
@@ -36,15 +36,15 @@ export const Header = () => {
             alt="Atelier LBF Logo"
             width={1400}
             height={500}
-            className="w-auto max-h-12 sm:max-h-14 md:max-h-16 lg:max-h-20 xl:max-h-24"
+            className="w-auto h-10 sm:h-12 md:h-14 lg:h-16 xl:h-20"
             style={{ objectFit: "contain" }}
             priority
           />
           </Link>
           
-          {/* Navigation centrée */}
-          <div className="flex-1 flex justify-center">
-            <div className="hidden items-center gap-2 md:gap-3 lg:gap-4 xl:gap-6 md:flex">
+          {/* Navigation centrée - cachée sur mobile/tablette */}
+          <div className="hidden lg:flex flex-1 justify-center">
+            <div className="flex items-center gap-2 lg:gap-3 xl:gap-6">
               {navLinks.map((link) => {
                 if (link.label === "Accessoires") {
                   const isActive =
@@ -125,24 +125,24 @@ export const Header = () => {
             </div>
           </div>
           
-          {/* Icônes à droite */}
-          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
+          {/* Icônes à droite - toujours visibles */}
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-shrink-0">
             {/* Favoris */}
-            <Link href="/favoris" className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition">
+            <Link href="/favoris" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
               <span className="relative">
-                <Heart size={22} />
+                <Heart className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                 {favoriteCount > 0 && (
-                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1.5 text-[10px] font-semibold text-white">
+                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1 sm:px-1.5 text-[9px] sm:text-[10px] font-semibold text-white">
                     {favoriteCount}
                   </span>
                 )}
               </span>
-              <span className="text-[10px] uppercase tracking-wide mt-1">Mes Favoris</span>
+              <span className="hidden md:block text-[8px] sm:text-[9px] uppercase tracking-wide mt-0.5">Favoris</span>
             </Link>
 
             {/* Mon Compte */}
             <div 
-              className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition relative cursor-pointer"
+              className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition relative cursor-pointer min-w-[40px]"
               onMouseEnter={() => {
                 if (accountTimer.current) clearTimeout(accountTimer.current);
                 setAccountMenuOpen(true);
@@ -151,9 +151,10 @@ export const Header = () => {
                 if (accountTimer.current) clearTimeout(accountTimer.current);
                 accountTimer.current = setTimeout(() => setAccountMenuOpen(false), 250);
               }}
+              onClick={() => setAccountMenuOpen(!accountMenuOpen)}
             >
-              <User size={22} />
-              <span className="text-[10px] uppercase tracking-wide mt-1">Mon Compte</span>
+              <User className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
+              <span className="hidden md:block text-[8px] sm:text-[9px] uppercase tracking-wide mt-0.5">Compte</span>
               
               {/* Menu déroulant */}
               <div
@@ -217,33 +218,34 @@ export const Header = () => {
             </div>
 
             {/* Panier */}
-            <Link href="/panier" className="hidden md:flex flex-col items-center text-slate-700 hover:text-slate-900 transition">
+            <Link href="/panier" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
               <span className="relative">
-                <ShoppingBag size={22} />
+                <ShoppingBag className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                 {itemCount > 0 && (
-                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1.5 text-[10px] font-semibold text-white">
+                  <span className="absolute -right-2 -top-2 rounded-full bg-[#ff5751] px-1 sm:px-1.5 text-[9px] sm:text-[10px] font-semibold text-white">
                     {itemCount}
                   </span>
                 )}
               </span>
-              <span className="text-[10px] uppercase tracking-wide mt-1">Panier</span>
+              <span className="hidden md:block text-[8px] sm:text-[9px] uppercase tracking-wide mt-0.5">Panier</span>
             </Link>
 
+            {/* Menu hamburger - visible sur mobile et tablette */}
             <button
               type="button"
               onClick={toggle}
-              className="rounded-full border border-slate-300 p-2 text-slate-900 md:hidden"
+              className="rounded-full border border-slate-300 p-1.5 sm:p-2 text-slate-900 lg:hidden"
               aria-label="Ouvrir le menu"
               aria-expanded={open}
             >
-              {open ? <X size={18} /> : <Menu size={18} />}
+              {open ? <X className="w-4 h-4 sm:w-[18px] sm:h-[18px]" /> : <Menu className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />}
             </button>
           </div>
         </div>
       </div>
 
       {open && (
-        <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-slate-200 bg-white px-4 py-4 lg:hidden">
           <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link
@@ -255,25 +257,13 @@ export const Header = () => {
                 {link.label}
               </Link>
             ))}
-            {/* Liens Favoris et Panier pour mobile */}
-            <div className="flex gap-3">
-              <Link
-                href="/favoris"
-                onClick={() => setOpen(false)}
-                className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-900"
-              >
-                <Heart size={16} />
-                Favoris {favoriteCount > 0 && `(${favoriteCount})`}
-              </Link>
-              <Link
-                href="/panier"
-                onClick={() => setOpen(false)}
-                className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-900"
-              >
-                <ShoppingBag size={16} />
-                Panier {itemCount > 0 && `(${itemCount})`}
-              </Link>
-            </div>
+            <Link
+              href="/recettes"
+              onClick={() => setOpen(false)}
+              className="rounded-lg bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-3 py-2 text-center text-sm font-semibold text-white"
+            >
+              Recettes
+            </Link>
             {user && isAdmin && (
               <Link
                 href="/admin"
