@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
+  const pathname = request.nextUrl.pathname;
   
   // Rediriger non-www vers www pour éviter les problèmes de cookies
   if (hostname === 'atelier-lbf.fr') {
@@ -12,7 +13,16 @@ export async function middleware(request: NextRequest) {
   }
   
   // Toujours mettre à jour la session pour maintenir l'état de connexion
-  return await updateSession(request)
+  const response = await updateSession(request);
+  
+  // Désactiver le cache CDN pour les pages produits (données dynamiques)
+  if (pathname.startsWith('/produits/')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('CDN-Cache-Control', 'no-store');
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
+  }
+  
+  return response;
 }
 
 export const config = {

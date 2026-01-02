@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
@@ -92,6 +93,12 @@ export async function PUT(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Invalider le cache de la page produit pour forcer le rechargement des données
+    if (product?.slug) {
+      revalidatePath(`/produits/${product.slug}`);
+      revalidatePath('/produits');
     }
 
     return NextResponse.json(product);
