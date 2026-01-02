@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
+import { ALLOWED_STORAGE_BUCKETS, sanitizeFileName, devError } from '@/lib/supabase/utils';
 
 // POST: Upload une image vers Supabase Storage
 export async function POST(request: NextRequest) {
@@ -29,11 +30,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Fichier et nom requis' }, { status: 400 });
     }
 
-    // Normaliser le nom du fichier pour supprimer les accents et caractères spéciaux
-    const sanitizedFileName = fileName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
-      .replace(/[^a-zA-Z0-9._-]/g, '_'); // Remplacer les caractères spéciaux par _
+    // Valider le bucket
+    if (!ALLOWED_STORAGE_BUCKETS.includes(bucket as any)) {
+      return NextResponse.json({ error: 'Bucket non autorisé' }, { status: 400 });
+    }
+
+    // Sanitize le nom du fichier pour éviter les path traversal
+    const sanitizedFileName = sanitizeFileName(fileName);
 
     // Upload vers Storage avec le client admin (bypass RLS)
     const { data: uploadData, error: uploadError } = await adminClient.storage
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest) {
       path: uploadData.path
     });
   } catch (error) {
-    console.error('Erreur upload storage:', error);
+    devError('Erreur upload storage:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -98,7 +101,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur delete storage:', error);
+    devError('Erreur delete storage:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

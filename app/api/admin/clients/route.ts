@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
+import { VALID_USER_ROLES, devError } from '@/lib/supabase/utils';
 
 export async function GET() {
   try {
@@ -25,13 +26,13 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Erreur chargement clients:', error);
+      devError('Erreur chargement clients:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ clients: data || [] });
   } catch (error) {
-    console.error('Erreur API clients:', error);
+    devError('Erreur API clients:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -48,6 +49,15 @@ export async function PUT(request: Request) {
 
     const { clientId, role } = await request.json();
 
+    // Valider le rôle
+    if (!role || !VALID_USER_ROLES.includes(role)) {
+      return NextResponse.json({ error: 'Rôle invalide' }, { status: 400 });
+    }
+
+    if (!clientId) {
+      return NextResponse.json({ error: 'ID client requis' }, { status: 400 });
+    }
+
     // Utiliser le client admin pour bypasser RLS
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
@@ -60,13 +70,13 @@ export async function PUT(request: Request) {
       .eq('id', clientId);
 
     if (error) {
-      console.error('Erreur mise à jour rôle:', error);
+      devError('Erreur mise à jour rôle:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur API update role:', error);
+    devError('Erreur API update role:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -104,13 +114,13 @@ export async function DELETE(request: Request) {
       .eq('id', clientId);
 
     if (error) {
-      console.error('Erreur suppression client:', error);
+      devError('Erreur suppression client:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur API delete client:', error);
+    devError('Erreur API delete client:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

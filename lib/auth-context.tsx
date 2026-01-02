@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail, AUTH_ROUTES } from '@/lib/auth';
+import { devLog, devError } from '@/lib/supabase/utils';
 import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -63,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updateUser(currentUser);
       } else if (error) {
         // Seulement si erreur réelle, pas juste session manquante
-        console.log('refreshUser error:', error.message);
+        devLog('refreshUser error:', error.message);
         // Ne pas effacer l'utilisateur si on a une erreur réseau
         if (error.message.includes('network') || error.message.includes('fetch')) {
           return; // Garder l'état actuel
@@ -71,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updateUser(null);
       }
     } catch (error) {
-      console.error('Erreur lors du rafraîchissement utilisateur:', error);
+      devError('Erreur lors du rafraîchissement utilisateur:', error);
       // Ne pas effacer en cas d'erreur réseau
     }
   }, [supabase, updateUser]);
@@ -96,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Rediriger avec un rechargement complet pour nettoyer tout l'état
       window.location.href = AUTH_ROUTES.home;
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      devError('Erreur lors de la déconnexion:', error);
       // Forcer la redirection même en cas d'erreur
       window.location.href = AUTH_ROUTES.home;
     }
@@ -123,13 +124,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: { user: currentUser }, error } = await supabase.auth.getUser();
         
         if (error) {
-          console.log('Init auth - pas de session:', error.message);
+          devLog('Init auth - pas de session:', error.message);
           // Ne pas effacer le cache si c'est juste une erreur réseau
           if (!error.message.includes('network') && !error.message.includes('fetch')) {
             updateUser(null);
           }
         } else if (currentUser) {
-          console.log('Init auth - utilisateur trouvé:', currentUser.email);
+          devLog('Init auth - utilisateur trouvé:', currentUser.email);
           updateUser(currentUser);
         } else {
           updateUser(null);
@@ -137,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         isInitialized = true;
       } catch (error) {
-        console.error('Erreur initialisation auth:', error);
+        devError('Erreur initialisation auth:', error);
         // Garder le cache en cas d'erreur
       } finally {
         setIsLoading(false);
@@ -150,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
-        console.log('Auth state change:', event, session?.user?.email);
+        devLog('Auth state change:', event, session?.user?.email);
         
         // Ignorer les événements INITIAL_SESSION car on a déjà initialisé
         if (event === 'INITIAL_SESSION') {
@@ -177,7 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isInitialized = false;
           } else {
             // Faux positif - l'utilisateur est toujours connecté côté serveur
-            console.log('SIGNED_OUT ignoré - utilisateur toujours valide côté serveur');
+            devLog('SIGNED_OUT ignoré - utilisateur toujours valide côté serveur');
             updateUser(serverUser);
           }
           setIsLoading(false);

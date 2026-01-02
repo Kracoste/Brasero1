@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
+import { VALID_ORDER_STATUSES, devError } from '@/lib/supabase/utils';
 
 // GET: Récupérer les commandes
 export async function GET(request: NextRequest) {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(orders);
   } catch (error) {
-    console.error('Erreur GET orders:', error);
+    devError('Erreur GET orders:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -56,6 +57,11 @@ export async function PUT(request: NextRequest) {
 
     const { status } = await request.json();
 
+    // Valider le statut
+    if (!status || !VALID_ORDER_STATUSES.includes(status)) {
+      return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
+    }
+
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
@@ -75,7 +81,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(order);
   } catch (error) {
-    console.error('Erreur PUT order:', error);
+    devError('Erreur PUT order:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

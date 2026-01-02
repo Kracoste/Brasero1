@@ -1,22 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-
-// Fonction pour extraire le domaine racine pour les cookies
-function getCookieDomain(hostname: string): string | undefined {
-  // En développement local, ne pas spécifier de domaine
-  if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
-    return undefined;
-  }
-  // Pour atelier-lbf.fr, utiliser le domaine racine pour partager les cookies
-  if (hostname.includes('atelier-lbf.fr')) {
-    return '.atelier-lbf.fr';
-  }
-  // Pour brasero-atelier.fr
-  if (hostname.includes('brasero-atelier.fr')) {
-    return '.brasero-atelier.fr';
-  }
-  return undefined;
-}
+import { getCookieDomain } from './utils'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({

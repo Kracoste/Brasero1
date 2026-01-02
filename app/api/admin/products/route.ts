@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
+import { sanitizeProductData, devError } from '@/lib/supabase/utils';
 
 // GET: Récupérer un produit par ID ou tous les produits
 export async function GET(request: NextRequest) {
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(products);
   } catch (error) {
-    console.error('Erreur GET product:', error);
+    devError('Erreur GET product:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -73,7 +74,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const productData = await request.json();
+    const rawData = await request.json();
+    // Sanitize les données pour n'autoriser que les champs valides
+    const productData = sanitizeProductData(rawData);
 
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
@@ -93,7 +96,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error('Erreur PUT product:', error);
+    devError('Erreur PUT product:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -109,7 +112,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const productData = await request.json();
+    const rawData = await request.json();
+    // Sanitize les données pour n'autoriser que les champs valides
+    const productData = sanitizeProductData(rawData);
 
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
@@ -128,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error('Erreur POST product:', error);
+    devError('Erreur POST product:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -167,7 +172,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur DELETE product:', error);
+    devError('Erreur DELETE product:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

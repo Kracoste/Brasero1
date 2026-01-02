@@ -16,7 +16,7 @@ type AddToFavoritesButtonProps = {
 };
 
 export function AddToFavoritesButton({ product, className = "", size = "default" }: AddToFavoritesButtonProps) {
-  const { isFavorite, toggleFavorite, favoriteCount } = useFavorites();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [loading, setLoading] = useState(false);
 
   const handleToggle = async () => {
