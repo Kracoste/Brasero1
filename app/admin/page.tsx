@@ -149,12 +149,12 @@ export default function AdminDashboard() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'visits' },
-        (payload) => {
+        (payload: { new: Record<string, unknown> }) => {
           console.log('Nouvelle visite détectée:', payload);
           triggerRefresh();
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         console.log('Visits channel status:', status);
       });
 
@@ -164,12 +164,12 @@ export default function AdminDashboard() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'orders' },
-        (payload) => {
+        (payload: { new: Record<string, unknown> }) => {
           console.log('Changement commande détecté:', payload);
           triggerRefresh();
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         console.log('Orders channel status:', status);
       });
 
