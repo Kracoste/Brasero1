@@ -56,24 +56,36 @@ export function sanitizeFileName(fileName: string): string {
 }
 
 /**
- * Valide les champs autorisés pour un produit
+ * Mapping camelCase vers snake_case pour les colonnes de la table products
+ */
+const CAMEL_TO_SNAKE_MAP: Record<string, string> = {
+  shortDescription: 'short_description',
+  comparePrice: 'compare_price',
+  discountPercent: 'discount_percent',
+  cardImage: 'card_image',
+  bowlThickness: 'bowl_thickness',
+  baseThickness: 'base_thickness',
+  inStock: 'in_stock',
+  onDemand: 'on_demand',
+  isFeatured: 'is_featured',
+  featuredOrder: 'featured_order',
+};
+
+/**
+ * Valide les champs autorisés pour un produit (en snake_case - format PostgreSQL)
  */
 export const ALLOWED_PRODUCT_FIELDS = [
   'name',
   'slug',
   'description',
   'short_description',
-  'shortDescription',
   'price',
   'compare_price',
-  'comparePrice',
   'discount_percent',
-  'discountPercent',
   'category',
   'badge',
   'images',
   'card_image',
-  'cardImage',
   'specs',
   'diameter',
   'height',
@@ -82,29 +94,29 @@ export const ALLOWED_PRODUCT_FIELDS = [
   'weight',
   'material',
   'bowl_thickness',
-  'bowlThickness',
   'base_thickness',
-  'baseThickness',
   'in_stock',
-  'inStock',
   'on_demand',
-  'onDemand',
   'is_featured',
-  'isFeatured',
   'featured_order',
-  'featuredOrder',
   'format'
 ] as const;
 
 /**
- * Filtre les données produit pour n'autoriser que les champs valides
+ * Filtre et normalise les données produit pour Supabase
+ * - Convertit les noms camelCase en snake_case
+ * - N'autorise que les champs valides
  */
 export function sanitizeProductData(data: Record<string, unknown>): Record<string, unknown> {
   const sanitized: Record<string, unknown> = {};
   
   for (const [key, value] of Object.entries(data)) {
-    if (ALLOWED_PRODUCT_FIELDS.includes(key as any)) {
-      sanitized[key] = value;
+    // Convertir camelCase en snake_case si nécessaire
+    const normalizedKey = CAMEL_TO_SNAKE_MAP[key] || key;
+    
+    // N'autoriser que les champs valides
+    if (ALLOWED_PRODUCT_FIELDS.includes(normalizedKey as any)) {
+      sanitized[normalizedKey] = value;
     }
   }
   

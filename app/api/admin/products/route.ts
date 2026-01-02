@@ -76,8 +76,14 @@ export async function PUT(request: NextRequest) {
     }
 
     const rawData = await request.json();
+    // DEBUG: Log les specs avant sanitize
+    console.log('[DEBUG PUT] rawData.specs:', JSON.stringify(rawData.specs, null, 2));
+    
     // Sanitize les données pour n'autoriser que les champs valides
     const productData = sanitizeProductData(rawData);
+    
+    // DEBUG: Log les specs après sanitize
+    console.log('[DEBUG PUT] productData.specs:', JSON.stringify(productData.specs, null, 2));
 
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
@@ -91,14 +97,19 @@ export async function PUT(request: NextRequest) {
       .select()
       .single();
 
+    // DEBUG: Log le produit retourné par Supabase
+    console.log('[DEBUG PUT] product.specs après save:', JSON.stringify(product?.specs, null, 2));
+
     if (error) {
+      console.error('[DEBUG PUT] Erreur Supabase:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     // Invalider le cache de la page produit pour forcer le rechargement des données
     if (product?.slug) {
-      revalidatePath(`/produits/${product.slug}`);
-      revalidatePath('/produits');
+      revalidatePath(`/produits/${product.slug}`, 'page');
+      revalidatePath('/produits', 'page');
+      revalidatePath('/', 'layout');
     }
 
     return NextResponse.json(product);
