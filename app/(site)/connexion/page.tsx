@@ -74,6 +74,9 @@ function ConnexionPageContent() {
         throw new Error('Connexion échouée - pas de session');
       }
 
+      // Rafraîchir l'auth context pour mettre à jour le cache
+      await refreshUser();
+
       // Marquer la redirection immédiatement
       setIsRedirecting(true);
       hasRedirected.current = true;
@@ -85,7 +88,28 @@ function ConnexionPageContent() {
       
       console.log('Connexion réussie, redirection vers:', finalTarget);
 
-      // Redirection directe et immédiate
+      // Attendre que la session soit synchronisée côté serveur
+      // Cela force le middleware à reconnaître la session
+      let retries = 0;
+      const maxRetries = 5;
+      while (retries < maxRetries) {
+        try {
+          const syncResponse = await fetch('/api/auth/sync-session', { 
+            method: 'POST',
+            credentials: 'include'
+          });
+          if (syncResponse.ok) {
+            console.log('Session synchronisée côté serveur');
+            break;
+          }
+        } catch (e) {
+          console.log('Sync attempt', retries + 1);
+        }
+        retries++;
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+
+      // Redirection directe
       window.location.href = finalTarget;
       
     } catch (error: any) {
