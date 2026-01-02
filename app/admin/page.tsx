@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
-type Metric = 'visites' | 'ca' | 'ventes' | 'clients';
+type Metric = 'visites' | 'ca' | 'ventes' | 'clients' | 'conversion';
 type Period = 'week' | 'month' | 'year';
 
 type ChartSeries = {
@@ -14,25 +14,54 @@ type ChartSeries = {
 
 type DailyData = {
   date: string;
-  visits: number;
+  sessions: number;
   uniqueVisitors: number;
+  pageViews: number;
   revenue: number;
   sales: number;
-  customers: number;
+};
+
+type ConversionFunnel = {
+  totalSessions: number;
+  productViews: number;
+  addToCart: number;
+  checkoutStart: number;
+  purchases: number;
+  viewRate: number;
+  cartRate: number;
+  checkoutRate: number;
+  purchaseRate: number;
+};
+
+type TopProduct = {
+  slug: string;
+  name: string;
+  count: number;
+  quantity?: number;
 };
 
 type Stats = {
-  // Visites
-  totalVisits: number;
+  // Sessions (remplace les visites)
+  totalSessions: number;
+  sessionsToday: number;
+  sessionsThisWeek: number;
+  sessionsThisMonth: number;
+  sessionsThisYear: number;
+  // Visiteurs uniques
   uniqueVisitors: number;
-  visitsToday: number;
-  visitsThisWeek: number;
-  visitsThisMonth: number;
-  visitsThisYear: number;
   uniqueVisitorsToday: number;
   uniqueVisitorsThisWeek: number;
   uniqueVisitorsThisMonth: number;
   uniqueVisitorsThisYear: number;
+  // Métriques de qualité
+  avgPagesPerSession: number;
+  avgSessionDuration: number;
+  bounceRate: number;
+  // Entonnoir de conversion
+  conversionFunnel: ConversionFunnel;
+  // Top produits
+  topProductsViewed: TopProduct[];
+  topProductsCarted: TopProduct[];
   // Ventes
   totalSales: number;
   salesToday: number;
@@ -63,16 +92,32 @@ export default function AdminDashboard() {
   const [selectedMetric, setSelectedMetric] = useState<Metric>('visites');
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('week');
   const [stats, setStats] = useState<Stats>({
-    totalVisits: 0,
+    totalSessions: 0,
+    sessionsToday: 0,
+    sessionsThisWeek: 0,
+    sessionsThisMonth: 0,
+    sessionsThisYear: 0,
     uniqueVisitors: 0,
-    visitsToday: 0,
-    visitsThisWeek: 0,
-    visitsThisMonth: 0,
-    visitsThisYear: 0,
     uniqueVisitorsToday: 0,
     uniqueVisitorsThisWeek: 0,
     uniqueVisitorsThisMonth: 0,
     uniqueVisitorsThisYear: 0,
+    avgPagesPerSession: 0,
+    avgSessionDuration: 0,
+    bounceRate: 0,
+    conversionFunnel: {
+      totalSessions: 0,
+      productViews: 0,
+      addToCart: 0,
+      checkoutStart: 0,
+      purchases: 0,
+      viewRate: 0,
+      cartRate: 0,
+      checkoutRate: 0,
+      purchaseRate: 0,
+    },
+    topProductsViewed: [],
+    topProductsCarted: [],
     totalSales: 0,
     salesToday: 0,
     salesThisWeek: 0,
@@ -97,37 +142,53 @@ export default function AdminDashboard() {
     setRefreshKey(prev => prev + 1);
   }, []);
 
-  // Charger les stats via l'API (rapide, utilise le service role)
+  // Charger les stats via la nouvelle API analytics
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/admin/stats');
+        const response = await fetch('/api/admin/analytics');
         if (!response.ok) {
-          throw new Error('Erreur lors du chargement des stats');
+          throw new Error('Erreur lors du chargement des analytics');
         }
         const data = await response.json();
         
-        setStats(prev => ({
-          ...prev,
-          totalVisits: data.totalVisits || 0,
+        setStats({
+          totalSessions: data.totalSessions || 0,
+          sessionsToday: data.sessionsToday || 0,
+          sessionsThisWeek: data.sessionsThisWeek || 0,
+          sessionsThisMonth: data.sessionsThisMonth || 0,
+          sessionsThisYear: data.sessionsThisYear || 0,
           uniqueVisitors: data.uniqueVisitors || 0,
-          visitsToday: data.visitsToday || 0,
-          visitsThisWeek: data.visitsThisWeek || 0,
-          visitsThisMonth: data.visitsThisMonth || 0,
-          visitsThisYear: data.visitsThisYear || 0,
           uniqueVisitorsToday: data.uniqueVisitorsToday || 0,
           uniqueVisitorsThisWeek: data.uniqueVisitorsThisWeek || 0,
           uniqueVisitorsThisMonth: data.uniqueVisitorsThisMonth || 0,
           uniqueVisitorsThisYear: data.uniqueVisitorsThisYear || 0,
+          avgPagesPerSession: data.avgPagesPerSession || 0,
+          avgSessionDuration: data.avgSessionDuration || 0,
+          bounceRate: data.bounceRate || 0,
+          conversionFunnel: data.conversionFunnel || {
+            totalSessions: 0, productViews: 0, addToCart: 0, checkoutStart: 0, purchases: 0,
+            viewRate: 0, cartRate: 0, checkoutRate: 0, purchaseRate: 0,
+          },
+          topProductsViewed: data.topProductsViewed || [],
+          topProductsCarted: data.topProductsCarted || [],
           totalSales: data.totalSales || 0,
+          salesToday: data.salesToday || 0,
+          salesThisWeek: data.salesThisWeek || 0,
+          salesThisMonth: data.salesThisMonth || 0,
+          salesThisYear: data.salesThisYear || 0,
           totalRevenue: data.totalRevenue || 0,
+          revenueToday: data.revenueToday || 0,
+          revenueThisWeek: data.revenueThisWeek || 0,
+          revenueThisMonth: data.revenueThisMonth || 0,
+          revenueThisYear: data.revenueThisYear || 0,
           totalProducts: data.totalProducts || 0,
           totalCustomers: data.totalCustomers || 0,
           recentOrders: data.recentOrders || [],
           dailyData: data.dailyData || [],
-        }));
+        });
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error('Error fetching analytics:', error);
       } finally {
         setLoading(false);
       }
@@ -143,19 +204,19 @@ export default function AdminDashboard() {
       triggerRefresh();
     }, 30000);
 
-    // Abonnement temps réel aux nouvelles visites
-    const visitsChannel = supabase
-      .channel('admin-visits-channel')
+    // Abonnement temps réel aux nouvelles sessions
+    const sessionsChannel = supabase
+      .channel('admin-sessions-channel')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'visits' },
+        { event: 'INSERT', schema: 'public', table: 'visitor_sessions' },
         (payload: { new: Record<string, unknown> }) => {
-          console.log('Nouvelle visite détectée:', payload);
+          console.log('Nouvelle session détectée:', payload);
           triggerRefresh();
         }
       )
       .subscribe((status: string) => {
-        console.log('Visits channel status:', status);
+        console.log('Sessions channel status:', status);
       });
 
     // Abonnement temps réel aux nouvelles commandes
@@ -176,7 +237,7 @@ export default function AdminDashboard() {
     // Cleanup
     return () => {
       clearInterval(intervalId);
-      supabase.removeChannel(visitsChannel);
+      supabase.removeChannel(sessionsChannel);
       supabase.removeChannel(ordersChannel);
     };
   }, [triggerRefresh, supabase]);
@@ -191,10 +252,11 @@ export default function AdminDashboard() {
   const chartTitle = useMemo(
     () =>
       ({
-        visites: 'Visites',
+        visites: 'Sessions',
         ca: "Chiffre d'affaires",
         ventes: 'Ventes',
         clients: 'Clients',
+        conversion: 'Conversion',
       }[selectedMetric]),
     [selectedMetric]
   );
@@ -218,7 +280,7 @@ export default function AdminDashboard() {
       // 7 derniers jours
       const labels: string[] = [];
       const dates: string[] = [];
-      const values: { visits: number; uniqueVisitors: number; revenue: number; sales: number }[] = [];
+      const values: { sessions: number; uniqueVisitors: number; pageViews: number; revenue: number; sales: number }[] = [];
       
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now);
@@ -231,8 +293,9 @@ export default function AdminDashboard() {
         
         const dayData = dailyData.find(d => d.date === dateStr);
         values.push({
-          visits: dayData?.visits || 0,
+          sessions: dayData?.sessions || 0,
           uniqueVisitors: dayData?.uniqueVisitors || 0,
+          pageViews: dayData?.pageViews || 0,
           revenue: dayData?.revenue || 0,
           sales: dayData?.sales || 0,
         });
@@ -244,7 +307,7 @@ export default function AdminDashboard() {
       // 4 dernières semaines
       const labels: string[] = [];
       const dates: string[] = [];
-      const values: { visits: number; uniqueVisitors: number; revenue: number; sales: number }[] = [];
+      const values: { sessions: number; uniqueVisitors: number; pageViews: number; revenue: number; sales: number }[] = [];
       
       for (let w = 3; w >= 0; w--) {
         const weekStart = new Date(now);
@@ -258,17 +321,18 @@ export default function AdminDashboard() {
         labels.push(`Sem. ${4 - w}`);
         dates.push(`${startStr} - ${endStr}`);
         
-        let visits = 0, uniqueVisitors = 0, revenue = 0, sales = 0;
+        let sessions = 0, uniqueVisitors = 0, pageViews = 0, revenue = 0, sales = 0;
         dailyData.forEach(d => {
           const date = new Date(d.date);
           if (date >= weekStart && date <= weekEnd) {
-            visits += d.visits;
+            sessions += d.sessions;
             uniqueVisitors += d.uniqueVisitors || 0;
+            pageViews += d.pageViews || 0;
             revenue += d.revenue;
             sales += d.sales;
           }
         });
-        values.push({ visits, uniqueVisitors, revenue, sales });
+        values.push({ sessions, uniqueVisitors, pageViews, revenue, sales });
       }
       return { chartLabels: labels, chartValues: values, chartDates: dates };
     }
@@ -276,7 +340,7 @@ export default function AdminDashboard() {
     // Cette année - 12 derniers mois
     const labels: string[] = [];
     const dates: string[] = [];
-    const values: { visits: number; uniqueVisitors: number; revenue: number; sales: number }[] = [];
+    const values: { sessions: number; uniqueVisitors: number; pageViews: number; revenue: number; sales: number }[] = [];
     
     for (let m = 11; m >= 0; m--) {
       const date = new Date(now.getFullYear(), now.getMonth() - m, 1);
@@ -287,16 +351,17 @@ export default function AdminDashboard() {
       
       const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
-      let visits = 0, uniqueVisitors = 0, revenue = 0, sales = 0;
+      let sessions = 0, uniqueVisitors = 0, pageViews = 0, revenue = 0, sales = 0;
       dailyData.forEach(d => {
         if (d.date.startsWith(monthStr)) {
-          visits += d.visits;
+          sessions += d.sessions;
           uniqueVisitors += d.uniqueVisitors || 0;
+          pageViews += d.pageViews || 0;
           revenue += d.revenue;
           sales += d.sales;
         }
       });
-      values.push({ visits, uniqueVisitors, revenue, sales });
+      values.push({ sessions, uniqueVisitors, pageViews, revenue, sales });
     }
     return { chartLabels: labels, chartValues: values, chartDates: dates };
   }, [selectedPeriod, stats.dailyData]);
@@ -311,9 +376,11 @@ export default function AdminDashboard() {
                selectedPeriod === 'month' ? stats.salesThisMonth : stats.salesThisYear;
       case 'clients':
         return stats.totalCustomers;
+      case 'conversion':
+        return stats.conversionFunnel.purchaseRate;
       default:
-        return selectedPeriod === 'week' ? stats.visitsThisWeek :
-               selectedPeriod === 'month' ? stats.visitsThisMonth : stats.visitsThisYear;
+        return selectedPeriod === 'week' ? stats.sessionsThisWeek :
+               selectedPeriod === 'month' ? stats.sessionsThisMonth : stats.sessionsThisYear;
     }
   }, [selectedMetric, selectedPeriod, stats]);
 
@@ -337,14 +404,19 @@ export default function AdminDashboard() {
       case 'visites':
         return [
           {
-            label: 'Visites totales',
+            label: 'Sessions',
             color: '#10b981',
-            values: chartValues.map(v => v.visits),
+            values: chartValues.map(v => v.sessions),
           },
           {
             label: 'Visiteurs uniques',
             color: '#0ea5e9',
             values: chartValues.map(v => v.uniqueVisitors),
+          },
+          {
+            label: 'Pages vues',
+            color: '#8b5cf6',
+            values: chartValues.map(v => v.pageViews),
           },
         ];
       case 'ca':
@@ -374,6 +446,31 @@ export default function AdminDashboard() {
             label: 'Visiteurs uniques',
             color: '#94a3b8',
             values: chartValues.map(() => stats.uniqueVisitors),
+          },
+        ];
+      }
+      case 'conversion': {
+        const funnel = stats.conversionFunnel;
+        return [
+          {
+            label: 'Vues produit',
+            color: '#10b981',
+            values: chartValues.map(() => funnel.viewRate),
+          },
+          {
+            label: 'Ajouts panier',
+            color: '#f59e0b',
+            values: chartValues.map(() => funnel.cartRate),
+          },
+          {
+            label: 'Checkout',
+            color: '#0ea5e9',
+            values: chartValues.map(() => funnel.checkoutRate),
+          },
+          {
+            label: 'Achats',
+            color: '#ef4444',
+            values: chartValues.map(() => funnel.purchaseRate),
           },
         ];
       }
@@ -418,10 +515,11 @@ export default function AdminDashboard() {
       {/* Navigation haute vers les vues détaillées */}
       <nav className="flex w-full gap-3 border-b border-slate-200 pb-3">
         {[
-          { label: 'Visites', metric: 'visites' as Metric },
+          { label: 'Sessions', metric: 'visites' as Metric },
           { label: "Chiffre d'affaires", metric: 'ca' as Metric },
           { label: 'Ventes', metric: 'ventes' as Metric },
           { label: 'Clients', metric: 'clients' as Metric },
+          { label: 'Conversion', metric: 'conversion' as Metric },
         ].map((item) => (
           <button
             key={item.metric}
@@ -482,13 +580,41 @@ export default function AdminDashboard() {
                 <span className="text-4xl font-bold text-[#10b981]">
                   {totalForMetric.toLocaleString('fr-FR')}
                 </span>
-                <span className="text-slate-500">visites totales</span>
+                <span className="text-slate-500">sessions</span>
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-bold text-[#0ea5e9]">
                   {uniqueVisitorsForPeriod.toLocaleString('fr-FR')}
                 </span>
                 <span className="text-slate-500">visiteurs uniques</span>
+              </div>
+              <div className="flex items-center gap-4 ml-4 text-sm text-slate-600">
+                <span>📄 {stats.avgPagesPerSession} pages/session</span>
+                <span>⏱ {Math.floor(stats.avgSessionDuration / 60)}m {stats.avgSessionDuration % 60}s moy.</span>
+                <span>📊 {stats.bounceRate}% rebond</span>
+              </div>
+            </>
+          ) : selectedMetric === 'conversion' ? (
+            <>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-[#ef4444]">
+                  {stats.conversionFunnel.purchaseRate}%
+                </span>
+                <span className="text-slate-500">taux de conversion</span>
+              </div>
+              <div className="flex items-center gap-4 ml-4 text-sm text-slate-600">
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-[#10b981]"></span>
+                  {stats.conversionFunnel.viewRate}% vues produit
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-[#f59e0b]"></span>
+                  {stats.conversionFunnel.cartRate}% paniers
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-[#0ea5e9]"></span>
+                  {stats.conversionFunnel.checkoutRate}% checkout
+                </span>
               </div>
             </>
           ) : (
@@ -516,6 +642,97 @@ export default function AdminDashboard() {
           ))}
         </div>
       </section>
+
+      {/* Section Entonnoir de Conversion & Top Produits */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Entonnoir de conversion */}
+        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">Entonnoir de conversion (ce mois)</h3>
+          <div className="space-y-3">
+            {[
+              { label: 'Sessions totales', value: stats.conversionFunnel.totalSessions, color: '#94a3b8', rate: 100 },
+              { label: 'Vues produit', value: stats.conversionFunnel.productViews, color: '#10b981', rate: stats.conversionFunnel.viewRate },
+              { label: 'Ajouts panier', value: stats.conversionFunnel.addToCart, color: '#f59e0b', rate: stats.conversionFunnel.cartRate },
+              { label: 'Checkout', value: stats.conversionFunnel.checkoutStart, color: '#0ea5e9', rate: stats.conversionFunnel.checkoutRate },
+              { label: 'Achats', value: stats.conversionFunnel.purchases, color: '#ef4444', rate: stats.conversionFunnel.purchaseRate },
+            ].map((step, idx) => (
+              <div key={step.label} className="relative">
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm font-medium text-slate-700">{step.label}</span>
+                  <span className="text-sm text-slate-500">{step.value} ({step.rate}%)</span>
+                </div>
+                <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${step.rate}%`, 
+                      backgroundColor: step.color,
+                    }}
+                  />
+                </div>
+                {idx > 0 && (
+                  <div className="absolute -top-1 right-0 text-xs text-slate-400">
+                    ↓ {step.rate > 0 ? Math.round((step.value / (stats.conversionFunnel.totalSessions || 1)) * 100) : 0}%
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Top Produits */}
+        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">Top Produits (ce mois)</h3>
+          
+          <div className="space-y-4">
+            {/* Top vus */}
+            <div>
+              <h4 className="text-sm font-semibold text-slate-600 mb-2 flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#10b981]"></span>
+                Les plus vus
+              </h4>
+              {stats.topProductsViewed.length > 0 ? (
+                <div className="space-y-2">
+                  {stats.topProductsViewed.map((product, idx) => (
+                    <div key={product.slug} className="flex items-center justify-between text-sm">
+                      <span className="text-slate-700 truncate flex-1">
+                        <span className="text-slate-400 mr-2">{idx + 1}.</span>
+                        {product.name}
+                      </span>
+                      <span className="text-slate-500 ml-2">{product.count} vues</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400">Aucune donnée</p>
+              )}
+            </div>
+
+            {/* Top ajoutés au panier */}
+            <div>
+              <h4 className="text-sm font-semibold text-slate-600 mb-2 flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#f59e0b]"></span>
+                Les plus ajoutés au panier
+              </h4>
+              {stats.topProductsCarted.length > 0 ? (
+                <div className="space-y-2">
+                  {stats.topProductsCarted.map((product, idx) => (
+                    <div key={product.slug} className="flex items-center justify-between text-sm">
+                      <span className="text-slate-700 truncate flex-1">
+                        <span className="text-slate-400 mr-2">{idx + 1}.</span>
+                        {product.name}
+                      </span>
+                      <span className="text-slate-500 ml-2">{product.quantity || product.count} unités</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400">Aucune donnée</p>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

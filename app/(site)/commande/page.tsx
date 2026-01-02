@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Check, ShoppingBag, Loader2 } from 'lucide-react';
 
 import { useCart } from '@/lib/cart-context';
+import { useAnalytics } from '@/lib/analytics-context';
 import { Section } from '@/components/Section';
 import { Container } from '@/components/Container';
 import { Price } from '@/components/Price';
@@ -42,7 +43,9 @@ type DeliveryOption = 'db-schenker';
 type PaymentOption = 'paypal' | 'card' | 'bank';
 
 export default function CheckoutPage() {
-  const { items, totalPrice, loading } = useCart();
+  const { items, totalPrice, loading, itemCount } = useCart();
+  const { trackCheckoutStart } = useAnalytics();
+  const hasTrackedCheckout = useRef(false);
   const [activeSection, setActiveSection] = useState<CheckoutSection>('infos');
   const [completedSections, setCompletedSections] = useState<Record<CheckoutSection, boolean>>({
     infos: false,
@@ -60,6 +63,14 @@ export default function CheckoutPage() {
   const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const supabase = createClient();
+
+  // Tracker le début du checkout
+  useEffect(() => {
+    if (!loading && items.length > 0 && !hasTrackedCheckout.current) {
+      hasTrackedCheckout.current = true;
+      trackCheckoutStart({ total: totalPrice, itemsCount: itemCount });
+    }
+  }, [loading, items.length, totalPrice, itemCount, trackCheckoutStart]);
 
   useEffect(() => {
     const prefillFromProfile = async () => {

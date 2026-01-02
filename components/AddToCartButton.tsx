@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
+import { useAnalytics } from '@/lib/analytics-context';
 import { ShoppingCart, Check, Minus, Plus } from 'lucide-react';
 import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
 
@@ -25,7 +26,8 @@ type AddToCartButtonProps = {
 };
 
 export function AddToCartButton({ product, selectedAccessories = [], className = '' }: AddToCartButtonProps) {
-  const { addItem } = useCart();
+  const { addItem, totalPrice: cartTotal, itemCount: cartItemsCount } = useCart();
+  const { trackAddToCart } = useAnalytics();
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
@@ -77,8 +79,20 @@ export function AddToCartButton({ product, selectedAccessories = [], className =
             },
             1
           );
+          // Tracker l'ajout de chaque accessoire
+          trackAddToCart(
+            { slug: accessory.slug, name: accessory.name, price: accessory.price },
+            1
+          );
         }
       }
+
+      // Tracker l'ajout au panier du produit principal
+      trackAddToCart(
+        { slug: product.slug, name: product.name, price: product.price },
+        quantity,
+        { total: cartTotal + (product.price * quantity), itemsCount: cartItemsCount + quantity }
+      );
 
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);

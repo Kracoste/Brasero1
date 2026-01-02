@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { CompatibleAccessories } from '@/components/CompatibleAccessories';
 import { AddToCartButton } from '@/components/AddToCartButton';
 import { Price } from '@/components/Price';
+import { useAnalytics } from '@/lib/analytics-context';
 import type { Product } from '@/lib/schema';
 
 type Accessory = {
@@ -21,6 +22,16 @@ type ProductPurchaseSectionProps = {
 
 export function ProductPurchaseSection({ product, compatibleAccessorySlugs }: ProductPurchaseSectionProps) {
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
+  const { trackProductView } = useAnalytics();
+
+  // Tracker la vue du produit au montage
+  useEffect(() => {
+    trackProductView({
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+    });
+  }, [product.slug, product.name, product.price, trackProductView]);
 
   const handleSelectionChange = useCallback((accessories: Accessory[]) => {
     setSelectedAccessories(accessories);

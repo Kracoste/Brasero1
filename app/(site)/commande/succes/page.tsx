@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Package, ArrowRight } from 'lucide-react';
@@ -8,6 +8,7 @@ import { CheckCircle, Package, ArrowRight } from 'lucide-react';
 import { Section } from '@/components/Section';
 import { Container } from '@/components/Container';
 import { useCart } from '@/lib/cart-context';
+import { useAnalytics } from '@/lib/analytics-context';
 
 function SuccessPageContent() {
   const searchParams = useSearchParams();
@@ -15,25 +16,42 @@ function SuccessPageContent() {
   const [orderDetails, setOrderDetails] = useState<{
     email: string;
     amount: number;
+    itemsCount?: number;
   } | null>(null);
   const { clearCart } = useCart();
+  const { trackPurchase } = useAnalytics();
+  const hasTrackedPurchase = useRef(false);
 
   useEffect(() => {
     // Vider le panier local après un paiement réussi
     clearCart();
 
-    // Optionnel: récupérer les détails de la session
+    // Récupérer les détails de la session et tracker l'achat
     if (sessionId) {
       fetch(`/api/checkout/session?session_id=${sessionId}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.email && data.amount) {
-            setOrderDetails(data);
+            setOrderDetails({
+              email: data.email,
+              amount: data.amount,
+              itemsCount: data.itemsCount || 1,
+            });
+            
+            // Tracker l'achat une seule fois
+            if (!hasTrackedPurchase.current) {
+              hasTrackedPurchase.current = true;
+              trackPurchase({
+                orderId: sessionId,
+                total: data.amount / 100, // Convertir de centimes à euros
+                itemsCount: data.itemsCount || 1,
+              });
+            }
           }
         })
         .catch(console.error);
     }
-  }, [sessionId, clearCart]);
+  }, [sessionId, clearCart, trackPurchase]);
 
   return (
     <Section className="py-24">
