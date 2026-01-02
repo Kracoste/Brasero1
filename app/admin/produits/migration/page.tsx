@@ -36,7 +36,7 @@ export default function MigrateProductsPage() {
       .from('products')
       .select('slug');
     
-    const existingSlugs = new Set((existingProducts || []).map(p => p.slug));
+    const existingSlugs = new Set((existingProducts || []).map((p: { slug: string }) => p.slug));
 
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
