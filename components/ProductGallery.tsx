@@ -18,7 +18,8 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
 
   return (
     <div className="flex flex-col items-center lg:items-end">
-      <div className="relative w-full aspect-square sm:aspect-[5/6] lg:aspect-[3/4]">
+      {/* Image principale avec espacement en bas */}
+      <div className="relative w-full aspect-square sm:aspect-[4/5] lg:aspect-[4/5] mb-4 sm:mb-6">
           <Image
             key={activeImage.src}
             src={activeImage.src}
@@ -28,8 +29,8 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             placeholder={activeImage.blurDataURL ? "blur" : "empty"}
             blurDataURL={activeImage.blurDataURL}
             className={cn(
-              "object-contain origin-center transition-transform duration-300",
-              isAccessory ? "scale-75 sm:scale-80 p-4 sm:p-8" : "scale-110 sm:scale-125"
+              "object-contain origin-center transition-transform duration-300 p-2 sm:p-4",
+              isAccessory ? "scale-90" : "scale-100"
             )}
             priority
           />
@@ -45,7 +46,8 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
           ))}
         </div>
       </div>
-      <div className="mt-3 sm:mt-4 flex gap-2 sm:gap-3 overflow-x-auto pb-2 w-full">
+      {/* Miniatures plus grandes et mieux visibles */}
+      <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 w-full justify-center">
         {product.images.map((image, index) => (
           <button
             key={image.src}
@@ -53,22 +55,19 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             onClick={() => setActiveIndex(index)}
             onFocus={() => setActiveIndex(index)}
             className={cn(
-              "relative flex-shrink-0 overflow-hidden rounded-lg sm:rounded-2xl border-2",
+              "relative flex-shrink-0 overflow-hidden rounded-lg sm:rounded-xl border-2 bg-white",
               activeIndex === index
-                ? "border-clay-900"
-                : "border-transparent opacity-70 hover:opacity-100",
+                ? "border-slate-900"
+                : "border-slate-200 opacity-70 hover:opacity-100",
             )}
           >
             <span className="sr-only">Voir l&apos;image {index + 1}</span>
             <Image
               src={image.src}
               alt={image.alt}
-              width={160}
-              height={120}
-              className={cn(
-                "h-16 w-20 sm:h-24 sm:w-32",
-                isAccessory ? "object-contain p-1 sm:p-2" : "object-cover"
-              )}
+              width={200}
+              height={150}
+              className="h-20 w-24 sm:h-24 sm:w-28 object-contain p-1 sm:p-2"
               placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}
             />

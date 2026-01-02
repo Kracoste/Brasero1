@@ -148,7 +148,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     En stock
                   </span>
                 </div>
-                <p className="text-base leading-relaxed text-slate-600">{product.description}</p>
               </div>
 
               <ProductPurchaseSection 
