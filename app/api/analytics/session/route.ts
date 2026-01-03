@@ -4,40 +4,7 @@ import { createHash } from "crypto";
 
 import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase/admin";
 import { ADMIN_EMAILS } from "@/lib/auth";
-
-// ============================================
-// SÉCURITÉ : Rate Limiting en mémoire
-// ============================================
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 60; // 60 requêtes par minute max
-
-function checkRateLimit(identifier: string): boolean {
-  const now = Date.now();
-  const record = rateLimitMap.get(identifier);
-  
-  if (!record || now > record.resetAt) {
-    rateLimitMap.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  
-  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-}
-
-// Nettoyer les anciennes entrées toutes les 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of rateLimitMap.entries()) {
-    if (now > value.resetAt) {
-      rateLimitMap.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
+import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 
 // ============================================
 // SÉCURITÉ : Validation des entrées
@@ -182,7 +149,6 @@ export async function POST(request: Request) {
     // SÉCURITÉ : Vérification de l'origine
     // ============================================
     const origin = headersList.get('origin');
-    const host = headersList.get('host');
     const allowedOrigins = [
       'http://localhost:3000',
       'https://localhost:3000',
@@ -193,19 +159,17 @@ export async function POST(request: Request) {
     // En production, vérifier l'origine
     if (process.env.NODE_ENV === 'production' && origin) {
       if (!allowedOrigins.some(allowed => origin.startsWith(allowed.replace('www.', '')))) {
-        console.warn('Analytics: Origin non autorisée:', origin);
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
     }
     
     // ============================================
-    // SÉCURITÉ : Rate Limiting par IP
+    // SÉCURITÉ : Rate Limiting par IP (utilise l'utilitaire partagé)
     // ============================================
-    const forwardedFor = headersList.get("x-forwarded-for");
-    const realIP = headersList.get("x-real-ip");
-    const clientIP = forwardedFor?.split(',')[0]?.trim() || realIP || 'unknown';
+    const clientIP = getClientIP(headersList);
+    const { maxRequests, windowMs } = RATE_LIMIT_PRESETS.api;
     
-    if (!checkRateLimit(clientIP)) {
+    if (!checkRateLimit(clientIP, maxRequests, windowMs)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
     
@@ -328,9 +292,11 @@ export async function POST(request: Request) {
         .single();
 
       if (sessionError || !newSession) {
-        console.error("Failed to create session", sessionError);
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Failed to create session", sessionError);
+        }
         return NextResponse.json(
-          { error: "Failed to create session", details: sessionError?.message },
+          { error: "Failed to create session" },
           { status: 500 }
         );
       }
@@ -358,7 +324,9 @@ export async function POST(request: Request) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error("Analytics tracking error", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Analytics tracking error", error);
+    }
     // Ne pas exposer les détails d'erreur en production
     return NextResponse.json(
       { error: "Tracking failed" },

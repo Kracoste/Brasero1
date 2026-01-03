@@ -2,30 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
 import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase/admin";
-
-// ============================================
-// SÉCURITÉ : Rate Limiting en mémoire
-// ============================================
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requêtes par minute max
-
-function checkRateLimit(identifier: string): boolean {
-  const now = Date.now();
-  const record = rateLimitMap.get(identifier);
-  
-  if (!record || now > record.resetAt) {
-    rateLimitMap.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  
-  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-}
+import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 
 // ============================================
 // SÉCURITÉ : Validation des entrées
@@ -96,19 +73,17 @@ export async function POST(request: Request) {
     
     if (process.env.NODE_ENV === 'production' && origin) {
       if (!allowedOrigins.some(allowed => origin.startsWith(allowed.replace('www.', '')))) {
-        console.warn('Analytics Event: Origin non autorisée:', origin);
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
     }
     
     // ============================================
-    // SÉCURITÉ : Rate Limiting
+    // SÉCURITÉ : Rate Limiting (utilise l'utilitaire partagé)
     // ============================================
-    const forwardedFor = headersList.get("x-forwarded-for");
-    const realIP = headersList.get("x-real-ip");
-    const clientIP = forwardedFor?.split(',')[0]?.trim() || realIP || 'unknown';
+    const clientIP = getClientIP(headersList);
+    const { maxRequests, windowMs } = RATE_LIMIT_PRESETS.analytics;
     
-    if (!checkRateLimit(clientIP)) {
+    if (!checkRateLimit(clientIP, maxRequests, windowMs)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
     
@@ -165,14 +140,18 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      console.error("Failed to record conversion event", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Failed to record conversion event", error);
+      }
       return NextResponse.json({ error: "Failed to record event" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true }, { status: 201 });
 
   } catch (error) {
-    console.error("Conversion event error", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Conversion event error", error);
+    }
     return NextResponse.json({ error: "Tracking failed" }, { status: 500 });
   }
 }

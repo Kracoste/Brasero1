@@ -40,7 +40,6 @@ function ConnexionPageContent() {
     
     // Force redirect direct
     const finalTarget = getRedirectTarget(target);
-    console.log('Redirection vers:', finalTarget);
     
     // En production, forcer www pour la cohérence des cookies
     let redirectUrl = finalTarget;
@@ -105,8 +104,6 @@ function ConnexionPageContent() {
       const isAdminUser = isAdminEmail(email.trim());
       const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
       const finalTarget = getRedirectTarget(target);
-      
-      console.log('Connexion réussie, redirection vers:', finalTarget);
 
       // Attendre que la session soit synchronisée côté serveur
       // Cela force le middleware à reconnaître la session
@@ -119,11 +116,10 @@ function ConnexionPageContent() {
             credentials: 'include'
           });
           if (syncResponse.ok) {
-            console.log('Session synchronisée côté serveur');
             break;
           }
-        } catch (e) {
-          console.log('Sync attempt', retries + 1);
+        } catch {
+          // Retry silently
         }
         retries++;
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -143,7 +139,6 @@ function ConnexionPageContent() {
       window.location.href = redirectUrl;
       
     } catch (error: any) {
-      console.error('Erreur connexion:', error);
       setError(error?.message || 'Une erreur est survenue');
       setLoading(false);
       setIsRedirecting(false);

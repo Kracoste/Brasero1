@@ -1,6 +1,15 @@
 import { updateSession } from '@/lib/supabase/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
 
+// Headers de sécurité HTTP
+const securityHeaders = {
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+};
+
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
   const pathname = request.nextUrl.pathname;
@@ -14,6 +23,19 @@ export async function middleware(request: NextRequest) {
   
   // Toujours mettre à jour la session pour maintenir l'état de connexion
   const response = await updateSession(request);
+  
+  // Appliquer les headers de sécurité sur toutes les réponses
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+  
+  // HSTS uniquement en production
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload'
+    );
+  }
   
   // Désactiver le cache CDN pour les pages produits (données dynamiques)
   if (pathname.startsWith('/produits/')) {

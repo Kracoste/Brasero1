@@ -25,8 +25,8 @@ export function AdminSignOutButton({ className }: AdminSignOutButtonProps) {
       
       // Rediriger vers l'accueil
       window.location.href = AUTH_ROUTES.home;
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+    } catch {
+      // Rediriger même en cas d'erreur
       window.location.href = AUTH_ROUTES.home;
     }
   };

@@ -11,9 +11,8 @@ import { createClient } from "@/lib/supabase/server";
 import { resolveDiameter } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 
-// Désactiver le cache pour toujours afficher les dernières données
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+// Cache ISR de 60 secondes - les modifications admin invalident le cache via revalidatePath
+export const revalidate = 60;
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;

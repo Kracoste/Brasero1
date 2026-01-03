@@ -26,7 +26,7 @@ type ConversionFunnel = {
 
 // Cache simple en mémoire pour réduire les requêtes
 let analyticsCache: { data: any; timestamp: number } | null = null;
-const CACHE_TTL = 30000; // 30 secondes
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes (au lieu de 30 secondes)
 
 export async function GET() {
   try {
@@ -241,12 +241,19 @@ export async function GET() {
     }));
 
     const responseData = {
-      // Sessions
+      // Sessions (nouvelles métriques)
       totalSessions: sessions.length,
       sessionsToday: sessionsToday.length,
       sessionsThisWeek: sessionsWeek.length,
       sessionsThisMonth: sessionsMonth.length,
       sessionsThisYear: sessionsYear.length,
+      
+      // Alias pour rétrocompatibilité avec /api/admin/stats
+      totalVisits: sessions.length,
+      visitsToday: sessionsToday.length,
+      visitsThisWeek: sessionsWeek.length,
+      visitsThisMonth: sessionsMonth.length,
+      visitsThisYear: sessionsYear.length,
       
       // Visiteurs uniques
       uniqueVisitors: countUnique(sessions),
@@ -296,9 +303,11 @@ export async function GET() {
     return NextResponse.json(responseData);
 
   } catch (error) {
-    console.error('Erreur récupération analytics:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Erreur récupération analytics:', error);
+    }
     return NextResponse.json(
-      { error: 'Erreur serveur', details: error instanceof Error ? error.message : 'Unknown' },
+      { error: 'Erreur serveur' },
       { status: 500 }
     );
   }

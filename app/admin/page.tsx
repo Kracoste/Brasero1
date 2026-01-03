@@ -188,7 +188,9 @@ export default function AdminDashboard() {
           dailyData: data.dailyData || [],
         });
       } catch (error) {
-        console.error('Error fetching analytics:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error fetching analytics:', error);
+        }
       } finally {
         setLoading(false);
       }
@@ -210,14 +212,11 @@ export default function AdminDashboard() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'visitor_sessions' },
-        (payload: { new: Record<string, unknown> }) => {
-          console.log('Nouvelle session détectée:', payload);
+        () => {
           triggerRefresh();
         }
       )
-      .subscribe((status: string) => {
-        console.log('Sessions channel status:', status);
-      });
+      .subscribe();
 
     // Abonnement temps réel aux nouvelles commandes
     const ordersChannel = supabase
@@ -225,14 +224,11 @@ export default function AdminDashboard() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'orders' },
-        (payload: { new: Record<string, unknown> }) => {
-          console.log('Changement commande détecté:', payload);
+        () => {
           triggerRefresh();
         }
       )
-      .subscribe((status: string) => {
-        console.log('Orders channel status:', status);
-      });
+      .subscribe();
 
     // Cleanup
     return () => {

@@ -49,7 +49,7 @@ export default function MetricPage() {
       startOfWeekDate.setDate(startOfWeekDate.getDate() - (day - 1));
 
       try {
-        const response = await fetch('/api/admin/stats', { cache: 'no-store' });
+        const response = await fetch('/api/admin/analytics', { cache: 'no-store' });
         if (!response.ok) {
           throw new Error('Erreur lors du chargement des stats');
         }
@@ -99,8 +99,8 @@ export default function MetricPage() {
           totalProducts: Number(data.totalProducts || 0),
           totalCustomers: Number(data.totalCustomers || 0),
         });
-      } catch (error) {
-        console.error('Error fetching stats:', error);
+      } catch {
+        // Erreur silencieuse en production
       } finally {
         setLoading(false);
       }

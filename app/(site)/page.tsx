@@ -4,9 +4,8 @@ import { ProductCarousel } from "@/components/ProductCarousel";
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/lib/schema";
 
-// Désactiver le cache pour toujours afficher les dernières données
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+// Cache ISR de 60 secondes pour équilibrer performance et fraîcheur des données
+export const revalidate = 60;
 
 export default async function HomePage() {
   // Récupérer les produits vedettes depuis Supabase (priorité aux produits marqués is_featured)
