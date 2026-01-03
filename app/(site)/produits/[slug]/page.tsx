@@ -123,6 +123,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
   
   // Récupérer les slugs des accessoires compatibles depuis les specs du produit
   const compatibleAccessorySlugs: string[] = product.specs?.compatibleAccessories || [];
+  
+  // DEBUG: Log en production pour voir les specs
+  console.log('=== PAGE PRODUIT PUBLIC ===');
+  console.log('product.slug:', product.slug);
+  console.log('product.specs:', JSON.stringify(product.specs, null, 2));
+  console.log('compatibleAccessorySlugs:', compatibleAccessorySlugs);
+  console.log('=== END PAGE PRODUIT ===');
 
   return (
     <div className="bg-[#f9f6f1] pb-24">
