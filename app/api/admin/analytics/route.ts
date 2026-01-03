@@ -3,6 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 
+// Force dynamic pour éviter le cache en production
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 type DailyData = {
   date: string;
   sessions: number;

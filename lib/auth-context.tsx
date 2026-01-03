@@ -115,13 +115,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     initInProgress.current = true;
     
-    // Initialisation - forcer une vérification serveur
+    // Initialisation - forcer une vérification serveur avec timeout
     const init = async () => {
       setIsLoading(true);
+      
+      // Timeout de 10 secondes pour éviter le blocage infini
+      const timeoutPromise = new Promise<null>((resolve) => {
+        setTimeout(() => {
+          console.log('Auth init timeout - using cached state');
+          resolve(null);
+        }, 10000);
+      });
+      
       try {
         // Utiliser getUser() directement car c'est plus fiable que getSession()
         // getUser() vérifie avec le serveur Supabase
-        const { data: { user: currentUser }, error } = await supabase.auth.getUser();
+        const userPromise = supabase.auth.getUser();
+        const result = await Promise.race([userPromise, timeoutPromise]);
+        
+        if (result === null) {
+          // Timeout - utiliser le cache ou null
+          console.log('Auth timeout - keeping cached user:', cachedUser?.email);
+          isInitialized = true;
+          setIsLoading(false);
+          initInProgress.current = false;
+          return;
+        }
+        
+        const { data: { user: currentUser }, error } = result;
         
         if (error) {
           devLog('Init auth - pas de session:', error.message);
@@ -139,6 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isInitialized = true;
       } catch (error) {
         devError('Erreur initialisation auth:', error);
+        console.log('Auth init error - keeping cached state');
         // Garder le cache en cas d'erreur
       } finally {
         setIsLoading(false);
