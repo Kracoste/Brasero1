@@ -6,6 +6,10 @@ import { isAdminEmail } from '@/lib/auth';
 import { sanitizeProductData, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
 
+// Force dynamic pour éviter le cache en production
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET: Récupérer un produit par ID ou tous les produits
 export async function GET(request: NextRequest) {
   try {
@@ -43,7 +47,19 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
-      return NextResponse.json(product);
+      // DEBUG: Log le produit récupéré
+      console.log('=== DEBUG GET Product ===');
+      console.log('product.specs:', JSON.stringify(product?.specs, null, 2));
+      console.log('=== END DEBUG GET ===');
+
+      // Retourner le produit avec un header no-cache
+      return NextResponse.json(product, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        }
+      });
     }
 
     // Sinon, récupérer tous les produits
@@ -100,8 +116,14 @@ export async function PUT(request: NextRequest) {
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
-      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
+      console.log('=== ERROR: adminClient is null - SUPABASE_SERVICE_ROLE_KEY missing? ===');
+      return NextResponse.json({ error: 'Configuration serveur manquante - Service Role Key non définie' }, { status: 500 });
     }
+    
+    console.log('=== ABOUT TO UPDATE ===');
+    console.log('productId:', productId);
+    console.log('specs being sent:', JSON.stringify(productData.specs, null, 2));
+    
     const { data: product, error } = await adminClient
       .from('products')
       .update(productData)
@@ -110,7 +132,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      console.log('=== ERROR UPDATE ===', error);
+      console.log('=== ERROR UPDATE ===', JSON.stringify(error, null, 2));
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -125,8 +147,17 @@ export async function PUT(request: NextRequest) {
       revalidatePath('/produits', 'page');
       revalidatePath('/', 'layout');
     }
+    // Aussi invalider l'admin
+    revalidatePath('/admin/produits', 'page');
+    revalidatePath(`/admin/produits/${productId}`, 'page');
 
-    return NextResponse.json(product);
+    return NextResponse.json(product, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
+    });
   } catch (error) {
     devError('Erreur PUT product:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
