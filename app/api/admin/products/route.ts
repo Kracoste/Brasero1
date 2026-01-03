@@ -83,8 +83,19 @@ export async function PUT(request: NextRequest) {
 
     const rawData = await request.json();
     
+    // DEBUG: Log les données reçues et sanitizées
+    console.log('=== DEBUG PUT Product ===');
+    console.log('rawData keys:', Object.keys(rawData));
+    console.log('rawData.specs:', JSON.stringify(rawData.specs, null, 2));
+    console.log('typeof rawData.specs:', typeof rawData.specs);
+    
     // Sanitize les données pour n'autoriser que les champs valides
     const productData = sanitizeProductData(rawData);
+    
+    console.log('productData keys:', Object.keys(productData));
+    console.log('productData.specs:', JSON.stringify(productData.specs, null, 2));
+    console.log('typeof productData.specs:', typeof productData.specs);
+    console.log('=== END DEBUG ===');
 
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
@@ -99,8 +110,14 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
+      console.log('=== ERROR UPDATE ===', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // DEBUG: Log le produit retourné après update
+    console.log('=== PRODUCT AFTER UPDATE ===');
+    console.log('product.specs:', JSON.stringify(product?.specs, null, 2));
+    console.log('=== END PRODUCT AFTER UPDATE ===');
 
     // Invalider le cache de la page produit pour forcer le rechargement des données
     if (product?.slug) {
