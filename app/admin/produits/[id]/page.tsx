@@ -69,7 +69,8 @@ export default function EditProduct() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`/api/admin/products?id=${productId}`);
+        // Ajouter un timestamp pour éviter le cache
+        const response = await fetch(`/api/admin/products?id=${productId}&_t=${Date.now()}`);
         if (!response.ok) {
           const errorData = await response.json();
           setSubmitError(errorData.error || 'Produit non trouvé');
@@ -77,6 +78,11 @@ export default function EditProduct() {
           return;
         }
         const product = await response.json();
+
+        // DEBUG: Log le produit reçu
+        console.log('=== FRONTEND DEBUG ===');
+        console.log('product.specs:', product.specs);
+        console.log('typeof product.specs:', typeof product.specs);
 
         if (!product) {
           setSubmitError('Produit non trouvé');
@@ -94,6 +100,11 @@ export default function EditProduct() {
               }
             })()
           : product.specs || {};
+      
+      // DEBUG: Log les specs parsés
+      console.log('parsedSpecs:', parsedSpecs);
+      console.log('parsedSpecs.compatibleAccessories:', parsedSpecs?.compatibleAccessories);
+      
       specsRef.current = parsedSpecs || {};
 
       setFormData({
