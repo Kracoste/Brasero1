@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
+import { devError } from '@/lib/supabase/utils';
 
 const ALLOWED_PROFILE_FIELDS = [
   'first_name',
@@ -64,13 +65,13 @@ export async function GET() {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur chargement profil:', error);
+      devError('Erreur chargement profil:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ profile: profile || null });
   } catch (error) {
-    console.error('Erreur API profile:', error);
+    devError('Erreur API profile:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

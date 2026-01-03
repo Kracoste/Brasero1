@@ -5,51 +5,18 @@ import { createHash } from "crypto";
 import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase/admin";
 import { ADMIN_EMAILS } from "@/lib/auth";
 import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { 
+  isValidUUID, 
+  isValidPrice, 
+  sanitizeString, 
+  sanitizePagePath,
+  isAllowedOrigin 
+} from "@/lib/validation";
 
 // ============================================
-// SÉCURITÉ : Validation des entrées
+// Constantes locales
 // ============================================
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const SAFE_STRING_REGEX = /^[a-zA-Z0-9\-_./àâäéèêëïîôùûüç\s,;:!?()@#%&*+='"<>€£¥°]+$/;
-const MAX_PAGE_LENGTH = 500;
 const MAX_TITLE_LENGTH = 200;
-
-function isValidUUID(str: string | undefined): boolean {
-  if (!str) return false;
-  return UUID_REGEX.test(str);
-}
-
-function sanitizePagePath(path: string | undefined): string {
-  if (!path) return '/';
-  // Supprimer les caractères dangereux et limiter la longueur
-  const cleaned = path
-    .replace(/[<>\"'`;\\]/g, '') // Supprimer caractères dangereux
-    .replace(/\.{2,}/g, '.') // Empêcher path traversal
-    .slice(0, MAX_PAGE_LENGTH);
-  return cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
-}
-
-function sanitizeString(value: string | undefined | null, maxLength: number): string | undefined {
-  if (!value) return undefined;
-  // Supprimer les caractères potentiellement dangereux
-  return value
-    .replace(/[<>\"'`;\\]/g, '')
-    .replace(/javascript:/gi, '')
-    .replace(/data:/gi, '')
-    .slice(0, maxLength);
-}
-
-function isValidPrice(price: any): boolean {
-  if (price === undefined || price === null) return true;
-  const num = Number(price);
-  return !isNaN(num) && num >= 0 && num <= 1000000; // Max 1M€
-}
-
-function isValidQuantity(qty: any): boolean {
-  if (qty === undefined || qty === null) return true;
-  const num = Number(qty);
-  return Number.isInteger(num) && num >= 1 && num <= 1000;
-}
 
 // Types
 type SessionPayload = {
@@ -146,21 +113,13 @@ export async function POST(request: Request) {
     const headersList = await headers();
     
     // ============================================
-    // SÉCURITÉ : Vérification de l'origine
+    // SÉCURITÉ : Vérification de l'origine (centralisée)
     // ============================================
     const origin = headersList.get('origin');
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'https://localhost:3000',
-      'https://atelier-lbf.fr',
-      'https://www.atelier-lbf.fr',
-    ];
     
     // En production, vérifier l'origine
-    if (process.env.NODE_ENV === 'production' && origin) {
-      if (!allowedOrigins.some(allowed => origin.startsWith(allowed.replace('www.', '')))) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
+    if (process.env.NODE_ENV === 'production' && origin && !isAllowedOrigin(origin)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     
     // ============================================

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { sanitizeProductData, devError } from '@/lib/supabase/utils';
+import { isValidUUID } from '@/lib/validation';
 
 // GET: Récupérer un produit par ID ou tous les produits
 export async function GET(request: NextRequest) {
@@ -27,6 +28,11 @@ export async function GET(request: NextRequest) {
 
     // Si un ID est fourni, récupérer un seul produit
     if (productId) {
+      // Valider que l'ID est un UUID valide
+      if (!isValidUUID(productId)) {
+        return NextResponse.json({ error: 'ID produit invalide' }, { status: 400 });
+      }
+
       const { data: product, error } = await adminClient
         .from('products')
         .select('*')
@@ -63,8 +69,8 @@ export async function PUT(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('id');
 
-    if (!productId) {
-      return NextResponse.json({ error: 'ID produit requis' }, { status: 400 });
+    if (!productId || !isValidUUID(productId)) {
+      return NextResponse.json({ error: 'ID produit invalide' }, { status: 400 });
     }
 
     // Vérifier l'authentification admin
@@ -153,8 +159,8 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('id');
 
-    if (!productId) {
-      return NextResponse.json({ error: 'ID produit requis' }, { status: 400 });
+    if (!productId || !isValidUUID(productId)) {
+      return NextResponse.json({ error: 'ID produit invalide' }, { status: 400 });
     }
 
     // Vérifier l'authentification admin

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe, hasStripeCredentials } from "@/lib/stripe";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { devLog, devError } from "@/lib/supabase/utils";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get("stripe-signature");
 
   if (!webhookSecret) {
-    console.error("❌ Missing STRIPE_WEBHOOK_SECRET in env");
+    devError("Missing STRIPE_WEBHOOK_SECRET in env");
     return NextResponse.json(
       { error: "Missing STRIPE_WEBHOOK_SECRET" },
       { status: 500 }
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!signature) {
-    console.error("❌ Missing stripe-signature header");
+    devError("Missing stripe-signature header");
     return NextResponse.json(
       { error: "Missing stripe-signature" },
       { status: 400 }
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error("❌ Webhook signature verification failed:", err);
+    devError("Webhook signature verification failed:", err);
     return NextResponse.json(
       { error: "Invalid webhook signature" },
       { status: 400 }
@@ -63,21 +64,21 @@ export async function POST(request: NextRequest) {
 
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log("✅ Paiement réussi:", paymentIntent.id);
+        devLog("Paiement réussi:", paymentIntent.id);
         break;
       }
 
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log("❌ Paiement échoué:", paymentIntent.id);
+        devLog("Paiement échoué:", paymentIntent.id);
         break;
       }
 
       default:
-        console.log(`ℹ️ Événement non géré: ${event.type}`);
+        devLog(`Événement non géré: ${event.type}`);
     }
   } catch (err) {
-    console.error("❌ Error handling webhook event:", err);
+    devError("Error handling webhook event:", err);
     // On répond 200 quand même dans certains cas pour éviter retries infinis,
     // mais en dev on peut renvoyer 500 pour voir l’erreur.
     return NextResponse.json(
@@ -91,13 +92,13 @@ export async function POST(request: NextRequest) {
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (!stripe) {
-    console.error("❌ Stripe client non configuré");
+    devError("Stripe client non configuré");
     return;
   }
 
   const supabase = getSupabaseAdminClient();
   if (!supabase) {
-    console.error("❌ Supabase admin client non configuré");
+    devError("Supabase admin client non configuré");
     return;
   }
 
@@ -158,11 +159,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       .single();
 
     if (orderError) {
-      console.error("❌ Erreur création commande:", orderError);
+      devError("Erreur création commande:", orderError);
       return;
     }
 
-    console.log("✅ Commande créée:", order.id);
+    devLog("Commande créée:", order.id);
 
     // Vider le panier de l'utilisateur s'il est connecté
     if (metadata.user_id && metadata.user_id !== "guest") {
@@ -174,10 +175,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       if (cart) {
         await supabase.from("cart_items").delete().eq("cart_id", cart.id);
-        console.log("✅ Panier vidé pour utilisateur:", metadata.user_id);
+        devLog("Panier vidé pour utilisateur:", metadata.user_id);
       }
     }
   } catch (error) {
-    console.error("❌ Erreur traitement webhook:", error);
+    devError("Erreur traitement webhook:", error);
   }
 }

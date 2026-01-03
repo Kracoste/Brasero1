@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import { stripe, hasStripeCredentials } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
+import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
+import { isValidEmail, sanitizeString, sanitizePhone } from '@/lib/validation';
 
 type CartItem = {
   product_slug: string;
@@ -37,6 +40,20 @@ const parseQuantity = (value: unknown) => {
 
 export async function POST(request: NextRequest) {
   try {
+    // ============================================
+    // SÉCURITÉ : Rate Limiting
+    // ============================================
+    const headersList = await headers();
+    const clientIP = getClientIP(headersList);
+    const { maxRequests, windowMs } = RATE_LIMIT_PRESETS.sensitive;
+    
+    if (!checkRateLimit(`checkout-${clientIP}`, maxRequests, windowMs)) {
+      return NextResponse.json(
+        { error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.' },
+        { status: 429 }
+      );
+    }
+
     if (!hasStripeCredentials() || !stripe) {
       return NextResponse.json(
         { error: 'Le paiement n\'est pas configuré. Veuillez contacter l\'administrateur.' },
@@ -46,6 +63,16 @@ export async function POST(request: NextRequest) {
 
     const body: CheckoutBody = await request.json();
     const { items, customerInfo, deliveryMessage } = body;
+
+    // ============================================
+    // SÉCURITÉ : Validation des entrées
+    // ============================================
+    if (!customerInfo?.email || !isValidEmail(customerInfo.email)) {
+      return NextResponse.json(
+        { error: 'Email invalide' },
+        { status: 400 }
+      );
+    }
 
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json(

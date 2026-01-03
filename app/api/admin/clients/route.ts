@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { VALID_USER_ROLES, devError } from '@/lib/supabase/utils';
+import { isValidUUID } from '@/lib/validation';
 
 export async function GET() {
   try {
@@ -54,8 +55,8 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Rôle invalide' }, { status: 400 });
     }
 
-    if (!clientId) {
-      return NextResponse.json({ error: 'ID client requis' }, { status: 400 });
+    if (!clientId || !isValidUUID(clientId)) {
+      return NextResponse.json({ error: 'ID client invalide' }, { status: 400 });
     }
 
     // Utiliser le client admin pour bypasser RLS
@@ -94,8 +95,8 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const clientId = searchParams.get('clientId');
 
-    if (!clientId) {
-      return NextResponse.json({ error: 'clientId requis' }, { status: 400 });
+    if (!clientId || !isValidUUID(clientId)) {
+      return NextResponse.json({ error: 'ID client invalide' }, { status: 400 });
     }
 
     // Utiliser le client admin pour bypasser RLS

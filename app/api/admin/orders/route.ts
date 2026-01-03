@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { VALID_ORDER_STATUSES, devError } from '@/lib/supabase/utils';
+import { isValidUUID } from '@/lib/validation';
 
 // GET: Récupérer les commandes
 export async function GET(request: NextRequest) {
@@ -43,8 +44,8 @@ export async function PUT(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const orderId = searchParams.get('id');
 
-    if (!orderId) {
-      return NextResponse.json({ error: 'ID commande requis' }, { status: 400 });
+    if (!orderId || !isValidUUID(orderId)) {
+      return NextResponse.json({ error: 'ID commande invalide' }, { status: 400 });
     }
 
     // Vérifier l'authentification admin

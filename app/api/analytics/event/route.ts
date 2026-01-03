@@ -3,33 +3,13 @@ import { headers } from "next/headers";
 
 import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase/admin";
 import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
-
-// ============================================
-// SÉCURITÉ : Validation des entrées
-// ============================================
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function isValidUUID(str: string | undefined): boolean {
-  if (!str) return false;
-  return UUID_REGEX.test(str);
-}
-
-function sanitizeString(value: string | undefined | null, maxLength: number): string | undefined {
-  if (!value) return undefined;
-  return value.replace(/[<>\"'`;\\]/g, '').slice(0, maxLength);
-}
-
-function isValidPrice(price: any): boolean {
-  if (price === undefined || price === null) return true;
-  const num = Number(price);
-  return !isNaN(num) && num >= 0 && num <= 1000000;
-}
-
-function isValidQuantity(qty: any): boolean {
-  if (qty === undefined || qty === null) return true;
-  const num = Number(qty);
-  return Number.isInteger(num) && num >= 1 && num <= 1000;
-}
+import { 
+  isValidUUID, 
+  isValidPrice, 
+  isValidQuantity, 
+  sanitizeString,
+  isAllowedOrigin 
+} from "@/lib/validation";
 
 const VALID_EVENT_TYPES = ['product_view', 'add_to_cart', 'remove_from_cart', 'checkout_start', 'purchase'] as const;
 type EventType = typeof VALID_EVENT_TYPES[number];
@@ -61,20 +41,12 @@ export async function POST(request: Request) {
     const headersList = await headers();
     
     // ============================================
-    // SÉCURITÉ : Vérification de l'origine
+    // SÉCURITÉ : Vérification de l'origine (centralisée)
     // ============================================
     const origin = headersList.get('origin');
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'https://localhost:3000',
-      'https://atelier-lbf.fr',
-      'https://www.atelier-lbf.fr',
-    ];
     
-    if (process.env.NODE_ENV === 'production' && origin) {
-      if (!allowedOrigins.some(allowed => origin.startsWith(allowed.replace('www.', '')))) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
+    if (process.env.NODE_ENV === 'production' && origin && !isAllowedOrigin(origin)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     
     // ============================================

@@ -4,6 +4,28 @@
  */
 
 // ============================================
+// Origines autorisées (CORS)
+// ============================================
+
+/** Liste des origines autorisées pour les requêtes API */
+export const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'https://localhost:3000',
+  'https://atelier-lbf.fr',
+  'https://www.atelier-lbf.fr',
+] as const;
+
+/**
+ * Vérifie si une origine est autorisée
+ */
+export function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return true; // Pas d'origine = requête same-origin
+  return ALLOWED_ORIGINS.some(allowed => 
+    origin.startsWith(allowed.replace('www.', ''))
+  );
+}
+
+// ============================================
 // Regex de validation
 // ============================================
 
