@@ -137,22 +137,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (currentUser) {
           // Utilisateur connecté - charger son panier depuis la DB
           const cartFromDb = await loadCart(currentUser.id);
-          // Si l'utilisateur a des items guest, les migrer vers la DB
+          // Si l'utilisateur a des items guest, les migrer vers la DB en batch
           if (guestItems.length > 0 && cartFromDb) {
-            // Migrer les items guest vers le panier DB
-            for (const guestItem of guestItems) {
-              try {
-                await supabase.from('cart_items').insert({
+            try {
+              // Migration batch (une seule requête au lieu de N)
+              await supabase.from('cart_items').insert(
+                guestItems.map(item => ({
                   cart_id: cartFromDb,
-                  product_slug: guestItem.product_slug,
-                  product_name: guestItem.product_name,
-                  product_price: guestItem.product_price,
-                  product_image: guestItem.product_image,
-                  quantity: guestItem.quantity,
-                });
-              } catch {
-                // Ignorer les erreurs de migration
-              }
+                  product_slug: item.product_slug,
+                  product_name: item.product_name,
+                  product_price: item.product_price,
+                  product_image: item.product_image,
+                  quantity: item.quantity,
+                }))
+              );
+            } catch {
+              // Ignorer les erreurs de migration
             }
             // Vider le panier local après migration
             persistGuestCart([]);

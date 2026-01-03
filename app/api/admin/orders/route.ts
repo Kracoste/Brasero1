@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur liste commandes:', error);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json(orders);
@@ -77,7 +78,8 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur mise à jour commande:', error);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json(order);

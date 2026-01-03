@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, hasStripeCredentials } from '@/lib/stripe';
 import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
-
-// Validation du format session ID Stripe (cs_test_... ou cs_live_...)
-const STRIPE_SESSION_ID_REGEX = /^cs_(test|live)_[a-zA-Z0-9]+$/;
+import { isValidStripeSessionId } from '@/lib/validation';
+import { devError } from '@/lib/supabase/utils';
 
 export async function GET(request: NextRequest) {
   if (!hasStripeCredentials() || !stripe) {
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Valider le format du session ID
-  if (!STRIPE_SESSION_ID_REGEX.test(sessionId)) {
+  if (!isValidStripeSessionId(sessionId)) {
     return NextResponse.json(
       { error: 'Format de session invalide' },
       { status: 400 }
@@ -52,9 +51,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     // Log seulement en dev
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Erreur récupération session:', error);
-    }
+    devError('Erreur récupération session:', error);
     return NextResponse.json(
       { error: 'Session introuvable' },
       { status: 404 }

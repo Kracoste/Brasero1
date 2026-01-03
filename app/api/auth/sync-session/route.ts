@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { devError } from '@/lib/supabase/utils';
 
 // Cette route permet de synchroniser la session côté serveur
 // après une connexion côté client (signInWithPassword)
@@ -20,7 +21,7 @@ export async function POST() {
       } 
     });
   } catch (error) {
-    console.error('Sync session error:', error);
+    devError('Sync session error:', error);
     return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
   }
 }

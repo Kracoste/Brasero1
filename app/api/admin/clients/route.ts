@@ -28,7 +28,7 @@ export async function GET() {
 
     if (error) {
       devError('Erreur chargement clients:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json({ clients: data || [] });
@@ -72,7 +72,7 @@ export async function PUT(request: Request) {
 
     if (error) {
       devError('Erreur mise à jour rôle:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
@@ -116,7 +116,7 @@ export async function DELETE(request: Request) {
 
     if (error) {
       devError('Erreur suppression client:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

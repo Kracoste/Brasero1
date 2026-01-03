@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { type NextRequest } from 'next/server'
 import { REDIRECT_PARAM, AUTH_ROUTES } from '@/lib/auth'
+import { devLog, devError } from '@/lib/supabase/utils'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        console.log('Auth callback - Session établie pour:', user.email);
+        devLog('Auth callback - Session établie pour:', user.email);
         
         // Utiliser www. en production pour la cohérence des cookies
         let redirectOrigin = origin
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
         return response
       }
     }
-    console.error('Auth callback error:', error)
+    devError('Auth callback error:', error)
   }
 
   // Rediriger vers la page de connexion avec un message d'erreur

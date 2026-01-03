@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 import { isValidEmail, sanitizeString, sanitizePhone } from '@/lib/validation';
+import { devError } from '@/lib/supabase/utils';
 
 type CartItem = {
   product_slug: string;
@@ -202,7 +203,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
-    console.error('Erreur checkout Stripe:', error);
+    devError('Erreur checkout Stripe:', error);
     return NextResponse.json(
       { error: 'Erreur lors de la création du paiement' },
       { status: 500 }

@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { devError } from '@/lib/supabase/utils';
+import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 const ALLOWED_PROFILE_FIELDS = [
   'first_name',
@@ -66,7 +68,7 @@ export async function GET() {
 
     if (error && error.code !== 'PGRST116') {
       devError('Erreur chargement profil:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json({ profile: profile || null });
@@ -108,13 +110,13 @@ export async function PUT(request: Request) {
       .single();
 
     if (error) {
-      console.error('Erreur mise à jour profil:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur mise à jour profil:', error);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json({ profile: data });
   } catch (error) {
-    console.error('Erreur API update profile:', error);
+    devError('Erreur API update profile:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

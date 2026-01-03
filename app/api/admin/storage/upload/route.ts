@@ -3,10 +3,17 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { ALLOWED_STORAGE_BUCKETS, sanitizeFileName, devError } from '@/lib/supabase/utils';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 // POST: Upload une image vers Supabase Storage
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting pour éviter les abus (30 uploads/minute max)
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`storage-upload-${clientIP}`, 30, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }, { status: 429 });
+    }
+
     // Vérifier l'authentification admin
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -47,7 +54,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
-      return NextResponse.json({ error: uploadError.message }, { status: 500 });
+      devError('Erreur upload storage:', uploadError);
+      return NextResponse.json({ error: 'Erreur lors de l\'upload' }, { status: 500 });
     }
 
     // Récupérer l'URL publique
@@ -85,6 +93,11 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Nom de fichier requis' }, { status: 400 });
     }
 
+    // Valider le bucket
+    if (!ALLOWED_STORAGE_BUCKETS.includes(bucket as any)) {
+      return NextResponse.json({ error: 'Bucket non autorisé' }, { status: 400 });
+    }
+
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
@@ -96,7 +109,8 @@ export async function DELETE(request: NextRequest) {
       .remove([fileName]);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur suppression fichier:', error);
+      return NextResponse.json({ error: 'Erreur lors de la suppression' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

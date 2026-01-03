@@ -44,13 +44,9 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        devError('Erreur GET produit:', error);
+        return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
       }
-
-      // DEBUG: Log le produit récupéré
-      console.log('=== DEBUG GET Product ===');
-      console.log('product.specs:', JSON.stringify(product?.specs, null, 2));
-      console.log('=== END DEBUG GET ===');
 
       // Retourner le produit avec un header no-cache
       return NextResponse.json(product, {
@@ -69,7 +65,8 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur liste produits:', error);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json(products);
@@ -99,30 +96,15 @@ export async function PUT(request: NextRequest) {
 
     const rawData = await request.json();
     
-    // DEBUG: Log les données reçues et sanitizées
-    console.log('=== DEBUG PUT Product ===');
-    console.log('rawData keys:', Object.keys(rawData));
-    console.log('rawData.specs:', JSON.stringify(rawData.specs, null, 2));
-    console.log('typeof rawData.specs:', typeof rawData.specs);
-    
     // Sanitize les données pour n'autoriser que les champs valides
     const productData = sanitizeProductData(rawData);
-    
-    console.log('productData keys:', Object.keys(productData));
-    console.log('productData.specs:', JSON.stringify(productData.specs, null, 2));
-    console.log('typeof productData.specs:', typeof productData.specs);
-    console.log('=== END DEBUG ===');
 
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
-      console.log('=== ERROR: adminClient is null - SUPABASE_SERVICE_ROLE_KEY missing? ===');
-      return NextResponse.json({ error: 'Configuration serveur manquante - Service Role Key non définie' }, { status: 500 });
+      devError('Admin client non disponible - SUPABASE_SERVICE_ROLE_KEY manquante?');
+      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
     }
-    
-    console.log('=== ABOUT TO UPDATE ===');
-    console.log('productId:', productId);
-    console.log('specs being sent:', JSON.stringify(productData.specs, null, 2));
     
     const { data: product, error } = await adminClient
       .from('products')
@@ -132,14 +114,9 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      console.log('=== ERROR UPDATE ===', JSON.stringify(error, null, 2));
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur UPDATE produit:', error);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
-
-    // DEBUG: Log le produit retourné après update
-    console.log('=== PRODUCT AFTER UPDATE ===');
-    console.log('product.specs:', JSON.stringify(product?.specs, null, 2));
-    console.log('=== END PRODUCT AFTER UPDATE ===');
 
     // Invalider le cache de la page produit pour forcer le rechargement des données
     if (product?.slug) {
@@ -230,7 +207,8 @@ export async function DELETE(request: NextRequest) {
       .eq('id', productId);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur DELETE produit:', error);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
