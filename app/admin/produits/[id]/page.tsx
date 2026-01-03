@@ -79,11 +79,6 @@ export default function EditProduct() {
         }
         const product = await response.json();
 
-        // DEBUG: Log le produit reçu
-        console.log('=== FRONTEND DEBUG ===');
-        console.log('product.specs:', product.specs);
-        console.log('typeof product.specs:', typeof product.specs);
-
         if (!product) {
           setSubmitError('Produit non trouvé');
           setLoadingProduct(false);
@@ -100,10 +95,6 @@ export default function EditProduct() {
               }
             })()
           : product.specs || {};
-      
-      // DEBUG: Log les specs parsés
-      console.log('parsedSpecs:', parsedSpecs);
-      console.log('parsedSpecs.compatibleAccessories:', parsedSpecs?.compatibleAccessories);
       
       specsRef.current = parsedSpecs || {};
 
@@ -939,12 +930,13 @@ export default function EditProduct() {
                 <div className="flex flex-wrap gap-2 mb-3">
                   {formData.compatibleAccessories.map((slug) => {
                     const product = availableProducts.find(a => a.slug === slug);
-                    if (!product) return null;
-                    const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                    // Afficher même si le produit n'est pas encore chargé
+                    const imageUrl = product?.images?.[0]?.src || '/logo/placeholder.png';
+                    const displayName = product?.name || slug;
                     return (
                       <div key={slug} className="flex items-center gap-2 bg-green-50 border border-green-300 rounded-lg px-3 py-2">
-                        <img src={imageUrl} alt={product.name} className="w-8 h-8 object-contain rounded" />
-                        <span className="text-sm font-medium text-green-800">{product.name}</span>
+                        <img src={imageUrl} alt={displayName} className="w-8 h-8 object-contain rounded" />
+                        <span className="text-sm font-medium text-green-800">{displayName}</span>
                         <button
                           type="button"
                           onClick={() => handleAccessoryChange(slug)}
@@ -1033,13 +1025,15 @@ export default function EditProduct() {
               <div className="flex flex-wrap gap-2 mb-3">
                 {formData.compatibleAccessories.map((slug) => {
                   const product = availableProducts.find(a => a.slug === slug);
-                  if (!product) return null;
-                  const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                  // Afficher même si le produit n'est pas encore chargé
+                  const imageUrl = product?.images?.[0]?.src || '/logo/placeholder.png';
+                  const displayName = product?.name || slug;
+                  const displayCategory = product?.category || 'produit';
                   return (
                     <div key={slug} className="flex items-center gap-2 bg-green-50 border border-green-300 rounded-lg px-3 py-2">
-                      <img src={imageUrl} alt={product.name} className="w-8 h-8 object-contain rounded" />
-                      <span className="text-xs text-slate-500 uppercase">{product.category}</span>
-                      <span className="text-sm font-medium text-green-800">{product.name}</span>
+                      <img src={imageUrl} alt={displayName} className="w-8 h-8 object-contain rounded" />
+                      <span className="text-xs text-slate-500 uppercase">{displayCategory}</span>
+                      <span className="text-sm font-medium text-green-800">{displayName}</span>
                       <button
                         type="button"
                         onClick={() => handleAccessoryChange(slug)}
