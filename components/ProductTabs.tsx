@@ -15,20 +15,17 @@ type ProductTabsProps = {
 const tabs = [
   { id: "description", label: "Description du produit" },
   { id: "specifications", label: "Spécifications" },
-  { id: "garantie", label: "Garantie" },
   { id: "critiques", label: "Critiques" },
 ];
 
 export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => {
   const [activeTab, setActiveTab] = useState("description");
   const descriptionRef = useRef<HTMLDivElement | null>(null);
-  const warrantyRef = useRef<HTMLDivElement | null>(null);
   const reviewsRef = useRef<HTMLDivElement | null>(null);
 
   const tabToRef: Record<string, React.RefObject<HTMLDivElement | null>> = {
     description: descriptionRef,
     specifications: descriptionRef,
-    garantie: warrantyRef,
     critiques: reviewsRef,
   };
 
@@ -195,52 +192,6 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
               </dl>
             </div>
           </div>
-        </div>
-
-        <div ref={warrantyRef} className="space-y-6 text-gray-600 scroll-mt-32">
-          <div className="rounded-lg border border-green-200 bg-green-50 p-6">
-            <h4 className="text-lg font-semibold text-green-800">{product.warranty}</h4>
-            <p className="mt-2 text-green-700">
-              Votre braséro est couvert par notre garantie fabricant couvrant tout défaut de fabrication ou de matériau.
-            </p>
-          </div>
-          <div className="space-y-4">
-            <h4 className="font-semibold text-gray-900">Ce que couvre la garantie :</h4>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-start gap-2">
-                <span className="text-green-600">✓</span>
-                <span>Défauts de fabrication (soudures, assemblage)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-600">✓</span>
-                <span>Défauts de matériau (perforation prématurée, fissures)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-600">✓</span>
-                <span>Problèmes structurels affectant la stabilité</span>
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <h4 className="font-semibold text-gray-900">Ce que ne couvre pas la garantie :</h4>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-start gap-2">
-                <span className="text-gray-400">✗</span>
-                <span>Usure normale et patine naturelle de l'acier corten</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-gray-400">✗</span>
-                <span>Dommages causés par une mauvaise utilisation</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-gray-400">✗</span>
-                <span>Modifications apportées au produit</span>
-              </li>
-            </ul>
-          </div>
-          <p className="text-sm text-gray-500">
-            Pour toute demande de garantie, contactez notre service client avec votre numéro de commande et des photos du problème constaté.
-          </p>
         </div>
 
         <div ref={reviewsRef} className="space-y-6 scroll-mt-32">
