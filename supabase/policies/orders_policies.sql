@@ -1,4 +1,7 @@
 -- Row Level Security policies for the "orders" table
+-- NOTE: Les admins accèdent aux commandes via le service_role key (admin client),
+-- donc pas besoin de policy RLS pour les admins. Cela évite la récursion infinie
+-- avec la table profiles.
 
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
@@ -11,15 +14,9 @@ DROP POLICY IF EXISTS "admin_orders_all" ON public.orders;
 DROP POLICY IF EXISTS "user_orders_select" ON public.orders;
 DROP POLICY IF EXISTS "user_orders_insert" ON public.orders;
 
-CREATE POLICY "admin_orders_all" ON public.orders
-  FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE profiles.id = auth.uid()
-        AND profiles.role = 'admin'
-    )
-  );
+-- SUPPRIMÉ: La policy admin_orders_all causait une récursion infinie avec profiles.role
+-- L'accès admin se fait désormais uniquement via le client admin (service_role key)
+-- qui bypass automatiquement RLS.
 
 CREATE POLICY "user_orders_select" ON public.orders
   FOR SELECT

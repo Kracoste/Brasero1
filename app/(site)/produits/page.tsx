@@ -23,8 +23,9 @@ export const metadata: Metadata = {
   description: "Parcourez nos braséros en acier corten et notre fendeur à bûches Made in France.",
 };
 
-// Cache ISR de 60 secondes pour équilibrer performance et fraîcheur des données
-export const revalidate = 60;
+// Pas de cache - les données sont toujours fraîches
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 type SearchParams = {
   category?: string;

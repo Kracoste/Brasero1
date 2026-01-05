@@ -5,6 +5,7 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { sanitizeProductData, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
+import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 // Force dynamic pour éviter le cache en production
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,12 @@ export const revalidate = 0;
 // GET: Récupérer un produit par ID ou tous les produits
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting admin (30 requêtes/min)
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`admin-products-${clientIP}`, 30, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('id');
 
@@ -69,7 +76,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
-    return NextResponse.json(products);
+    // Ajouter un cache buster aux URLs des images pour forcer le rafraîchissement
+    const timestamp = Date.now();
+    const productsWithCacheBuster = (products || []).map((p: any) => ({
+      ...p,
+      cardImage: p.card_image ? `${p.card_image}?t=${timestamp}` : null,
+      card_image: p.card_image ? `${p.card_image}?t=${timestamp}` : null,
+    }));
+
+    return NextResponse.json(productsWithCacheBuster, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
+    });
   } catch (error) {
     devError('Erreur GET product:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
@@ -120,13 +141,21 @@ export async function PUT(request: NextRequest) {
 
     // Invalider le cache de la page produit pour forcer le rechargement des données
     if (product?.slug) {
+      // Invalider la page produit spécifique
       revalidatePath(`/produits/${product.slug}`, 'page');
+      revalidatePath(`/produits/${product.slug}`, 'layout');
+      // Invalider la liste des produits
       revalidatePath('/produits', 'page');
+      revalidatePath('/produits', 'layout');
+      // Invalider la page d'accueil
+      revalidatePath('/', 'page');
       revalidatePath('/', 'layout');
     }
     // Aussi invalider l'admin
     revalidatePath('/admin/produits', 'page');
     revalidatePath(`/admin/produits/${productId}`, 'page');
+    // Invalider tout le site pour les images
+    revalidatePath('/', 'layout');
 
     return NextResponse.json(product, {
       headers: {

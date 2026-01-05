@@ -1,12 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { VALID_USER_ROLES, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting admin (30 requêtes/min)
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`admin-clients-${clientIP}`, 30, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
     const { data: uploadData, error: uploadError } = await adminClient.storage
       .from(bucket)
       .upload(sanitizedFileName, file, {
-        cacheControl: '3600',
-        upsert: false
+        cacheControl: '0',
+        upsert: true
       });
 
     if (uploadError) {

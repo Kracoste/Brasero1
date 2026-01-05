@@ -174,3 +174,84 @@ export type ConversionEventType = typeof VALID_CONVERSION_EVENT_TYPES[number];
 export function isValidConversionEventType(type: string | undefined): type is ConversionEventType {
   return !!type && VALID_CONVERSION_EVENT_TYPES.includes(type as ConversionEventType);
 }
+
+// ============================================
+// Validation des mots de passe
+// ============================================
+
+/** Regex pour valider un nom (lettres, espaces, points, accents) */
+export const NAME_REGEX = /^[a-zA-ZÀ-ÿ\s.]+$/;
+
+/**
+ * Configuration de la politique de mot de passe
+ */
+export const PASSWORD_POLICY = {
+  minLength: 8,
+  maxLength: 128,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireNumber: true,
+  requireSpecialChar: false, // Optionnel pour le moment
+} as const;
+
+/**
+ * Résultat de la validation de mot de passe
+ */
+export type PasswordValidationResult = {
+  isValid: boolean;
+  errors: string[];
+};
+
+/**
+ * Valide un mot de passe selon la politique de sécurité
+ */
+export function validatePassword(password: string | undefined | null): PasswordValidationResult {
+  const errors: string[] = [];
+  
+  if (!password) {
+    return { isValid: false, errors: ['Le mot de passe est requis'] };
+  }
+  
+  if (password.length < PASSWORD_POLICY.minLength) {
+    errors.push(`Le mot de passe doit contenir au moins ${PASSWORD_POLICY.minLength} caractères`);
+  }
+  
+  if (password.length > PASSWORD_POLICY.maxLength) {
+    errors.push(`Le mot de passe ne doit pas dépasser ${PASSWORD_POLICY.maxLength} caractères`);
+  }
+  
+  if (PASSWORD_POLICY.requireUppercase && !/[A-Z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une majuscule');
+  }
+  
+  if (PASSWORD_POLICY.requireLowercase && !/[a-z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une minuscule');
+  }
+  
+  if (PASSWORD_POLICY.requireNumber && !/[0-9]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un chiffre');
+  }
+  
+  if (PASSWORD_POLICY.requireSpecialChar && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un caractère spécial');
+  }
+  
+  return { isValid: errors.length === 0, errors };
+}
+
+/**
+ * Valide un nom (prénom ou nom de famille)
+ */
+export function isValidName(name: string | undefined | null): boolean {
+  if (!name) return false;
+  return NAME_REGEX.test(name) && name.length >= 1 && name.length <= 100;
+}
+
+/**
+ * Nettoie un nom (prénom ou nom de famille)
+ */
+export function sanitizeName(name: string | undefined | null): string | undefined {
+  if (!name) return undefined;
+  const cleaned = name.trim().slice(0, 100);
+  return isValidName(cleaned) ? cleaned : undefined;
+}

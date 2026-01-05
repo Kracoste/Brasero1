@@ -5,7 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/lib/schema";
 
 // Cache ISR de 60 secondes pour équilibrer performance et fraîcheur des données
-export const revalidate = 60;
+// Pas de cache - les données sont toujours fraîches
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   // Récupérer les produits vedettes depuis Supabase (priorité aux produits marqués is_featured)

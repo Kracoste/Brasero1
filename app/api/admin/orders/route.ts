@@ -4,10 +4,17 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { VALID_ORDER_STATUSES, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 // GET: Récupérer les commandes
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting admin (30 requêtes/min)
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`admin-orders-${clientIP}`, 30, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     // Vérifier l'authentification admin
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();

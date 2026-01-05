@@ -59,6 +59,10 @@ const generateGuestId = (slug: string) =>
 
 const isGuestItem = (item: CartItem) => item.id.startsWith('guest-');
 
+// Limite de sécurité pour éviter les abus
+const MAX_CART_ITEMS = 50;
+const MAX_QUANTITY_PER_ITEM = 99;
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,8 +73,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const syncGuestCart = (updater: (items: CartItem[]) => CartItem[]) => {
     setItems(prev => {
       const next = updater(prev);
-      persistGuestCart(next);
-      return next;
+      // Limiter le nombre d'items dans le panier
+      const limitedNext = next.slice(0, MAX_CART_ITEMS).map(item => ({
+        ...item,
+        quantity: Math.min(item.quantity, MAX_QUANTITY_PER_ITEM)
+      }));
+      persistGuestCart(limitedNext);
+      return limitedNext;
     });
   };
 
@@ -79,12 +88,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     quantity: number,
   ) => {
     syncGuestCart(prev => {
+      // Vérifier si on a atteint la limite
+      if (prev.length >= MAX_CART_ITEMS) {
+        console.warn('Limite du panier atteinte');
+        return prev;
+      }
+      
       const existing = prev.find(
         (item) => isGuestItem(item) && item.product_slug === product.slug,
       );
       if (existing) {
         return prev.map((item) =>
-          item.id === existing.id ? { ...item, quantity: item.quantity + quantity } : item,
+          item.id === existing.id 
+            ? { ...item, quantity: Math.min(item.quantity + quantity, MAX_QUANTITY_PER_ITEM) } 
+            : item,
         );
       }
       const newItem: CartItem = {
@@ -93,7 +110,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         product_name: product.name,
         product_price: product.price,
         product_image: product.image || null,
-        quantity,
+        quantity: Math.min(quantity, MAX_QUANTITY_PER_ITEM),
       };
       return [...prev, newItem];
     });

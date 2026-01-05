@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
+import { isValidName, validatePassword, isValidEmail } from '@/lib/validation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ChevronDown } from 'lucide-react';
@@ -22,10 +23,6 @@ export default function InscriptionPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const validateName = (value: string) => {
-    return /^[a-zA-ZÀ-ÿ\s.]+$/.test(value);
-  };
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -37,20 +34,30 @@ export default function InscriptionPage() {
       return;
     }
 
-    if (!validateName(prenom)) {
+    // Utilisation des validations centralisées
+    if (!isValidName(prenom)) {
       setError('Le prénom ne doit contenir que des lettres');
       setLoading(false);
       return;
     }
 
-    if (!validateName(nom)) {
+    if (!isValidName(nom)) {
       setError('Le nom ne doit contenir que des lettres');
       setLoading(false);
       return;
     }
 
-    if (password.length < 5) {
-      setError('Le mot de passe doit contenir au moins 5 caractères');
+    // Validation de l'email
+    if (!isValidEmail(email)) {
+      setError('Veuillez entrer une adresse email valide');
+      setLoading(false);
+      return;
+    }
+
+    // Validation renforcée du mot de passe avec la fonction centralisée
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors[0]);
       setLoading(false);
       return;
     }

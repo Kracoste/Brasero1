@@ -22,16 +22,27 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [cacheBuster, setCacheBuster] = useState(Date.now());
 
   useEffect(() => {
     fetchProducts();
+    
+    // Rafraîchir les données et les images quand la fenêtre reprend le focus
+    const handleFocus = () => {
+      setCacheBuster(Date.now());
+      fetchProducts();
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProducts = async () => {
     try {
-      // Utiliser l'API route pour bypass RLS
-      const response = await fetch('/api/admin/products');
+      // Utiliser l'API route pour bypass RLS + timestamp pour éviter le cache
+      const response = await fetch(`/api/admin/products?_t=${Date.now()}`, {
+        cache: 'no-store',
+      });
       if (!response.ok) {
         console.error('Error fetching products:', await response.text());
         setProducts([]);

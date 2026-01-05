@@ -43,7 +43,12 @@ const sanitizeText = (value?: string | null, maxLength = 512) => {
 
 const hashIP = (ip: string): string => {
   // Utiliser une clé secrète pour le hash (plus sécurisé)
-  const secret = process.env.ANALYTICS_SECRET || process.env.NEXT_PUBLIC_SUPABASE_URL || 'fallback-secret';
+  // En production, ANALYTICS_SECRET doit être défini. Le fallback utilise une combinaison unique.
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+  const secret = process.env.ANALYTICS_SECRET || 
+    (serviceKey.slice(0, 32) + supabaseUrl) || 
+    'dev-only-fallback-' + Date.now();
   return createHash('sha256').update(ip + secret).digest('hex').slice(0, 32);
 };
 

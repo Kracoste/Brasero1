@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 // Force dynamic pour éviter le cache en production
 export const dynamic = 'force-dynamic';
@@ -30,10 +31,16 @@ type ConversionFunnel = {
 
 // Cache simple en mémoire pour réduire les requêtes
 let analyticsCache: { data: any; timestamp: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes (au lieu de 30 secondes)
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes (amélioré pour réduire la charge)
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting admin (20 requêtes/min pour analytics - plus restrictif car coûteux)
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`admin-analytics-${clientIP}`, 20, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

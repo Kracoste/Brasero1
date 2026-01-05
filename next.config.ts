@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
         hostname: "kxztmjqxsskvbqcohtgj.supabase.co",
       },
     ],
+    // Réduire le cache des images pour permettre les mises à jour plus rapides
+    minimumCacheTTL: 60,
   },
 };
 

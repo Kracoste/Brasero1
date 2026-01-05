@@ -12,8 +12,9 @@ import { createClient } from "@/lib/supabase/server";
 import { resolveDiameter } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 
-// Cache ISR de 60 secondes - les modifications admin invalident le cache via revalidatePath
-export const revalidate = 60;
+// Pas de cache ISR - les données sont toujours fraîches
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
