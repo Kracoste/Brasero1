@@ -55,6 +55,9 @@ export default function NewProduct() {
     fuelType: [] as string[],
     painting: '',
     compatibleAccessories: [] as string[],
+    imageScale: '100',
+    detailImageScale: '100',
+    detailImageOffsetX: '0',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -243,6 +246,9 @@ export default function NewProduct() {
       if (formData.fuelType.length > 0) specsPayload.fuelType = formData.fuelType;
       if (formData.painting) specsPayload.painting = formData.painting;
       if (formData.compatibleAccessories.length > 0) specsPayload.compatibleAccessories = formData.compatibleAccessories;
+      if (formData.imageScale && formData.imageScale !== '100') specsPayload.imageScale = parseInt(formData.imageScale);
+      if (formData.detailImageScale && formData.detailImageScale !== '100') specsPayload.detailImageScale = parseInt(formData.detailImageScale);
+      if (formData.detailImageOffsetX && formData.detailImageOffsetX !== '0') specsPayload.detailImageOffsetX = parseInt(formData.detailImageOffsetX);
 
       const productData = {
         name: formData.name,
@@ -499,6 +505,81 @@ export default function NewProduct() {
             onChange={handleImageUpload}
             className="hidden"
           />
+
+          {/* Réglage du zoom de l'image */}
+          <div className="mt-6 pt-6 border-t border-slate-200 space-y-6">
+            <h3 className="text-md font-semibold text-slate-800">Réglages d'affichage des images</h3>
+            
+            {/* Zoom carte produit */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                🃏 Zoom sur la carte produit ({formData.imageScale}%)
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  name="imageScale"
+                  min="80"
+                  max="180"
+                  step="5"
+                  value={formData.imageScale}
+                  onChange={handleInputChange}
+                  className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-sm text-slate-600 w-16 text-right">{formData.imageScale}%</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Zoom de l'image sur les cartes du catalogue. 100% = taille normale.
+              </p>
+            </div>
+
+            {/* Zoom page détail */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                🔍 Zoom sur la page détail ({formData.detailImageScale}%)
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  name="detailImageScale"
+                  min="80"
+                  max="180"
+                  step="5"
+                  value={formData.detailImageScale}
+                  onChange={handleInputChange}
+                  className="flex-1 h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-sm text-slate-600 w-16 text-right">{formData.detailImageScale}%</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Zoom de l'image sur la page de détail du produit.
+              </p>
+            </div>
+
+            {/* Décalage horizontal page détail */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                ↔️ Position horizontale ({formData.detailImageOffsetX > '0' ? '+' : ''}{formData.detailImageOffsetX}%)
+              </label>
+              <div className="flex items-center gap-4">
+                <span className="text-xs text-slate-500">Gauche</span>
+                <input
+                  type="range"
+                  name="detailImageOffsetX"
+                  min="-50"
+                  max="50"
+                  step="5"
+                  value={formData.detailImageOffsetX}
+                  onChange={handleInputChange}
+                  className="flex-1 h-2 bg-green-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-xs text-slate-500">Droite</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Décale l'image à gauche ou à droite sur la page de détail. 0 = centré.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Prix et promotion */}

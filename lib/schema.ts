@@ -27,6 +27,9 @@ const specSchema = z.object({
   painting: z.string().optional(),
   format: z.string().optional(),
   compatibleAccessories: z.array(z.string()).optional(),
+  imageScale: z.number().optional(),
+  detailImageScale: z.number().optional(),
+  detailImageOffsetX: z.number().optional(),
 });
 
 export const productSchema = z.object({

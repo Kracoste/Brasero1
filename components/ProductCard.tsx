@@ -71,6 +71,9 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}
               className="product-card__image-el"
+              style={{
+                transform: `scale(${(product.specs?.imageScale || 110) / 100})`,
+              }}
             />
           ) : (
             <div className="flex items-center justify-center h-full bg-gray-100 text-gray-400 text-sm">

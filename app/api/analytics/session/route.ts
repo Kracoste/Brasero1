@@ -182,15 +182,62 @@ export async function POST(request: Request) {
     // Vérifier si admin
     const userIsAdmin = isAdmin(body.userEmail);
     
-    // Chercher une session existante (moins de 30 min d'inactivité)
-    const { data: existingSession } = await adminClient
+    // ============================================
+    // AMÉLIORATION: Identifier visiteur par IP si nouveau visitorId
+    // Permet de détecter les visiteurs récurrents même sans cookies
+    // ============================================
+    
+    // Chercher une session récente avec la même IP (dernières 24h)
+    // pour corréler les visiteurs qui ont effacé leurs cookies
+    const { data: recentIpSession } = await adminClient
       .from("visitor_sessions")
-      .select("id, page_count, started_at")
+      .select("visitor_id")
+      .eq("ip_address", hashedIP)
+      .eq("is_admin", false)
+      .gte("started_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .single();
+    
+    // Si on trouve un ancien visitor_id pour cette IP, on peut le noter
+    // mais on garde le nouveau pour respecter le localStorage de l'utilisateur
+    const correlatedVisitorId = recentIpSession?.visitor_id;
+    const isReturningByIp = correlatedVisitorId && correlatedVisitorId !== visitorId;
+    
+    // Chercher une session existante (moins de 30 min d'inactivité)
+    // D'abord par visitorId, puis par IP hashée comme fallback
+    let existingSession = null;
+    
+    // Essayer avec le visitorId
+    const { data: sessionByVisitor } = await adminClient
+      .from("visitor_sessions")
+      .select("id, page_count, started_at, visitor_id")
       .eq("visitor_id", visitorId)
       .gte("last_activity_at", new Date(Date.now() - SESSION_TIMEOUT_MS).toISOString())
       .order("last_activity_at", { ascending: false })
       .limit(1)
       .single();
+    
+    if (sessionByVisitor) {
+      existingSession = sessionByVisitor;
+    } else {
+      // Fallback: chercher par IP hashée (même appareil, cookies effacés)
+      const { data: sessionByIp } = await adminClient
+        .from("visitor_sessions")
+        .select("id, page_count, started_at, visitor_id")
+        .eq("ip_address", hashedIP)
+        .eq("browser", browser)
+        .eq("os", os)
+        .eq("is_admin", false)
+        .gte("last_activity_at", new Date(Date.now() - SESSION_TIMEOUT_MS).toISOString())
+        .order("last_activity_at", { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (sessionByIp) {
+        existingSession = sessionByIp;
+      }
+    }
 
     let sessionId: string;
     let isNewSession = false;
@@ -230,6 +277,8 @@ export async function POST(request: Request) {
         .from("visitor_sessions")
         .insert({
           visitor_id: visitorId,
+          // Stocker l'ancien visitor_id si détecté par IP (corrélation)
+          correlated_visitor_id: isReturningByIp ? correlatedVisitorId : null,
           fingerprint: `${hashedIP}-${browser}-${os}`,
           ip_address: hashedIP,
           user_agent: userAgent,
@@ -246,6 +295,8 @@ export async function POST(request: Request) {
           utm_campaign: sanitizeString(utmCampaign, 100),
           entry_page: page,
           is_admin: userIsAdmin,
+          // Marquer si c'est un visiteur de retour détecté par IP
+          is_returning_by_ip: isReturningByIp || false,
         })
         .select("id")
         .single();

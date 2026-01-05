@@ -7,6 +7,7 @@ import { ProductGallery } from "@/components/ProductGallery";
 import { Section } from "@/components/Section";
 import { ProductTabs } from "@/components/ProductTabs";
 import { ProductPurchaseSection } from "@/components/ProductPurchaseSection";
+import { RelatedProducts } from "@/components/RelatedProducts";
 import { createClient } from "@/lib/supabase/server";
 import { resolveDiameter } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
@@ -93,6 +94,20 @@ async function getProduct(slug: string) {
   return mapDbProductToProduct(p);
 }
 
+// Fonction pour récupérer les produits similaires (même catégorie, excluant le produit actuel)
+async function getRelatedProducts(currentSlug: string, category: string, limit: number = 8) {
+  const supabase = await createClient();
+  const { data: products } = await supabase
+    .from('products')
+    .select('*')
+    .eq('category', category)
+    .neq('slug', currentSlug)
+    .limit(limit);
+
+  if (!products) return [];
+  return products.map(mapDbProductToProduct).filter(Boolean) as Product[];
+}
+
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
@@ -123,6 +138,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
   
   // Récupérer les slugs des accessoires compatibles depuis les specs du produit
   const compatibleAccessorySlugs: string[] = product.specs?.compatibleAccessories || [];
+
+  // Récupérer les produits similaires (même catégorie)
+  const relatedProducts = await getRelatedProducts(slug, product.category, 8);
 
   return (
     <div className="bg-[#f9f6f1] pb-24">
@@ -163,6 +181,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <ProductTabs product={product} accessories={[]} />
         </Container>
       </Section>
+
+      {/* Section produits similaires - pleine largeur */}
+      {relatedProducts.length > 0 && (
+        <Section className="py-8 sm:py-12 w-full max-w-none">
+          <RelatedProducts products={relatedProducts} />
+        </Section>
+      )}
     </div>
   );
 }

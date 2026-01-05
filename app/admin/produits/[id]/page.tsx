@@ -59,6 +59,9 @@ export default function EditProduct() {
     numberOfGuests: '',
     fuelType: [] as string[],
     compatibleAccessories: [] as string[],
+    imageScale: '100',
+    detailImageScale: '100',
+    detailImageOffsetX: '0',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -125,6 +128,9 @@ export default function EditProduct() {
         numberOfGuests: parsedSpecs?.numberOfGuests || '',
         fuelType: parsedSpecs?.fuelType || [],
         compatibleAccessories: parsedSpecs?.compatibleAccessories || [],
+        imageScale: parsedSpecs?.imageScale?.toString() || '100',
+        detailImageScale: parsedSpecs?.detailImageScale?.toString() || '100',
+        detailImageOffsetX: parsedSpecs?.detailImageOffsetX?.toString() || '0',
       });
 
       // Charger les images existantes
@@ -342,6 +348,24 @@ export default function EditProduct() {
         nextSpecs.compatibleAccessories = formData.compatibleAccessories;
       } else {
         delete nextSpecs.compatibleAccessories;
+      }
+      // Zoom de l'image (100 = normal, 150 = 50% plus grand)
+      if (formData.imageScale && formData.imageScale !== '100') {
+        nextSpecs.imageScale = parseInt(formData.imageScale);
+      } else {
+        delete nextSpecs.imageScale;
+      }
+      // Zoom de l'image sur la page détail
+      if (formData.detailImageScale && formData.detailImageScale !== '100') {
+        nextSpecs.detailImageScale = parseInt(formData.detailImageScale);
+      } else {
+        delete nextSpecs.detailImageScale;
+      }
+      // Décalage horizontal de l'image sur la page détail (-50 à +50)
+      if (formData.detailImageOffsetX && formData.detailImageOffsetX !== '0') {
+        nextSpecs.detailImageOffsetX = parseInt(formData.detailImageOffsetX);
+      } else {
+        delete nextSpecs.detailImageOffsetX;
       }
       specsRef.current = nextSpecs;
 
@@ -606,6 +630,81 @@ export default function EditProduct() {
             onChange={handleImageUpload}
             className="hidden"
           />
+
+          {/* Réglage du zoom de l'image */}
+          <div className="mt-6 pt-6 border-t border-slate-200 space-y-6">
+            <h3 className="text-md font-semibold text-slate-800">Réglages d'affichage des images</h3>
+            
+            {/* Zoom carte produit */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                🃏 Zoom sur la carte produit ({formData.imageScale}%)
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  name="imageScale"
+                  min="80"
+                  max="180"
+                  step="5"
+                  value={formData.imageScale}
+                  onChange={handleInputChange}
+                  className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-sm text-slate-600 w-16 text-right">{formData.imageScale}%</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Zoom de l'image sur les cartes du catalogue. 100% = taille normale.
+              </p>
+            </div>
+
+            {/* Zoom page détail */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                🔍 Zoom sur la page détail ({formData.detailImageScale}%)
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  name="detailImageScale"
+                  min="80"
+                  max="180"
+                  step="5"
+                  value={formData.detailImageScale}
+                  onChange={handleInputChange}
+                  className="flex-1 h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-sm text-slate-600 w-16 text-right">{formData.detailImageScale}%</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Zoom de l'image sur la page de détail du produit.
+              </p>
+            </div>
+
+            {/* Décalage horizontal page détail */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                ↔️ Position horizontale ({formData.detailImageOffsetX > '0' ? '+' : ''}{formData.detailImageOffsetX}%)
+              </label>
+              <div className="flex items-center gap-4">
+                <span className="text-xs text-slate-500">Gauche</span>
+                <input
+                  type="range"
+                  name="detailImageOffsetX"
+                  min="-50"
+                  max="50"
+                  step="5"
+                  value={formData.detailImageOffsetX}
+                  onChange={handleInputChange}
+                  className="flex-1 h-2 bg-green-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-xs text-slate-500">Droite</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Décale l'image à gauche ou à droite sur la page de détail. 0 = centré.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Prix */}

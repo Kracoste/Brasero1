@@ -195,60 +195,10 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
         </div>
 
         <div ref={reviewsRef} className="space-y-6 scroll-mt-32">
-          <div className="flex items-center gap-4">
-            <div className="text-4xl font-bold text-gray-900">4.8</div>
-            <div>
-              <div className="flex text-yellow-400">
-                {"★★★★★".split("").map((star, i) => (
-                  <span key={i} className={i === 4 ? "text-yellow-200" : ""}>
-                    {star}
-                  </span>
-                ))}
-              </div>
-              <p className="text-sm text-gray-500">Basé sur 47 avis clients</p>
-            </div>
+          {/* Section avis Google à venir */}
+          <div className="text-center py-8 text-gray-500">
+            <p className="text-sm">Les avis clients seront bientôt disponibles.</p>
           </div>
-
-          <div className="space-y-4">
-            {[
-              {
-                name: "Jean-Pierre M.",
-                date: "15 novembre 2025",
-                rating: 5,
-                comment: "Excellent braséro, la qualité de fabrication est remarquable. Les soudures sont parfaites et la patine se développe magnifiquement. Livraison rapide et bien emballé.",
-              },
-              {
-                name: "Marie L.",
-                date: "3 novembre 2025",
-                rating: 5,
-                comment: "Nous avons passé de superbes soirées autour de ce braséro. La chaleur est bien diffusée et le design s'intègre parfaitement dans notre jardin. Je recommande !",
-              },
-              {
-                name: "Thomas D.",
-                date: "28 octobre 2025",
-                rating: 4,
-                comment: "Très beau produit, robuste et bien fini. J'enlève une étoile car le délai de livraison était un peu long, mais la qualité vaut l'attente.",
-              },
-            ].map((review, index) => (
-              <div key={index} className="border-b border-gray-100 pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-900">{review.name}</span>
-                    <span className="text-yellow-400">
-                      {"★".repeat(review.rating)}
-                      {"☆".repeat(5 - review.rating)}
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-400">{review.date}</span>
-                </div>
-                <p className="mt-2 text-sm text-gray-600">{review.comment}</p>
-              </div>
-            ))}
-          </div>
-
-          <button className="text-sm font-medium text-[#1f7a1a] hover:text-[#166614]">
-            Voir tous les avis →
-          </button>
         </div>
       </div>
     </div>
