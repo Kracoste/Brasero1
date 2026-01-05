@@ -139,10 +139,10 @@ export function AddToCartButton({ product, selectedAccessories = [], className =
         type="button"
         onClick={handleAddToCart}
         disabled={adding || added}
-        className={`flex items-center justify-center gap-2 rounded-md px-6 py-3 font-semibold shadow-lg transition ${
+        className={`flex items-center justify-center gap-2 px-6 py-3 font-medium tracking-wide uppercase transition ${
           added
             ? "bg-emerald-600 text-white hover:bg-emerald-700"
-            : "bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110"
+            : "bg-[#9C8572] text-white hover:bg-[#8B7461]"
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {added ? (

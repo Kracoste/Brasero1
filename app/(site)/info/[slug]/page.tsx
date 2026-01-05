@@ -71,7 +71,6 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
         <h2 className="text-xl font-semibold">Moyens de paiement acceptés</h2>
         <ul className="list-disc pl-6 space-y-2">
           <li><strong>Carte bancaire :</strong> Visa, Mastercard, CB (paiement sécurisé SSL)</li>
-          <li><strong>PayPal :</strong> Payez avec votre compte PayPal</li>
           <li><strong>Virement bancaire :</strong> Pour les commandes importantes</li>
           <li><strong>Paiement en 3x sans frais :</strong> À partir de 300€ d&apos;achat</li>
         </ul>
@@ -218,7 +217,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
           </div>
           <div className="border-l-4 border-orange-500 pl-4">
             <p className="font-medium">Livrez-vous à l&apos;étranger ?</p>
-            <p className="text-gray-600 mt-1">Oui, nous livrons en Belgique, Luxembourg et Suisse. Contactez-nous pour d&apos;autres destinations.</p>
+            <p className="text-gray-600 mt-1">Oui, nous livrons en Belgique, Luxembourg , Suisse et en Allemagne. Contactez-nous pour d&apos;autres destinations.</p>
           </div>
         </div>
         <h2 className="text-xl font-semibold">Produits</h2>

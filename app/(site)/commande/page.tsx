@@ -40,7 +40,7 @@ const emptyCheckoutForm: CheckoutForm = {
 
 type CheckoutSection = 'infos' | 'address' | 'delivery' | 'payment';
 type DeliveryOption = 'db-schenker';
-type PaymentOption = 'paypal' | 'card' | 'bank';
+type PaymentOption = 'card' | 'bank';
 
 export default function CheckoutPage() {
   const { items, totalPrice, loading, itemCount } = useCart();
@@ -244,8 +244,6 @@ export default function CheckoutPage() {
         setPaymentError('Une erreur est survenue. Veuillez réessayer.');
         setIsProcessingPayment(false);
       }
-    } else if (paymentMethod === 'paypal') {
-      setPaymentNotice('PayPal sera bientôt disponible. Veuillez utiliser le paiement par carte.');
     } else {
       setPaymentNotice('Le virement bancaire sera bientôt disponible. Veuillez utiliser le paiement par carte.');
     }
@@ -659,11 +657,6 @@ export default function CheckoutPage() {
                   <div className="mt-6 space-y-3">
                     {[
                       {
-                        id: 'paypal',
-                        label: 'PayPal',
-                        description: 'Redirection sécurisée vers votre compte PayPal.',
-                      },
-                      {
                         id: 'card',
                         label: 'Carte de crédit',
                         description: 'Visa, Mastercard et Amex. Paiement sécurisé par Stripe.',
@@ -671,7 +664,7 @@ export default function CheckoutPage() {
                       {
                         id: 'bank',
                         label: 'Virement bancaire',
-                        description: 'Recevez immédiatement l’IBAN et la référence de votre commande.',
+                        description: "Recevez immédiatement l'IBAN et la référence de votre commande.",
                       },
                     ].map((option) => (
                       <label

@@ -277,21 +277,6 @@ export default function ParametresPage() {
                 
                 <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center text-xl">
-                      💳
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-900">PayPal</p>
-                      <p className="text-sm text-slate-500">Paiement sécurisé PayPal</p>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                    Activé
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
-                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl">
                       🏦
                     </div>
