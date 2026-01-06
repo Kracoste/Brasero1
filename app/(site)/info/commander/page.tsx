@@ -148,7 +148,7 @@ export default async function CommanderPage() {
   const paymentMethods = [
     { name: "Carte bancaire", description: "CB, Visa, Mastercard" },
     { name: "Virement bancaire", description: "Pour les grosses commandes" },
-    { name: "Paiement en 3x", description: "Sans frais dès 300€" },
+    { name: "Paiement en 3x", description: "Sans frais dès 500€" },
   ];
 
   return (
@@ -282,10 +282,10 @@ export default async function CommanderPage() {
                   <div className="text-center">
                     <CreditCard className="w-16 h-16 text-orange-500 mx-auto" />
                     <h3 className="mt-6 text-xl font-semibold text-slate-900">
-                      Payez en 3x sans frais
+                      Paiement sécurisé
                     </h3>
                     <p className="mt-2 text-slate-600">
-                      À partir de 300€ d'achat, étalez votre paiement en 3 mensualités sans aucun frais supplémentaire.
+                      Réglez votre commande en toute sécurité par carte bancaire ou virement.
                     </p>
                     <Link
                       href="/info/paiement"

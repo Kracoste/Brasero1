@@ -324,9 +324,9 @@ const rawProducts: Product[] = [
           "Oui, Origine 100 peut être semi-encastré dans une terrasse en prévoyant une dalle béton 70x70 cm ventilée.",
       },
       {
-        question: "Quel est le délai réel ?",
+        question: "Quel est le délai de livraison ?",
         answer:
-          "Deux semaines fabrication + livraison palette sur créneau confirmé avec notre transporteur premium.",
+          "Expédition sous 24 à 48h pour les braseros en stock. Pour un brasero personnalisé ou sur mesure, le délai de fabrication artisanale vous sera communiqué lors de votre demande.",
       },
       {
         question: "Fournissez-vous une couverture ?",

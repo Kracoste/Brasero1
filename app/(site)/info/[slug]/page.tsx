@@ -72,7 +72,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
         <ul className="list-disc pl-6 space-y-2">
           <li><strong>Carte bancaire :</strong> Visa, Mastercard, CB (paiement sécurisé SSL)</li>
           <li><strong>Virement bancaire :</strong> Pour les commandes importantes</li>
-          <li><strong>Paiement en 3x sans frais :</strong> À partir de 300€ d&apos;achat</li>
+          <li><strong>Paiement en 3x sans frais :</strong> À partir de 500€ d&apos;achat</li>
         </ul>
         <h2 className="text-xl font-semibold">Sécurité des transactions</h2>
         <p>
@@ -206,7 +206,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
           </div>
           <div className="border-l-4 border-orange-500 pl-4">
             <p className="font-medium">Puis-je payer en plusieurs fois ?</p>
-            <p className="text-gray-600 mt-1">Oui, nous proposons le paiement en 3x sans frais à partir de 300€ d&apos;achat.</p>
+            <p className="text-gray-600 mt-1">Oui, nous proposons le paiement en 3x sans frais à partir de 500€ d&apos;achat.</p>
           </div>
         </div>
         <h2 className="text-xl font-semibold">Livraison</h2>

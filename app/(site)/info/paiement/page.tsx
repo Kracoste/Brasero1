@@ -82,22 +82,19 @@ export default async function PaiementPage() {
       icon: CreditCard,
       title: "Carte bancaire",
       description: "Visa, Mastercard, CB",
-      details: "Paiement instantané et sécurisé. Vos données sont protégées par cryptage SSL 256 bits.",
-      recommended: true
+      details: "Paiement instantané et sécurisé. Vos données sont protégées par cryptage SSL 256 bits."
     },
     {
       icon: Banknote,
       title: "Virement bancaire",
-      description: "Pour les commandes professionnelles",
-      details: "Recevez nos coordonnées bancaires par email. Expédition après réception du virement.",
-      recommended: false
+      description: "Professionnels et particuliers",
+      details: "Contactez-nous par email pour recevoir nos coordonnées bancaires. Expédition après réception du virement."
     },
     {
       icon: CreditCard,
       title: "Paiement en 3x sans frais",
-      description: "À partir de 300€ d'achat",
-      details: "Étalez votre paiement en 3 mensualités sans aucun frais supplémentaire.",
-      recommended: false
+      description: "À partir de 500€ d'achat",
+      details: "Étalez votre paiement en 3 mensualités sans aucun frais supplémentaire."
     }
   ];
 
@@ -131,7 +128,7 @@ export default async function PaiementPage() {
     },
     {
       question: "Puis-je payer en plusieurs fois ?",
-      answer: "Oui ! À partir de 300€ d'achat, vous pouvez payer en 3x sans frais. Cette option est proposée lors du paiement."
+      answer: "Oui !Vous pouvez payer en 3x sans frais. Cette option est proposée lors du paiement."
     },
     {
       question: "Le paiement par virement est-il possible ?",
@@ -156,21 +153,17 @@ export default async function PaiementPage() {
       
       <main className="min-h-screen">
         {/* Hero Section */}
-        <section className="relative bg-slate-900 py-16 sm:py-24 overflow-hidden">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-500/20" />
-          </div>
-          
+        <section className="relative bg-white py-16 sm:py-24 overflow-hidden">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-400 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 bg-[#8B4513]/10 text-[#8B4513] px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <Lock size={16} />
                 Paiement 100% sécurisé
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white leading-tight">
-                Payez en toute <span className="text-green-400">sécurité</span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-slate-900 leading-tight">
+                Payez en toute sécurité
               </h1>
-              <p className="mt-6 text-lg sm:text-xl text-slate-300 leading-relaxed">
+              <p className="mt-6 text-lg sm:text-xl text-slate-600 leading-relaxed">
                 Nous proposons plusieurs moyens de paiement sécurisés pour vous faciliter la vie. 
                 Toutes vos transactions sont protégées par les dernières technologies de cryptage.
               </p>
@@ -184,7 +177,7 @@ export default async function PaiementPage() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3 transition-all border border-white/20"
+                  className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 transition-all border border-slate-200"
                 >
                   <Phone size={18} />
                   Nous contacter
@@ -210,24 +203,16 @@ export default async function PaiementPage() {
               {paymentMethods.map((method) => (
                 <div 
                   key={method.title}
-                  className={`relative bg-white p-6 sm:p-8 shadow-sm border hover:shadow-md transition-shadow ${
-                    method.recommended ? 'border-green-500 ring-2 ring-green-500/20' : 'border-slate-100'
-                  }`}
+                  className="relative bg-white p-6 sm:p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
                 >
-                  {method.recommended && (
-                    <div className="absolute -top-3 left-6 bg-green-500 text-white text-xs font-semibold px-3 py-1">
-                      Recommandé
-                    </div>
-                  )}
-                  
-                  <div className="w-12 h-12 bg-green-100 flex items-center justify-center mb-4">
-                    <method.icon className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-orange-100 flex items-center justify-center mb-4">
+                    <method.icon className="w-6 h-6 text-[#8B4513]" />
                   </div>
                   
                   <h3 className="text-lg font-semibold text-slate-900 mb-1">
                     {method.title}
                   </h3>
-                  <p className="text-sm text-green-600 font-medium mb-3">
+                  <p className="text-sm text-[#8B4513] font-medium mb-3">
                     {method.description}
                   </p>
                   <p className="text-slate-600 text-sm leading-relaxed">
@@ -255,8 +240,8 @@ export default async function PaiementPage() {
                 <div className="mt-8 space-y-6">
                   {securityFeatures.map((feature) => (
                     <div key={feature.title} className="flex gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 bg-green-100 flex items-center justify-center">
-                        <feature.icon className="w-5 h-5 text-green-600" />
+                      <div className="flex-shrink-0 w-10 h-10 bg-orange-100 flex items-center justify-center">
+                        <feature.icon className="w-5 h-5 text-[#8B4513]" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-slate-900">{feature.title}</h3>
@@ -267,28 +252,24 @@ export default async function PaiementPage() {
                 </div>
               </div>
               
-              <div className="relative">
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 sm:p-12">
-                  <div className="text-center">
-                    <Shield className="w-16 h-16 text-green-500 mx-auto" />
-                    <h3 className="mt-6 text-xl font-semibold text-slate-900">
-                      Paiement via Stripe
-                    </h3>
-                    <p className="mt-2 text-slate-600">
-                      Nous utilisons Stripe, le leader mondial du paiement en ligne, 
-                      utilisé par des millions d'entreprises dans le monde.
-                    </p>
-                    <div className="mt-6 flex justify-center gap-4">
-                      <div className="bg-white px-4 py-2 border border-slate-200">
-                        <span className="text-sm font-semibold text-slate-700">VISA</span>
-                      </div>
-                      <div className="bg-white px-4 py-2 border border-slate-200">
-                        <span className="text-sm font-semibold text-slate-700">Mastercard</span>
-                      </div>
-                      <div className="bg-white px-4 py-2 border border-slate-200">
-                        <span className="text-sm font-semibold text-slate-700">CB</span>
-                      </div>
-                    </div>
+              <div className="text-center">
+                <Shield className="w-16 h-16 text-[#8B4513] mx-auto" />
+                <h3 className="mt-6 text-xl font-semibold text-slate-900">
+                  Paiement via Stripe
+                </h3>
+                <p className="mt-2 text-slate-600">
+                  Nous utilisons Stripe, le leader mondial du paiement en ligne, 
+                  utilisé par des millions d'entreprises dans le monde.
+                </p>
+                <div className="mt-6 flex justify-center gap-4">
+                  <div className="bg-white px-4 py-2 border border-slate-200">
+                    <span className="text-sm font-semibold text-slate-700">VISA</span>
+                  </div>
+                  <div className="bg-white px-4 py-2 border border-slate-200">
+                    <span className="text-sm font-semibold text-slate-700">Mastercard</span>
+                  </div>
+                  <div className="bg-white px-4 py-2 border border-slate-200">
+                    <span className="text-sm font-semibold text-slate-700">CB</span>
                   </div>
                 </div>
               </div>
@@ -303,13 +284,13 @@ export default async function PaiementPage() {
               <div className="order-2 lg:order-1">
                 <div className="bg-white p-8 sm:p-10">
                   <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
-                    <CreditCard className="w-6 h-6 text-green-500" />
+                    <CreditCard className="w-6 h-6 text-[#8B4513]" />
                     Comment ça marche ?
                   </h3>
                   
                   <div className="space-y-6">
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white flex items-center justify-center font-bold text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 bg-[#8B4513] text-white flex items-center justify-center font-bold text-sm">
                         1
                       </div>
                       <div>
@@ -318,7 +299,7 @@ export default async function PaiementPage() {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white flex items-center justify-center font-bold text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 bg-[#8B4513] text-white flex items-center justify-center font-bold text-sm">
                         2
                       </div>
                       <div>
@@ -327,7 +308,7 @@ export default async function PaiementPage() {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white flex items-center justify-center font-bold text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 bg-[#8B4513] text-white flex items-center justify-center font-bold text-sm">
                         3
                       </div>
                       <div>
@@ -337,8 +318,8 @@ export default async function PaiementPage() {
                     </div>
                   </div>
                   
-                  <div className="mt-8 bg-green-50 p-4 border border-green-200">
-                    <p className="text-sm text-green-800">
+                  <div className="mt-8 bg-orange-50 p-4 border border-orange-200">
+                    <p className="text-sm text-orange-800">
                       <strong>Exemple :</strong> Pour un brasero à 600€, vous payez 200€ aujourd'hui, 
                       puis 200€ dans 30 jours, et 200€ dans 60 jours. Aucun frais supplémentaire !
                     </p>
@@ -351,25 +332,25 @@ export default async function PaiementPage() {
                   Paiement en 3x sans frais
                 </h2>
                 <p className="mt-4 text-lg text-slate-600 leading-relaxed">
-                  À partir de 300€ d'achat, étalez votre paiement en 3 mensualités 
+                  À partir de 500€ d'achat, étalez votre paiement en 3 mensualités 
                   sans aucun frais supplémentaire. Une solution flexible pour vous faire plaisir 
                   sans impacter votre budget.
                 </p>
                 <ul className="mt-6 space-y-3">
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
                     Aucun frais, aucun intérêt
                   </li>
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    À partir de 300€ d'achat
+                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                    À partir de 500€ d'achat
                   </li>
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
                     Décision instantanée
                   </li>
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
                     100% en ligne, sans justificatif
                   </li>
                 </ul>
