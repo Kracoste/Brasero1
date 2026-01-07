@@ -4,7 +4,7 @@ export const siteConfig = {
     "Braseros premium fabriqués à Moncoutant (Deux-Sèvres). Acier corten, finitions haute couture et service client réactif.",
   url: "https://brasero-atelier.fr",
   ogImage: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
-  email: "atelier@brasero.fr",
+  email: "atelier-lbf@outlook.com",
   phone: "+33 5 49 00 00 00",
   address: "Rue du Moulin, 79320 Moncoutant-sur-Sèvre",
   schedules: [

@@ -347,7 +347,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
           <li>Livraison et installation si nécessaire</li>
         </ol>
         <p className="mt-4">
-          Contactez-nous à <strong>atelier@braseroatelier.fr</strong> pour démarrer votre projet.
+          Contactez-nous à <strong>atelier-lbf@outlook.com</strong> pour démarrer votre projet.
         </p>
       </div>
     ),
