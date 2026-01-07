@@ -25,18 +25,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `FAQ Brasero | Questions fréquentes | ${settings.storeName}`,
-    description: `Toutes les réponses à vos questions sur nos braseros artisanaux : livraison, paiement, entretien, personnalisation, garantie. FAQ complète ${settings.storeName}.`,
+    title: `FAQ Brasero | Questions avant achat | ${settings.storeName}`,
+    description: `Réponses à vos questions avant d'acheter : quel brasero choisir, différences entre modèles, options de personnalisation, modalités de commande. FAQ ${settings.storeName}.`,
     keywords: [
       "FAQ brasero",
-      "questions fréquentes brasero",
-      "entretien brasero",
-      "comment utiliser un brasero",
-      "brasero acier corten",
-      "garantie brasero",
-      "livraison brasero",
-      "brasero sur mesure",
-      "brasero personnalisé",
+      "questions brasero",
+      "quel brasero choisir",
+      "aide choix brasero",
+      "différence brasero",
+      "brasero acier corten vs acier",
+      "taille brasero",
+      "questions avant achat brasero",
       settings.storeName,
     ],
     openGraph: {

@@ -21,16 +21,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Comment commander un brasero | Guide d'achat | ${settings.storeName}`,
-    description: `Découvrez comment commander facilement votre brasero artisanal chez ${settings.storeName}. Paiement sécurisé, livraison en France, fabrication française. Guide complet étape par étape.`,
+    title: `Comment commander un brasero | Guide étape par étape | ${settings.storeName}`,
+    description: `Guide complet pour commander votre brasero : créer un compte, ajouter au panier, valider la commande. Processus simple et rapide chez ${settings.storeName}.`,
     keywords: [
-      "commander brasero",
-      "acheter brasero",
-      "brasero artisanal",
-      "brasero français",
-      "commande en ligne brasero",
-      "brasero livraison France",
-      "brasero paiement sécurisé",
+      "commander brasero en ligne",
+      "comment acheter brasero",
+      "guide achat brasero",
+      "panier brasero",
+      "processus commande brasero",
+      "créer compte brasero",
+      "valider commande brasero",
       settings.storeName,
     ],
     openGraph: {

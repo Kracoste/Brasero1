@@ -25,18 +25,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Conseils brasero | Entretien et utilisation | ${settings.storeName}`,
-    description: `Tous nos conseils pour profiter de votre brasero : allumage, entretien, sécurité, choix du bois. Guide complet pour les amateurs de brasero artisanal.`,
+    title: `Guide entretien brasero | Tutoriels et astuces | ${settings.storeName}`,
+    description: `Guide complet d'utilisation : comment allumer, entretenir et nettoyer votre brasero. Choix du bois, règles de sécurité et astuces d'expert.`,
     keywords: [
-      "conseil brasero",
-      "entretien brasero",
-      "allumer brasero",
-      "bois brasero",
-      "sécurité brasero",
-      "nettoyer brasero",
-      "brasero acier corten entretien",
-      "utilisation brasero",
-      "astuces brasero",
+      "guide entretien brasero",
+      "tutoriel brasero",
+      "comment allumer brasero",
+      "quel bois pour brasero",
+      "nettoyer brasero acier corten",
+      "entretien brasero hiver",
+      "sécurité utilisation brasero",
+      "protéger brasero pluie",
       settings.storeName,
     ],
     openGraph: {

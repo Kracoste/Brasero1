@@ -21,17 +21,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Livraison et expédition brasero | Délais et zones | ${settings.storeName}`,
-    description: `Informations complètes sur la livraison de votre brasero artisanal. Expédition en France, Belgique, Luxembourg, Suisse et Allemagne. Délais, tarifs et suivi de commande.`,
+    title: `Livraison brasero | Délais, zones et frais de port | ${settings.storeName}`,
+    description: `Tout sur la livraison de votre brasero : délais d'expédition, zones desservies (France, Belgique, Suisse), transporteurs et frais de port. Suivi colis inclus.`,
     keywords: [
-      "livraison brasero",
-      "expédition brasero",
-      "délai livraison brasero",
-      "brasero livraison France",
-      "brasero livraison Belgique",
-      "brasero livraison Suisse",
-      "suivi commande brasero",
+      "livraison brasero France",
+      "délai expédition brasero",
       "frais de port brasero",
+      "transporteur brasero",
+      "livraison brasero Belgique",
+      "livraison brasero Suisse",
+      "zones livraison brasero",
+      "suivi colis brasero",
       settings.storeName,
     ],
     openGraph: {

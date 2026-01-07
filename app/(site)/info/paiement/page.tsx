@@ -21,16 +21,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Paiement sécurisé | Moyens de paiement | ${settings.storeName}`,
-    description: `Découvrez nos moyens de paiement sécurisés : carte bancaire, virement, paiement en 3x sans frais. Transactions SSL 256 bits. ${settings.storeName}, artisan brasero français.`,
+    title: `Moyens de paiement | Paiement sécurisé et 3x sans frais | ${settings.storeName}`,
+    description: `Modes de paiement acceptés : carte bancaire Visa/Mastercard, virement SEPA, paiement en 3x sans frais. Transactions sécurisées SSL 256 bits.`,
     keywords: [
-      "paiement sécurisé brasero",
-      "paiement en ligne brasero",
-      "paiement 3x sans frais",
-      "carte bancaire brasero",
-      "virement bancaire brasero",
-      "paiement SSL sécurisé",
-      "acheter brasero en ligne",
+      "paiement brasero 3x sans frais",
+      "paiement carte bancaire brasero",
+      "virement SEPA brasero",
+      "paiement sécurisé SSL",
+      "facilité paiement brasero",
+      "modes paiement brasero",
+      "paiement échelonné brasero",
       settings.storeName,
     ],
     openGraph: {

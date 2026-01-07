@@ -23,16 +23,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Contactez-nous | Devis brasero sur mesure | ${settings.storeName}`,
-    description: `Contactez l'Atelier LBF pour un devis brasero personnalisé. Fabrication artisanale en France à ${settings.atelier.city}. Réponse sous 24h. Téléphone, email ou formulaire.`,
+    title: `Contact et devis brasero | Demande personnalisée | ${settings.storeName}`,
+    description: `Demandez un devis gratuit pour votre brasero. Contactez l'Atelier LBF par téléphone, email ou formulaire. Fabrication artisanale à ${settings.atelier.city}. Réponse sous 24h.`,
     keywords: [
-      "contact brasero",
-      "devis brasero",
-      "brasero sur mesure devis",
-      "atelier brasero France",
-      "fabricant brasero contact",
-      "brasero personnalisé contact",
-      "artisan brasero",
+      "contact atelier brasero",
+      "devis brasero gratuit",
+      "demande devis brasero",
+      "téléphone atelier brasero",
+      "email fabricant brasero",
+      "formulaire contact brasero",
       settings.atelier.city,
       settings.atelier.department,
       settings.storeName,

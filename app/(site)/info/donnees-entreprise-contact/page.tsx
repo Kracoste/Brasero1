@@ -22,13 +22,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Informations légales et contact | ${settings.storeName}`,
-    description: `Coordonnées et informations légales de l'Atelier LBF. SIRET, TVA, adresse, téléphone, email. Fabricant artisanal de braseros à ${settings.atelier.city}, France.`,
+    title: `Mentions légales et informations société | ${settings.storeName}`,
+    description: `Mentions légales et données d'entreprise de l'Atelier LBF. SIRET, numéro TVA, siège social, RCS. Fabricant artisanal de braseros à ${settings.atelier.city}, France.`,
     keywords: [
-      "contact brasero",
+      "mentions légales brasero",
       "informations légales brasero",
-      "SIRET brasero",
-      "atelier brasero adresse",
+      "SIRET atelier LBF",
+      "RCS brasero artisanal",
+      "données entreprise brasero",
       settings.atelier.city,
       settings.atelier.department,
       settings.storeName,

@@ -28,19 +28,18 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Brasero sur mesure | Personnalisé et unique | ${settings.storeName}`,
-    description: `Créez votre brasero sur mesure : dimensions personnalisées, gravures laser, motifs découpés, finitions uniques. Fabrication artisanale en France à ${settings.atelier.city}. Devis gratuit.`,
+    title: `Brasero sur mesure particulier | Création unique | ${settings.storeName}`,
+    description: `Créez votre brasero sur mesure pour votre jardin : dimensions personnalisées, gravures laser, motifs découpés. Fabrication artisanale pour particuliers à ${settings.atelier.city}.`,
     keywords: [
-      "brasero sur mesure",
-      "brasero personnalisé",
-      "brasero gravé",
-      "brasero avec logo",
-      "brasero dimensions personnalisées",
-      "brasero découpe laser",
-      "brasero unique",
-      "brasero artisanal personnalisé",
-      "création brasero sur mesure",
-      "fabricant brasero France",
+      "brasero sur mesure particulier",
+      "brasero personnalisé jardin",
+      "brasero gravé prénom",
+      "brasero dimensions jardin",
+      "brasero découpe personnalisée",
+      "brasero unique particulier",
+      "création brasero maison",
+      "brasero cadeau personnalisé",
+      "brasero gravure laser",
       settings.storeName,
     ],
     openGraph: {

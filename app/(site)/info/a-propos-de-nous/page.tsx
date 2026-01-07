@@ -25,16 +25,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `À propos | Notre histoire et savoir-faire | ${settings.storeName}`,
-    description: `Découvrez l'histoire de l'Atelier LBF, fabricant artisanal de braseros en France. Notre passion, notre savoir-faire et nos valeurs au service de créations uniques à ${settings.atelier.city}.`,
+    title: `Notre histoire | L'Atelier LBF, fabricant français | ${settings.storeName}`,
+    description: `Découvrez l'histoire de l'Atelier LBF : notre passion du métal, notre savoir-faire artisanal et nos valeurs. Fabrication française de braseros d'exception à ${settings.atelier.city}.`,
     keywords: [
-      "atelier brasero France",
-      "fabricant brasero artisanal",
-      "histoire brasero",
-      "artisan brasero",
+      "histoire atelier LBF",
+      "fabricant brasero français",
+      "atelier brasero ${settings.atelier.city}",
       "brasero made in France",
-      "savoir-faire brasero",
-      settings.atelier.city,
+      "savoir-faire artisanal brasero",
+      "valeurs atelier brasero",
+      "équipe atelier LBF",
       settings.atelier.department,
       settings.storeName,
     ],

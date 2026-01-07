@@ -29,19 +29,19 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   
   return {
-    title: `Commande professionnelle brasero | B2B & Entreprises | ${settings.storeName}`,
-    description: `Braseros pour professionnels : restaurants, hôtels, paysagistes, collectivités. Devis personnalisé, tarifs B2B, livraison France et Europe. Fabrication artisanale sur mesure.`,
+    title: `Brasero professionnel B2B | Grossiste et entreprises | ${settings.storeName}`,
+    description: `Fournisseur braseros pour professionnels : restaurants, hôtels, paysagistes, revendeurs. Tarifs grossiste, volume et personnalisation entreprise. Livraison Europe.`,
     keywords: [
-      "brasero professionnel",
-      "brasero restaurant",
-      "brasero hotel",
-      "brasero terrasse professionnelle",
-      "brasero B2B",
-      "brasero entreprise",
-      "brasero paysagiste",
-      "brasero collectivité",
-      "brasero sur mesure professionnel",
-      "achat brasero grossiste",
+      "brasero grossiste",
+      "fournisseur brasero professionnel",
+      "brasero restaurant terrasse",
+      "brasero hotel extérieur",
+      "brasero revendeur",
+      "tarif B2B brasero",
+      "brasero volume entreprise",
+      "brasero paysagiste architecte",
+      "brasero collectivité mairie",
+      "partenariat brasero professionnel",
       settings.storeName,
     ],
     openGraph: {
