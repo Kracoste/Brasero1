@@ -3,13 +3,46 @@
 import { FormEvent, useState } from "react";
 
 export const ContactForm = () => {
-  const [status, setStatus] = useState<"idle" | "success">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
-    setStatus("success");
-    form.reset();
+    const formData = new FormData(form);
+    
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      message: formData.get("message") as string,
+    };
+
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Erreur lors de l'envoi");
+      }
+
+      setStatus("success");
+      form.reset();
+    } catch (error) {
+      setStatus("error");
+      setErrorMessage(
+        error instanceof Error ? error.message : "Une erreur est survenue"
+      );
+    }
   };
 
   return (
@@ -22,7 +55,8 @@ export const ContactForm = () => {
           id="name"
           name="name"
           required
-          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
+          disabled={status === "loading"}
+          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"
         />
       </div>
       <div>
@@ -34,7 +68,8 @@ export const ContactForm = () => {
           name="email"
           type="email"
           required
-          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
+          disabled={status === "loading"}
+          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"
         />
       </div>
       <div>
@@ -46,18 +81,25 @@ export const ContactForm = () => {
           name="message"
           rows={4}
           required
-          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
+          disabled={status === "loading"}
+          className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"
         />
       </div>
       <button
         type="submit"
-        className="w-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+        disabled={status === "loading"}
+        className="w-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
       >
-        Envoyer
+        {status === "loading" ? "Envoi en cours..." : "Envoyer"}
       </button>
       {status === "success" && (
         <p className="text-center text-sm font-semibold text-green-700">
           Merci ! Nous revenons vers vous sous 24h ouvrées.
+        </p>
+      )}
+      {status === "error" && (
+        <p className="text-center text-sm font-semibold text-red-600">
+          {errorMessage || "Une erreur est survenue. Veuillez réessayer."}
         </p>
       )}
     </form>
