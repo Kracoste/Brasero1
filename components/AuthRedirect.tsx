@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { AUTH_ROUTES } from '@/lib/auth';
 
@@ -22,15 +22,15 @@ export function AuthRedirect({
   fallback
 }: AuthRedirectProps) {
   const { user, isAdmin, isLoading } = useAuth();
-  const hasRedirected = useRef(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
-    if (hasRedirected.current) return;
+    if (isRedirecting) return;
 
     // Si pas d'utilisateur, rediriger vers connexion
     if (!user) {
-      hasRedirected.current = true;
+      setIsRedirecting(true);
       const currentPath = window.location.pathname;
       window.location.href = `${redirectTo}?redirectTo=${encodeURIComponent(currentPath)}`;
       return;
@@ -38,14 +38,14 @@ export function AuthRedirect({
 
     // Si admin requis mais pas admin, rediriger vers accueil
     if (requireAdmin && !isAdmin) {
-      hasRedirected.current = true;
+      setIsRedirecting(true);
       window.location.href = '/';
       return;
     }
-  }, [user, isAdmin, isLoading, redirectTo, requireAdmin]);
+  }, [user, isAdmin, isLoading, redirectTo, requireAdmin, isRedirecting]);
 
   // Pendant le chargement ou si redirection en cours
-  if (isLoading || (!user && !hasRedirected.current)) {
+  if (isLoading || isRedirecting) {
     return fallback || (
       <div className="flex h-screen items-center justify-center bg-slate-100">
         <div className="text-center">
@@ -56,7 +56,7 @@ export function AuthRedirect({
     );
   }
 
-  // Si pas d'utilisateur et redirection en cours
+  // Si pas d'utilisateur
   if (!user) {
     return fallback || (
       <div className="flex h-screen items-center justify-center bg-slate-100">

@@ -57,7 +57,7 @@ function isBot(): boolean {
   if (BOT_PATTERNS.some(pattern => ua.includes(pattern))) return true;
   
   // Vérifier webdriver (automation)
-  if ((navigator as any).webdriver) return true;
+  if ((navigator as Navigator & { webdriver?: boolean }).webdriver) return true;
   
   // Vérifier les plugins (les bots n'en ont généralement pas)
   if (navigator.plugins && navigator.plugins.length === 0 && !ua.includes('mobile')) {
@@ -82,7 +82,7 @@ function generateFingerprint(): string {
     screen.colorDepth,
     new Date().getTimezoneOffset(),
     navigator.hardwareConcurrency || 0,
-    (navigator as any).deviceMemory || 0,
+    (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 0,
     // Canvas fingerprint simplifié
     (() => {
       try {

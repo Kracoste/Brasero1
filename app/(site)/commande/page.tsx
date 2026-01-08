@@ -42,6 +42,47 @@ type CheckoutSection = 'infos' | 'address' | 'delivery' | 'payment';
 type DeliveryOption = 'db-schenker';
 type PaymentOption = 'card' | 'bank';
 
+// Composant SectionHeader extrait pour éviter la recréation pendant le render
+function SectionHeader({ 
+  section, 
+  title, 
+  completed, 
+  isActive, 
+  onReopen 
+}: { 
+  section: CheckoutSection; 
+  title: string;
+  completed: boolean;
+  isActive: boolean;
+  onReopen: (section: CheckoutSection) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center gap-4">
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+            completed ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-slate-200 text-slate-300'
+          }`}
+        >
+          <Check className="h-5 w-5" />
+        </span>
+        <h2 className="text-xl font-semibold uppercase text-slate-900">{title}</h2>
+      </div>
+      {completed && (
+        <button
+          type="button"
+          onClick={() => onReopen(section)}
+          className={`text-sm font-semibold uppercase tracking-wide ${
+            isActive ? 'text-red-600' : 'text-slate-400'
+          }`}
+        >
+          Modifier
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function CheckoutPage() {
   const { items, totalPrice, loading, itemCount } = useCart();
   const { trackCheckoutStart } = useAnalytics();
@@ -279,36 +320,6 @@ export default function CheckoutPage() {
     );
   }
 
-  const SectionHeader = ({ section, title }: { section: CheckoutSection; title: string }) => {
-    const completed = completedSections[section];
-    const isActive = activeSection === section;
-    return (
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <span
-            className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
-              completed ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-slate-200 text-slate-300'
-            }`}
-          >
-            <Check className="h-5 w-5" />
-          </span>
-          <h2 className="text-xl font-semibold uppercase text-slate-900">{title}</h2>
-        </div>
-        {completed && (
-          <button
-            type="button"
-            onClick={() => reopenSection(section)}
-            className={`text-sm font-semibold uppercase tracking-wide ${
-              isActive ? 'text-red-600' : 'text-slate-400'
-            }`}
-          >
-            Modifier
-          </button>
-        )}
-      </div>
-    );
-  };
-
   return (
     <Section className="py-24">
       <Container className="max-w-7xl">
@@ -326,7 +337,13 @@ export default function CheckoutPage() {
           <div className="space-y-5">
             {/* Informations personnelles */}
             <div className="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionHeader section="infos" title="Informations personnelles" />
+              <SectionHeader 
+                section="infos" 
+                title="Informations personnelles" 
+                completed={completedSections.infos}
+                isActive={activeSection === 'infos'}
+                onReopen={reopenSection}
+              />
 
               {activeSection === 'infos' ? (
                 <form className="mt-6 space-y-4" onSubmit={handleDetailsSubmit}>
@@ -461,7 +478,13 @@ export default function CheckoutPage() {
 
             {/* Adresse */}
             <div className="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionHeader section="address" title="Adresses" />
+              <SectionHeader 
+                section="address" 
+                title="Adresses" 
+                completed={completedSections.address}
+                isActive={activeSection === 'address'}
+                onReopen={reopenSection}
+              />
               {activeSection === 'address' && (
                 <form className="mt-6 space-y-4" onSubmit={handleAddressContinue}>
                   <label className="text-sm font-semibold text-slate-700">
@@ -576,7 +599,13 @@ export default function CheckoutPage() {
 
             {/* Livraison */}
             <div className="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionHeader section="delivery" title="Mode de livraison" />
+              <SectionHeader 
+                section="delivery" 
+                title="Mode de livraison" 
+                completed={completedSections.delivery}
+                isActive={activeSection === 'delivery'}
+                onReopen={reopenSection}
+              />
               {activeSection === 'delivery' ? (
                 <form className="mt-6 space-y-4" onSubmit={handleDeliverySubmit}>
                   <label
@@ -647,7 +676,13 @@ export default function CheckoutPage() {
 
             {/* Paiement */}
             <div className="rounded-none border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionHeader section="payment" title="Paiement" />
+              <SectionHeader 
+                section="payment" 
+                title="Paiement" 
+                completed={completedSections.payment}
+                isActive={activeSection === 'payment'}
+                onReopen={reopenSection}
+              />
               {activeSection !== 'payment' ? (
                 <p className="mt-6 rounded-none border border-dashed border-slate-300 p-4 text-sm text-slate-600">
                   Finalisez d’abord les étapes précédentes pour débloquer le paiement.

@@ -43,9 +43,14 @@ export const FilterPanel = ({
     setIsOpen(newState);
     onToggle?.(newState);
   };
-  const [priceMin, setPriceMin] = useState(value.priceMin ?? minPrice);
-  const [priceMax, setPriceMax] = useState(value.priceMax ?? maxPrice);
+  
+  // Initialiser les valeurs de prix directement depuis les props
+  const initialPriceMin = value.priceMin ?? minPrice;
+  const initialPriceMax = value.priceMax ?? maxPrice;
+  const [priceMin, setPriceMin] = useState(initialPriceMin);
+  const [priceMax, setPriceMax] = useState(initialPriceMax);
 
+  // Mettre à jour les valeurs de prix quand les props externes changent
   useEffect(() => {
     setPriceMin(value.priceMin ?? minPrice);
     setPriceMax(value.priceMax ?? maxPrice);

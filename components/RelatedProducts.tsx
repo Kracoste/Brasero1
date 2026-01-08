@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import type { Product } from '@/lib/schema';
@@ -16,8 +16,9 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const checkScroll = () => {
+  const checkScroll = useCallback(() => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
       setCanScrollLeft(scrollLeft > 10);
@@ -26,20 +27,21 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
       // Calculate current page based on scroll position
       const cardWidth = 280;
       const visibleCards = Math.floor(clientWidth / cardWidth);
-      const totalPages = Math.ceil(products.length / Math.max(visibleCards, 1));
+      const calculatedTotalPages = Math.ceil(products.length / Math.max(visibleCards, 1));
+      setTotalPages(calculatedTotalPages);
       const newPage = Math.min(
         Math.floor(scrollLeft / (cardWidth * Math.max(visibleCards, 1))),
-        totalPages - 1
+        calculatedTotalPages - 1
       );
       setCurrentPage(Math.max(0, newPage));
     }
-  };
+  }, [products.length]);
 
   useEffect(() => {
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return () => window.removeEventListener('resize', checkScroll);
-  }, []);
+  }, [checkScroll]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -60,14 +62,6 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
         behavior: 'smooth' 
       });
     }
-  };
-
-  // Calculate total pages for dots
-  const calculateTotalPages = () => {
-    const cardWidth = 280;
-    const containerWidth = scrollRef.current?.clientWidth || 1200;
-    const visibleCards = Math.floor(containerWidth / cardWidth);
-    return Math.ceil(products.length / Math.max(visibleCards, 1));
   };
 
   if (products.length === 0) return null;
@@ -129,7 +123,7 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
 
       {/* Indicateurs de page (dots) */}
       <div className="flex justify-center gap-2 mt-8">
-        {Array.from({ length: Math.max(1, calculateTotalPages()) }).map((_, index) => (
+        {Array.from({ length: Math.max(1, totalPages) }).map((_, index) => (
           <button
             key={index}
             onClick={() => scrollToPage(index)}

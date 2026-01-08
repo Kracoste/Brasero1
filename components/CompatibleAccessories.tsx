@@ -9,19 +9,17 @@ type CompatibleProduct = {
   slug: string;
   name: string;
   price: number;
-  images: any[];
+  images: { url: string; alt?: string }[];
   category: string;
 };
 
 type CompatibleAccessoriesProps = {
-  productSlug: string;
   compatibleSlugs?: string[];
   onSelectionChange?: (accessories: CompatibleProduct[]) => void;
   productCategory?: string;
 };
 
 export function CompatibleAccessories({ 
-  productSlug, 
   compatibleSlugs = [],
   onSelectionChange,
   productCategory = 'brasero'
@@ -112,7 +110,7 @@ export function CompatibleAccessories({
       <div className="divide-y divide-slate-300">
         {products.map((product) => {
           const firstImage = Array.isArray(product.images) && product.images[0]
-            ? product.images[0].src || product.images[0]
+            ? (product.images[0] as { url: string }).url || '/logo/placeholder.png'
             : '/logo/placeholder.png';
           const isSelected = selectedProducts.has(product.slug);
 

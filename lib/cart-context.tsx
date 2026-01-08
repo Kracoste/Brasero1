@@ -204,11 +204,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const loadCart = async (userId: string) => {
     try {
       // Récupérer ou créer le panier
-      let { data: cart, error: cartError } = await supabase
+      const { data: existingCart, error: cartError } = await supabase
         .from('cart')
         .select('id')
         .eq('user_id', userId)
         .single();
+
+      let cart = existingCart;
 
       if (cartError && cartError.code === 'PGRST116') {
         // Le panier n'existe pas, le créer

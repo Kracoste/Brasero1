@@ -20,7 +20,7 @@ export const ALLOWED_ORIGINS = [
  */
 export function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true; // Pas d'origine = requête same-origin
-  return ALLOWED_ORIGINS.includes(origin as any);
+  return (ALLOWED_ORIGINS as readonly string[]).includes(origin);
 }
 
 // ============================================

@@ -1,5 +1,5 @@
+import Link from "next/link";
 import { HeroMenu } from "@/components/HeroMenu";
-import { ProductCard } from "@/components/ProductCard";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/lib/schema";
@@ -114,12 +114,12 @@ export default async function HomePage() {
           </div>
           <ProductCarousel products={braseros} />
           <div className="flex justify-center">
-            <a
+            <Link
               href="/produits"
               className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
             >
               Voir notre catalogue
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -179,12 +179,12 @@ const PromoTile = () => (
       <p className="text-xs sm:text-sm lg:text-base text-[#CD853F] max-w-md">
         Promotions pouvant aller jusqu&apos;à 40% sur nos braséros et accessoires.
       </p>
-      <a
+      <Link
         href="/produits?category=promotions"
         className="mt-1 sm:mt-2 inline-flex items-center justify-center rounded-full bg-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 lg:py-3 text-[10px] sm:text-xs lg:text-sm font-semibold text-slate-900 shadow transition hover:scale-[1.02]"
       >
         J&apos;en profite
-      </a>
+      </Link>
     </div>
   </div>
 );

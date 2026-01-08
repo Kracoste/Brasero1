@@ -19,15 +19,15 @@ export default function CancelledPage() {
         </h1>
 
         <p className="mt-4 text-lg text-slate-600">
-          Votre paiement a été annulé. Aucun montant n'a été débité de votre compte.
+          Votre paiement a été annulé. Aucun montant n&apos;a été débité de votre compte.
           Votre panier a été conservé.
         </p>
 
         <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-6 text-left">
-          <h2 className="font-semibold text-amber-800">Besoin d'aide ?</h2>
+          <h2 className="font-semibold text-amber-800">Besoin d&apos;aide ?</h2>
           <p className="mt-2 text-sm text-amber-700">
             Si vous avez rencontré un problème lors du paiement ou si vous avez des questions,
-            n'hésitez pas à nous contacter. Notre équipe est là pour vous aider.
+            n&apos;hésitez pas à nous contacter. Notre équipe est là pour vous aider.
           </p>
           <Link
             href="/contact"

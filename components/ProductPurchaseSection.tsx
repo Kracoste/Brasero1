@@ -12,7 +12,7 @@ type Accessory = {
   slug: string;
   name: string;
   price: number;
-  images: any[];
+  images: { url: string; alt?: string }[];
 };
 
 type ProductPurchaseSectionProps = {
@@ -44,7 +44,6 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs }: Pr
     <div className="space-y-4">
       {compatibleAccessorySlugs.length > 0 && (
         <CompatibleAccessories 
-          productSlug={product.slug}
           compatibleSlugs={compatibleAccessorySlugs}
           onSelectionChange={handleSelectionChange}
           productCategory={product.category}
@@ -58,7 +57,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs }: Pr
             {selectedAccessories.length > 0 && (
               <div className="text-lg text-slate-600">
                 <span className="text-green-600 font-semibold">
-                  + {totalAccessoriesPrice.toFixed(2).replace('.', ',')} € d'accessoires
+                  + {totalAccessoriesPrice.toFixed(2).replace('.', ',')} € d&apos;accessoires
                 </span>
                 <span className="mx-2">=</span>
                 <span className="font-bold text-slate-900">

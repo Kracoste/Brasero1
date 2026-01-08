@@ -115,7 +115,7 @@ export function sanitizeProductData(data: Record<string, unknown>): Record<strin
     const normalizedKey = CAMEL_TO_SNAKE_MAP[key] || key;
     
     // N'autoriser que les champs valides
-    if (ALLOWED_PRODUCT_FIELDS.includes(normalizedKey as any)) {
+    if ((ALLOWED_PRODUCT_FIELDS as readonly string[]).includes(normalizedKey)) {
       sanitized[normalizedKey] = value;
     }
   }

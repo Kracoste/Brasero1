@@ -92,7 +92,7 @@ export function ProfileForm({ user, initialProfile }: ProfileFormProps) {
                 disabled
                 className="mt-1 block w-full rounded-none border border-slate-300 bg-slate-100 px-3 py-2 text-slate-500"
               />
-              <p className="mt-1 text-xs text-slate-500">L'email ne peut pas être modifié</p>
+              <p className="mt-1 text-xs text-slate-500">L&apos;email ne peut pas être modifié</p>
             </div>
           </div>
         </div>

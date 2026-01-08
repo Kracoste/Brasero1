@@ -130,7 +130,7 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Dimensions</p>
-                        <p className="font-semibold text-gray-900">{formatDimensions(product as any)}</p>
+                        <p className="font-semibold text-gray-900">{formatDimensions(product)}</p>
                       </div>
                     </div>
                   )}
