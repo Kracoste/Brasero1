@@ -6,10 +6,32 @@ import { LeafletMap } from "@/components/LeafletMap";
 import { Section } from "@/components/Section";
 import { getSiteSettings } from "@/lib/site-settings";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: "Écrivez-nous pour un devis sur mesure ou prenez rendez-vous à l'atelier.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  
+  return {
+    title: `Contactez-nous | Devis brasero personnalisé | ${settings.storeName}`,
+    description: `Besoin d'un devis sur mesure pour un brasero artisanal ? Contactez notre atelier à ${settings.atelier.city}. Réponse sous 24h. Visite atelier possible sur rendez-vous.`,
+    keywords: [
+      "contact brasero artisanal",
+      "devis brasero sur mesure",
+      "atelier brasero Moncoutant",
+      "rendez-vous atelier brasero",
+      "devis gratuit brasero",
+      "contact fabricant brasero",
+      settings.storeName,
+    ],
+    openGraph: {
+      title: `Contactez-nous | ${settings.storeName}`,
+      description: `Devis personnalisé sous 24h. Visite atelier possible.`,
+      type: "website",
+      locale: "fr_FR",
+    },
+    alternates: {
+      canonical: "/contact",
+    },
+  };
+}
 
 export default async function ContactPage() {
   const siteSettings = await getSiteSettings();

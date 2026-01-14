@@ -25,11 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
     description: `Notre processus de contrôle qualité garantit des braseros irréprochables. Triple inspection, garantie 2 ans, certification CE. Exigence et excellence à chaque étape.`,
     keywords: [
       "contrôle qualité brasero",
-      "garantie brasero 2 ans",
+      "inspection brasero artisanal",
       "certification CE brasero",
-      "inspection brasero",
-      "qualité brasero artisanal",
-      "brasero garanti France",
+      "brasero qualité professionnelle",
+      "contrôle brasero fabrication",
+      "exigence qualité brasero",
       settings.storeName,
     ],
     openGraph: {

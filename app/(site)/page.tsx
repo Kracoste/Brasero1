@@ -21,12 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: [
       "boutique brasero",
       "acheter brasero",
-      "espace barbecue jardin",
+      "vente brasero artisanal",
       "ameublement extérieur",
       "brasero jardin",
       "magasin brasero en ligne",
-      "vente brasero artisanal",
-      "brasero plancha",
+      "brasero made in France",
+      "brasero acier corten",
       settings.storeName,
     ],
     openGraph: {
@@ -270,25 +270,37 @@ export default async function HomePage() {
             </h2>
             <p className="text-slate-600 leading-relaxed mb-4">
               Bienvenue chez <strong>{settings.storeName}</strong>, votre spécialiste de l&apos;ameublement d&apos;extérieur 
-              et des espaces barbecue. Depuis notre atelier de {settings.atelier.city}, nous créons des braseros 
-              artisanaux qui transforment votre jardin en véritable lieu de vie.
+              pour jardin et terrasse. Depuis notre atelier de {settings.atelier.city}, nous créons des braseros 
+              artisanaux qui transforment votre jardin en véritable lieu de vie et de convivialité.
             </p>
             <p className="text-slate-600 leading-relaxed mb-4">
-              Nos braseros en acier corten et acier noir sont conçus pour durer. Que vous cherchiez un brasero plancha 
-              pour cuisiner en extérieur, un brasero chauffage pour prolonger vos soirées d&apos;été, ou simplement un 
-              élément décoratif pour votre terrasse, vous trouverez chez nous le produit idéal.
+              Nos braseros en acier corten et acier noir sont conçus pour durer des années. Que vous cherchiez un 
+              brasero multifonction pour cuisiner et vous réchauffer, un modèle design pour sublimer votre terrasse, 
+              ou un brasero traditionnel pour vos soirées entre amis, vous trouverez chez nous le produit idéal.
+            </p>
+            <p className="text-slate-600 leading-relaxed mb-4">
+              Complétez votre ameublement d&apos;extérieur avec nos accessoires : planchas amovibles, grilles de cuisson, 
+              pare-étincelles et fendeurs à bûches. Tout ce qu&apos;il faut pour profiter pleinement de votre jardin, 
+              été comme hiver.
             </p>
             <p className="text-slate-600 leading-relaxed">
-              Complétez votre espace avec nos accessoires : planchas amovibles, grilles de cuisson, pare-étincelles 
-              et fendeurs à bûches. Tout ce qu&apos;il faut pour profiter pleinement de votre jardin, été comme hiver.
+              Chaque brasero est fabriqué à la main dans notre atelier français. Nous sélectionnons des matériaux de 
+              première qualité et appliquons un contrôle qualité rigoureux pour vous garantir un produit qui durera 
+              des décennies. Livraison soignée partout en France.
             </p>
           </div>
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex justify-center gap-4">
             <Link
               href="/produits"
               className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
             >
               Découvrir notre collection
+            </Link>
+            <Link
+              href="/made-in-france"
+              className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
+            >
+              Notre atelier
             </Link>
           </div>
         </div>
