@@ -166,7 +166,7 @@ export default async function FAQPage() {
         },
         {
           question: "Quels sont les frais de livraison ?",
-          answer: `Les frais de livraison sont calculés en fonction du poids et de la destination. La livraison est offerte à partir de ${settings.freeShippingThreshold}€ d'achat en France métropolitaine.`
+          answer: `Les frais de livraison sont calculés en fonction du poids et de la destination lors du paiement de votre commande.`
         },
         {
           question: "Comment sont emballés les braseros ?",

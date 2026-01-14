@@ -140,9 +140,8 @@ export default async function HomePage() {
       <section className="bg-[#f6f1e9] py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 xl:px-16 text-center">
           <div className="inline-flex items-center gap-2 mb-3">
-            <MapPin className="w-4 h-4 text-[#CD853F]" />
             <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-[#CD853F]">
-              {settings.atelier.city}, {settings.atelier.department}
+              Atelier LBF
             </span>
           </div>
           <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 leading-tight">
@@ -218,7 +217,7 @@ export default async function HomePage() {
       </section>
 
       {/* Section SEO - Avantages */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-[#f6f1e9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
@@ -230,34 +229,34 @@ export default async function HomePage() {
           </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+            <Link href="/brasero-multifonction" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
                 <Flame className="w-6 h-6 text-[#CD853F]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Espace barbecue unique</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Espace barbecue unique</h3>
               <p className="text-sm text-slate-600">Créez un coin chaleureux dans votre jardin avec nos braseros multifonctions</p>
-            </div>
-            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+            </Link>
+            <Link href="/made-in-france" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
                 <Award className="w-6 h-6 text-[#CD853F]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Fabrication française</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Fabrication française</h3>
               <p className="text-sm text-slate-600">Chaque pièce est fabriquée à la main dans notre atelier des Deux-Sèvres</p>
-            </div>
-            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+            </Link>
+            <Link href="/garantie" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
                 <Shield className="w-6 h-6 text-[#CD853F]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Garantie 2 ans</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Garantie 2 ans</h3>
               <p className="text-sm text-slate-600">Qualité garantie sur tous nos produits avec un SAV réactif</p>
-            </div>
-            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+            </Link>
+            <Link href="/livraison-france" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
                 <Truck className="w-6 h-6 text-[#CD853F]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Livraison soignée</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Livraison soignée</h3>
               <p className="text-sm text-slate-600">Emballage renforcé et livraison partout en France sous 5-10 jours</p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

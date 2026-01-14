@@ -131,7 +131,7 @@ export default async function CommanderPage() {
     {
       icon: Truck,
       title: "Livraison soignée",
-      description: `Livraison gratuite en France à partir de ${settings.freeShippingThreshold}€. Vos produits sont emballés avec soin.`
+      description: `Frais de livraison calculés selon le poids lors du paiement. Vos produits sont emballés avec soin.`
     },
     {
       icon: HeartHandshake,

@@ -93,11 +93,11 @@ export default async function LivraisonPage() {
   ];
 
   const zones = [
-    { country: "France métropolitaine", delay: "5-10 jours", price: "Gratuit dès 500€" },
-    { country: "Belgique", delay: "7-12 jours", price: "À partir de 49€" },
-    { country: "Luxembourg", delay: "7-12 jours", price: "À partir de 49€" },
+    { country: "France métropolitaine", delay: "5-10 jours", price: "Selon le poids" },
+    { country: "Belgique", delay: "7-12 jours", price: "Selon le poids" },
+    { country: "Luxembourg", delay: "7-12 jours", price: "Selon le poids" },
     { country: "Suisse", delay: "10-15 jours", price: "Sur devis" },
-    { country: "Allemagne", delay: "10-15 jours", price: "À partir de 79€" },
+    { country: "Allemagne", delay: "10-15 jours", price: "Selon le poids" },
   ];
 
   const tips = [

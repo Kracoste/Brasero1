@@ -100,7 +100,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
         </ul>
         <h2 className="text-xl font-semibold">Frais de livraison</h2>
         <p>
-          Les frais de livraison sont calculés en fonction du poids et de la destination. <strong>Livraison gratuite en France métropolitaine à partir de {formatCurrency(settings.freeShippingThreshold)} d&apos;achat.</strong>
+          Les frais de livraison sont calculés en fonction du poids et de la destination lors du paiement de votre commande.
         </p>
         <h2 className="text-xl font-semibold">Suivi de commande</h2>
         <p>

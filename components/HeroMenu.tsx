@@ -43,9 +43,8 @@ export const HeroMenu = () => {
           {/* Titre principal */}
           <div className="text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center gap-2 mb-4">
-              <MapPin className="w-5 h-5 text-[#CD853F]" />
               <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[#CD853F]">
-                Moncoutant, Deux-Sèvres
+                Atelier LBF
               </span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
