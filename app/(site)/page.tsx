@@ -1,13 +1,45 @@
 import Link from "next/link";
+import { Metadata } from "next";
 import { HeroMenu } from "@/components/HeroMenu";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { Product } from "@/lib/schema";
+import { Flame, Truck, Shield, Award, MapPin } from "lucide-react";
 
 // Cache ISR de 60 secondes pour équilibrer performance et fraîcheur des données
 // Pas de cache - les données sont toujours fraîches
 export const revalidate = 0;
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  
+  return {
+    title: `Brasero artisanal | Espace barbecue & Ameublement jardin | ${settings.storeName}`,
+    description: `Boutique en ligne de braseros artisanaux fabriqués en France. Espace barbecue, plancha, fendeur à bûches et accessoires pour aménager votre jardin. Livraison partout en France.`,
+    keywords: [
+      "boutique brasero",
+      "acheter brasero",
+      "espace barbecue jardin",
+      "ameublement extérieur",
+      "brasero jardin",
+      "magasin brasero en ligne",
+      "vente brasero artisanal",
+      "brasero plancha",
+      settings.storeName,
+    ],
+    openGraph: {
+      title: `${settings.storeName} | Espace barbecue & Jardin`,
+      description: `Braseros artisanaux, planchas et accessoires pour votre jardin. Fabriqués en France, livrés chez vous.`,
+      type: "website",
+      locale: "fr_FR",
+    },
+    alternates: {
+      canonical: "/",
+    },
+  };
+}
 
 export default async function HomePage() {
   // Récupérer les produits vedettes depuis Supabase (priorité aux produits marqués is_featured)
@@ -64,8 +96,65 @@ export default async function HomePage() {
     customSpecs: p.customSpecs || p.custom_specs,
   })) as Product[];
 
+  const settings = await getSiteSettings();
+
   return (
     <>
+      {/* Schema.org pour la page d'accueil */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Store",
+            "name": settings.storeName,
+            "description": "Boutique en ligne de braseros artisanaux fabriqués en France",
+            "url": "https://www.atelier-lbf.fr",
+            "image": "https://www.atelier-lbf.fr/Braserobanner.jpg",
+            "telephone": settings.storePhone,
+            "email": settings.storeEmail,
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": settings.atelier.city,
+              "addressRegion": settings.atelier.department,
+              "postalCode": "79320",
+              "addressCountry": "FR"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": settings.atelier.lat,
+              "longitude": settings.atelier.lng
+            },
+            "priceRange": "€€",
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              "opens": "09:00",
+              "closes": "18:00"
+            }
+          })
+        }}
+      />
+
+      {/* Hero avec H1 SEO */}
+      <section className="bg-[#f6f1e9] py-8 sm:py-10 lg:py-12">
+        <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 xl:px-16 text-center">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <MapPin className="w-4 h-4 text-[#CD853F]" />
+            <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-[#CD853F]">
+              {settings.atelier.city}, {settings.atelier.department}
+            </span>
+          </div>
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 leading-tight">
+            Votre espace barbecue <span className="text-[#CD853F]">artisanal</span>
+          </h1>
+          <p className="mt-3 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+            Braseros, planchas et accessoires fabriqués à la main en France. 
+            Transformez votre jardin en véritable espace de convivialité.
+          </p>
+        </div>
+      </section>
+
       <section className="py-4 sm:py-6 lg:py-10 overflow-hidden">
         <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 xl:px-16">
           {/* Layout simple et fiable */}
@@ -126,6 +215,84 @@ export default async function HomePage() {
 
       <section>
         <HeroMenu />
+      </section>
+
+      {/* Section SEO - Avantages */}
+      <section className="py-12 sm:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
+              Pourquoi choisir nos braseros ?
+            </h2>
+            <p className="mt-3 text-slate-600 max-w-2xl mx-auto">
+              Un espace barbecue d&apos;exception pour votre jardin
+            </p>
+          </div>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+                <Flame className="w-6 h-6 text-[#CD853F]" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Espace barbecue unique</h3>
+              <p className="text-sm text-slate-600">Créez un coin chaleureux dans votre jardin avec nos braseros multifonctions</p>
+            </div>
+            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+                <Award className="w-6 h-6 text-[#CD853F]" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Fabrication française</h3>
+              <p className="text-sm text-slate-600">Chaque pièce est fabriquée à la main dans notre atelier des Deux-Sèvres</p>
+            </div>
+            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-6 h-6 text-[#CD853F]" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Garantie 2 ans</h3>
+              <p className="text-sm text-slate-600">Qualité garantie sur tous nos produits avec un SAV réactif</p>
+            </div>
+            <div className="bg-[#f6f1e9] p-6 text-center border border-slate-200">
+              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
+                <Truck className="w-6 h-6 text-[#CD853F]" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Livraison soignée</h3>
+              <p className="text-sm text-slate-600">Emballage renforcé et livraison partout en France sous 5-10 jours</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section SEO - Texte descriptif */}
+      <section className="py-12 sm:py-16 bg-[#f6f1e9]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="prose prose-slate max-w-none text-center">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900 mb-6">
+              Aménagez votre extérieur avec style
+            </h2>
+            <p className="text-slate-600 leading-relaxed mb-4">
+              Bienvenue chez <strong>{settings.storeName}</strong>, votre spécialiste de l&apos;ameublement d&apos;extérieur 
+              et des espaces barbecue. Depuis notre atelier de {settings.atelier.city}, nous créons des braseros 
+              artisanaux qui transforment votre jardin en véritable lieu de vie.
+            </p>
+            <p className="text-slate-600 leading-relaxed mb-4">
+              Nos braseros en acier corten et acier noir sont conçus pour durer. Que vous cherchiez un brasero plancha 
+              pour cuisiner en extérieur, un brasero chauffage pour prolonger vos soirées d&apos;été, ou simplement un 
+              élément décoratif pour votre terrasse, vous trouverez chez nous le produit idéal.
+            </p>
+            <p className="text-slate-600 leading-relaxed">
+              Complétez votre espace avec nos accessoires : planchas amovibles, grilles de cuisson, pare-étincelles 
+              et fendeurs à bûches. Tout ce qu&apos;il faut pour profiter pleinement de votre jardin, été comme hiver.
+            </p>
+          </div>
+          <div className="mt-8 flex justify-center">
+            <Link
+              href="/produits"
+              className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
+            >
+              Découvrir notre collection
+            </Link>
+          </div>
+        </div>
       </section>
     </>
   );

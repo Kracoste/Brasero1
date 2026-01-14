@@ -1,148 +1,138 @@
-'use client';
-
-import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Hammer, Truck, Shield, MapPin, CheckCircle2, ArrowRight } from 'lucide-react';
 
-type MenuItem = {
-  id: string;
-  label: string;
-  title: string;
-  description: string;
-  image: string;
-};
-
-const heroItems: MenuItem[] = [
+const processCards = [
   {
-    id: 'signature',
-    label: 'Brasero Signature 80',
-    title: 'Braseros sculpturaux',
-    description:
-      'Nos braseros emblematiques en acier corten pour structurer vos terrasses et accueillir jusqua 12 convives.',
-    image:
-      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80',
+    href: '/fabrication',
+    icon: Hammer,
+    number: 1,
+    title: 'Fabrication artisanale',
+    shortDesc: 'Chaque brasero est fabriqué à la main dans notre atelier à Moncoutant, Deux-Sèvres.',
   },
   {
-    id: 'terrasse',
-    label: 'Brasero Terrasse 60',
-    title: 'Compacts pour balcons',
-    description:
-      'Une selection de formats legers adaptes aux espaces urbains, livres avec anneau plancha.',
-    image:
-      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
+    href: '/qualite',
+    icon: Shield,
+    number: 2,
+    title: 'Contrôle qualité',
+    shortDesc: 'Inspection minutieuse de chaque pièce avant expédition pour garantir la perfection.',
   },
   {
-    id: 'premium',
-    label: 'Collection Premium',
-    title: 'Edition limitee',
-    description:
-      'Des pieces uniques fabriquees a la main avec des finitions haut de gamme pour une experience exceptionnelle.',
-    image:
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'atelier',
-    label: 'Atelier & sur-mesure',
-    title: 'Fabrication locale',
-    description: 'Visitez latelier, personnalisez vos finitions et suivez lassemblage en direct.',
-    image:
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
+    href: '/livraison',
+    icon: Truck,
+    number: 3,
+    title: 'Livraison soignée',
+    shortDesc: 'Emballage renforcé et livraison partout en France sous 5 à 10 jours ouvrés.',
   },
 ];
 
+const stats = [
+  { value: '100%', label: 'Fabriqué en France' },
+  { value: '2 ans', label: 'Garantie minimum' },
+  { value: '5-10j', label: 'Délai de livraison' },
+  { value: '98%', label: 'Clients satisfaits' },
+];
+
 export const HeroMenu = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const activeItem = heroItems[currentIndex];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroItems.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + heroItems.length) % heroItems.length);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % heroItems.length);
-  };
-
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Image pleine largeur en arrière-plan */}
-      <div className="relative h-[400px] sm:h-[450px] md:h-[500px] w-full lg:h-[650px]">
-        <Image
-          key={activeItem.id}
-          src={activeItem.image}
-          alt={activeItem.label}
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        {/* Overlay gradient pour lisibilité */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30" />
-      </div>
+    <div className="relative w-full overflow-hidden bg-[#f6f1e9]">
 
-      {/* Contenu superposé sur l'image */}
-      <div className="absolute inset-0 flex items-center">
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16">
-          <div className="mx-auto max-w-7xl">
-            <div className="max-w-2xl space-y-4 sm:space-y-6 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/90">
-                Work light, LED, white
-              </p>
-              
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-tight lg:text-6xl">
-                {activeItem.title}
-              </h1>
-              
-              <p className="text-base sm:text-lg leading-relaxed text-white/90 lg:text-xl">
-                {activeItem.description}
-              </p>
-              
+
+      {/* Contenu */}
+      <div className="relative py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Titre principal */}
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <MapPin className="w-5 h-5 text-[#CD853F]" />
+              <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[#CD853F]">
+                Moncoutant, Deux-Sèvres
+              </span>
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+              De la fabrication<br />
+              <span className="text-[#CD853F]">à votre jardin</span>
+            </h2>
+            <p className="mt-4 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
+              Nous concevons, fabriquons et livrons nos braseros artisanaux directement depuis notre atelier français.
+            </p>
+          </div>
+
+          {/* Cartes cliquables vers les pages */}
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8 mb-12">
+            {processCards.map((card) => (
+              <Link 
+                key={card.href}
+                href={card.href}
+                className="group relative text-left p-6 sm:p-8 transition-all bg-white border border-slate-200 shadow-sm hover:shadow-lg hover:border-[#CD853F]"
+              >
+                {/* Numéro */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 flex items-center justify-center text-white font-bold text-sm bg-[#8B4513] group-hover:bg-[#CD853F] transition-colors">
+                  {card.number}
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-[#CD853F]/20 group-hover:bg-[#CD853F]/30 transition-colors">
+                    <card.icon className="w-8 h-8 text-[#CD853F]" />
+                  </div>
+                  
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-slate-900 group-hover:text-[#CD853F] transition-colors">
+                    {card.title}
+                  </h3>
+                  <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-4">
+                    {card.shortDesc}
+                  </p>
+                  
+                  {/* Bouton En savoir plus */}
+                  <span className="inline-flex items-center gap-2 text-[#CD853F] font-semibold text-sm uppercase tracking-wide group-hover:gap-3 transition-all">
+                    En savoir plus
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12">
+            {stats.map((stat) => (
+              <div 
+                key={stat.label}
+                className="text-center p-4 sm:p-6"
+              >
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#CD853F]">
+                  {stat.value}
+                </div>
+                <div className="mt-1 text-sm sm:text-base text-slate-600">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="text-center">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/produits"
-                className="inline-flex w-fit items-center rounded-full bg-black px-6 sm:px-10 py-3 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-black/95"
+                className="inline-flex items-center gap-2 bg-[#CD853F] hover:bg-[#8B4513] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
               >
-                Shop now
+                <CheckCircle2 className="w-5 h-5" />
+                Découvrir nos braseros
               </Link>
-              
-              <div className="flex gap-2 pt-2">
-                {heroItems.map((item, index) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setCurrentIndex(index)}
-                    className={`h-1.5 rounded-full transition-all ${
-                      index === currentIndex ? 'w-8 bg-black' : 'w-3 bg-black/40'
-                    }`}
-                    aria-label={`Aller a ${item.label}`}
-                  />
-                ))}
-              </div>
+              <Link
+                href="/info/a-propos-de-nous"
+                className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              >
+                Visiter notre atelier
+              </Link>
             </div>
+            <p className="mt-6 text-sm text-slate-500 flex items-center justify-center gap-2">
+              <Shield className="w-4 h-4" />
+              Paiement sécurisé • Livraison assurée • Satisfait ou remboursé
+            </p>
           </div>
         </div>
       </div>
-
-      {/* Flèches de navigation */}
-      <button
-        onClick={goToPrevious}
-        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:left-8"
-        aria-label="Precedent"
-      >
-        <ChevronLeft className="h-6 w-6 text-slate-800" />
-      </button>
-      <button
-        onClick={goToNext}
-        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/90 p-3 shadow-lg backdrop-blur-sm transition hover:scale-110 lg:right-8"
-        aria-label="Suivant"
-      >
-        <ChevronRight className="h-6 w-6 text-slate-800" />
-      </button>
     </div>
   );
 };
