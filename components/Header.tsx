@@ -11,6 +11,7 @@ import { navLinks } from '@/components/navigation';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from "@/lib/favorites-context";
 import { useAuth } from '@/lib/auth-context';
+import LanguageSelector from '@/components/LanguageSelector';
 
 export const Header = () => {
   const pathname = usePathname();
@@ -127,6 +128,9 @@ export const Header = () => {
           
           {/* Icônes à droite - toujours visibles */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-shrink-0">
+            {/* Sélecteur de langue */}
+            <LanguageSelector />
+            
             {/* Favoris */}
             <Link href="/favoris" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
               <span className="relative">

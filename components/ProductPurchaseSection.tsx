@@ -12,7 +12,7 @@ type Accessory = {
   slug: string;
   name: string;
   price: number;
-  images: { url: string; alt?: string }[];
+  images: { url?: string; src?: string; alt?: string }[];
 };
 
 type ProductPurchaseSectionProps = {

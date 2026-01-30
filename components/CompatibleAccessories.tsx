@@ -9,7 +9,7 @@ type CompatibleProduct = {
   slug: string;
   name: string;
   price: number;
-  images: { url: string; alt?: string }[];
+  images: { url?: string; src?: string; alt?: string }[];
   category: string;
 };
 
@@ -109,9 +109,15 @@ export function CompatibleAccessories({
       </div>
       <div className="divide-y divide-slate-300">
         {products.map((product) => {
-          const firstImage = Array.isArray(product.images) && product.images[0]
-            ? (product.images[0] as { url: string }).url || '/logo/placeholder.png'
-            : '/logo/placeholder.png';
+          // Support both formats: { url: ... } and { src: ... }
+          const getImageUrl = () => {
+            if (!Array.isArray(product.images) || product.images.length === 0) {
+              return '/logo/placeholder.png';
+            }
+            const firstImage = product.images[0] as { url?: string; src?: string };
+            return firstImage.url || firstImage.src || '/logo/placeholder.png';
+          };
+          const firstImage = getImageUrl();
           const isSelected = selectedProducts.has(product.slug);
 
           return (

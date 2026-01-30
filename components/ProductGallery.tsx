@@ -17,10 +17,6 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
 
   const activeImage = product.images[activeIndex];
   const isAccessory = product.category === 'accessoire';
-  
-  // Zoom et position depuis les specs admin
-  const detailImageScale = product.specs?.detailImageScale || (isAccessory ? 95 : 110);
-  const detailImageOffsetX = product.specs?.detailImageOffsetX || 0;
 
   const goToPrevious = () => {
     const newIndex = activeIndex === 0 ? product.images.length - 1 : activeIndex - 1;
@@ -51,19 +47,11 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
     setActiveIndex(index);
   };
 
-  // Calculer le décalage des flèches basé sur le scale et le translateX de l'image
-  // Si scale = 110%, l'image dépasse de 5% de chaque côté
-  const scaleOverflow = ((detailImageScale - 100) / 2);
-  // Combiner avec le décalage horizontal de l'image
-  const totalOffsetLeft = -scaleOverflow + detailImageOffsetX;
-  const totalOffsetRight = -scaleOverflow - detailImageOffsetX;
-
   return (
     <div className="flex flex-col">
       {/* Image principale */}
       <div 
-        className="relative w-full aspect-[3/4] sm:aspect-[4/5] lg:aspect-[3/4] min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]"
-        style={{ overflow: 'visible' }}
+        className="relative w-full aspect-[3/4] sm:aspect-[4/5] lg:aspect-[3/4] min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] overflow-hidden flex items-center justify-center"
       >
           <Image
             key={activeImage.src}
@@ -75,8 +63,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
             blurDataURL={activeImage.blurDataURL}
             className="object-contain transition-transform duration-300"
             style={{
-              transform: `scale(${detailImageScale / 100}) translateX(${detailImageOffsetX}%)`,
-              padding: isAccessory ? '16px' : '0',
+              padding: isAccessory ? '16px' : '8px',
             }}
             priority
           />
@@ -84,11 +71,10 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
       
       {/* Miniatures et flèches de navigation - centrées sous l'image */}
       <div 
-        className="flex items-center justify-between mt-4"
+        className="flex items-center justify-between mt-4 lg:mt-4"
         style={{ 
-          marginLeft: `${totalOffsetLeft - 11}%`,
-          marginRight: `${totalOffsetRight}%`,
-          width: `${100 + scaleOverflow * 2 + 11}%`
+          // Sur mobile, pas de marges négatives pour garder centré
+          // Sur desktop (lg), appliquer les marges pour aligner avec l'image zoomée
         }}
       >
         {/* Flèche gauche */}

@@ -168,3 +168,28 @@ body {
 .nav-link-hover:hover::after {
   width: 100%;
 }
+
+/* Hide Google Translate elements */
+.goog-te-banner-frame,
+.skiptranslate,
+body > .skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+div#goog-gt-,
+.goog-text-highlight {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+.goog-te-gadget {
+  font-size: 0 !important;
+}
+
+/* Prevent Google Translate from adding extra padding */
+.translated-ltr body,
+.translated-rtl body {
+  top: 0 !important;
+}

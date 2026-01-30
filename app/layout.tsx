@@ -92,6 +92,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="fr">
       <head>
+        {/* Google Translate */}
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'fr',
+                  includedLanguages: 'fr,en,de,es,nl',
+                  autoDisplay: false
+                }, 'google_translate_element');
+              }
+            `,
+          }}
+        />
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
@@ -104,6 +119,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} antialiased`}>
+        {/* Google Translate element (hidden) */}
+        <div id="google_translate_element" style={{ display: 'none' }} />
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
