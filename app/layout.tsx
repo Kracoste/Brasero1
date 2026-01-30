@@ -90,7 +90,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   };
 
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         {/* Google Translate */}
         <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer />
@@ -118,7 +118,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} antialiased`}>
+      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} antialiased`}>
         {/* Google Translate element (hidden) */}
         <div id="google_translate_element" style={{ display: 'none' }} />
         {/* Google Tag Manager (noscript) */}
