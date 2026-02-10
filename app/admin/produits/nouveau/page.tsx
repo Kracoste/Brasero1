@@ -214,9 +214,20 @@ export default function NewProduct() {
           });
 
           if (!uploadResponse.ok) {
-            const errorData = await uploadResponse.json();
-            setSubmitError(`Erreur upload image: ${errorData.error}`);
-            throw new Error(errorData.error);
+            let errorMessage = `Erreur upload (${uploadResponse.status})`;
+            try {
+              const errorData = await uploadResponse.json();
+              errorMessage = errorData.error || errorMessage;
+            } catch {
+              const text = await uploadResponse.text();
+              if (text.toLowerCase().includes('request entity too large') || uploadResponse.status === 413) {
+                errorMessage = 'Image trop volumineuse. Réduisez la taille (max ~4 Mo par image).';
+              } else {
+                errorMessage = text || errorMessage;
+              }
+            }
+            setSubmitError(`Erreur upload image: ${errorMessage}`);
+            throw new Error(errorMessage);
           }
 
           const { publicUrl } = await uploadResponse.json();
@@ -284,9 +295,20 @@ export default function NewProduct() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setSubmitError(`Erreur base de données: ${errorData.error}`);
-        throw new Error(errorData.error);
+        let errorMessage = `Erreur serveur (${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          const text = await response.text();
+          if (text.toLowerCase().includes('request entity too large') || response.status === 413) {
+            errorMessage = 'Données trop volumineuses. Réduisez la taille des images.';
+          } else {
+            errorMessage = text || errorMessage;
+          }
+        }
+        setSubmitError(`Erreur base de données: ${errorMessage}`);
+        throw new Error(errorMessage);
       }
 
       router.push('/admin/produits');
@@ -301,8 +323,8 @@ export default function NewProduct() {
   };
 
   return (
-    <div className="p-8 max-w-4xl">
-      <div className="mb-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
+      <div className="mb-6 sm:mb-8">
         <Link
           href="/admin/produits"
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
@@ -310,7 +332,7 @@ export default function NewProduct() {
           <ArrowLeft size={20} />
           Retour aux produits
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Ajouter un produit</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Ajouter un produit</h1>
         <p className="text-slate-600 mt-1">Remplissez les informations du nouveau produit</p>
       </div>
 

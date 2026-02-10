@@ -11,7 +11,7 @@ export default function LocalProductView({ params }: { params: Promise<{ slug: s
 
   if (!product) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold text-slate-900">Produit non trouvé</h1>
           <p className="text-slate-600 mt-2">Le produit "{slug}" n'existe pas dans les produits locaux.</p>
@@ -32,7 +32,7 @@ export default function LocalProductView({ params }: { params: Promise<{ slug: s
   };
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
       <Link
         href="/admin/produits"
         className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6"
@@ -56,13 +56,13 @@ export default function LocalProductView({ params }: { params: Promise<{ slug: s
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-amber-100 rounded-lg">
               <FileCode className="text-amber-600" size={24} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">{product.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{product.name}</h1>
               <p className="text-slate-500">Slug: {product.slug}</p>
             </div>
           </div>
@@ -76,7 +76,7 @@ export default function LocalProductView({ params }: { params: Promise<{ slug: s
           </Link>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
           {/* Image */}
           {product.images && product.images[0] && (
             <div>

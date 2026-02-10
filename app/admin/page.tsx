@@ -482,7 +482,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="animate-pulse space-y-6">
           <div className="h-8 w-48 bg-slate-200 rounded"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -496,20 +496,20 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-8 space-y-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 bg-white min-h-screen">
       <header className="flex flex-col gap-2">
-        <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.08em]">Tableau de bord</p>
-        <div className="flex flex-wrap gap-3 items-baseline">
-          <h1 className="text-3xl font-bold text-slate-900">Bienvenue, admin</h1>
-          <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-semibold">
+        <p className="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-[0.08em]">Tableau de bord</p>
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-baseline">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Bienvenue, admin</h1>
+          <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold">
             Vue d'ensemble en temps réel
           </span>
         </div>
-        <p className="text-slate-600">Un aperçu clair des visites, ventes et commandes récentes.</p>
+        <p className="text-sm sm:text-base text-slate-600">Un aperçu clair des visites, ventes et commandes récentes.</p>
       </header>
 
       {/* Navigation haute vers les vues détaillées */}
-      <nav className="flex w-full gap-3 border-b border-slate-200 pb-3">
+      <nav className="flex w-full gap-1 sm:gap-3 border-b border-slate-200 pb-3 overflow-x-auto no-scrollbar">
         {[
           { label: 'Sessions', metric: 'visites' as Metric },
           { label: "Chiffre d'affaires", metric: 'ca' as Metric },
@@ -521,7 +521,7 @@ export default function AdminDashboard() {
             key={item.metric}
             type="button"
             onClick={() => setSelectedMetric(item.metric)}
-            className={`group relative flex-1 flex items-center justify-center text-sm font-semibold uppercase tracking-[0.18em] py-3 rounded-lg transition-colors ${
+            className={`group relative flex-1 min-w-0 flex items-center justify-center text-[10px] sm:text-xs lg:text-sm font-semibold uppercase tracking-[0.08em] sm:tracking-[0.18em] py-2 sm:py-3 px-1 sm:px-2 rounded-lg transition-colors whitespace-nowrap ${
               selectedMetric === item.metric
                 ? 'text-slate-900 bg-slate-100 shadow-inner'
                 : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'

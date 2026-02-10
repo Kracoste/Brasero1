@@ -403,9 +403,20 @@ export default function EditProduct() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setSubmitError(`Erreur base de données: ${errorData.error}`);
-        throw new Error(errorData.error);
+        let errorMessage = `Erreur serveur (${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          const text = await response.text();
+          if (text.toLowerCase().includes('request entity too large') || response.status === 413) {
+            errorMessage = 'Données trop volumineuses. Réduisez la taille des images.';
+          } else {
+            errorMessage = text || errorMessage;
+          }
+        }
+        setSubmitError(`Erreur base de données: ${errorMessage}`);
+        throw new Error(errorMessage);
       }
 
       router.push('/admin/produits');
@@ -421,7 +432,7 @@ export default function EditProduct() {
 
   if (loadingProduct) {
     return (
-      <div className="p-8 flex items-center justify-center">
+      <div className="p-4 sm:p-6 lg:p-8 flex items-center justify-center">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-slate-900 mx-auto"></div>
           <p className="mt-4 text-slate-600">Chargement du produit...</p>
@@ -431,8 +442,8 @@ export default function EditProduct() {
   }
 
   return (
-    <div className="p-8 max-w-4xl">
-      <div className="mb-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
+      <div className="mb-6 sm:mb-8">
         <Link
           href="/admin/produits"
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
@@ -440,7 +451,7 @@ export default function EditProduct() {
           <ArrowLeft size={20} />
           Retour aux produits
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Modifier le produit</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Modifier le produit</h1>
         <p className="text-slate-600 mt-1">Modifiez les informations du produit</p>
       </div>
 

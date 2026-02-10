@@ -111,7 +111,7 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-48 bg-slate-200 rounded"></div>
           <div className="h-64 bg-slate-200 rounded-xl"></div>
@@ -121,9 +121,9 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Clients</h1>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Clients</h1>
         <p className="text-slate-600 mt-1">Gérez votre base de clients</p>
       </div>
 
@@ -195,8 +195,8 @@ export default function ClientsPage() {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
+          <table className="w-full min-w-[700px]">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Client</th>

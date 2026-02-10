@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 
@@ -27,33 +27,68 @@ export function CompatibleAccessories({
   const [products, setProducts] = useState<CompatibleProduct[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  
+  // Stabiliser la référence des slugs pour éviter les re-renders inutiles
+  const slugsKey = useMemo(() => JSON.stringify([...compatibleSlugs].sort()), [compatibleSlugs]);
+  const fetchedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    // Éviter les requêtes dupliquées pour les mêmes slugs
+    if (fetchedRef.current === slugsKey) return;
+    
+    const slugs: string[] = JSON.parse(slugsKey);
+    if (slugs.length === 0) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchProducts = async (retry = 0) => {
       try {
+        setError(false);
         const supabase = createClient();
         
-        // Charger les produits compatibles par leurs slugs
-        if (compatibleSlugs.length > 0) {
-          const { data, error } = await supabase
-            .from('products')
-            .select('id, slug, name, price, images, category')
-            .in('slug', compatibleSlugs)
-            .order('name');
+        const { data, error: fetchError } = await supabase
+          .from('products')
+          .select('id, slug, name, price, images, category')
+          .in('slug', slugs)
+          .order('name');
 
-          if (!error && data) {
-            setProducts(data);
+        if (cancelled) return;
+
+        if (fetchError) {
+          console.error('Erreur chargement produits compatibles:', fetchError);
+          // Retry une fois après 1 seconde
+          if (retry < 2) {
+            setTimeout(() => fetchProducts(retry + 1), 1000);
+            return;
           }
+          setError(true);
+        } else if (data && data.length > 0) {
+          setProducts(data);
+          fetchedRef.current = slugsKey;
+        } else if (data && data.length === 0 && retry < 2) {
+          // Parfois Supabase retourne un tableau vide transitoire, retry
+          setTimeout(() => fetchProducts(retry + 1), 500);
+          return;
         }
-      } catch (error) {
-        console.error('Erreur chargement produits compatibles:', error);
+      } catch (err) {
+        console.error('Erreur chargement produits compatibles:', err);
+        if (!cancelled && retry < 2) {
+          setTimeout(() => fetchProducts(retry + 1), 1000);
+          return;
+        }
+        if (!cancelled) setError(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [compatibleSlugs]);
+    return () => { cancelled = true; };
+  }, [slugsKey]);
 
   const toggleProduct = useCallback((slug: string) => {
     setSelectedProducts(prev => {
@@ -79,7 +114,19 @@ export function CompatibleAccessories({
     return (
       <div className="border border-slate-200 rounded-xl p-6 my-6">
         <h2 className="text-xl font-bold text-slate-900 mb-4">Produits compatibles</h2>
-        <p className="text-slate-500">Chargement...</p>
+        <div className="flex items-center gap-3">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700"></div>
+          <p className="text-slate-500">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="border border-slate-200 rounded-xl p-6 my-6">
+        <h2 className="text-xl font-bold text-slate-900 mb-4">Produits compatibles</h2>
+        <p className="text-red-500 text-sm">Impossible de charger les produits. Rechargez la page.</p>
       </div>
     );
   }
@@ -123,7 +170,7 @@ export function CompatibleAccessories({
           return (
             <label
               key={product.slug}
-              className={`flex items-center gap-4 cursor-pointer p-4 transition ${
+              className={`flex items-center gap-2 sm:gap-4 cursor-pointer p-3 sm:p-4 transition ${
                 isSelected ? 'bg-green-50' : 'hover:bg-slate-50'
               }`}
             >
@@ -131,22 +178,22 @@ export function CompatibleAccessories({
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => toggleProduct(product.slug)}
-                className="w-6 h-6 rounded border-slate-300 text-green-600 focus:ring-green-500 flex-shrink-0"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded border-slate-300 text-green-600 focus:ring-green-500 flex-shrink-0"
               />
-              <div className="relative w-20 h-20 flex-shrink-0 bg-white overflow-hidden rounded-lg border border-slate-200">
+              <div className="relative w-14 h-14 sm:w-20 sm:h-20 flex-shrink-0 bg-white overflow-hidden rounded-lg border border-slate-200">
                 <Image
                   src={firstImage}
                   alt={product.name}
                   fill
-                  className="object-contain p-2"
+                  className="object-contain p-1 sm:p-2"
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <span className="text-xs text-slate-400 uppercase tracking-wide">
+                <span className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wide">
                   {product.category === 'brasero' ? 'Braséro' : 'Accessoire'}
                 </span>
-                <h3 className="font-semibold text-slate-900 text-base">{product.name}</h3>
-                <p className="text-xl font-bold text-green-600 mt-1">
+                <h3 className="font-semibold text-slate-900 text-sm sm:text-base truncate">{product.name}</h3>
+                <p className="text-base sm:text-xl font-bold text-green-600 mt-0.5 sm:mt-1">
                   +{product.price.toFixed(2).replace('.', ',')} €
                 </p>
               </div>

@@ -195,8 +195,8 @@ export default async function LivraisonFrancePage() {
           </div>
 
           <div className="max-w-3xl mx-auto">
-            <div className="bg-white border border-slate-200 shadow-sm overflow-hidden">
-              <table className="w-full">
+            <div className="bg-white border border-slate-200 shadow-sm overflow-x-auto">
+              <table className="w-full min-w-[400px]">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
                     <th className="px-6 py-4 text-left text-sm font-semibold text-[#8B4513]">Destination</th>

@@ -77,7 +77,7 @@ export default function ParametresPage() {
 
   if (initialLoading) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-56 rounded bg-slate-200" />
           <div className="h-64 rounded-3xl bg-slate-200" />
@@ -87,10 +87,10 @@ export default function ParametresPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Paramètres</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Paramètres</h1>
           <p className="text-slate-600 mt-1">Configurez votre boutique</p>
         </div>
         <button
@@ -117,16 +117,16 @@ export default function ParametresPage() {
         </button>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
         {/* Sidebar des onglets */}
-        <div className="w-64 space-y-1">
+        <div className="flex lg:flex-col lg:w-64 gap-1 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition ${
+                className={`flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2 lg:py-3 rounded-lg text-left transition whitespace-nowrap text-sm lg:text-base lg:w-full ${
                   activeTab === tab.id
                     ? 'bg-slate-900 text-white'
                     : 'text-slate-600 hover:bg-slate-100'

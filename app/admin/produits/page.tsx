@@ -106,20 +106,20 @@ export default function AdminProducts() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Produits</h1>
-          <p className="text-slate-600 mt-1">
-            Gérez votre catalogue de produits ({products.length} produits)
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Produits</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">
+            Gérez votre catalogue ({products.length} produits)
           </p>
         </div>
         <Link
           href="/admin/produits/nouveau"
-          className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition"
+          className="flex items-center justify-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition text-sm sm:text-base"
         >
           <Plus size={20} />
-          Ajouter un produit
+          <span>Ajouter un produit</span>
         </Link>
       </div>
 
@@ -191,7 +191,7 @@ export default function AdminProducts() {
       </div>
 
       {/* Liste des produits */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
         {loading ? (
           <div className="p-8 text-center">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-slate-900 mx-auto"></div>

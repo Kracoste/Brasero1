@@ -123,7 +123,7 @@ export default function MigrateProductsPage() {
   const skippedCount = statuses.filter(s => s.status === 'skipped').length;
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
       <Link
         href="/admin/produits"
         className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6"
@@ -132,8 +132,8 @@ export default function MigrateProductsPage() {
         Retour aux produits
       </Link>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Migration des produits</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Migration des produits</h1>
         <p className="text-slate-600 mt-1">
           Importer les {products.length} produits du fichier local vers Supabase
         </p>
@@ -189,9 +189,9 @@ export default function MigrateProductsPage() {
 
       {/* Liste des statuts */}
       {statuses.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
           <div className="max-h-96 overflow-y-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[500px]">
               <thead className="bg-slate-50 sticky top-0">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Produit</th>

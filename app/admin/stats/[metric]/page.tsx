@@ -179,14 +179,14 @@ export default function MetricPage() {
 
   if (loading || !stats) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <p className="text-sm text-slate-500">Chargement du graphique…</p>
       </div>
     );
   }
 
   return (
-    <div className="p-8 space-y-6 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50 min-h-screen">
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.back()}

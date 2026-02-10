@@ -144,10 +144,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const relatedProducts = await getRelatedProducts(slug, product.category, 8);
 
   return (
-    <div className="bg-[#f9f6f1] pb-24">
-      <Section className="pt-6 sm:pt-10">
-        <Container className="max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-6 sm:gap-10 lg:grid-cols-2 items-start">
+    <div className="bg-white pb-16 sm:pb-24">
+      <Section className="pt-4 sm:pt-6 lg:pt-10">
+        <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
+          <div className="grid gap-4 sm:gap-6 lg:gap-10 lg:grid-cols-2 items-start">
             <div className="space-y-8 sm:space-y-16">
               <ProductGallery key={product.slug} product={product} />
             </div>
