@@ -50,6 +50,8 @@ export function CompatibleAccessories({
         setError(false);
         const supabase = createClient();
         
+        console.log(`[CompatibleAccessories] Fetching products for slugs:`, slugs, `(attempt ${retry + 1}/4)`);
+        
         const { data, error: fetchError } = await supabase
           .from('products')
           .select('id, slug, name, price, images, category')
@@ -59,25 +61,33 @@ export function CompatibleAccessories({
         if (cancelled) return;
 
         if (fetchError) {
-          console.error('Erreur chargement produits compatibles:', fetchError);
-          // Retry une fois après 1 seconde
-          if (retry < 2) {
-            setTimeout(() => fetchProducts(retry + 1), 1000);
+          console.error('[CompatibleAccessories] Fetch error:', fetchError);
+          // Retry up to 3 times with increasing delays
+          if (retry < 3) {
+            const delay = retry === 0 ? 1000 : retry === 1 ? 2000 : 3000;
+            console.log(`[CompatibleAccessories] Retrying in ${delay}ms...`);
+            setTimeout(() => fetchProducts(retry + 1), delay);
             return;
           }
+          console.error('[CompatibleAccessories] Max retries reached, showing error');
           setError(true);
         } else if (data && data.length > 0) {
+          console.log(`[CompatibleAccessories] Successfully loaded ${data.length} products`);
           setProducts(data);
           fetchedRef.current = slugsKey;
-        } else if (data && data.length === 0 && retry < 2) {
+        } else if (data && data.length === 0 && retry < 3) {
           // Parfois Supabase retourne un tableau vide transitoire, retry
-          setTimeout(() => fetchProducts(retry + 1), 500);
+          console.warn('[CompatibleAccessories] Empty result, retrying...');
+          setTimeout(() => fetchProducts(retry + 1), 1000);
           return;
+        } else {
+          console.warn('[CompatibleAccessories] No products found after retries');
         }
       } catch (err) {
-        console.error('Erreur chargement produits compatibles:', err);
-        if (!cancelled && retry < 2) {
-          setTimeout(() => fetchProducts(retry + 1), 1000);
+        console.error('[CompatibleAccessories] Exception:', err);
+        if (!cancelled && retry < 3) {
+          const delay = 1500;
+          setTimeout(() => fetchProducts(retry + 1), delay);
           return;
         }
         if (!cancelled) setError(true);

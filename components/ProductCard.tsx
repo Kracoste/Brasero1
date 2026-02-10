@@ -67,11 +67,12 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               src={image.src}
               alt={image.alt || product.name}
               fill
-              sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+              sizes="(max-width: 480px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
               placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}
               className="product-card__image-el"
               style={{
+                objectFit: 'contain',
                 transform: `scale(${(product.specs?.imageScale || 110) / 100})`,
               }}
             />

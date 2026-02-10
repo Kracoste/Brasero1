@@ -99,7 +99,7 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
           {products.map((product) => (
             <div
               key={product.slug}
-              className="flex-shrink-0 w-[calc(25%-15px)] min-w-[280px] snap-start"
+              className="flex-shrink-0 w-full sm:w-[calc(50%-10px)] md:w-[calc(33.333%-13px)] lg:w-[calc(25%-15px)] min-w-[260px] snap-start"
             >
               <ProductCard product={product} />
             </div>
