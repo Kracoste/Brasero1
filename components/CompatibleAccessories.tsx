@@ -121,7 +121,6 @@ export function CompatibleAccessories({
     fetchProducts();
     return () => { cancelled = true; };
   }, [slugsKey]);
-  }, [slugsKey]);
 
   const toggleProduct = useCallback((slug: string) => {
     setSelectedProducts(prev => {
