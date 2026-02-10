@@ -111,15 +111,31 @@ export default function LanguageSelector() {
     
     if (langCode === currentLang) return;
 
-    // Méthode directe et rapide : cookies + reload
-    clearGoogTransCookies();
+    // Vérifier que Google Translate est prêt
+    const selectEl = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (!selectEl) {
+      console.warn('[LanguageSelector] Google Translate not ready');
+      return;
+    }
+
+    // Méthode 1 : Utiliser directement le select de Google Translate
+    selectEl.value = langCode;
     
+    // Déclencher l'événement change pour que Google Translate réagisse
+    const event = new Event('change', { bubbles: true });
+    selectEl.dispatchEvent(event);
+    
+    // Méthode 2 : Forcer les cookies en parallèle pour la persistance
+    clearGoogTransCookies();
     if (langCode !== 'fr') {
       setGoogTransCookie(langCode);
     }
     
-    // Rechargement immédiat
-    window.location.reload();
+    // Mettre à jour l'état local immédiatement
+    setCurrentLang(langCode);
+    
+    // NE PAS RELOAD - laisser Google Translate gérer la transformation
+    // La page se rechargera naturellement quand Google Translate aura fini
   };
 
   const currentLanguage = languages.find(l => l.code === currentLang) || languages[0];

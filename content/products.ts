@@ -97,6 +97,7 @@ const rawProducts: Product[] = [
       epaisseur: "Bol 5 mm",
       dimensions: "Ø 60 cm x H 42 cm",
       poids: "48 kg",
+      compatibleAccessories: ["plancha-acier-80", "grille-inox-80", "pince-brasero-inox", "gants-cuir-resistant"],
     },
     highlights: [
       "Résiste naturellement à la corrosion",
@@ -187,6 +188,7 @@ const rawProducts: Product[] = [
       dimensions: "Ø 75 cm x H 38 cm",
       poids: "32 kg",
       compatibilite: "Anneau plancha 58 cm",
+      compatibleAccessories: ["plancha-acier-60", "grille-inox-60", "pince-brasero-inox", "gants-cuir-resistant"],
     },
     highlights: [
       "Pied tulipe ventilé",
@@ -270,6 +272,7 @@ const rawProducts: Product[] = [
       dimensions: "Ø 90 cm x H 45 cm",
       poids: "62 kg",
       compatibilite: "Anneau plancha 95 cm",
+      compatibleAccessories: ["plancha-acier-80", "grille-inox-80", "pince-brasero-inox", "gants-cuir-resistant"],
     },
     highlights: [
       "Rigole anti-retombées",
@@ -360,6 +363,7 @@ const rawProducts: Product[] = [
       dimensions: "Ø 105 cm x H 35 cm",
       poids: "24 kg",
       compatibilite: "Grille inox 50 cm",
+      compatibleAccessories: ["plancha-acier-60", "grille-inox-60", "pince-brasero-inox", "gants-cuir-resistant"],
     },
     highlights: [
       "Dessous ventilé",

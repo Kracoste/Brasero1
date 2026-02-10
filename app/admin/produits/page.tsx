@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Image as ImageIcon, Package, Database } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Image as ImageIcon, Package, Database, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 type Product = {
@@ -23,6 +23,8 @@ export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [cacheBuster, setCacheBuster] = useState(Date.now());
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -105,6 +107,36 @@ export default function AdminProducts() {
     }).format(amount);
   };
 
+  const handleSync = async () => {
+    if (!confirm('Synchroniser les produits depuis content/products.ts vers Supabase?\n\nCela mettra à jour les specs (compatibleAccessories) des produits existants.')) {
+      return;
+    }
+
+    setSyncing(true);
+    setSyncResult(null);
+
+    try {
+      const response = await fetch('/api/admin/sync-products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSyncResult(`✅ Sync réussie!\n- ${data.results.updated} produits mis à jour\n- ${data.results.inserted} produits insérés\n- ${data.results.skipped} ignorés\n${data.results.errors.length > 0 ? `- ${data.results.errors.length} erreurs` : ''}`);
+        // Refresh products list
+        fetchProducts();
+      } else {
+        setSyncResult(`❌ Erreur: ${data.error || 'Sync échouée'}`);
+      }
+    } catch (error) {
+      setSyncResult(`❌ Exception: ${error instanceof Error ? error.message : 'Unknown'}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
@@ -114,14 +146,36 @@ export default function AdminProducts() {
             Gérez votre catalogue ({products.length} produits)
           </p>
         </div>
-        <Link
-          href="/admin/produits/nouveau"
-          className="flex items-center justify-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition text-sm sm:text-base"
-        >
-          <Plus size={20} />
-          <span>Ajouter un produit</span>
-        </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Synchroniser les produits depuis content/products.ts vers Supabase"
+          >
+            <RefreshCw size={20} className={syncing ? 'animate-spin' : ''} />
+            <span>{syncing ? 'Sync...' : 'Sync DB'}</span>
+          </button>
+          <Link
+            href="/admin/produits/nouveau"
+            className="flex items-center justify-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition text-sm sm:text-base"
+          >
+            <Plus size={20} />
+            <span>Ajouter un produit</span>
+          </Link>
+        </div>
       </div>
+
+      {/* Sync Result */}
+      {syncResult && (
+        <div className={`mb-6 p-4 rounded-lg border ${
+          syncResult.startsWith('✅') 
+            ? 'bg-green-50 border-green-200 text-green-800' 
+            : 'bg-red-50 border-red-200 text-red-800'
+        }`}>
+          <pre className="text-sm whitespace-pre-wrap font-mono">{syncResult}</pre>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

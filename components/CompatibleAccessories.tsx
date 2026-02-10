@@ -28,6 +28,7 @@ export function CompatibleAccessories({
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [debug, setDebug] = useState<string>('');
   
   // Stabiliser la référence des slugs pour éviter les re-renders inutiles
   const slugsKey = useMemo(() => JSON.stringify([...compatibleSlugs].sort()), [compatibleSlugs]);
@@ -39,6 +40,7 @@ export function CompatibleAccessories({
     
     const slugs: string[] = JSON.parse(slugsKey);
     if (slugs.length === 0) {
+      setDebug('No compatible slugs provided');
       setLoading(false);
       return;
     }
@@ -48,9 +50,11 @@ export function CompatibleAccessories({
     const fetchProducts = async (retry = 0) => {
       try {
         setError(false);
+        setDebug(`Attempt ${retry + 1}/5 - Fetching slugs: ${slugs.join(', ')}`);
+        
         const supabase = createClient();
         
-        console.log(`[CompatibleAccessories] Fetching products for slugs:`, slugs, `(attempt ${retry + 1}/4)`);
+        console.log(`[CompatibleAccessories] Fetching products for slugs:`, slugs, `(attempt ${retry + 1}/5)`);
         
         const { data, error: fetchError } = await supabase
           .from('products')
@@ -62,35 +66,53 @@ export function CompatibleAccessories({
 
         if (fetchError) {
           console.error('[CompatibleAccessories] Fetch error:', fetchError);
-          // Retry up to 3 times with increasing delays
-          if (retry < 3) {
-            const delay = retry === 0 ? 1000 : retry === 1 ? 2000 : 3000;
+          setDebug(`Error: ${fetchError.message}`);
+          
+          // Retry up to 4 times with exponential backoff
+          if (retry < 4) {
+            const delay = Math.min(1000 * Math.pow(2, retry), 8000); // Max 8s
             console.log(`[CompatibleAccessories] Retrying in ${delay}ms...`);
+            setDebug(`Retrying in ${delay}ms... (${retry + 1}/5)`);
             setTimeout(() => fetchProducts(retry + 1), delay);
             return;
           }
+          
           console.error('[CompatibleAccessories] Max retries reached, showing error');
+          setDebug('Max retries reached - data not available');
           setError(true);
+          
         } else if (data && data.length > 0) {
           console.log(`[CompatibleAccessories] Successfully loaded ${data.length} products`);
+          setDebug(`Loaded ${data.length} products successfully`);
           setProducts(data);
           fetchedRef.current = slugsKey;
-        } else if (data && data.length === 0 && retry < 3) {
-          // Parfois Supabase retourne un tableau vide transitoire, retry
-          console.warn('[CompatibleAccessories] Empty result, retrying...');
-          setTimeout(() => fetchProducts(retry + 1), 1000);
-          return;
-        } else {
-          console.warn('[CompatibleAccessories] No products found after retries');
+          
+        } else if (data && data.length === 0) {
+          // Empty result - could be transient or data doesn't exist
+          if (retry < 4) {
+            console.warn('[CompatibleAccessories] Empty result, retrying...');
+            const delay = Math.min(1000 * Math.pow(2, retry), 8000);
+            setDebug(`Empty result, retrying in ${delay}ms... (${retry + 1}/5)`);
+            setTimeout(() => fetchProducts(retry + 1), delay);
+            return;
+          } else {
+            console.warn('[CompatibleAccessories] No products found after all retries');
+            setDebug(`No products found in database for slugs: ${slugs.join(', ')}`);
+          }
         }
+        
       } catch (err) {
         console.error('[CompatibleAccessories] Exception:', err);
-        if (!cancelled && retry < 3) {
-          const delay = 1500;
+        setDebug(`Exception: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        
+        if (!cancelled && retry < 4) {
+          const delay = Math.min(1500 * Math.pow(2, retry), 8000);
+          setDebug(`Exception, retrying in ${delay}ms... (${retry + 1}/5)`);
           setTimeout(() => fetchProducts(retry + 1), delay);
           return;
         }
         if (!cancelled) setError(true);
+        
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -98,6 +120,7 @@ export function CompatibleAccessories({
 
     fetchProducts();
     return () => { cancelled = true; };
+  }, [slugsKey]);
   }, [slugsKey]);
 
   const toggleProduct = useCallback((slug: string) => {
@@ -124,9 +147,14 @@ export function CompatibleAccessories({
     return (
       <div className="border border-slate-200 rounded-xl p-6 my-6">
         <h2 className="text-xl font-bold text-slate-900 mb-4">Produits compatibles</h2>
-        <div className="flex items-center gap-3">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700"></div>
-          <p className="text-slate-500">Chargement...</p>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700"></div>
+            <p className="text-slate-500">Chargement...</p>
+          </div>
+          {debug && process.env.NODE_ENV === 'development' && (
+            <p className="text-xs text-slate-400 font-mono">{debug}</p>
+          )}
         </div>
       </div>
     );
@@ -136,12 +164,31 @@ export function CompatibleAccessories({
     return (
       <div className="border border-slate-200 rounded-xl p-6 my-6">
         <h2 className="text-xl font-bold text-slate-900 mb-4">Produits compatibles</h2>
-        <p className="text-red-500 text-sm">Impossible de charger les produits. Rechargez la page.</p>
+        <div className="space-y-2">
+          <p className="text-red-500 text-sm">Impossible de charger les produits.</p>
+          {debug && (
+            <details className="text-xs text-slate-500">
+              <summary className="cursor-pointer hover:text-slate-700">Voir les détails</summary>
+              <pre className="mt-2 p-2 bg-slate-50 rounded font-mono overflow-x-auto">{debug}</pre>
+            </details>
+          )}
+        </div>
       </div>
     );
   }
 
   if (products.length === 0) {
+    // Don't show anything if no products found - they may not be set up yet
+    if (debug && process.env.NODE_ENV === 'development') {
+      return (
+        <div className="border border-slate-200 rounded-xl p-4 my-6 bg-slate-50">
+          <p className="text-xs text-slate-500">
+            <strong>Dev Info:</strong> No compatible accessories configured for this product.
+          </p>
+          <p className="text-xs text-slate-400 mt-1">{debug}</p>
+        </div>
+      );
+    }
     return null;
   }
 
