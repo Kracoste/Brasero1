@@ -94,24 +94,38 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Vérifier les colonnes de la table orders
+  // Vérifier TOUTES les colonnes que le webhook essaie d'insérer
   if (supabase) {
-    try {
-      const { data, error } = await supabase.rpc('to_jsonb', {}).maybeSingle();
-      // Fallback: essayer d'insérer et voir les colonnes
-    } catch {}
+    const columnsToCheck = [
+      'user_id', 'stripe_session_id', 'stripe_payment_intent', 'status',
+      'total_amount', 'currency', 'customer_email', 'customer_name', 'customer_phone',
+      'shipping_address', 'shipping_address_line2', 'shipping_postal_code',
+      'shipping_city', 'shipping_country', 'delivery_message',
+      'items', 'confirmation_email_sent', 'tracking_number', 'carrier',
+      'shipped_at', 'delivered_at', 'internal_notes', 'shipping_email_sent'
+    ];
 
-    // Vérifier que les colonnes nécessaires existent en faisant un select
-    try {
-      const { error: colErr } = await supabase
-        .from('orders')
-        .select('shipping_address, shipping_address_line2, shipping_postal_code, shipping_city, shipping_country, delivery_message, items, confirmation_email_sent')
-        .limit(1);
-      checks.orders_columns_ok = !colErr;
-      checks.orders_columns_error = colErr?.message || null;
-    } catch (e) {
-      checks.orders_columns_error = e instanceof Error ? e.message : 'Unknown';
+    const missingColumns: string[] = [];
+    const existingColumns: string[] = [];
+
+    for (const col of columnsToCheck) {
+      try {
+        const { error } = await supabase
+          .from('orders')
+          .select(col)
+          .limit(1);
+        if (error) {
+          missingColumns.push(col);
+        } else {
+          existingColumns.push(col);
+        }
+      } catch {
+        missingColumns.push(col);
+      }
     }
+
+    checks.orders_existing_columns = existingColumns;
+    checks.orders_missing_columns = missingColumns;
   }
 
   return NextResponse.json(checks, {
