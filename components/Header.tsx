@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useRef, useState } from 'react';
-import { Heart, Menu, ShoppingBag, User, X, LogOut } from 'lucide-react';
+import { Heart, Menu, Package, ShoppingBag, User, X, LogOut } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { navLinks } from '@/components/navigation';
@@ -144,6 +144,14 @@ export const Header = () => {
               <span className="hidden md:block text-[8px] sm:text-[9px] uppercase tracking-wide mt-0.5">Favoris</span>
             </Link>
 
+            {/* Commandes - visible seulement quand connecté */}
+            {user && (
+              <Link href="/mon-compte/commandes" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
+                <Package className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
+                <span className="hidden md:block text-[8px] sm:text-[9px] uppercase tracking-wide mt-0.5">Commandes</span>
+              </Link>
+            )}
+
             {/* Mon Compte */}
             <div 
               className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition relative cursor-pointer min-w-[40px]"
@@ -279,6 +287,14 @@ export const Header = () => {
             )}
             {user ? (
               <>
+                <Link
+                  href="/mon-compte/commandes"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-center text-sm font-semibold text-amber-700 flex items-center justify-center gap-2"
+                >
+                  <Package size={16} />
+                  Mes commandes
+                </Link>
                 <Link
                   href="/mon-compte"
                   onClick={() => setOpen(false)}

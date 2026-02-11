@@ -7,8 +7,6 @@ import { ProfileForm } from '@/components/ProfileForm';
 import { useAuth } from '@/lib/auth-context';
 import { AUTH_ROUTES } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/client';
-import Link from 'next/link';
-import { Package, User, ChevronRight } from 'lucide-react';
 
 export default function MonComptePage() {
   const { user, isLoading } = useAuth();
@@ -29,12 +27,15 @@ export default function MonComptePage() {
       
       try {
         const supabase = createClient();
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
         
+        if (error) {
+          console.error('Erreur chargement profil:', error);
+        }
         setProfile(data);
       } catch (error) {
         console.error('Erreur chargement profil:', error);
@@ -45,8 +46,10 @@ export default function MonComptePage() {
 
     if (user) {
       loadProfile();
+    } else if (!isLoading) {
+      setProfileLoading(false);
     }
-  }, [user]);
+  }, [user, isLoading]);
 
   // Loading state
   if (isLoading || !user) {
@@ -66,39 +69,8 @@ export default function MonComptePage() {
     <Section className="py-24">
       <Container className="max-w-3xl">
         <div>
-          <h1 className="font-display text-3xl font-semibold text-slate-900">Mon compte</h1>
+          <h1 className="font-display text-3xl font-semibold text-slate-900">Mon profil</h1>
           <p className="mt-2 text-slate-600">Gérez vos informations personnelles</p>
-        </div>
-
-        {/* Navigation rapide */}
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <Link
-            href="/mon-compte/commandes"
-            className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-sm transition-all"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-                <Package className="h-5 w-5 text-amber-700" />
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900">Mes commandes</p>
-                <p className="text-sm text-slate-500">Suivi et historique</p>
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 text-slate-400" />
-          </Link>
-
-          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-                <User className="h-5 w-5 text-slate-700" />
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900">Mes informations</p>
-                <p className="text-sm text-slate-500">Profil et coordonnées</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="mt-8">
