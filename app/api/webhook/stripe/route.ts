@@ -2,205 +2,236 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe, hasStripeCredentials } from "@/lib/stripe";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
-import { devLog, devError } from "@/lib/supabase/utils";
 import { sendOrderConfirmationEmail, sendAdminOrderNotification } from "@/lib/email";
 
 export const runtime = "nodejs";
 
+function log(...args: unknown[]) {
+  console.log("[WEBHOOK]", ...args);
+}
+function logError(...args: unknown[]) {
+  console.error("[WEBHOOK ERROR]", ...args);
+}
+
 /**
- * Petit ping pour éviter les 500 quand tu testes dans le navigateur / curl
+ * GET → diagnostic / replay manuel
+ * Usage: /api/webhook/stripe?action=replay-last
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const action = request.nextUrl.searchParams.get("action");
+
+  if (action === "replay-last") {
+    if (!stripe) {
+      return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
+    }
+
+    try {
+      const events = await stripe.events.list({
+        type: "checkout.session.completed",
+        limit: 1,
+      });
+
+      if (events.data.length === 0) {
+        return NextResponse.json({ error: "Aucun événement checkout.session.completed trouvé" });
+      }
+
+      const event = events.data[0];
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      log("=== REPLAY MANUEL ===");
+      log("Event ID:", event.id);
+      log("Session ID:", session.id);
+
+      const result = await handleCheckoutCompleted(session);
+
+      return NextResponse.json({
+        replayed: true,
+        event_id: event.id,
+        session_id: session.id,
+        created: new Date(event.created * 1000).toISOString(),
+        result,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.stack || err.message : String(err);
+      logError("Replay failed:", msg);
+      return NextResponse.json({ error: msg }, { status: 500 });
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }
 
 export async function POST(request: NextRequest) {
+  log("=== WEBHOOK POST REÇU ===");
+
   if (!hasStripeCredentials() || !stripe) {
-    return NextResponse.json(
-      { error: "Stripe not configured" },
-      { status: 503 }
-    );
+    logError("Stripe non configuré");
+    return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
   }
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = request.headers.get("stripe-signature");
 
   if (!webhookSecret) {
-    devError("Missing STRIPE_WEBHOOK_SECRET in env");
-    return NextResponse.json(
-      { error: "Missing STRIPE_WEBHOOK_SECRET" },
-      { status: 500 }
-    );
+    logError("STRIPE_WEBHOOK_SECRET manquant");
+    return NextResponse.json({ error: "Missing STRIPE_WEBHOOK_SECRET" }, { status: 500 });
   }
 
   if (!signature) {
-    devError("Missing stripe-signature header");
-    return NextResponse.json(
-      { error: "Missing stripe-signature" },
-      { status: 400 }
-    );
+    logError("stripe-signature header manquant");
+    return NextResponse.json({ error: "Missing stripe-signature" }, { status: 400 });
   }
 
-  // IMPORTANT: raw body
   const body = await request.text();
+  log("Body length:", body.length);
 
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    log("Signature OK ✅ - Event:", event.type, "ID:", event.id);
   } catch (err) {
-    devError("Webhook signature verification failed:", err);
-    return NextResponse.json(
-      { error: "Invalid webhook signature" },
-      { status: 400 }
-    );
+    const msg = err instanceof Error ? err.message : String(err);
+    logError("❌ Signature échouée:", msg);
+    return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
   }
 
-  try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        await handleCheckoutCompleted(session);
-        break;
-      }
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    log("🛒 checkout.session.completed - Session:", session.id);
 
-      case "payment_intent.succeeded": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        devLog("Paiement réussi:", paymentIntent.id);
-        break;
-      }
-
-      case "payment_intent.payment_failed": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        devLog("Paiement échoué:", paymentIntent.id);
-        break;
-      }
-
-      default:
-        devLog(`Événement non géré: ${event.type}`);
+    try {
+      const result = await handleCheckoutCompleted(session);
+      log("✅ Traitement terminé:", JSON.stringify(result));
+    } catch (err) {
+      const msg = err instanceof Error ? err.stack || err.message : String(err);
+      logError("❌ Erreur traitement checkout:", msg);
+      return NextResponse.json({ received: true, error: msg });
     }
-  } catch (err) {
-    devError("Error handling webhook event:", err);
-    // On répond 200 quand même dans certains cas pour éviter retries infinis,
-    // mais en dev on peut renvoyer 500 pour voir l’erreur.
-    return NextResponse.json(
-      { error: "Webhook handler error" },
-      { status: 500 }
-    );
+  } else {
+    log("Événement ignoré:", event.type);
   }
 
   return NextResponse.json({ received: true });
 }
 
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  if (!stripe) {
-    devError("Stripe client non configuré");
-    return;
-  }
+async function handleCheckoutCompleted(
+  session: Stripe.Checkout.Session
+): Promise<Record<string, unknown>> {
+  const result: Record<string, unknown> = { steps: [] };
+  const steps = result.steps as string[];
+
+  if (!stripe) throw new Error("Stripe client non disponible");
 
   const supabase = getSupabaseAdminClient();
-  if (!supabase) {
-    devError("Supabase admin client non configuré");
-    return;
-  }
+  if (!supabase) throw new Error("Supabase admin client non disponible");
+  steps.push("clients_ok");
 
   const metadata = session.metadata || {};
+  log("Metadata:", JSON.stringify(metadata));
+  log("Session email:", session.customer_email);
+  log("Session customer_details:", JSON.stringify(session.customer_details));
+  log("Session amount:", session.amount_total);
+  log("Payment intent:", session.payment_intent);
+  steps.push("metadata_ok");
 
+  // Récupérer les line items
+  let lineItems: Stripe.ApiList<Stripe.LineItem>;
   try {
-    // Récupérer les détails de la session
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+    lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
       expand: ["data.price.product"],
     });
+    log("Line items count:", lineItems.data.length);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logError("Erreur listLineItems:", msg);
+    throw new Error("listLineItems failed: " + msg);
+  }
+  steps.push("line_items_ok");
 
-    // Préparer les articles de la commande
-    const orderItems = lineItems.data.map((item) => {
-      const product = item.price?.product as Stripe.Product | string | null;
+  // Préparer les articles
+  const orderItems = lineItems.data.map((item) => {
+    const product = item.price?.product as Stripe.Product | string | null;
+    const slug =
+      product && typeof product !== "string"
+        ? product.metadata?.slug || ""
+        : "";
+    const qty = item.quantity || 1;
+    const amountTotal = item.amount_total || 0;
 
-      const slug =
-        product && typeof product !== "string"
-          ? product.metadata?.slug || ""
-          : "";
+    return {
+      product_name: item.description || "Produit",
+      product_slug: slug,
+      quantity: qty,
+      unit_price: qty ? amountTotal / qty / 100 : amountTotal / 100,
+      total_price: amountTotal / 100,
+    };
+  });
+  log("Order items:", JSON.stringify(orderItems));
+  steps.push("items_prepared");
 
-      const qty = item.quantity || 1;
-      const amountTotal = item.amount_total || 0;
+  // Vérifier doublon
+  const { data: existingOrder } = await supabase
+    .from("orders")
+    .select("id")
+    .eq("stripe_session_id", session.id)
+    .maybeSingle();
 
-      return {
-        product_name: item.description || "Produit",
-        product_slug: slug,
-        quantity: qty,
-        unit_price: qty ? amountTotal / qty / 100 : amountTotal / 100,
-        total_price: amountTotal / 100,
-      };
-    });
+  if (existingOrder) {
+    log("⚠️ Commande déjà existante:", existingOrder.id);
+    result.order_id = existingOrder.id;
+    result.already_exists = true;
+    return result;
+  }
+  steps.push("no_duplicate");
 
-    // Créer la commande dans Supabase
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        user_id: metadata.user_id && metadata.user_id !== "guest" ? metadata.user_id : null,
-        stripe_session_id: session.id,
-        stripe_payment_intent: session.payment_intent as string,
-        status: "pending",
-        total_amount: (session.amount_total || 0) / 100,
-        currency: session.currency || "eur",
-        customer_email: session.customer_email || session.customer_details?.email,
-        customer_name: metadata.customer_name || session.customer_details?.name,
-        customer_phone: metadata.customer_phone || session.customer_details?.phone,
+  // Créer la commande
+  const orderData = {
+    user_id: metadata.user_id && metadata.user_id !== "guest" ? metadata.user_id : null,
+    stripe_session_id: session.id,
+    stripe_payment_intent: typeof session.payment_intent === "string" ? session.payment_intent : null,
+    status: "pending",
+    total_amount: (session.amount_total || 0) / 100,
+    currency: session.currency || "eur",
+    customer_email: session.customer_email || session.customer_details?.email || null,
+    customer_name: metadata.customer_name || session.customer_details?.name || null,
+    customer_phone: metadata.customer_phone || session.customer_details?.phone || null,
+    shipping_address: metadata.shipping_address || null,
+    shipping_address_line2: metadata.shipping_address_line2 || null,
+    shipping_postal_code: metadata.shipping_postal_code || null,
+    shipping_city: metadata.shipping_city || null,
+    shipping_country: metadata.shipping_country || null,
+    delivery_message: metadata.delivery_message || null,
+    items: orderItems,
+  };
 
-        // ⚠️ Ces champs dépendent de ton schéma Supabase
-        shipping_address: metadata.shipping_address,
-        shipping_address_line2: metadata.shipping_address_line2,
-        shipping_postal_code: metadata.shipping_postal_code,
-        shipping_city: metadata.shipping_city,
-        shipping_country: metadata.shipping_country,
-        delivery_message: metadata.delivery_message,
+  log("Insert order data:", JSON.stringify(orderData));
 
-        items: orderItems,
-      })
-      .select()
-      .single();
+  const { data: order, error: orderError } = await supabase
+    .from("orders")
+    .insert(orderData)
+    .select()
+    .single();
 
-    if (orderError) {
-      devError("Erreur création commande:", orderError);
-      return;
-    }
+  if (orderError) {
+    logError("❌ Insert order failed:", JSON.stringify(orderError));
+    result.order_error = orderError;
+    throw new Error("Insert order: " + orderError.message + " (code: " + orderError.code + ", details: " + orderError.details + ")");
+  }
 
-    devLog("Commande créée:", order.id);
+  log("✅ Commande créée:", order.id);
+  result.order_id = order.id;
+  steps.push("order_created");
 
-    // Décrémenter le stock pour chaque produit (non bloquant)
-    try {
-      for (const item of orderItems) {
-        if (item.product_slug) {
-          const { data: product } = await supabase
-            .from('products')
-            .select('id')
-            .eq('slug', item.product_slug)
-            .single();
+  // Envoyer les emails
+  const customerEmail = order.customer_email || session.customer_details?.email || "";
 
-          if (product) {
-            const { error: stockError } = await supabase.rpc('decrement_stock', {
-              p_product_id: product.id,
-              p_quantity: item.quantity,
-            });
-            if (stockError) {
-              devError(`Erreur stock ${item.product_slug}:`, stockError);
-            } else {
-              devLog(`Stock décrémenté: ${item.product_slug} (-${item.quantity})`);
-            }
-          }
-        }
-      }
-    } catch (stockErr) {
-      devError("Erreur décrémentation stock (non bloquant):", stockErr);
-    }
-
-    // Envoyer l'email de confirmation au client
-    const customerEmail = order.customer_email || session.customer_details?.email || '';
+  if (customerEmail) {
     const emailData = {
       orderNumber: order.id.slice(0, 8).toUpperCase(),
-      customerName: order.customer_name || session.customer_details?.name || 'Client',
+      customerName: order.customer_name || session.customer_details?.name || "Client",
       customerEmail,
       totalAmount: order.total_amount,
-      items: orderItems.map(item => ({
+      items: orderItems.map((item) => ({
         name: item.product_name,
         quantity: item.quantity,
         price: item.unit_price,
@@ -208,58 +239,67 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       shippingAddress: [
         metadata.shipping_address,
         metadata.shipping_address_line2,
-        `${metadata.shipping_postal_code} ${metadata.shipping_city}`,
+        ((metadata.shipping_postal_code || "") + " " + (metadata.shipping_city || "")).trim(),
         metadata.shipping_country,
-      ].filter(Boolean).join(', '),
+      ]
+        .filter(Boolean)
+        .join(", "),
     };
 
-    // Envoyer email confirmation client (non bloquant)
-    if (customerEmail) {
-      try {
-        devLog("Envoi email confirmation à:", customerEmail);
-        const emailResult = await sendOrderConfirmationEmail(emailData, supabase, order.id, metadata.user_id);
-        devLog("Résultat email confirmation:", emailResult);
-
-        if (emailResult.success) {
-          try {
-            await supabase
-              .from('orders')
-              .update({ confirmation_email_sent: true })
-              .eq('id', order.id);
-          } catch {
-            // Ignorer si la colonne n'existe pas encore
-          }
-        }
-      } catch (emailErr) {
-        devError("Erreur envoi email confirmation (non bloquant):", emailErr);
-      }
-    } else {
-      devError("Pas d'email client disponible pour la commande:", order.id);
-    }
-
-    // Envoyer notification admin (non bloquant)
     try {
-      devLog("Envoi notification admin");
-      const adminResult = await sendAdminOrderNotification(emailData, supabase, order.id);
-      devLog("Résultat notification admin:", adminResult);
-    } catch (adminErr) {
-      devError("Erreur notification admin (non bloquant):", adminErr);
+      log("Envoi email confirmation à:", customerEmail);
+      const emailResult = await sendOrderConfirmationEmail(emailData, supabase, order.id, metadata.user_id);
+      log("Résultat email client:", JSON.stringify(emailResult));
+      result.email_client = emailResult;
+
+      if (emailResult.success) {
+        await supabase
+          .from("orders")
+          .update({ confirmation_email_sent: true })
+          .eq("id", order.id);
+      }
+    } catch (emailErr) {
+      const msg = emailErr instanceof Error ? emailErr.message : String(emailErr);
+      logError("Erreur email client (non bloquant):", msg);
+      result.email_client_error = msg;
     }
 
-    // Vider le panier de l'utilisateur s'il est connecté
-    if (metadata.user_id && metadata.user_id !== "guest") {
+    try {
+      log("Envoi notification admin");
+      const adminResult = await sendAdminOrderNotification(emailData, supabase, order.id);
+      log("Résultat email admin:", JSON.stringify(adminResult));
+      result.email_admin = adminResult;
+    } catch (adminErr) {
+      const msg = adminErr instanceof Error ? adminErr.message : String(adminErr);
+      logError("Erreur email admin (non bloquant):", msg);
+      result.email_admin_error = msg;
+    }
+
+    steps.push("emails_sent");
+  } else {
+    log("⚠️ Pas d'email client disponible");
+    result.email_skipped = true;
+  }
+
+  // Vider le panier
+  if (metadata.user_id && metadata.user_id !== "guest") {
+    try {
       const { data: cart } = await supabase
         .from("cart")
         .select("id")
         .eq("user_id", metadata.user_id)
-        .single();
+        .maybeSingle();
 
       if (cart) {
         await supabase.from("cart_items").delete().eq("cart_id", cart.id);
-        devLog("Panier vidé pour utilisateur:", metadata.user_id);
+        log("Panier vidé pour:", metadata.user_id);
+        steps.push("cart_cleared");
       }
+    } catch (cartErr) {
+      logError("Erreur vidage panier (non bloquant):", cartErr);
     }
-  } catch (error) {
-    devError("Erreur traitement webhook:", error);
   }
+
+  result.success = true;
+  return result;
 }
