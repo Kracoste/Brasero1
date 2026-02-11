@@ -38,19 +38,8 @@ function ConnexionPageContent() {
     hasRedirected.current = true;
     setIsRedirecting(true);
     
-    // Force redirect direct
     const finalTarget = getRedirectTarget(target);
-    
-    // En production, forcer www pour la cohérence des cookies
-    let redirectUrl = finalTarget;
-    if (typeof window !== 'undefined') {
-      const currentHost = window.location.host;
-      if (currentHost === 'atelier-lbf.fr') {
-        redirectUrl = `https://www.atelier-lbf.fr${finalTarget}`;
-      }
-    }
-    
-    window.location.href = redirectUrl;
+    window.location.href = finalTarget;
   }, [getRedirectTarget]);
 
   // Rediriger si déjà connecté
@@ -125,18 +114,8 @@ function ConnexionPageContent() {
         await new Promise(resolve => setTimeout(resolve, 200));
       }
 
-      // Construire l'URL de redirection complète
-      // En production, forcer www pour la cohérence des cookies
-      let redirectUrl = finalTarget;
-      if (typeof window !== 'undefined') {
-        const currentHost = window.location.host;
-        if (currentHost === 'atelier-lbf.fr') {
-          redirectUrl = `https://www.atelier-lbf.fr${finalTarget}`;
-        }
-      }
-
       // Redirection directe
-      window.location.href = redirectUrl;
+      window.location.href = finalTarget;
       
     } catch (error: any) {
       setError(error?.message || 'Une erreur est survenue');
