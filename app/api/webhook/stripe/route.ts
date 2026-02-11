@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { stripe, hasStripeCredentials } from "@/lib/stripe";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { devLog, devError } from "@/lib/supabase/utils";
+import { sendOrderConfirmationEmail, sendAdminOrderNotification } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -138,7 +139,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         user_id: metadata.user_id && metadata.user_id !== "guest" ? metadata.user_id : null,
         stripe_session_id: session.id,
         stripe_payment_intent: session.payment_intent as string,
-        status: "confirmed",
+        status: "pending",
         total_amount: (session.amount_total || 0) / 100,
         currency: session.currency || "eur",
         customer_email: session.customer_email || session.customer_details?.email,
@@ -164,6 +165,57 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     devLog("Commande créée:", order.id);
+
+    // Décrémenter le stock pour chaque produit
+    for (const item of orderItems) {
+      if (item.product_slug) {
+        // Récupérer le product_id depuis le slug
+        const { data: product } = await supabase
+          .from('products')
+          .select('id')
+          .eq('slug', item.product_slug)
+          .single();
+
+        if (product) {
+          // Décrémenter le stock via la fonction SQL
+          await supabase.rpc('decrement_stock', {
+            p_product_id: product.id,
+            p_quantity: item.quantity,
+          });
+          devLog(`Stock décrémenté: ${item.product_slug} (-${item.quantity})`);
+        }
+      }
+    }
+
+    // Envoyer l'email de confirmation au client
+    const emailData = {
+      orderNumber: order.id.slice(0, 8).toUpperCase(),
+      customerName: order.customer_name || 'Client',
+      customerEmail: order.customer_email || '',
+      totalAmount: order.total_amount,
+      items: orderItems.map(item => ({
+        name: item.product_name,
+        quantity: item.quantity,
+        price: item.unit_price,
+      })),
+      shippingAddress: [
+        metadata.shipping_address,
+        metadata.shipping_address_line2,
+        `${metadata.shipping_postal_code} ${metadata.shipping_city}`,
+        metadata.shipping_country,
+      ].filter(Boolean).join(', '),
+    };
+
+    await sendOrderConfirmationEmail(emailData, supabase, order.id, metadata.user_id);
+    
+    // Marquer l'email comme envoyé
+    await supabase
+      .from('orders')
+      .update({ confirmation_email_sent: true })
+      .eq('id', order.id);
+
+    // Envoyer notification admin
+    await sendAdminOrderNotification(emailData, supabase, order.id);
 
     // Vider le panier de l'utilisateur s'il est connecté
     if (metadata.user_id && metadata.user_id !== "guest") {
