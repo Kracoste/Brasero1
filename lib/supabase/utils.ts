@@ -13,10 +13,7 @@ export function getCookieDomain(hostname: string): string | undefined {
   if (hostname.includes('atelier-lbf.fr')) {
     return '.atelier-lbf.fr';
   }
-  // Pour brasero-atelier.fr
-  if (hostname.includes('brasero-atelier.fr')) {
-    return '.brasero-atelier.fr';
-  }
+
   return undefined;
 }
 

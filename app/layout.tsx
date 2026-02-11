@@ -22,7 +22,7 @@ const displayFont = Space_Grotesk({
   variable: "--font-display-variable",
 });
 
-const baseUrl = new URL("https://brasero-atelier.fr");
+const baseUrl = new URL("https://www.atelier-lbf.fr");
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();

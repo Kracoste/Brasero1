@@ -8,7 +8,7 @@ export const resend = process.env.RESEND_API_KEY
 export const hasResendCredentials = () => !!process.env.RESEND_API_KEY;
 
 // Email par défaut pour l'envoi
-export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@brasero-atelier.fr';
+export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@atelier-lbf.fr';
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'atelier-lbf@outlook.com';
 
 // Types d'emails
@@ -247,7 +247,7 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
       
       <!-- CTA Button -->
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://brasero-atelier.fr/mon-compte/commandes" 
+        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
            style="display: inline-block; padding: 14px 32px; background-color: #8B4513; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
           Suivre ma commande
         </a>
@@ -318,7 +318,7 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
       </p>
       
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://brasero-atelier.fr/mon-compte/commandes" 
+        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
            style="display: inline-block; padding: 14px 32px; background-color: #10b981; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
           Voir ma commande
         </a>
@@ -360,7 +360,7 @@ function generateAdminOrderNotificationHTML(order: OrderEmailData): string {
   ${order.shippingAddress ? `<p><strong>Adresse:</strong><br>${order.shippingAddress}</p>` : ''}
   
   <p style="margin-top: 30px;">
-    <a href="https://brasero-atelier.fr/admin/commandes" 
+    <a href="https://www.atelier-lbf.fr/admin/commandes" 
        style="display: inline-block; padding: 12px 24px; background-color: #8B4513; color: white; text-decoration: none; border-radius: 4px;">
       Voir dans l'admin
     </a>

@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://brasero-atelier.fr';
+  const baseUrl = 'https://www.atelier-lbf.fr';
   const supabase = await createClient();
 
   // Récupérer tous les produits
