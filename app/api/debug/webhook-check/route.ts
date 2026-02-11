@@ -1,14 +1,50 @@
-import { NextResponse } from 'next/server';
-import { hasStripeCredentials } from '@/lib/stripe';
+import { NextRequest, NextResponse } from 'next/server';
+import { hasStripeCredentials, stripe } from '@/lib/stripe';
 import { hasResendCredentials, FROM_EMAIL, ADMIN_EMAIL, resend } from '@/lib/email';
 import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = getSupabaseAdminClient();
+  const action = request.nextUrl.searchParams.get('action');
 
-  // Vérifier les variables d'environnement
+  // Action: test-email → envoyer un email test
+  if (action === 'test-email') {
+    if (!resend) {
+      return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    }
+    try {
+      const { data, error } = await resend.emails.send({
+        from: FROM_EMAIL,
+        to: ADMIN_EMAIL,
+        subject: '✅ Test email Atelier LBF - ' + new Date().toLocaleString('fr-FR'),
+        html: '<h1>Test réussi !</h1><p>Si vous lisez ceci, les emails fonctionnent.</p>',
+      });
+      return NextResponse.json({ success: !error, data, error: error?.message || null });
+    } catch (e) {
+      return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown error' }, { status: 500 });
+    }
+  }
+
+  // Action: check-stripe-webhooks → vérifier les événements récents
+  if (action === 'check-stripe' && stripe) {
+    try {
+      const events = await stripe.events.list({ limit: 5 });
+      return NextResponse.json({
+        recent_events: events.data.map(e => ({
+          id: e.id,
+          type: e.type,
+          created: new Date(e.created * 1000).toISOString(),
+          livemode: e.livemode,
+        })),
+      });
+    } catch (e) {
+      return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown error' }, { status: 500 });
+    }
+  }
+
+  // Default: diagnostic complet
   const checks: Record<string, unknown> = {
     stripe_configured: hasStripeCredentials(),
     stripe_webhook_secret_set: !!process.env.STRIPE_WEBHOOK_SECRET,
@@ -20,7 +56,6 @@ export async function GET() {
     supabase_admin_configured: hasSupabaseAdminCredentials(),
   };
 
-  // Vérifier si la table orders existe et compter les commandes
   if (supabase) {
     try {
       const { data: orders, error: ordersErr } = await supabase
@@ -44,7 +79,6 @@ export async function GET() {
       checks.orders_error = e instanceof Error ? e.message : 'Unknown error';
     }
 
-    // Vérifier la table email_logs
     try {
       const { data: emailLogs, error: emailErr } = await supabase
         .from('email_logs')
@@ -60,13 +94,23 @@ export async function GET() {
     }
   }
 
-  // Tester Resend (sans envoyer d'email)
-  if (resend) {
+  // Vérifier les colonnes de la table orders
+  if (supabase) {
     try {
-      // Juste vérifier que le client est initialisé
-      checks.resend_client_initialized = true;
-    } catch {
-      checks.resend_client_initialized = false;
+      const { data, error } = await supabase.rpc('to_jsonb', {}).maybeSingle();
+      // Fallback: essayer d'insérer et voir les colonnes
+    } catch {}
+
+    // Vérifier que les colonnes nécessaires existent en faisant un select
+    try {
+      const { error: colErr } = await supabase
+        .from('orders')
+        .select('shipping_address, shipping_address_line2, shipping_postal_code, shipping_city, shipping_country, delivery_message, items, confirmation_email_sent')
+        .limit(1);
+      checks.orders_columns_ok = !colErr;
+      checks.orders_columns_error = colErr?.message || null;
+    } catch (e) {
+      checks.orders_columns_error = e instanceof Error ? e.message : 'Unknown';
     }
   }
 
