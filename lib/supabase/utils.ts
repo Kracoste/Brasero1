@@ -121,16 +121,13 @@ export function sanitizeProductData(data: Record<string, unknown>): Record<strin
 }
 
 /**
- * Logger conditionnel - n'affiche les logs qu'en développement
+ * Logger - affiche les logs en dev et en prod
+ * En prod les logs sont visibles dans Vercel Functions logs
  */
 export function devLog(...args: unknown[]): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(...args);
-  }
+  console.log('[App]', ...args);
 }
 
 export function devError(...args: unknown[]): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.error(...args);
-  }
+  console.error('[App Error]', ...args);
 }

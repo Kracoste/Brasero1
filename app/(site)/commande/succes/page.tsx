@@ -20,9 +20,12 @@ function SuccessPageContent() {
   } | null>(null);
   const { clearCart } = useCart();
   const { trackPurchase } = useAnalytics();
-  const hasTrackedPurchase = useRef(false);
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
+
     // Vider le panier local après un paiement réussi
     clearCart();
 
@@ -38,20 +41,17 @@ function SuccessPageContent() {
               itemsCount: data.itemsCount || 1,
             });
             
-            // Tracker l'achat une seule fois
-            if (!hasTrackedPurchase.current) {
-              hasTrackedPurchase.current = true;
-              trackPurchase({
-                orderId: sessionId,
-                total: data.amount / 100, // Convertir de centimes à euros
-                itemsCount: data.itemsCount || 1,
-              });
-            }
+            trackPurchase({
+              orderId: sessionId,
+              total: data.amount / 100,
+              itemsCount: data.itemsCount || 1,
+            });
           }
         })
         .catch(console.error);
     }
-  }, [sessionId, clearCart, trackPurchase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
 
   return (
     <Section className="py-24">

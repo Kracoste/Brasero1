@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     // Déterminer l'URL de base
-    const origin = request.headers.get('origin') || 'https://atelier-lbf.fr';
+    const origin = request.headers.get('origin') || 'https://www.atelier-lbf.fr';
 
     const productSlugs = Array.from(new Set(normalizedItems.map((item) => item.slug)));
     const productClient = getSupabaseAdminClient() ?? supabase;
