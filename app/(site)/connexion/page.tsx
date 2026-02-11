@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'rea
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail, AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 
 function ConnexionPageContent() {
@@ -14,6 +14,7 @@ function ConnexionPageContent() {
   const [loading, setLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { user, isAdmin, isLoading: authLoading, refreshUser } = useAuth();
   const hasRedirected = useRef(false);
   const supabase = useMemo(() => createClient(), []);
@@ -32,36 +33,23 @@ function ConnexionPageContent() {
     return redirectFromQuery;
   }, [searchParams]);
 
-  // Effectuer la redirection de manière impérative
-  const performRedirect = useCallback((target: string) => {
-    if (hasRedirected.current) return;
-    hasRedirected.current = true;
-    setIsRedirecting(true);
-    
-    const finalTarget = getRedirectTarget(target);
-    window.location.href = finalTarget;
-  }, [getRedirectTarget]);
-
-  // Rediriger si déjà connecté
-  // On redirige seulement si l'utilisateur arrive directement sur /connexion sans redirectTo
+  // Rediriger si déjà connecté (sans redirectTo = visite directe sur /connexion)
   useEffect(() => {
     if (authLoading) return;
     if (!user) return;
     if (hasRedirected.current) return;
     
-    // Vérifier s'il y a un redirectTo valide
     const redirectTarget = searchParams?.get(REDIRECT_PARAM);
     
-    // Si pas de redirectTo, on peut rediriger automatiquement
-    // (l'utilisateur est allé sur /connexion alors qu'il est déjà connecté)
     if (!redirectTarget) {
+      hasRedirected.current = true;
+      setIsRedirecting(true);
       const isAdminUser = isAdmin || isAdminEmail(user.email);
       const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
-      performRedirect(target);
+      router.push(target);
     }
-    // Si redirectTo est présent, l'utilisateur doit se reconnecter manuellement
-    // car sa session serveur n'est pas reconnue
-  }, [authLoading, user, isAdmin, performRedirect, searchParams]);
+    // Si redirectTo est présent, on attend que l'utilisateur se connecte
+  }, [authLoading, user, isAdmin, router, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +70,7 @@ function ConnexionPageContent() {
         throw new Error('Connexion échouée - pas de session');
       }
 
-      // Rafraîchir l'auth context pour mettre à jour le cache
+      // Rafraîchir l'auth context pour mettre à jour le cache global
       await refreshUser();
 
       // Marquer la redirection immédiatement
@@ -94,32 +82,17 @@ function ConnexionPageContent() {
       const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
       const finalTarget = getRedirectTarget(target);
 
-      // Attendre que la session soit synchronisée côté serveur
-      // Cela force le middleware à reconnaître la session
-      let synced = false;
-      for (let i = 0; i < 3; i++) {
-        try {
-          const syncResponse = await fetch('/api/auth/sync-session', { 
-            method: 'POST',
-            credentials: 'include'
-          });
-          if (syncResponse.ok) {
-            synced = true;
-            break;
-          }
-        } catch {
-          // Retry silently
-        }
-        await new Promise(resolve => setTimeout(resolve, 300));
-      }
+      // Synchroniser la session côté serveur (1 seul appel, non bloquant)
+      fetch('/api/auth/sync-session', { 
+        method: 'POST',
+        credentials: 'include'
+      }).catch(() => {});
 
-      // Petit délai pour laisser les cookies se propager
-      if (!synced) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-
-      // Redirection directe
-      window.location.href = finalTarget;
+      // Utiliser router.push (soft navigation) pour préserver le state React
+      // Le AuthProvider garde le user en cache, pas de perte de session
+      router.push(finalTarget);
+      // Rafraîchir les données serveur (cookies middleware)
+      router.refresh();
       
     } catch (error: any) {
       setError(error?.message || 'Une erreur est survenue');
