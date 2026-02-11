@@ -120,7 +120,7 @@ function SuccessPageContent() {
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/produits"
+            href="/"
             className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 hover:bg-slate-50"
           >
             Continuer mes achats

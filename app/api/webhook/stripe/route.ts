@@ -166,32 +166,39 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     devLog("Commande créée:", order.id);
 
-    // Décrémenter le stock pour chaque produit
-    for (const item of orderItems) {
-      if (item.product_slug) {
-        // Récupérer le product_id depuis le slug
-        const { data: product } = await supabase
-          .from('products')
-          .select('id')
-          .eq('slug', item.product_slug)
-          .single();
+    // Décrémenter le stock pour chaque produit (non bloquant)
+    try {
+      for (const item of orderItems) {
+        if (item.product_slug) {
+          const { data: product } = await supabase
+            .from('products')
+            .select('id')
+            .eq('slug', item.product_slug)
+            .single();
 
-        if (product) {
-          // Décrémenter le stock via la fonction SQL
-          await supabase.rpc('decrement_stock', {
-            p_product_id: product.id,
-            p_quantity: item.quantity,
-          });
-          devLog(`Stock décrémenté: ${item.product_slug} (-${item.quantity})`);
+          if (product) {
+            const { error: stockError } = await supabase.rpc('decrement_stock', {
+              p_product_id: product.id,
+              p_quantity: item.quantity,
+            });
+            if (stockError) {
+              devError(`Erreur stock ${item.product_slug}:`, stockError);
+            } else {
+              devLog(`Stock décrémenté: ${item.product_slug} (-${item.quantity})`);
+            }
+          }
         }
       }
+    } catch (stockErr) {
+      devError("Erreur décrémentation stock (non bloquant):", stockErr);
     }
 
     // Envoyer l'email de confirmation au client
+    const customerEmail = order.customer_email || session.customer_details?.email || '';
     const emailData = {
       orderNumber: order.id.slice(0, 8).toUpperCase(),
-      customerName: order.customer_name || 'Client',
-      customerEmail: order.customer_email || '',
+      customerName: order.customer_name || session.customer_details?.name || 'Client',
+      customerEmail,
       totalAmount: order.total_amount,
       items: orderItems.map(item => ({
         name: item.product_name,
@@ -206,16 +213,38 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       ].filter(Boolean).join(', '),
     };
 
-    await sendOrderConfirmationEmail(emailData, supabase, order.id, metadata.user_id);
-    
-    // Marquer l'email comme envoyé
-    await supabase
-      .from('orders')
-      .update({ confirmation_email_sent: true })
-      .eq('id', order.id);
+    // Envoyer email confirmation client (non bloquant)
+    if (customerEmail) {
+      try {
+        devLog("Envoi email confirmation à:", customerEmail);
+        const emailResult = await sendOrderConfirmationEmail(emailData, supabase, order.id, metadata.user_id);
+        devLog("Résultat email confirmation:", emailResult);
 
-    // Envoyer notification admin
-    await sendAdminOrderNotification(emailData, supabase, order.id);
+        if (emailResult.success) {
+          try {
+            await supabase
+              .from('orders')
+              .update({ confirmation_email_sent: true })
+              .eq('id', order.id);
+          } catch {
+            // Ignorer si la colonne n'existe pas encore
+          }
+        }
+      } catch (emailErr) {
+        devError("Erreur envoi email confirmation (non bloquant):", emailErr);
+      }
+    } else {
+      devError("Pas d'email client disponible pour la commande:", order.id);
+    }
+
+    // Envoyer notification admin (non bloquant)
+    try {
+      devLog("Envoi notification admin");
+      const adminResult = await sendAdminOrderNotification(emailData, supabase, order.id);
+      devLog("Résultat notification admin:", adminResult);
+    } catch (adminErr) {
+      devError("Erreur notification admin (non bloquant):", adminErr);
+    }
 
     // Vider le panier de l'utilisateur s'il est connecté
     if (metadata.user_id && metadata.user_id !== "guest") {

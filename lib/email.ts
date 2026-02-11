@@ -8,7 +8,8 @@ export const resend = process.env.RESEND_API_KEY
 export const hasResendCredentials = () => !!process.env.RESEND_API_KEY;
 
 // Email par défaut pour l'envoi
-export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@atelier-lbf.fr';
+const fromAddress = process.env.RESEND_FROM_EMAIL || 'noreply@atelier-lbf.fr';
+export const FROM_EMAIL = `Atelier LBF <${fromAddress}>`;
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'atelier-lbf@outlook.com';
 
 // Types d'emails
