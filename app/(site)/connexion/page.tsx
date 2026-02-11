@@ -96,22 +96,26 @@ function ConnexionPageContent() {
 
       // Attendre que la session soit synchronisée côté serveur
       // Cela force le middleware à reconnaître la session
-      let retries = 0;
-      const maxRetries = 5;
-      while (retries < maxRetries) {
+      let synced = false;
+      for (let i = 0; i < 3; i++) {
         try {
           const syncResponse = await fetch('/api/auth/sync-session', { 
             method: 'POST',
             credentials: 'include'
           });
           if (syncResponse.ok) {
+            synced = true;
             break;
           }
         } catch {
           // Retry silently
         }
-        retries++;
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      // Petit délai pour laisser les cookies se propager
+      if (!synced) {
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
 
       // Redirection directe

@@ -3,9 +3,10 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, ShoppingBag, Loader2 } from 'lucide-react';
+import { Check, ShoppingBag, Loader2, LogIn, UserPlus } from 'lucide-react';
 
 import { useCart } from '@/lib/cart-context';
+import { useAuth } from '@/lib/auth-context';
 import { useAnalytics } from '@/lib/analytics-context';
 import { Section } from '@/components/Section';
 import { Container } from '@/components/Container';
@@ -85,6 +86,7 @@ function SectionHeader({
 
 export default function CheckoutPage() {
   const { items, totalPrice, loading, itemCount } = useCart();
+  const { user, isLoading: authLoading } = useAuth();
   const { trackCheckoutStart } = useAnalytics();
   const hasTrackedCheckout = useRef(false);
   const [activeSection, setActiveSection] = useState<CheckoutSection>('infos');
@@ -290,12 +292,47 @@ export default function CheckoutPage() {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <Section className="py-24">
         <Container>
           <div className="flex items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-clay-900 border-t-transparent"></div>
+          </div>
+        </Container>
+      </Section>
+    );
+  }
+
+  // Obliger la connexion avant de passer commande
+  if (!user) {
+    return (
+      <Section className="py-24">
+        <Container className="max-w-lg text-center">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-amber-50">
+            <LogIn className="h-10 w-10 text-amber-700" />
+          </div>
+          <h1 className="font-display text-3xl font-semibold text-slate-900">
+            Connectez-vous pour commander
+          </h1>
+          <p className="mt-4 text-slate-600">
+            Pour passer commande et suivre vos achats, vous devez être connecté à votre compte.
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <Link
+              href="/connexion?redirectTo=/commande"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800"
+            >
+              <LogIn className="h-4 w-4" />
+              Se connecter
+            </Link>
+            <Link
+              href="/inscription?redirectTo=/commande"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <UserPlus className="h-4 w-4" />
+              Créer un compte
+            </Link>
           </div>
         </Container>
       </Section>
