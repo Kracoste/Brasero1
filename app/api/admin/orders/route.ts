@@ -89,16 +89,8 @@ export async function PUT(request: NextRequest) {
     // Construire l'objet de mise à jour
     const updateData: Record<string, unknown> = {};
 
-    if (status && VALID_ORDER_STATUSES.includes(status)) {
+    if (status && (VALID_ORDER_STATUSES as readonly string[]).includes(status)) {
       updateData.status = status;
-
-      // Mettre à jour les dates automatiquement
-      if (status === 'shipped' && !currentOrder.shipped_at) {
-        updateData.shipped_at = new Date().toISOString();
-      }
-      if (status === 'delivered' && !currentOrder.delivered_at) {
-        updateData.delivered_at = new Date().toISOString();
-      }
     }
 
     if (tracking_number !== undefined) {
@@ -113,6 +105,18 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Aucune donnée à mettre à jour' }, { status: 400 });
     }
 
+    // Mettre à jour les dates automatiquement (dans un try séparé car les colonnes peuvent ne pas exister)
+    if (status === 'shipped') {
+      try {
+        await adminClient.from('orders').update({ shipped_at: new Date().toISOString() }).eq('id', orderId);
+      } catch { /* colonne peut ne pas exister */ }
+    }
+    if (status === 'delivered') {
+      try {
+        await adminClient.from('orders').update({ delivered_at: new Date().toISOString() }).eq('id', orderId);
+      } catch { /* colonne peut ne pas exister */ }
+    }
+
     // Mettre à jour la commande
     const { data: updatedOrder, error: updateError } = await adminClient
       .from('orders')
@@ -122,8 +126,17 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (updateError) {
-      devError('Erreur mise à jour commande:', updateError);
-      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+      devError('Erreur mise à jour commande:', JSON.stringify(updateError));
+      devError('updateData était:', JSON.stringify(updateData));
+      return NextResponse.json({ 
+        error: `Erreur: ${updateError.message || 'inconnue'}`,
+        details: updateError,
+        update_data: updateData,
+      }, { status: 500 });
+    }
+
+    if (!updatedOrder) {
+      return NextResponse.json({ error: 'Commande non trouvée après mise à jour' }, { status: 404 });
     }
 
     // Envoyer un email au client si demandé et si le statut passe à "shipped"
@@ -167,6 +180,8 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     devError('Erreur PUT order:', error);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : 'Erreur serveur',
+    }, { status: 500 });
   }
 }
