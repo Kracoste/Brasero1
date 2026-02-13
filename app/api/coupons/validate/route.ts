@@ -28,6 +28,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validation du cartTotal
+    const total = Number(cartTotal);
+    if (!Number.isFinite(total) || total < 0 || total > 1000000) {
+      return NextResponse.json(
+        { error: 'Montant du panier invalide' },
+        { status: 400 }
+      );
+    }
+
     const supabase = await createClient();
 
     // Récupérer le coupon
@@ -62,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier le montant minimum
-    if (coupon.min_purchase_amount && cartTotal < coupon.min_purchase_amount) {
+    if (coupon.min_purchase_amount && total < coupon.min_purchase_amount) {
       return NextResponse.json(
         {
           valid: false,
@@ -75,20 +84,20 @@ export async function POST(request: NextRequest) {
     // Calculer la réduction
     let discount = 0;
     if (coupon.discount_type === 'percentage') {
-      discount = (cartTotal * coupon.discount_value) / 100;
+      discount = (total * coupon.discount_value) / 100;
     } else {
       discount = coupon.discount_value;
     }
 
     // Ne pas dépasser le total
-    discount = Math.min(discount, cartTotal);
+    discount = Math.min(discount, total);
 
     return NextResponse.json({
       valid: true,
       discount,
       discountType: coupon.discount_type,
       discountValue: coupon.discount_value,
-      newTotal: cartTotal - discount,
+      newTotal: total - discount,
     });
   } catch (error) {
     console.error('[Coupon API] Error:', error);

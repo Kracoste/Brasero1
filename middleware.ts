@@ -1,4 +1,5 @@
 import { updateSession } from '@/lib/supabase/middleware'
+import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
 // Headers de sécurité HTTP
@@ -37,6 +38,34 @@ export async function middleware(request: NextRequest) {
     );
   }
   
+  // Protection admin côté serveur : bloquer l'accès aux routes /admin si non-admin
+  if (pathname.startsWith('/admin')) {
+    const adminEmails = (process.env.ADMIN_EMAILS || 'allouhugo@gmail.com')
+      .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+    
+    try {
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return request.cookies.getAll();
+            },
+            setAll() {},
+          },
+        }
+      );
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user?.email || !adminEmails.includes(user.email.toLowerCase())) {
+        return NextResponse.redirect(new URL('/connexion', request.url));
+      }
+    } catch {
+      return NextResponse.redirect(new URL('/connexion', request.url));
+    }
+  }
+
   // Désactiver le cache CDN pour les pages produits (données dynamiques)
   if (pathname.startsWith('/produits/')) {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

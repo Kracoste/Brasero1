@@ -7,7 +7,11 @@ import { devLog, devError } from '@/lib/supabase/utils'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get(REDIRECT_PARAM) ?? AUTH_ROUTES.home
+  const rawNext = searchParams.get(REDIRECT_PARAM) ?? AUTH_ROUTES.home
+  
+  // Sécurité : n'autoriser que les redirections internes (commence par /)
+  // Empêche les attaques d'open redirect vers des sites externes
+  const next = (rawNext.startsWith('/') && !rawNext.startsWith('//')) ? rawNext : AUTH_ROUTES.home
 
   if (code) {
     const supabase = await createClient()

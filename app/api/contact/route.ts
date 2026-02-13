@@ -1,11 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import { resend, FROM_EMAIL, ADMIN_EMAIL } from "@/lib/email";
+import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { isValidEmail } from "@/lib/validation";
 
-// Initialize Resend with API key (optional during build)
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+/**
+ * Échappe les caractères HTML dangereux pour prévenir les injections XSS
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting — protection anti-spam
+    const clientIP = getClientIP(request.headers);
+    const { maxRequests, windowMs } = RATE_LIMIT_PRESETS.sensitive;
+    if (!checkRateLimit(`contact-${clientIP}`, maxRequests, windowMs)) {
+      return NextResponse.json(
+        { error: "Trop de messages envoyés. Veuillez réessayer dans quelques minutes." },
+        { status: 429 }
+      );
+    }
+
     // Check if Resend is configured
     if (!resend) {
       return NextResponse.json(
@@ -25,21 +46,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validation types et longueurs
+    if (typeof name !== 'string' || name.length > 200) {
+      return NextResponse.json({ error: "Nom invalide" }, { status: 400 });
+    }
+    if (typeof message !== 'string' || message.length > 5000) {
+      return NextResponse.json({ error: "Message trop long (max 5000 caractères)" }, { status: 400 });
+    }
+    if (subject && (typeof subject !== 'string' || subject.length > 300)) {
+      return NextResponse.json({ error: "Sujet invalide" }, { status: 400 });
+    }
+
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!isValidEmail(email)) {
       return NextResponse.json(
         { error: "Adresse email invalide" },
         { status: 400 }
       );
     }
 
+    // Sanitizer toutes les entrées pour le HTML
+    const safeName = escapeHtml(name.trim());
+    const safeEmail = escapeHtml(email.trim());
+    const safeMessage = escapeHtml(message.trim());
+    const safeSubject = subject ? escapeHtml(subject.trim()) : '';
+
     // Send email to the store
     const { data, error } = await resend.emails.send({
-      from: "Atelier LBF <onboarding@resend.dev>", // Domaine par défaut Resend (gratuit)
-      to: ["atelier-lbf@outlook.com"], // Email vérifié sur Resend
-      replyTo: email,
-      subject: subject || `Nouveau message de ${name} via le site`,
+      from: FROM_EMAIL,
+      to: [ADMIN_EMAIL],
+      replyTo: email.trim(),
+      subject: safeSubject || `Nouveau message de ${safeName} via le site`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -63,14 +100,14 @@ export async function POST(request: NextRequest) {
             </div>
             <div class="content">
               <div class="field">
-                <span class="label">Nom :</span> ${name}
+                <span class="label">Nom :</span> ${safeName}
               </div>
               <div class="field">
-                <span class="label">Email :</span> <a href="mailto:${email}">${email}</a>
+                <span class="label">Email :</span> <a href="mailto:${safeEmail}">${safeEmail}</a>
               </div>
               <div class="field">
                 <span class="label">Message :</span>
-                <div class="message">${message.replace(/\n/g, "<br>")}</div>
+                <div class="message">${safeMessage.replace(/\n/g, "<br>")}</div>
               </div>
             </div>
             <div class="footer">
@@ -81,13 +118,13 @@ export async function POST(request: NextRequest) {
         </html>
       `,
       text: `
-Nouveau message de ${name}
+Nouveau message de ${name.trim()}
 
-Nom: ${name}
-Email: ${email}
+Nom: ${name.trim()}
+Email: ${email.trim()}
 
 Message:
-${message}
+${message.trim()}
 
 ---
 Envoyé depuis le formulaire de contact - www.atelier-lbf.fr
@@ -102,11 +139,8 @@ Envoyé depuis le formulaire de contact - www.atelier-lbf.fr
       );
     }
 
-    // Note: L'email de confirmation au client nécessite un domaine vérifié sur Resend
-    // Pour l'activer, ajoutez votre domaine atelier-lbf.fr dans les paramètres Resend
-
     return NextResponse.json(
-      { success: true, message: "Email envoyé avec succès", id: data?.id },
+      { success: true, message: "Email envoyé avec succès" },
       { status: 200 }
     );
   } catch (error) {

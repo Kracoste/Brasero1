@@ -3,10 +3,15 @@
  * Toutes les constantes et fonctions utilitaires d'auth sont ici
  */
 
-// Liste des emails administrateurs - À modifier ici uniquement
-export const ADMIN_EMAILS: string[] = [
-  'allouhugo@gmail.com',
-];
+// Liste des emails administrateurs
+// Configurable via la variable d'env ADMIN_EMAILS (séparés par des virgules)
+const envAdminEmails = process.env.ADMIN_EMAILS
+  ? process.env.ADMIN_EMAILS.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+  : [];
+
+export const ADMIN_EMAILS: string[] = envAdminEmails.length > 0
+  ? envAdminEmails
+  : ['allouhugo@gmail.com']; // Fallback de sécurité
 
 /**
  * Vérifie si un email est celui d'un administrateur

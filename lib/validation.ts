@@ -17,9 +17,14 @@ export const ALLOWED_ORIGINS = [
 
 /**
  * Vérifie si une origine est autorisée
+ * En production, les requêtes sans origin sont rejetées (sauf same-origin du navigateur qui inclut toujours l'origin)
  */
 export function isAllowedOrigin(origin: string | null): boolean {
-  if (!origin) return true; // Pas d'origine = requête same-origin
+  if (!origin) {
+    // En développement, on autorise (outils comme curl)
+    // En production, les requêtes navigateur same-origin incluent l'origin
+    return process.env.NODE_ENV !== 'production';
+  }
   return (ALLOWED_ORIGINS as readonly string[]).includes(origin);
 }
 

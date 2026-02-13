@@ -93,12 +93,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly' as const,
-      priority: 0.5,
-    },
-    {
       url: `${baseUrl}/cgv`,
       lastModified: new Date(),
       changeFrequency: 'yearly' as const,
@@ -114,6 +108,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Pages info
   const infoPages: MetadataRoute.Sitemap = [
+    'a-propos-de-nous',
     'astuces-conseils',
     'blog',
     'bulletin-information',
@@ -121,6 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'commander',
     'confidentialite-politique',
     'contact',
+    'donnees-entreprise-contact',
     'expedition',
     'faq',
     'paiement',

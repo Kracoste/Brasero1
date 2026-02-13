@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
-import { isValidUUID } from '@/lib/validation';
+import { isValidUUID, sanitizeString } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -162,6 +162,10 @@ export async function POST(request: NextRequest) {
       isVerifiedPurchase = !!order;
     }
 
+    // Sanitizer les entrées texte
+    const safeTitle = sanitizeString(title, 200) || null;
+    const safeComment = sanitizeString(comment, 2000) || null;
+
     // Créer l'avis (nécessite approbation admin)
     const { data: review, error: insertError } = await adminClient
       .from('reviews')
@@ -170,8 +174,8 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         order_id: order_id || null,
         rating,
-        title: title || null,
-        comment: comment || null,
+        title: safeTitle,
+        comment: safeComment,
         is_verified_purchase: isVerifiedPurchase,
         is_approved: false, // Modération requise
       })
