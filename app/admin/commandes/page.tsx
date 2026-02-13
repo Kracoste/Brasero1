@@ -101,7 +101,7 @@ function OrderDetailModal({
       if (isStatusChanged) body.status = status;
       if (isTrackingChanged) body.tracking_number = trackingNumber;
       if (isCarrierChanged) body.carrier = carrier;
-      if (sendEmail && status === 'shipped' && isStatusChanged) body.send_email = true;
+      if (sendEmail && isStatusChanged && ['processing', 'shipped', 'delivered'].includes(status)) body.send_email = true;
 
       const res = await fetch(`/api/admin/orders?id=${order.id}`, {
         method: 'PUT',
