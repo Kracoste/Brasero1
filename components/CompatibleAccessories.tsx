@@ -10,31 +10,41 @@ type CompatibleProduct = {
   name: string;
   price: number;
   images: { url?: string; src?: string; alt?: string }[];
-  category: string;
+  category?: string;
 };
 
 type CompatibleAccessoriesProps = {
   compatibleSlugs?: string[];
   onSelectionChange?: (accessories: CompatibleProduct[]) => void;
   productCategory?: string;
+  preloadedProducts?: CompatibleProduct[];
 };
 
 export function CompatibleAccessories({ 
   compatibleSlugs = [],
   onSelectionChange,
-  productCategory = 'brasero'
+  productCategory = 'brasero',
+  preloadedProducts
 }: CompatibleAccessoriesProps) {
-  const [products, setProducts] = useState<CompatibleProduct[]>([]);
+  const [products, setProducts] = useState<CompatibleProduct[]>(preloadedProducts || []);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!preloadedProducts || preloadedProducts.length === 0);
   const [error, setError] = useState(false);
   const [debug, setDebug] = useState<string>('');
   
   // Stabiliser la référence des slugs pour éviter les re-renders inutiles
   const slugsKey = useMemo(() => JSON.stringify([...compatibleSlugs].sort()), [compatibleSlugs]);
-  const fetchedRef = useRef<string | null>(null);
+  const fetchedRef = useRef<string | null>(preloadedProducts && preloadedProducts.length > 0 ? slugsKey : null);
 
   useEffect(() => {
+    // Si les données sont déjà préchargées, ne rien faire
+    if (preloadedProducts && preloadedProducts.length > 0) {
+      setProducts(preloadedProducts);
+      setLoading(false);
+      fetchedRef.current = slugsKey;
+      return;
+    }
+
     // Éviter les requêtes dupliquées pour les mêmes slugs
     if (fetchedRef.current === slugsKey) return;
     

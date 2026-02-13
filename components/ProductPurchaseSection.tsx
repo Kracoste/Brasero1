@@ -14,14 +14,16 @@ type Accessory = {
   name: string;
   price: number;
   images: { url?: string; src?: string; alt?: string }[];
+  category?: string;
 };
 
 type ProductPurchaseSectionProps = {
   product: Product;
   compatibleAccessorySlugs: string[];
+  preloadedAccessories?: Accessory[];
 };
 
-export function ProductPurchaseSection({ product, compatibleAccessorySlugs }: ProductPurchaseSectionProps) {
+export function ProductPurchaseSection({ product, compatibleAccessorySlugs, preloadedAccessories }: ProductPurchaseSectionProps) {
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   const [engravingEnabled, setEngravingEnabled] = useState(false);
   const [engravingText, setEngravingText] = useState('');
@@ -51,6 +53,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs }: Pr
           compatibleSlugs={compatibleAccessorySlugs}
           onSelectionChange={handleSelectionChange}
           productCategory={product.category}
+          preloadedProducts={preloadedAccessories}
         />
       )}
 

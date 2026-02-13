@@ -111,6 +111,20 @@ async function getRelatedProducts(currentSlug: string, category: string, limit: 
   return products.map(mapDbProductToProduct).filter(Boolean) as Product[];
 }
 
+// Fonction pour récupérer les accessoires compatibles (server-side)
+async function getCompatibleAccessories(slugs: string[]) {
+  if (!slugs || slugs.length === 0) return [];
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('products')
+    .select('id, slug, name, price, images, category')
+    .in('slug', slugs)
+    .order('name');
+
+  if (error || !data) return [];
+  return data;
+}
+
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
@@ -141,6 +155,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
   
   // Récupérer les slugs des accessoires compatibles depuis les specs du produit
   const compatibleAccessorySlugs: string[] = product.specs?.compatibleAccessories || [];
+
+  // Récupérer les accessoires compatibles côté serveur (instantané)
+  const compatibleAccessories = await getCompatibleAccessories(compatibleAccessorySlugs);
 
   // Récupérer les produits similaires (même catégorie)
   const relatedProducts = await getRelatedProducts(slug, product.category, 8);
@@ -173,6 +190,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <ProductPurchaseSection 
                 product={product} 
                 compatibleAccessorySlugs={compatibleAccessorySlugs}
+                preloadedAccessories={compatibleAccessories}
               />
             </div>
           </div>
