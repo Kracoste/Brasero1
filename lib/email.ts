@@ -15,6 +15,7 @@ export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'atelier-lbf@outlook.com';
 // Types d'emails
 export type EmailType =
   | 'order_confirmation'
+  | 'order_processing'
   | 'order_shipped'
   | 'order_delivered'
   | 'order_cancelled'
@@ -131,6 +132,76 @@ export async function sendOrderShippedEmail(
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     await logEmail(supabase, 'order_shipped', orderData.customerEmail, orderId, userId, 'failed', undefined, errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}
+
+/**
+ * Envoyer un email de mise en fabrication
+ */
+export async function sendOrderProcessingEmail(
+  orderData: OrderEmailData,
+  supabase: any,
+  orderId?: string,
+  userId?: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!hasResendCredentials() || !resend) {
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: orderData.customerEmail,
+      subject: `Votre commande #${orderData.orderNumber} est en cours de fabrication 🔨`,
+      html: generateOrderProcessingHTML(orderData),
+    });
+
+    if (error) {
+      await logEmail(supabase, 'order_processing', orderData.customerEmail, orderId, userId, 'failed', undefined, error.message);
+      return { success: false, error: error.message };
+    }
+
+    await logEmail(supabase, 'order_processing', orderData.customerEmail, orderId, userId, 'sent', data?.id);
+    return { success: true };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    await logEmail(supabase, 'order_processing', orderData.customerEmail, orderId, userId, 'failed', undefined, errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}
+
+/**
+ * Envoyer un email de livraison
+ */
+export async function sendOrderDeliveredEmail(
+  orderData: OrderEmailData,
+  supabase: any,
+  orderId?: string,
+  userId?: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!hasResendCredentials() || !resend) {
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: orderData.customerEmail,
+      subject: `Votre commande #${orderData.orderNumber} a été livrée ✅`,
+      html: generateOrderDeliveredHTML(orderData),
+    });
+
+    if (error) {
+      await logEmail(supabase, 'order_delivered', orderData.customerEmail, orderId, userId, 'failed', undefined, error.message);
+      return { success: false, error: error.message };
+    }
+
+    await logEmail(supabase, 'order_delivered', orderData.customerEmail, orderId, userId, 'sent', data?.id);
+    return { success: true };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    await logEmail(supabase, 'order_delivered', orderData.customerEmail, orderId, userId, 'failed', undefined, errorMessage);
     return { success: false, error: errorMessage };
   }
 }
@@ -329,6 +400,114 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
     <div style="background-color: #f9fafb; padding: 30px 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
       <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
         Des questions ? <a href="mailto:atelier-lbf@outlook.com" style="color: #10b981; text-decoration: none;">atelier-lbf@outlook.com</a>
+      </p>
+      <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+        © ${new Date().getFullYear()} Brasero Atelier LBF
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+function generateOrderProcessingHTML(order: OrderEmailData): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande en fabrication</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f9fafb; margin: 0; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+      <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🔨 Votre brasero est en fabrication !</h1>
+    </div>
+    
+    <div style="padding: 40px 20px;">
+      <p style="font-size: 16px; margin-bottom: 20px;">
+        Bonjour <strong>${order.customerName}</strong>,
+      </p>
+      
+      <p style="font-size: 16px; margin-bottom: 20px;">
+        Bonne nouvelle ! Votre commande <strong>#${order.orderNumber}</strong> est maintenant en cours de fabrication dans notre atelier.
+      </p>
+      
+      <p style="font-size: 16px; margin-bottom: 30px;">
+        Nos artisans travaillent avec soin pour vous livrer un brasero de qualité. Vous recevrez un email dès que votre commande sera expédiée.
+      </p>
+      
+      <div style="background-color: #fffbeb; border-left: 4px solid #d97706; padding: 16px; border-radius: 0 6px 6px 0; margin-bottom: 30px;">
+        <p style="margin: 0; font-size: 14px; color: #92400e;">⏳ Délai estimé : nos braseros artisanaux sont fabriqués sur commande. Comptez quelques jours de fabrication.</p>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
+           style="display: inline-block; padding: 14px 32px; background-color: #d97706; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
+          Suivre ma commande
+        </a>
+      </div>
+    </div>
+    
+    <div style="background-color: #f9fafb; padding: 30px 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+        Des questions ? <a href="mailto:atelier-lbf@outlook.com" style="color: #d97706; text-decoration: none;">atelier-lbf@outlook.com</a>
+      </p>
+      <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+        © ${new Date().getFullYear()} Brasero Atelier LBF
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+function generateOrderDeliveredHTML(order: OrderEmailData): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande livrée</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f9fafb; margin: 0; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+      <h1 style="color: #ffffff; margin: 0; font-size: 28px;">✅ Votre commande a été livrée !</h1>
+    </div>
+    
+    <div style="padding: 40px 20px;">
+      <p style="font-size: 16px; margin-bottom: 20px;">
+        Bonjour <strong>${order.customerName}</strong>,
+      </p>
+      
+      <p style="font-size: 16px; margin-bottom: 20px;">
+        Votre commande <strong>#${order.orderNumber}</strong> a bien été livrée. Nous espérons que vous apprécierez votre brasero artisanal !
+      </p>
+      
+      <p style="font-size: 16px; margin-bottom: 30px;">
+        N'hésitez pas à nous contacter si vous avez la moindre question sur l'utilisation ou l'entretien de votre brasero.
+      </p>
+      
+      <div style="background-color: #ecfdf5; border-left: 4px solid #059669; padding: 16px; border-radius: 0 6px 6px 0; margin-bottom: 30px;">
+        <p style="margin: 0; font-size: 14px; color: #065f46;">💡 Consultez nos <a href="https://www.atelier-lbf.fr/recettes" style="color: #059669; font-weight: 600;">recettes</a> pour profiter pleinement de votre brasero !</p>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
+           style="display: inline-block; padding: 14px 32px; background-color: #059669; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
+          Voir ma commande
+        </a>
+      </div>
+    </div>
+    
+    <div style="background-color: #f9fafb; padding: 30px 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+        Merci pour votre confiance ! <a href="mailto:atelier-lbf@outlook.com" style="color: #059669; text-decoration: none;">atelier-lbf@outlook.com</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
         © ${new Date().getFullYear()} Brasero Atelier LBF

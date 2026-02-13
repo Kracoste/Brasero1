@@ -5,7 +5,7 @@ import { isAdminEmail } from '@/lib/auth';
 import { VALID_ORDER_STATUSES, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
-import { sendOrderShippedEmail, type OrderEmailData } from '@/lib/email';
+import { sendOrderShippedEmail, sendOrderProcessingEmail, sendOrderDeliveredEmail, type OrderEmailData } from '@/lib/email';
 
 // Helper: vérifier que l'utilisateur est admin
 async function verifyAdmin(request: NextRequest) {
@@ -139,9 +139,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Commande non trouvée après mise à jour' }, { status: 404 });
     }
 
-    // Envoyer un email au client si demandé et si le statut passe à "shipped"
+    // Envoyer un email au client si demandé et si le statut a changé
     let emailResult = null;
-    if (send_email && status === 'shipped' && currentOrder.customer_email) {
+    const isStatusChanged = status && status !== currentOrder.status;
+    if (send_email && isStatusChanged && currentOrder.customer_email) {
       const emailData: OrderEmailData = {
         orderNumber: orderId.slice(0, 8).toUpperCase(),
         customerName: currentOrder.customer_name || 'Client',
@@ -162,14 +163,15 @@ export async function PUT(request: NextRequest) {
       };
 
       try {
-        emailResult = await sendOrderShippedEmail(
-          emailData,
-          adminClient,
-          orderId,
-          currentOrder.user_id
-        );
+        if (status === 'processing') {
+          emailResult = await sendOrderProcessingEmail(emailData, adminClient, orderId, currentOrder.user_id);
+        } else if (status === 'shipped') {
+          emailResult = await sendOrderShippedEmail(emailData, adminClient, orderId, currentOrder.user_id);
+        } else if (status === 'delivered') {
+          emailResult = await sendOrderDeliveredEmail(emailData, adminClient, orderId, currentOrder.user_id);
+        }
       } catch (err) {
-        devError('Erreur envoi email expédition:', err);
+        devError('Erreur envoi email statut:', err);
         emailResult = { success: false, error: err instanceof Error ? err.message : 'Erreur inconnue' };
       }
     }

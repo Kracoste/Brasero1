@@ -119,7 +119,7 @@ function OrderDetailModal({
 
       let msg = 'Commande mise à jour';
       if (data.email_sent?.success) {
-        msg += ' — Email d\'expédition envoyé au client ✉️';
+        msg += ' — Email envoyé au client ✉️';
       } else if (data.email_sent && !data.email_sent.success) {
         msg += ' — ⚠️ Erreur envoi email: ' + (data.email_sent.error || 'inconnue');
       }
@@ -313,8 +313,8 @@ function OrderDetailModal({
               </div>
             )}
 
-            {/* Option envoyer email */}
-            {status === 'shipped' && isStatusChanged && (
+            {/* Option envoyer email — visible pour tout changement de statut */}
+            {isStatusChanged && ['processing', 'shipped', 'delivered'].includes(status) && (
               <label className="flex items-center gap-3 bg-indigo-50 border border-indigo-200 rounded-lg px-4 py-3 cursor-pointer mb-4">
                 <input
                   type="checkbox"
@@ -325,7 +325,9 @@ function OrderDetailModal({
                 <div>
                   <p className="text-sm font-medium text-indigo-800">Envoyer un email au client</p>
                   <p className="text-xs text-indigo-600">
-                    Le client recevra un email avec le numéro de suivi
+                    {status === 'processing' && 'Le client sera informé que sa commande est en fabrication'}
+                    {status === 'shipped' && 'Le client recevra un email avec le numéro de suivi'}
+                    {status === 'delivered' && 'Le client sera informé que sa commande a été livrée'}
                   </p>
                 </div>
                 <Send size={18} className="ml-auto text-indigo-400" />
