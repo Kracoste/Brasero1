@@ -5,29 +5,39 @@ import { isAdminEmail } from '@/lib/auth';
 import { VALID_ORDER_STATUSES, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
+import { sendOrderShippedEmail, type OrderEmailData } from '@/lib/email';
+
+// Helper: vérifier que l'utilisateur est admin
+async function verifyAdmin(request: NextRequest) {
+  const clientIP = getClientIP(request.headers);
+  if (!checkRateLimit(`admin-orders-${clientIP}`, 30, 60000)) {
+    return { error: 'Trop de requêtes', status: 429 };
+  }
+
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user || !isAdminEmail(user.email)) {
+    return { error: 'Non autorisé', status: 401 };
+  }
+
+  const adminClient = getSupabaseAdminClient();
+  if (!adminClient) {
+    return { error: 'Configuration serveur manquante', status: 500 };
+  }
+
+  return { adminClient, user };
+}
 
 // GET: Récupérer les commandes
 export async function GET(request: NextRequest) {
   try {
-    // Rate limiting admin (30 requêtes/min)
-    const clientIP = getClientIP(request.headers);
-    if (!checkRateLimit(`admin-orders-${clientIP}`, 30, 60000)) {
-      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    const auth = await verifyAdmin(request);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    // Vérifier l'authentification admin
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user || !isAdminEmail(user.email)) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
-    }
-
-    // Utiliser le client admin pour bypass RLS
-    const adminClient = getSupabaseAdminClient();
-    if (!adminClient) {
-      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
-    }
+    const { adminClient } = auth;
 
     const { data: orders, error } = await adminClient
       .from('orders')
@@ -46,7 +56,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT: Mettre à jour le statut d'une commande
+// PUT: Mettre à jour une commande (statut, tracking, transporteur, etc.)
 export async function PUT(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -56,40 +66,105 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID commande invalide' }, { status: 400 });
     }
 
-    // Vérifier l'authentification admin
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user || !isAdminEmail(user.email)) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    const auth = await verifyAdmin(request);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    const { status } = await request.json();
+    const { adminClient } = auth;
+    const body = await request.json();
+    const { status, tracking_number, carrier, send_email } = body;
 
-    // Valider le statut
-    if (!status || !VALID_ORDER_STATUSES.includes(status)) {
-      return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
-    }
-
-    // Utiliser le client admin pour bypass RLS
-    const adminClient = getSupabaseAdminClient();
-    if (!adminClient) {
-      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
-    }
-
-    const { data: order, error } = await adminClient
+    // Récupérer la commande actuelle
+    const { data: currentOrder, error: fetchError } = await adminClient
       .from('orders')
-      .update({ status })
+      .select('*')
+      .eq('id', orderId)
+      .single();
+
+    if (fetchError || !currentOrder) {
+      return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 });
+    }
+
+    // Construire l'objet de mise à jour
+    const updateData: Record<string, unknown> = {};
+
+    if (status && VALID_ORDER_STATUSES.includes(status)) {
+      updateData.status = status;
+
+      // Mettre à jour les dates automatiquement
+      if (status === 'shipped' && !currentOrder.shipped_at) {
+        updateData.shipped_at = new Date().toISOString();
+      }
+      if (status === 'delivered' && !currentOrder.delivered_at) {
+        updateData.delivered_at = new Date().toISOString();
+      }
+    }
+
+    if (tracking_number !== undefined) {
+      updateData.tracking_number = tracking_number || null;
+    }
+
+    if (carrier !== undefined) {
+      updateData.carrier = carrier || null;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'Aucune donnée à mettre à jour' }, { status: 400 });
+    }
+
+    // Mettre à jour la commande
+    const { data: updatedOrder, error: updateError } = await adminClient
+      .from('orders')
+      .update(updateData)
       .eq('id', orderId)
       .select()
       .single();
 
-    if (error) {
-      devError('Erreur mise à jour commande:', error);
+    if (updateError) {
+      devError('Erreur mise à jour commande:', updateError);
       return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
-    return NextResponse.json(order);
+    // Envoyer un email au client si demandé et si le statut passe à "shipped"
+    let emailResult = null;
+    if (send_email && status === 'shipped' && currentOrder.customer_email) {
+      const emailData: OrderEmailData = {
+        orderNumber: orderId.slice(0, 8).toUpperCase(),
+        customerName: currentOrder.customer_name || 'Client',
+        customerEmail: currentOrder.customer_email,
+        totalAmount: currentOrder.total_amount || 0,
+        items: (currentOrder.items || []).map((item: any) => ({
+          name: item.product_name || 'Produit',
+          quantity: item.quantity || 1,
+          price: item.unit_price || 0,
+        })),
+        shippingAddress: [
+          currentOrder.shipping_address,
+          currentOrder.shipping_postal_code,
+          currentOrder.shipping_city,
+        ].filter(Boolean).join(', '),
+        trackingNumber: tracking_number || currentOrder.tracking_number || undefined,
+        carrier: carrier || currentOrder.carrier || undefined,
+      };
+
+      try {
+        emailResult = await sendOrderShippedEmail(
+          emailData,
+          adminClient,
+          orderId,
+          currentOrder.user_id
+        );
+      } catch (err) {
+        devError('Erreur envoi email expédition:', err);
+        emailResult = { success: false, error: err instanceof Error ? err.message : 'Erreur inconnue' };
+      }
+    }
+
+    return NextResponse.json({
+      order: updatedOrder,
+      email_sent: emailResult,
+    });
   } catch (error) {
     devError('Erreur PUT order:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
