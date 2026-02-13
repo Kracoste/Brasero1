@@ -9,6 +9,7 @@ type OrderItem = {
   quantity: number;
   unit_price: number;
   total_price: number;
+  engraving_text?: string;
 };
 
 type Order = {
@@ -200,7 +201,12 @@ function OrderDetailModal({
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
                       {item.quantity}×
                     </span>
-                    <span className="text-sm font-medium text-slate-900">{item.product_name}</span>
+                    <div>
+                      <span className="text-sm font-medium text-slate-900">{item.product_name}</span>
+                      {item.engraving_text && (
+                        <p className="text-xs text-[#8B4513] italic">✏️ Gravure : &quot;{item.engraving_text}&quot;</p>
+                      )}
+                    </div>
                   </div>
                   <span className="text-sm font-semibold text-slate-700">
                     {formatCurrency(item.total_price)}
@@ -558,6 +564,7 @@ export default function CommandesPage() {
                   {(order.items || []).slice(0, 3).map((item, i) => (
                     <span key={i} className="inline-flex items-center gap-1 bg-slate-50 rounded-full px-3 py-1 text-xs text-slate-600">
                       {item.quantity}× {item.product_name}
+                      {item.engraving_text && <span className="text-[#8B4513]">✏️</span>}
                     </span>
                   ))}
                   {(order.items || []).length > 3 && (

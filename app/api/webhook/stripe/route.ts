@@ -151,20 +151,25 @@ async function handleCheckoutCompleted(
   // Préparer les articles
   const orderItems = lineItems.data.map((item) => {
     const product = item.price?.product as Stripe.Product | string | null;
-    const slug =
-      product && typeof product !== "string"
-        ? product.metadata?.slug || ""
-        : "";
+    const productMeta = product && typeof product !== "string" ? product.metadata : {};
+    const slug = productMeta?.slug || "";
     const qty = item.quantity || 1;
     const amountTotal = item.amount_total || 0;
 
-    return {
+    const orderItem: Record<string, unknown> = {
       product_name: item.description || "Produit",
       product_slug: slug,
       quantity: qty,
       unit_price: qty ? amountTotal / qty / 100 : amountTotal / 100,
       total_price: amountTotal / 100,
     };
+
+    // Capturer le texte de gravure si présent
+    if (productMeta?.engraving_text) {
+      orderItem.engraving_text = productMeta.engraving_text;
+    }
+
+    return orderItem;
   });
   log("Order items:", JSON.stringify(orderItems));
   steps.push("items_prepared");
@@ -232,9 +237,9 @@ async function handleCheckoutCompleted(
       customerEmail,
       totalAmount: order.total_amount,
       items: orderItems.map((item) => ({
-        name: item.product_name,
-        quantity: item.quantity,
-        price: item.unit_price,
+        name: item.product_name as string,
+        quantity: item.quantity as number,
+        price: item.unit_price as number,
       })),
       shippingAddress: [
         metadata.shipping_address,

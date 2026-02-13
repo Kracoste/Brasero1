@@ -71,6 +71,8 @@ const mapDbProductToProduct = (p: any): Product | null => {
     shipping: p.shipping || "",
     popularScore: p.popularScore || p.popular_score || 50,
     onDemand: p.onDemand ?? p.on_demand ?? false,
+    engravingAvailable: p.engravingAvailable ?? p.engraving_available ?? false,
+    engravingPrice: Number(p.engravingPrice ?? p.engraving_price ?? 0),
     specs:
       (specs && Object.keys(specs).length > 0
         ? specs

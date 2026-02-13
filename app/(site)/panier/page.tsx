@@ -100,6 +100,11 @@ export default function PanierPage() {
                       <Link href={`/produits/${item.product_slug}`} className="font-semibold text-clay-900 hover:text-clay-700">
                         {item.product_name}
                       </Link>
+                      {item.engraving_text && (
+                        <p className="mt-0.5 text-sm text-[#8B4513] italic">
+                          ✏️ Gravure : &quot;{item.engraving_text}&quot;
+                        </p>
+                      )}
                       <p className="mt-1 text-sm text-slate-500">
                         <Price amount={item.product_price} /> / unité
                       </p>

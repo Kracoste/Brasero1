@@ -11,6 +11,7 @@ export type CartItem = {
   product_price: number;
   product_image: string | null;
   quantity: number;
+  engraving_text?: string;
 };
 
 type CartContextType = {
@@ -23,7 +24,7 @@ type CartContextType = {
     name: string;
     price: number;
     image?: string;
-  }, quantity?: number) => Promise<void>;
+  }, quantity?: number, engravingText?: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -86,6 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addGuestItem = (
     product: { slug: string; name: string; price: number; image?: string },
     quantity: number,
+    engravingText?: string,
   ) => {
     syncGuestCart(prev => {
       // Vérifier si on a atteint la limite
@@ -94,8 +96,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return prev;
       }
       
+      // Si gravure, toujours ajouter comme nouvel item (texte unique)
+      if (engravingText) {
+        const newItem: CartItem = {
+          id: generateGuestId(product.slug),
+          product_slug: product.slug,
+          product_name: product.name,
+          product_price: product.price,
+          product_image: product.image || null,
+          quantity: Math.min(quantity, MAX_QUANTITY_PER_ITEM),
+          engraving_text: engravingText,
+        };
+        return [...prev, newItem];
+      }
+
       const existing = prev.find(
-        (item) => isGuestItem(item) && item.product_slug === product.slug,
+        (item) => isGuestItem(item) && item.product_slug === product.slug && !item.engraving_text,
       );
       if (existing) {
         return prev.map((item) =>
@@ -247,10 +263,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Ajouter un article au panier
   const addItem = async (
     product: { slug: string; name: string; price: number; image?: string },
-    quantity: number = 1
+    quantity: number = 1,
+    engravingText?: string
   ) => {
     // Toujours ajouter d'abord localement pour une réponse instantanée
-    addGuestItem(product, quantity);
+    addGuestItem(product, quantity, engravingText);
     
     // Si l'utilisateur est connecté, synchroniser avec la DB en arrière-plan
     if (user) {

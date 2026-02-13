@@ -66,6 +66,8 @@ const CAMEL_TO_SNAKE_MAP: Record<string, string> = {
   onDemand: 'on_demand',
   isFeatured: 'is_featured',
   featuredOrder: 'featured_order',
+  engravingAvailable: 'engraving_available',
+  engravingPrice: 'engraving_price',
 };
 
 /**
@@ -96,7 +98,9 @@ export const ALLOWED_PRODUCT_FIELDS = [
   'on_demand',
   'is_featured',
   'featured_order',
-  'format'
+  'format',
+  'engraving_available',
+  'engraving_price'
 ] as const;
 
 /**

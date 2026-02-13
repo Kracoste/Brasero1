@@ -58,6 +58,8 @@ export default function NewProduct() {
     imageScale: '100',
     detailImageScale: '100',
     detailImageOffsetX: '0',
+    engravingAvailable: false,
+    engravingPrice: '',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -283,6 +285,8 @@ export default function NewProduct() {
         on_demand: formData.onDemand,
         is_featured: formData.isFeatured,
         featured_order: parseInt(formData.featuredOrder),
+        engraving_available: formData.engravingAvailable,
+        engraving_price: formData.engravingPrice ? parseFloat(formData.engravingPrice) : 0,
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
@@ -659,7 +663,36 @@ export default function NewProduct() {
                 />
                 <span className="text-sm font-medium text-slate-700">Produit vedette (page d'accueil)</span>
               </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="engravingAvailable"
+                  checked={formData.engravingAvailable}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 rounded border-slate-300 text-[#8B4513] focus:ring-[#8B4513]"
+                />
+                <span className="text-sm font-medium text-slate-700">Gravure personnalisée disponible</span>
+              </label>
             </div>
+
+            {formData.engravingAvailable && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Prix de la gravure (€) *
+                </label>
+                <input
+                  type="number"
+                  name="engravingPrice"
+                  value={formData.engravingPrice}
+                  onChange={handleInputChange}
+                  min="0"
+                  step="0.01"
+                  placeholder="25.00"
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                />
+                <p className="text-xs text-slate-500 mt-1">Prix que le client paiera en supplément pour la gravure</p>
+              </div>
+            )}
 
             {formData.isFeatured && (
               <div>

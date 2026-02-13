@@ -55,6 +55,8 @@ export const productSchema = z.object({
   popularScore: z.number(),
   badge: z.string(),
   onDemand: z.boolean().optional(),
+  engravingAvailable: z.boolean().optional(),
+  engravingPrice: z.number().optional(),
   specs: specSchema,
   highlights: z.array(z.string()),
   features: z.array(

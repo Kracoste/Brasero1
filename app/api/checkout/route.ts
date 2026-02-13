@@ -13,6 +13,7 @@ type CartItem = {
   product_price: number;
   product_image: string | null;
   quantity: number;
+  engraving_text?: string | null;
 };
 
 type CheckoutBody = {
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
       .map((item) => ({
         slug: typeof item.product_slug === 'string' ? item.product_slug.trim() : '',
         quantity: parseQuantity(item.quantity),
+        engraving_text: item.engraving_text || null,
       }))
       .filter((item) => item.slug && item.quantity);
 
@@ -103,7 +105,11 @@ export async function POST(request: NextRequest) {
     // Déterminer l'URL de base
     const origin = request.headers.get('origin') || 'https://www.atelier-lbf.fr';
 
-    const productSlugs = Array.from(new Set(normalizedItems.map((item) => item.slug)));
+    // Séparer les articles normaux des articles gravure
+    const regularItems = normalizedItems.filter(item => !item.slug.endsWith('-gravure'));
+    const engravingItems = normalizedItems.filter(item => item.slug.endsWith('-gravure'));
+
+    const productSlugs = Array.from(new Set(regularItems.map((item) => item.slug)));
     const productClient = getSupabaseAdminClient() ?? supabase;
     const { data: products, error: productsError } = await productClient
       .from('products')
@@ -142,7 +148,7 @@ export async function POST(request: NextRequest) {
 
     // Créer les line items pour Stripe avec les prix venant de la base
     const lineItems = [];
-    for (const item of normalizedItems) {
+    for (const item of regularItems) {
       const product = productsBySlug.get(item.slug);
       const price = Number(product?.price ?? 0);
 
@@ -159,19 +165,66 @@ export async function POST(request: NextRequest) {
           ? images[0]
           : images[0]?.src ?? null;
 
+      // Si cet item a un texte de gravure, l'ajouter dans les metadata du produit Stripe
+      const productMetadata: Record<string, string> = { slug: item.slug };
+      if (item.engraving_text) {
+        productMetadata.engraving_text = item.engraving_text;
+      }
+
       lineItems.push({
         price_data: {
           currency: 'eur',
           product_data: {
             name: product?.name || 'Produit',
             images: getAbsoluteImageUrl(firstImage),
-            metadata: {
-              slug: item.slug,
-            },
+            metadata: productMetadata,
           },
           unit_amount: Math.round(price * 100), // Stripe utilise les centimes
         },
         quantity: item.quantity as number,
+      });
+    }
+
+    // Ajouter les lignes de gravure (prix vérifié depuis la DB)
+    for (const engravingItem of engravingItems) {
+      // Extraire le slug du produit parent (enlever "-gravure" à la fin)
+      const parentSlug = engravingItem.slug.replace(/-gravure$/, '');
+      const parentProduct = productsBySlug.get(parentSlug);
+      
+      if (!parentProduct) continue;
+
+      // Récupérer le prix de gravure depuis la DB pour ce produit
+      const { data: productWithEngraving } = await productClient
+        .from('products')
+        .select('engraving_price, engraving_available')
+        .eq('slug', parentSlug)
+        .single();
+
+      if (!productWithEngraving?.engraving_available || !productWithEngraving?.engraving_price) continue;
+
+      const engravingPrice = Number(productWithEngraving.engraving_price);
+      if (!Number.isFinite(engravingPrice) || engravingPrice <= 0) continue;
+
+      // Trouver le texte de gravure depuis les items réguliers correspondants
+      const parentItem = regularItems.find(ri => ri.slug === parentSlug);
+      const engravingText = parentItem?.engraving_text || 'Gravure personnalisée';
+
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: `Gravure : "${engravingText}"`,
+            images: [],
+            metadata: {
+              slug: engravingItem.slug,
+              is_engraving: 'true',
+              parent_slug: parentSlug,
+              engraving_text: engravingText,
+            },
+          },
+          unit_amount: Math.round(engravingPrice * 100),
+        },
+        quantity: engravingItem.quantity as number,
       });
     }
 

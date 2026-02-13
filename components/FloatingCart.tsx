@@ -87,6 +87,11 @@ export function FloatingCart() {
                         >
                           {item.product_name}
                         </Link>
+                        {item.engraving_text && (
+                          <p className="text-xs text-[#8B4513] italic">
+                            ✏️ Gravure : &quot;{item.engraving_text}&quot;
+                          </p>
+                        )}
                         <p className="text-xs text-slate-600">
                           Quantité: {item.quantity}
                         </p>
