@@ -168,6 +168,9 @@ async function handleCheckoutCompleted(
     if (productMeta?.engraving_text) {
       orderItem.engraving_text = productMeta.engraving_text;
     }
+    if (productMeta?.engraving_font) {
+      orderItem.engraving_font = productMeta.engraving_font;
+    }
 
     return orderItem;
   });

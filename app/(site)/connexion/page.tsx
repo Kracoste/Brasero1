@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'rea
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail, AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 
 function ConnexionPageContent() {
@@ -14,8 +14,7 @@ function ConnexionPageContent() {
   const [loading, setLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const { user, isAdmin, isLoading: authLoading, refreshUser } = useAuth();
+  const { user, isAdmin, isLoading: authLoading } = useAuth();
   const hasRedirected = useRef(false);
   const supabase = useMemo(() => createClient(), []);
 
@@ -46,10 +45,10 @@ function ConnexionPageContent() {
       setIsRedirecting(true);
       const isAdminUser = isAdmin || isAdminEmail(user.email);
       const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
-      router.push(target);
+      window.location.href = target;
     }
     // Si redirectTo est présent, on attend que l'utilisateur se connecte
-  }, [authLoading, user, isAdmin, router, searchParams]);
+  }, [authLoading, user, isAdmin, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,8 +69,8 @@ function ConnexionPageContent() {
         throw new Error('Connexion échouée - pas de session');
       }
 
-      // Rafraîchir l'auth context pour mettre à jour le cache global
-      await refreshUser();
+      // Connexion réussie - on a déjà la session, pas besoin de refreshUser
+      // Le onAuthStateChange dans AuthProvider mettra à jour le contexte automatiquement
 
       // Marquer la redirection immédiatement
       setIsRedirecting(true);
@@ -82,17 +81,24 @@ function ConnexionPageContent() {
       const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
       const finalTarget = getRedirectTarget(target);
 
-      // Synchroniser la session côté serveur (1 seul appel, non bloquant)
-      fetch('/api/auth/sync-session', { 
-        method: 'POST',
-        credentials: 'include'
-      }).catch(() => {});
+      // Synchroniser la session côté serveur avec un timeout de 3s
+      // Si ça prend trop longtemps, on navigue quand même
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        await fetch('/api/auth/sync-session', { 
+          method: 'POST',
+          credentials: 'include',
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+      } catch {
+        // Continue même si sync échoue ou timeout - les cookies client sont déjà là
+      }
 
-      // Utiliser router.push (soft navigation) pour préserver le state React
-      // Le AuthProvider garde le user en cache, pas de perte de session
-      router.push(finalTarget);
-      // Rafraîchir les données serveur (cookies middleware)
-      router.refresh();
+      // Naviguer vers la cible avec un rechargement complet
+      // window.location.href garantit que le middleware verra les cookies à jour
+      window.location.href = finalTarget;
       
     } catch (error: any) {
       setError(error?.message || 'Une erreur est survenue');
@@ -101,6 +107,17 @@ function ConnexionPageContent() {
       hasRedirected.current = false;
     }
   };
+
+  // Sécurité : si la redirection prend trop longtemps (>8s), réinitialiser
+  useEffect(() => {
+    if (!isRedirecting) return;
+    const timeout = setTimeout(() => {
+      setIsRedirecting(false);
+      hasRedirected.current = false;
+      setLoading(false);
+    }, 8000);
+    return () => clearTimeout(timeout);
+  }, [isRedirecting]);
 
   if (isRedirecting) {
     return (

@@ -1,5 +1,4 @@
 import { updateSession } from '@/lib/supabase/middleware'
-import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
 // Headers de sécurité HTTP
@@ -22,8 +21,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(newUrl, 301);
   }
   
-  // Toujours mettre à jour la session pour maintenir l'état de connexion
-  const response = await updateSession(request);
+  // Mettre à jour la session ET récupérer l'utilisateur en une seule opération
+  // C'est critique : on utilise UN SEUL client Supabase qui gère correctement les cookies
+  const { response, user } = await updateSession(request);
   
   // Appliquer les headers de sécurité sur toutes les réponses
   Object.entries(securityHeaders).forEach(([key, value]) => {
@@ -38,31 +38,20 @@ export async function middleware(request: NextRequest) {
     );
   }
   
-  // Protection admin côté serveur : bloquer l'accès aux routes /admin si non-admin
+  // Protection admin côté serveur : utiliser le user déjà récupéré par updateSession
+  // Plus besoin de créer un second client Supabase (c'était la cause du bug de redirection)
   if (pathname.startsWith('/admin')) {
     const adminEmails = (process.env.ADMIN_EMAILS || 'allouhugo@gmail.com')
       .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
     
-    try {
-      const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          cookies: {
-            getAll() {
-              return request.cookies.getAll();
-            },
-            setAll() {},
-          },
-        }
-      );
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user?.email || !adminEmails.includes(user.email.toLowerCase())) {
-        return NextResponse.redirect(new URL('/connexion', request.url));
-      }
-    } catch {
-      return NextResponse.redirect(new URL('/connexion', request.url));
+    if (!user?.email || !adminEmails.includes(user.email.toLowerCase())) {
+      // Copier les cookies de la response updateSession vers la redirect
+      // pour ne pas perdre les tokens rafraîchis
+      const redirectResponse = NextResponse.redirect(new URL('/connexion', request.url));
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+      return redirectResponse;
     }
   }
 

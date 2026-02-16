@@ -190,19 +190,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
         
-        // Pour SIGNED_OUT, vérifier d'abord avec le serveur avant d'effacer
+        // Pour SIGNED_OUT, effacer l'utilisateur directement
+        // Ne PAS faire de getUser() ici car ça peut bloquer/créer un deadlock
+        // lors de la transition SIGNED_OUT -> SIGNED_IN au login
         if (event === 'SIGNED_OUT') {
-          // Double vérification avec getUser() pour éviter les faux positifs
-          const { data: { user: serverUser } } = await supabase.auth.getUser();
-          if (!serverUser) {
-            // Vraiment déconnecté
-            updateUser(null);
-            isInitialized = false;
-          } else {
-            // Faux positif - l'utilisateur est toujours connecté côté serveur
-            devLog('SIGNED_OUT ignoré - utilisateur toujours valide côté serveur');
-            updateUser(serverUser);
-          }
+          updateUser(null);
+          isInitialized = false;
           setIsLoading(false);
           return;
         }

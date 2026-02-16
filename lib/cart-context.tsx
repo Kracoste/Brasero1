@@ -12,6 +12,7 @@ export type CartItem = {
   product_image: string | null;
   quantity: number;
   engraving_text?: string;
+  engraving_font?: string;
 };
 
 type CartContextType = {
@@ -24,7 +25,7 @@ type CartContextType = {
     name: string;
     price: number;
     image?: string;
-  }, quantity?: number, engravingText?: string) => Promise<void>;
+  }, quantity?: number, engravingText?: string, engravingFont?: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -88,6 +89,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     product: { slug: string; name: string; price: number; image?: string },
     quantity: number,
     engravingText?: string,
+    engravingFont?: string,
   ) => {
     syncGuestCart(prev => {
       // Vérifier si on a atteint la limite
@@ -106,6 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           product_image: product.image || null,
           quantity: Math.min(quantity, MAX_QUANTITY_PER_ITEM),
           engraving_text: engravingText,
+          engraving_font: engravingFont,
         };
         return [...prev, newItem];
       }
@@ -264,10 +267,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addItem = async (
     product: { slug: string; name: string; price: number; image?: string },
     quantity: number = 1,
-    engravingText?: string
+    engravingText?: string,
+    engravingFont?: string
   ) => {
     // Toujours ajouter d'abord localement pour une réponse instantanée
-    addGuestItem(product, quantity, engravingText);
+    addGuestItem(product, quantity, engravingText, engravingFont);
     
     // Si l'utilisateur est connecté, synchroniser avec la DB en arrière-plan
     if (user) {

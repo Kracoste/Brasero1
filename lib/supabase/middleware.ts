@@ -1,7 +1,13 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import type { User } from '@supabase/supabase-js'
 
-export async function updateSession(request: NextRequest) {
+/**
+ * Met à jour la session Supabase et retourne la réponse + l'utilisateur authentifié.
+ * Le middleware utilise le user retourné pour les vérifications d'accès (ex: admin),
+ * évitant ainsi de créer un second client Supabase qui causerait des problèmes de cookies.
+ */
+export async function updateSession(request: NextRequest): Promise<{ response: NextResponse; user: User | null }> {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -36,9 +42,11 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // Refresh session - juste rafraîchir, pas de redirection
+  // Refresh session et récupérer l'utilisateur
+  let user: User | null = null
   try {
-    await supabase.auth.getUser();
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    user = currentUser
   } catch {
     // If error, continue without blocking
   }
@@ -56,5 +64,5 @@ export async function updateSession(request: NextRequest) {
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely!
 
-  return supabaseResponse
+  return { response: supabaseResponse, user }
 }

@@ -23,11 +23,12 @@ type AddToCartButtonProps = {
   };
   selectedAccessories?: SelectedAccessory[];
   engravingText?: string;
+  engravingFont?: string;
   engravingPrice?: number;
   className?: string;
 };
 
-export function AddToCartButton({ product, selectedAccessories = [], engravingText, engravingPrice, className = '' }: AddToCartButtonProps) {
+export function AddToCartButton({ product, selectedAccessories = [], engravingText, engravingFont, engravingPrice, className = '' }: AddToCartButtonProps) {
   const { addItem, totalPrice: cartTotal, itemCount: cartItemsCount } = useCart();
   const { trackAddToCart } = useAnalytics();
   const [quantity, setQuantity] = useState(1);
@@ -67,7 +68,8 @@ export function AddToCartButton({ product, selectedAccessories = [], engravingTe
           image: product.images[0]?.src,
         },
         quantity,
-        engravingText
+        engravingText,
+        engravingFont
       );
 
       // Si gravure, ajouter une ligne séparée pour le prix de la gravure

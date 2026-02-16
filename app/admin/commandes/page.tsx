@@ -10,6 +10,7 @@ type OrderItem = {
   unit_price: number;
   total_price: number;
   engraving_text?: string;
+  engraving_font?: string;
 };
 
 type Order = {
@@ -204,7 +205,11 @@ function OrderDetailModal({
                     <div>
                       <span className="text-sm font-medium text-slate-900">{item.product_name}</span>
                       {item.engraving_text && (
-                        <p className="text-xs text-[#8B4513] italic">✏️ Gravure : &quot;{item.engraving_text}&quot;</p>
+                        <p className="text-xs text-[#8B4513] italic">✏️ Gravure : &quot;{item.engraving_text}&quot;
+                          {item.engraving_font && (
+                            <span className="text-[10px] text-slate-500 not-italic ml-1">— style : {item.engraving_font}</span>
+                          )}
+                        </p>
                       )}
                     </div>
                   </div>

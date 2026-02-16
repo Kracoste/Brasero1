@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ChevronLeft, Menu, X } from 'lucide-react';
 
 import { AdminSignOutButton } from '@/components/AdminSignOutButton';
-import { AuthRedirect } from '@/components/AuthRedirect';
 import { AuthProvider } from '@/lib/auth-context';
 
 type AdminLayoutProps = {
@@ -64,48 +63,46 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <AuthProvider>
-      <AuthRedirect requireAdmin={true}>
-        <div className="flex h-screen bg-white">
-          {/* Mobile header */}
-          <div className="fixed top-0 left-0 right-0 z-40 flex items-center gap-3 px-4 py-3 text-white lg:hidden" style={{ background: 'linear-gradient(to right, #8B4513, #5D3A1A)' }}>
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-1 rounded-lg hover:bg-white/10 transition"
-              aria-label="Ouvrir le menu"
-            >
-              <Menu size={24} />
-            </button>
-            <h1 className="text-lg font-bold">Admin LBF</h1>
-          </div>
-
-          {/* Mobile sidebar overlay */}
-          {sidebarOpen && (
-            <div className="fixed inset-0 z-50 lg:hidden">
-              <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
-              <aside className="fixed inset-y-0 left-0 w-72 text-white flex flex-col z-50" style={{ background: 'linear-gradient(to bottom, #8B4513, #5D3A1A, #3D2314)' }}>
-                <div className="flex items-center justify-end p-3">
-                  <button
-                    onClick={() => setSidebarOpen(false)}
-                    className="p-1 rounded-lg hover:bg-white/10 transition"
-                    aria-label="Fermer le menu"
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
-                <AdminSidebar onNavigate={() => setSidebarOpen(false)} />
-              </aside>
-            </div>
-          )}
-
-          {/* Desktop sidebar */}
-          <aside className="hidden lg:flex w-64 text-white flex-col flex-shrink-0" style={{ background: 'linear-gradient(to bottom, #8B4513, #5D3A1A, #3D2314)' }}>
-            <AdminSidebar />
-          </aside>
-
-          {/* Main content */}
-          <main className="flex-1 overflow-auto pt-14 lg:pt-0">{children}</main>
+      <div className="flex h-screen bg-white">
+        {/* Mobile header */}
+        <div className="fixed top-0 left-0 right-0 z-40 flex items-center gap-3 px-4 py-3 text-white lg:hidden" style={{ background: 'linear-gradient(to right, #8B4513, #5D3A1A)' }}>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-1 rounded-lg hover:bg-white/10 transition"
+            aria-label="Ouvrir le menu"
+          >
+            <Menu size={24} />
+          </button>
+          <h1 className="text-lg font-bold">Admin LBF</h1>
         </div>
-      </AuthRedirect>
+
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
+            <aside className="fixed inset-y-0 left-0 w-72 text-white flex flex-col z-50" style={{ background: 'linear-gradient(to bottom, #8B4513, #5D3A1A, #3D2314)' }}>
+              <div className="flex items-center justify-end p-3">
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-1 rounded-lg hover:bg-white/10 transition"
+                  aria-label="Fermer le menu"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <AdminSidebar onNavigate={() => setSidebarOpen(false)} />
+            </aside>
+          </div>
+        )}
+
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:flex w-64 text-white flex-col flex-shrink-0" style={{ background: 'linear-gradient(to bottom, #8B4513, #5D3A1A, #3D2314)' }}>
+          <AdminSidebar />
+        </aside>
+
+        {/* Main content */}
+        <main className="flex-1 overflow-auto pt-14 lg:pt-0">{children}</main>
+      </div>
     </AuthProvider>
   );
 }

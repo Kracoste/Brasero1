@@ -90,6 +90,11 @@ export function FloatingCart() {
                         {item.engraving_text && (
                           <p className="text-xs text-[#8B4513] italic">
                             ✏️ Gravure : &quot;{item.engraving_text}&quot;
+                            {item.engraving_font && (
+                              <span className="text-[10px] text-slate-500 not-italic ml-1">
+                                ({item.engraving_font})
+                              </span>
+                            )}
                           </p>
                         )}
                         <p className="text-xs text-slate-600">

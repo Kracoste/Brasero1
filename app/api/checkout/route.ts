@@ -14,6 +14,7 @@ type CartItem = {
   product_image: string | null;
   quantity: number;
   engraving_text?: string | null;
+  engraving_font?: string | null;
 };
 
 type CheckoutBody = {
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest) {
         slug: typeof item.product_slug === 'string' ? item.product_slug.trim() : '',
         quantity: parseQuantity(item.quantity),
         engraving_text: item.engraving_text || null,
+        engraving_font: item.engraving_font || null,
       }))
       .filter((item) => item.slug && item.quantity);
 
@@ -170,6 +172,9 @@ export async function POST(request: NextRequest) {
       if (item.engraving_text) {
         productMetadata.engraving_text = item.engraving_text;
       }
+      if (item.engraving_font) {
+        productMetadata.engraving_font = item.engraving_font;
+      }
 
       lineItems.push({
         price_data: {
@@ -220,6 +225,7 @@ export async function POST(request: NextRequest) {
               is_engraving: 'true',
               parent_slug: parentSlug,
               engraving_text: engravingText,
+              engraving_font: parentItem?.engraving_font || '',
             },
           },
           unit_amount: Math.round(engravingPrice * 100),

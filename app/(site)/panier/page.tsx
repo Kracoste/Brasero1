@@ -103,6 +103,11 @@ export default function PanierPage() {
                       {item.engraving_text && (
                         <p className="mt-0.5 text-sm text-[#8B4513] italic">
                           ✏️ Gravure : &quot;{item.engraving_text}&quot;
+                          {item.engraving_font && (
+                            <span className="text-xs text-slate-500 not-italic ml-1">
+                              — style {item.engraving_font}
+                            </span>
+                          )}
                         </p>
                       )}
                       <p className="mt-1 text-sm text-slate-500">
