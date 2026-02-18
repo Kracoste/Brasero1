@@ -4,12 +4,11 @@ import { HeroMenu } from "@/components/HeroMenu";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/site-settings";
+import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 import { Flame, Truck, Shield, Award } from "lucide-react";
 
-// Cache ISR de 60 secondes pour équilibrer performance et fraîcheur des données
-// Pas de cache - les données sont toujours fraîches
-export const revalidate = 0;
+// Force dynamic rendering — données toujours fraîches depuis Supabase
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -66,35 +65,9 @@ export default async function HomePage() {
     allProducts = [...allProducts, ...(moreProducts || [])];
   }
 
-  const braseros = allProducts.map((p: any) => ({
-    slug: p.slug,
-    name: p.name,
-    shortDescription: p.shortDescription || p.short_description || '',
-    description: p.description || '',
-    category: p.category,
-    price: p.price,
-    comparePrice: p.comparePrice || p.compare_price,
-    discountPercent: p.discountPercent || p.discount_percent,
-    badge: p.badge || '',
-    images: p.images || [],
-    popularScore: p.popularScore || p.popular_score || 50,
-    onDemand: p.onDemand ?? p.on_demand ?? false,
-    madeIn: 'France' as const,
-    material: p.material || '',
-    diameter: p.diameter || 0,
-    thickness: p.thickness || 0,
-    height: p.height || 0,
-    weight: p.weight || 0,
-    warranty: p.warranty || '',
-    availability: p.availability || 'En stock',
-    shipping: p.shipping || '',
-    specs: p.specs || { acier: '', epaisseur: '', dimensions: '', poids: '' },
-    highlights: p.highlights || [],
-    features: p.features || [],
-    location: p.location || { city: '', dept: '', lat: 0, lng: 0 },
-    faq: p.faq || [],
-    customSpecs: p.customSpecs || p.custom_specs,
-  })) as Product[];
+  const braseros = allProducts
+    .map((p: Record<string, unknown>) => mapSupabaseProduct(p))
+    .filter(Boolean) as Product[];
 
   const settings = await getSiteSettings();
 
@@ -318,7 +291,7 @@ type CategoryTileProps = {
 };
 
 const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTileProps) => (
-  <a
+  <Link
     href={href}
     className={`relative block overflow-hidden rounded-xl sm:rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${
       compact ? 'h-[120px] sm:h-[140px] lg:h-[160px]' : 'h-[180px] sm:h-[200px] lg:h-[240px]'
@@ -338,7 +311,7 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
         {cta}
       </span>
     </div>
-  </a>
+  </Link>
 );
 
 const PromoTile = () => (

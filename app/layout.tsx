@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Geist, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@/styles/globals.css";
@@ -9,11 +9,6 @@ import { SiteSettingsProvider } from "@/components/SiteSettingsProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -118,7 +113,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
       </head>
-      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} antialiased`}>
+      <body suppressHydrationWarning className={`${geistSans.variable} ${displayFont.variable} antialiased`}>
         <div id="google_translate_element" style={{ display: 'none' }} />
         {/* Google Tag Manager (noscript) */}
         <noscript>

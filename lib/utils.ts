@@ -72,7 +72,7 @@ export const parseNumericValue = (value: unknown) => {
   return undefined;
 };
 
-const normalizeSpecs = (specs: unknown): Record<string, unknown> => {
+export const normalizeSpecs = (specs: unknown): Record<string, unknown> => {
   if (!specs) return {};
   if (typeof specs === "string") {
     try {
@@ -330,3 +330,55 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
 
 export const getProductBySlug = (products: Product[], slug: string) =>
   products.find((product) => product.slug === slug);
+
+/**
+ * Mappe un produit issu de Supabase (snake_case ou camelCase) vers le type Product.
+ * Centralise la logique de normalisation pour éviter la duplication.
+ */
+export const mapSupabaseProduct = (p: Record<string, unknown>): Product | null => {
+  if (!p) return null;
+  const specs = normalizeSpecs(p.specs);
+  const diameter =
+    resolveDiameter({ ...p, specs }) ?? 0;
+
+  return {
+    slug: (p.slug as string) ?? "",
+    name: (p.name as string) ?? "Produit",
+    shortDescription: (p.shortDescription || p.short_description || "") as string,
+    description: (p.description || "") as string,
+    category: ((p.category as string) || "accessoire") as Product["category"],
+    price: Number(p.price ?? 0),
+    comparePrice: (p.comparePrice || p.compare_price) as number | undefined,
+    discountPercent: (p.discountPercent || p.discount_percent) as number | undefined,
+    badge: (p.badge || "") as string,
+    images: (Array.isArray(p.images) ? p.images : []).map((img: Record<string, unknown>) => ({
+      src: (img.src as string) || "",
+      alt: (img.alt as string) || (p.name as string) || "Image produit",
+      width: (img.width as number) || 800,
+      height: (img.height as number) || 600,
+      blurDataURL: (img.blurDataURL as string) || "",
+    })),
+    material: (p.material || "Acier") as string,
+    madeIn: "France" as const,
+    diameter,
+    length: (p.length as number) || 0,
+    width: (p.width as number) || 0,
+    thickness: (p.thickness as number) || 0,
+    height: (p.height as number) || 0,
+    weight: (p.weight as number) || 0,
+    warranty: (p.warranty || "Garantie atelier") as string,
+    availability: (p.availability || "En stock") as string,
+    shipping: (p.shipping || "") as string,
+    popularScore: ((p.popularScore || p.popular_score || 50) as number),
+    onDemand: (p.onDemand ?? p.on_demand ?? false) as boolean,
+    specs:
+      (specs && Object.keys(specs).length > 0
+        ? specs
+        : { dimensions: diameter ? `Ø ${diameter} cm` : "-" }) as Product["specs"],
+    highlights: (p.highlights || []) as string[],
+    features: (p.features || []) as Product["features"],
+    faq: (p.faq || []) as Product["faq"],
+    customSpecs: (p.customSpecs || p.custom_specs || []) as Product["customSpecs"],
+    location: (p.location || { city: "", dept: "", lat: 0, lng: 0 }) as Product["location"],
+  };
+};

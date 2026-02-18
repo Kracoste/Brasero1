@@ -16,18 +16,9 @@ type ProductTabsProps = {
   faqOptions?: FAQOptions;
 };
 
-const tabs = [
-  { id: "description", label: "Description du produit" },
-  { id: "specifications", label: "Spécifications" },
-  { id: "faq", label: "FAQ" },
-  { id: "critiques", label: "Critiques" },
-];
-
 export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTabsProps) => {
   const [activeTab, setActiveTab] = useState("description");
-  const descriptionRef = useRef<HTMLDivElement | null>(null);
-  const faqRef = useRef<HTMLDivElement | null>(null);
-  const reviewsRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   // Générer la FAQ dynamique en fonction du produit et des options (variantes)
   const dynamicFAQ = useMemo(
@@ -35,19 +26,22 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
     [product, faqOptions]
   );
 
-  const tabToRef: Record<string, React.RefObject<HTMLDivElement | null>> = {
-    description: descriptionRef,
-    specifications: descriptionRef,
-    faq: faqRef,
-    critiques: reviewsRef,
-  };
+  const hasCharacteristics = product.specs?.characteristics && product.specs.characteristics.length > 0;
+
+  // Construire les onglets dynamiquement
+  const tabs = [
+    { id: "description", label: "Description du produit" },
+    { id: "specifications", label: "Spécifications" },
+    ...(hasCharacteristics ? [{ id: "characteristics", label: "Caractéristiques" }] : []),
+    ...(dynamicFAQ.length > 0 ? [{ id: "faq", label: "FAQ" }] : []),
+    { id: "critiques", label: "Critiques" },
+  ];
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
-    const target = tabToRef[tabId]?.current;
-    if (target) {
+    if (contentRef.current) {
       requestAnimationFrame(() => {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   };
@@ -83,9 +77,11 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
         </div>
       )}
 
-      {/* Contenu des onglets */}
-      <div className="space-y-8 py-2">
-        <div ref={descriptionRef} className="scroll-mt-32">
+      {/* Contenu des onglets — un seul onglet visible à la fois */}
+      <div ref={contentRef} className="py-6 scroll-mt-32">
+
+        {/* === DESCRIPTION === */}
+        {(activeTab === "description" || activeTab === "specifications") && (
           <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(450px,1.2fr)]">
             <div className="space-y-4 text-gray-700">
               <p className="leading-relaxed text-[15px]">{product.description}</p>
@@ -99,7 +95,6 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
               {/* Caractéristiques avec icônes */}
               <div className="px-4 py-4 border-b border-gray-200">
                 <div className="grid grid-cols-2 gap-4">
-                  {/* Convives - seulement pour braseros */}
                   {product.category === "brasero" && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -111,7 +106,6 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                       </div>
                     </div>
                   )}
-                  {/* Combustible - seulement pour braseros */}
                   {product.category === "brasero" && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -123,7 +117,6 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                       </div>
                     </div>
                   )}
-                  {/* Matière - pour tous les produits */}
                   {product.material && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -135,7 +128,6 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                       </div>
                     </div>
                   )}
-                  {/* Dimensions - pour tous les produits */}
                   {(product.length || product.width || product.height || product.diameter) && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -147,7 +139,6 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                       </div>
                     </div>
                   )}
-                  {/* Poids - seulement si défini */}
                   {(product.weight || product.specs?.poids) && product.category === "brasero" && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -159,7 +150,6 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                       </div>
                     </div>
                   )}
-                  {/* Peinture - seulement si défini */}
                   {product.specs?.painting && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -171,7 +161,6 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                       </div>
                     </div>
                   )}
-                  {/* Matière plancha - seulement si défini */}
                   {product.specs?.planchaMaterial && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -218,31 +207,28 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
               </dl>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Tableau des caractéristiques (style brasero.com) */}
-        {product.specs?.characteristics && product.specs.characteristics.length > 0 && (
-          <div className="scroll-mt-32">
-            <h2 className="font-display text-2xl font-bold text-slate-900 uppercase tracking-wide mb-6">
+        {/* === CARACTÉRISTIQUES === */}
+        {activeTab === "characteristics" && hasCharacteristics && (
+          <div>
+            <h2 className="font-display text-2xl font-bold text-slate-900 uppercase tracking-wide mb-8">
               Caractéristiques
             </h2>
-            <div className="rounded-xl overflow-hidden border border-amber-100">
-              {/* Titre du produit en en-tête */}
-              <div className="bg-amber-50/80 px-6 py-4 border-b border-amber-100">
-                <p className="font-bold text-slate-900 uppercase text-sm tracking-wide">{product.name}</p>
+            <div className="max-w-3xl">
+              {/* En-tête nom du produit */}
+              <div className="border-b-2 border-slate-900 pb-3 mb-0">
+                <p className="font-display font-bold text-slate-900 uppercase text-sm tracking-widest">{product.name}</p>
               </div>
-              {/* Lignes du tableau */}
-              <dl>
-                {product.specs.characteristics.map((item: { label: string; value: string }, idx: number) => (
+              {/* Lignes */}
+              <dl className="divide-y divide-slate-200">
+                {product.specs!.characteristics!.map((item: { label: string; value: string }, idx: number) => (
                   <div
                     key={item.label}
-                    className={cn(
-                      "grid grid-cols-[minmax(180px,1fr)_1.5fr] gap-6 px-6 py-4",
-                      idx % 2 === 0 ? "bg-amber-50/40" : "bg-white"
-                    )}
+                    className="flex items-baseline justify-between py-4 gap-8"
                   >
-                    <dt className="font-bold text-slate-900 text-sm">{item.label}</dt>
-                    <dd className="text-slate-700 text-sm">{item.value}</dd>
+                    <dt className="text-sm font-semibold text-slate-900 shrink-0">{item.label}</dt>
+                    <dd className="text-sm text-slate-600 text-right">{item.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -250,9 +236,9 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
           </div>
         )}
 
-        {/* Section FAQ dynamique */}
-        {dynamicFAQ.length > 0 && (
-          <div ref={faqRef} className="space-y-6 scroll-mt-32">
+        {/* === FAQ === */}
+        {activeTab === "faq" && dynamicFAQ.length > 0 && (
+          <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Questions fréquentes</h2>
               <p className="text-sm text-gray-500 mb-6">
@@ -282,12 +268,12 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
           </div>
         )}
 
-        <div ref={reviewsRef} className="space-y-6 scroll-mt-32">
-          {/* Section avis Google à venir */}
+        {/* === CRITIQUES === */}
+        {activeTab === "critiques" && (
           <div className="text-center py-8 text-gray-500">
             <p className="text-sm">Les avis clients seront bientôt disponibles.</p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

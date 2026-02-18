@@ -11,7 +11,7 @@ const envAdminEmails = process.env.ADMIN_EMAILS
 
 export const ADMIN_EMAILS: string[] = envAdminEmails.length > 0
   ? envAdminEmails
-  : ['allouhugo@gmail.com']; // Fallback de sécurité
+  : ['allouhugo@gmail.com'];
 
 /**
  * Vérifie si un email est celui d'un administrateur

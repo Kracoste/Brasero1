@@ -4,8 +4,6 @@
   --background: #f6f1e9;
   --foreground: #111111;
   --brand-primary: #1a1a1a;
-  --brand-accent: #6fbf73;
-  --brand-secondary: #0f6a36;
   --muted: #9ca3af;
 }
 
@@ -51,24 +49,6 @@ body {
 }
 .filter-button {
   position: relative;
-}
-
-.filter-button::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 3.3ch;
-  height: 3px;
-  background: #8b4513;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-
-.filter-button:hover::after,
-.filter-button:focus-visible::after {
-  transform: scaleX(1);
 }
 
 .header-texture {

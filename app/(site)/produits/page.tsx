@@ -4,27 +4,14 @@ import { CatalogueView } from "@/components/CatalogueView";
 import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
 import { createClient } from "@/lib/supabase/server";
-import { resolveDiameter } from "@/lib/utils";
-
-const normalizeSpecs = (specs: any) => {
-  if (!specs) return {};
-  if (typeof specs === "string") {
-    try {
-      return JSON.parse(specs);
-    } catch {
-      return {};
-    }
-  }
-  return specs;
-};
+import { mapSupabaseProduct } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Catalogue",
   description: "Parcourez nos braséros en acier corten et notre fendeur à bûches Made in France.",
 };
 
-// Pas de cache - les données sont toujours fraîches
-export const revalidate = 0;
+// Force dynamic rendering — données toujours fraîches depuis Supabase
 export const dynamic = 'force-dynamic';
 
 type SearchParams = {
@@ -48,47 +35,10 @@ export default async function ProductsPage({ searchParams }: Props) {
     .select('*')
     .order('created_at', { ascending: false });
 
-  // Transformer les produits Supabase au format attendu (supporte camelCase et snake_case)
-  const allProducts = (supabaseProducts || []).map((p: any) => {
-    const specs = normalizeSpecs(p.specs);
-    const diameter =
-      resolveDiameter({
-        ...p,
-        specs,
-      }) ?? 0;
-
-    return {
-      diameter,
-      slug: p.slug,
-      name: p.name,
-      shortDescription: p.shortDescription || p.short_description || '',
-      description: p.description || '',
-      category: p.category,
-      price: p.price,
-      comparePrice: p.comparePrice || p.compare_price,
-      discountPercent: p.discountPercent || p.discount_percent,
-      badge: p.badge,
-      images: p.images || [],
-      material: p.material,
-      format: (specs?.format as string | undefined) || p.format,
-      madeIn: p.madeIn || p.made_in || 'France',
-      thickness: p.thickness,
-      height: p.height,
-      weight: p.weight,
-      warranty: p.warranty,
-      availability: p.availability || 'En stock',
-      shipping: p.shipping,
-      popularScore: p.popularScore || p.popular_score || 50,
-      inStock: p.inStock ?? p.in_stock ?? true,
-      onDemand: p.onDemand ?? p.on_demand ?? false,
-      specs: specs || {},
-      highlights: p.highlights || [],
-      features: p.features || [],
-      faq: p.faq || [],
-      customSpecs: p.customSpecs || p.custom_specs || [],
-      location: p.location,
-    };
-  });
+  // Transformer les produits Supabase au format attendu
+  const allProducts = (supabaseProducts || [])
+    .map((p: Record<string, unknown>) => mapSupabaseProduct(p))
+    .filter(Boolean) as NonNullable<ReturnType<typeof mapSupabaseProduct>>[];
   
   const filteredProducts =
     category === "promotions"

@@ -2,7 +2,7 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
 import { isAdminEmail } from '@/lib/auth'
 
-// Headers de sécurité HTTP
+// Headers de sécurité HTTP (sans CSP pour éviter de bloquer les appels Supabase/Stripe)
 const securityHeaders = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',

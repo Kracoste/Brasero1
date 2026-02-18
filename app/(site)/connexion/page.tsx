@@ -120,14 +120,22 @@ function ConnexionPageContent() {
       }
 
       // Injecter la session dans le client Supabase (pour les cookies)
-      // On n'attend PAS la résolution complète pour éviter les locks
-      supabase.auth.setSession({
-        access_token: body.access_token,
-        refresh_token: body.refresh_token,
-      }).catch(() => {});
+      // On attend avec un timeout pour éviter les locks du navigateur
+      // (le lock API peut bloquer setSession si un autre onglet le détient)
+      try {
+        await Promise.race([
+          supabase.auth.setSession({
+            access_token: body.access_token,
+            refresh_token: body.refresh_token,
+          }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('setSession timeout')), 5000)),
+        ]);
+      } catch {
+        // Si setSession timeout ou échoue, on continue — les tokens REST sont valides
+      }
 
-      // Petit délai pour laisser les cookies se mettre en place
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Petit délai pour s'assurer que les cookies sont bien écrits
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Connexion réussie → rediriger
       performRedirect(body.user?.email);
