@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Product } from "@/lib/schema";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,25 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
   const activeImage = product.images[activeIndex];
   const isAccessory = product.category === 'accessoire';
 
+  // Scroll la barre de miniatures vers l'index actif
+  const scrollToThumbnail = (index: number) => {
+    if (thumbnailsRef.current) {
+      const container = thumbnailsRef.current;
+      const child = container.children[index] as HTMLElement | undefined;
+      if (child) {
+        const left = child.offsetLeft - container.offsetLeft - (container.clientWidth / 2) + (child.clientWidth / 2);
+        container.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+      }
+    }
+  };
+
+  // S'assurer que la 1ère miniature est visible au montage
+  useEffect(() => {
+    if (thumbnailsRef.current) {
+      thumbnailsRef.current.scrollTo({ left: 0 });
+    }
+  }, []);
+
   const goToPrevious = () => {
     const newIndex = activeIndex === 0 ? product.images.length - 1 : activeIndex - 1;
     setActiveIndex(newIndex);
@@ -30,21 +49,9 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
     scrollToThumbnail(newIndex);
   };
 
-  const scrollToThumbnail = (index: number) => {
-    if (thumbnailsRef.current) {
-      const thumbnails = thumbnailsRef.current.children;
-      if (thumbnails[index]) {
-        (thumbnails[index] as HTMLElement).scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'center'
-        });
-      }
-    }
-  };
-
   const handleThumbnailClick = (index: number) => {
     setActiveIndex(index);
+    scrollToThumbnail(index);
   };
 
   return (
@@ -95,10 +102,10 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
           <div className="w-10" />
         )}
         
-        {/* Miniatures - centrées */}
+        {/* Miniatures - scrollable horizontalement, alignées à gauche pour ne pas cacher la 1ère */}
         <div 
           ref={thumbnailsRef}
-          className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide justify-center flex-1 mx-2"
+          className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-1 mx-2 items-center"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {product.images.map((image, index) => (
@@ -107,7 +114,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
               type="button"
               onClick={() => handleThumbnailClick(index)}
               className={cn(
-                "relative flex-shrink-0 overflow-hidden rounded-lg bg-transparent transition-all",
+                "relative flex-shrink-0 overflow-hidden rounded-lg transition-all",
                 activeIndex === index
                   ? "opacity-100"
                   : "opacity-50 hover:opacity-80",
@@ -119,7 +126,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
                 alt={image.alt}
                 width={200}
                 height={150}
-                className="h-20 w-24 sm:h-24 sm:w-28 object-contain p-2"
+                className="h-16 w-20 sm:h-20 sm:w-24 object-cover rounded-md"
                 placeholder={image.blurDataURL ? "blur" : "empty"}
                 blurDataURL={image.blurDataURL}
               />
