@@ -28,13 +28,19 @@ export interface OrderEmailData {
   orderNumber: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
   totalAmount: number;
   items: Array<{
     name: string;
+    description?: string;
     quantity: number;
     price: number;
+    imageUrl?: string;
   }>;
   shippingAddress?: string;
+  shippingCost?: number;
+  discount?: number;
+  orderDate?: string;
   trackingNumber?: string;
   carrier?: string;
 }
@@ -255,14 +261,33 @@ function escapeHtml(str: string): string {
 function generateOrderConfirmationHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeEmail = escapeHtml(order.customerEmail);
+  const safePhone = order.customerPhone ? escapeHtml(order.customerPhone) : '';
   const safeAddress = order.shippingAddress ? escapeHtml(order.shippingAddress) : '';
+  const orderDate = order.orderDate || new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  // Sous-total articles (sans livraison ni remise)
+  const subtotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shippingCost = order.shippingCost ?? 0;
+  const discount = order.discount ?? 0;
+  const tvaRate = 0.20;
+  const tvaAmount = order.totalAmount - (order.totalAmount / (1 + tvaRate));
+
   const itemsHTML = order.items
     .map(
       (item) => `
     <tr>
-      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(item.name)}</td>
-      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
-      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">${item.price.toFixed(2)} €</td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; width: 80px;">
+        ${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;" />` : ''}
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+        <strong style="font-size: 15px; color: #1f2937;">${escapeHtml(item.name)}</strong>
+        ${item.description ? `<br><span style="font-size: 13px; color: #6b7280;">${escapeHtml(item.description)}</span>` : ''}
+        <br><span style="font-size: 13px; color: #6b7280;">Quantité : ${item.quantity}</span>
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; text-align: right; white-space: nowrap;">
+        <strong style="font-size: 15px; color: #1f2937;">${(item.price * item.quantity).toFixed(2).replace('.', ',')} €</strong>
+      </td>
     </tr>
   `
     )
@@ -276,78 +301,95 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Confirmation de commande</title>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f9fafb; margin: 0; padding: 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <!-- Header -->
-    <div style="background: linear-gradient(135deg, #8B4513 0%, #CD853F 100%); padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Merci pour votre commande !</h1>
-    </div>
+<body style="font-family: Georgia, 'Times New Roman', serif; line-height: 1.6; color: #374151; background-color: #f5f0eb; margin: 0; padding: 20px;">
+  <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
     
-    <!-- Content -->
-    <div style="padding: 40px 20px;">
-      <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${safeName}</strong>,
-      </p>
-      
-      <p style="font-size: 16px; margin-bottom: 30px;">
-        Nous avons bien reçu votre commande <strong>#${safeOrderNumber}</strong>. 
-        Nous préparons votre brasero artisanal avec soin et vous tiendrons informé de l'expédition.
-      </p>
-      
-      <!-- Order Details -->
-      <div style="background-color: #f9fafb; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
-        <h2 style="font-size: 18px; margin-top: 0; color: #1f2937;">Détails de la commande</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background-color: #e5e7eb;">
-              <th style="padding: 12px; text-align: left; font-weight: 600;">Produit</th>
-              <th style="padding: 12px; text-align: center; font-weight: 600;">Qté</th>
-              <th style="padding: 12px; text-align: right; font-weight: 600;">Prix</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHTML}
-          </tbody>
+    <!-- Logo Header -->
+    <div style="padding: 30px 20px 10px; text-align: center;">
+      <img src="https://www.atelier-lbf.fr/logo/Logo1.png" alt="Atelier LBF" style="height: 80px; width: auto;" />
+    </div>
+
+    <!-- Titre -->
+    <div style="text-align: center; padding: 10px 20px 20px;">
+      <h1 style="font-family: Georgia, serif; font-size: 26px; font-weight: 400; color: #1f2937; margin: 0 0 8px 0; border-bottom: 2px solid #1f2937; display: inline-block; padding-bottom: 4px;">Confirmation de commande</h1>
+      <p style="font-size: 15px; color: #6b7280; margin: 12px 0 0 0;">Merci ${safeName} &mdash; on a bien reçu votre commande.</p>
+    </div>
+
+    <!-- Infos commande -->
+    <div style="margin: 0 24px; padding: 18px 20px; background-color: #faf8f5; border-radius: 6px; border: 1px solid #e8e2da;">
+      <table style="width: 100%; font-size: 14px; color: #374151;" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding: 3px 0;"><strong>N° de commande :</strong> ${safeOrderNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 3px 0;"><strong>Date :</strong> ${escapeHtml(orderDate)}</td>
+        </tr>
+        <tr>
+          <td style="padding: 3px 0;"><strong>Email client :</strong> ${safeEmail}</td>
+        </tr>
+        ${safePhone ? `<tr><td style="padding: 3px 0;"><strong>Téléphone :</strong> ${safePhone}</td></tr>` : ''}
+      </table>
+    </div>
+
+    <!-- Articles -->
+    <div style="padding: 24px;">
+      <h2 style="font-family: Georgia, serif; font-size: 18px; font-weight: 400; color: #1f2937; margin: 0 0 16px 0; font-style: italic;">Article(s)</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tbody>
+          ${itemsHTML}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Récapitulatif prix -->
+    <div style="padding: 0 24px 24px;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 6px 0; font-size: 14px; color: #374151;"><strong>Sous-total</strong></td>
+          <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${subtotal.toFixed(2).replace('.', ',')} €</td>
+          <td style="padding: 6px 0; padding-left: 30px; font-size: 14px; color: #374151;"><strong>Livraison</strong></td>
+          <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${shippingCost > 0 ? shippingCost.toFixed(2).replace('.', ',') + ' €' : 'Offerte'}</td>
+        </tr>
+        ${discount > 0 ? `
+        <tr>
+          <td style="padding: 6px 0; font-size: 14px; color: #374151;"></td>
+          <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;"></td>
+          <td style="padding: 6px 0; padding-left: 30px; font-size: 14px; color: #374151;"><strong>Remise</strong></td>
+          <td style="padding: 6px 0; font-size: 14px; color: #059669; text-align: right;">-${discount.toFixed(2).replace('.', ',')} €</td>
+        </tr>
+        ` : ''}
+      </table>
+
+      <!-- Adresse de livraison -->
+      ${safeAddress ? `
+      <div style="margin-top: 16px;">
+        <p style="font-size: 14px; color: #374151; margin: 0;"><strong>Livraison à domicile</strong></p>
+        <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">${safeAddress.replace(/,/g, '<br>')}</p>
+        <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">Référence : ${safeOrderNumber}</p>
+      </div>
+      ` : ''}
+
+      <!-- Total -->
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 2px solid #1f2937;">
+        <table style="width: 100%;">
+          <tr>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937;">Total</td>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937; text-align: right;">${order.totalAmount.toFixed(2).replace('.', ',')} €</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="font-size: 13px; color: #6b7280; text-align: right; padding-top: 2px;">TVA : 20 % incuse (${tvaAmount.toFixed(2).replace('.', ',')} €)</td>
+          </tr>
         </table>
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #8B4513;">
-          <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700;">
-            <span>Total</span>
-            <span>${order.totalAmount.toFixed(2)} €</span>
-          </div>
-        </div>
-      </div>
-      
-      ${
-        safeAddress
-          ? `
-      <div style="margin-bottom: 30px;">
-        <h3 style="font-size: 16px; margin-bottom: 10px; color: #1f2937;">Adresse de livraison</h3>
-        <p style="margin: 0; color: #6b7280;">${safeAddress}</p>
-      </div>
-      `
-          : ''
-      }
-      
-      <p style="font-size: 14px; color: #6b7280; margin-bottom: 30px;">
-        Vous recevrez un email dès l'expédition de votre commande avec un numéro de suivi.
-      </p>
-      
-      <!-- CTA Button -->
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
-           style="display: inline-block; padding: 14px 32px; background-color: #8B4513; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-          Suivre ma commande
-        </a>
       </div>
     </div>
-    
+
     <!-- Footer -->
-    <div style="background-color: #f9fafb; padding: 30px 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
-      <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
-        Une question ? Contactez-nous à <a href="mailto:atelier-lbf@outlook.com" style="color: #8B4513; text-decoration: none;">atelier-lbf@outlook.com</a>
+    <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
+      <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
+        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-        © ${new Date().getFullYear()} Brasero Atelier LBF - Moncoutant, France
+        © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
       </p>
     </div>
   </div>
@@ -359,20 +401,35 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
 function generateOrderShippedHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeEmail = escapeHtml(order.customerEmail);
+  const safePhone = order.customerPhone ? escapeHtml(order.customerPhone) : '';
+  const safeAddress = order.shippingAddress ? escapeHtml(order.shippingAddress) : '';
+
+  const itemsHTML = order.items
+    .map(
+      (item) => `
+    <tr>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; width: 80px;">
+        ${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;" />` : ''}
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+        <strong style="font-size: 15px; color: #1f2937;">${escapeHtml(item.name)}</strong>
+        <br><span style="font-size: 13px; color: #6b7280;">Quantité : ${item.quantity}</span>
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; text-align: right; white-space: nowrap;">
+        <strong style="font-size: 15px; color: #1f2937;">${(item.price * item.quantity).toFixed(2).replace('.', ',')} €</strong>
+      </td>
+    </tr>
+  `
+    )
+    .join('');
+
   const trackingHTML = order.trackingNumber
     ? `
-    <div style="background-color: #dbeafe; padding: 20px; border-radius: 6px; margin: 30px 0; text-align: center;">
-      <p style="margin: 0 0 10px 0; font-size: 14px; color: #1e40af; font-weight: 600;">
-        Numéro de suivi
-      </p>
-      <p style="margin: 0; font-size: 24px; font-weight: 700; color: #1e3a8a; font-family: monospace;">
-        ${escapeHtml(order.trackingNumber)}
-      </p>
-      ${
-        order.carrier
-          ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #3b82f6;">Transporteur: ${escapeHtml(order.carrier)}</p>`
-          : ''
-      }
+    <div style="margin: 20px 24px; padding: 18px 20px; background-color: #f0f9ff; border-radius: 6px; border: 1px solid #bae6fd; text-align: center;">
+      <p style="margin: 0 0 6px 0; font-size: 13px; color: #0369a1; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Numéro de suivi</p>
+      <p style="margin: 0; font-size: 22px; font-weight: 700; color: #0c4a6e; font-family: monospace;">${escapeHtml(order.trackingNumber)}</p>
+      ${order.carrier ? `<p style="margin: 8px 0 0 0; font-size: 13px; color: #0369a1;">Transporteur : ${escapeHtml(order.carrier)}</p>` : ''}
     </div>
   `
     : '';
@@ -385,41 +442,74 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Commande expédiée</title>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f9fafb; margin: 0; padding: 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 28px;">📦 Votre commande est en route !</h1>
+<body style="font-family: Georgia, 'Times New Roman', serif; line-height: 1.6; color: #374151; background-color: #f5f0eb; margin: 0; padding: 20px;">
+  <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+    <!-- Logo -->
+    <div style="padding: 30px 20px 10px; text-align: center;">
+      <img src="https://www.atelier-lbf.fr/logo/Logo1.png" alt="Atelier LBF" style="height: 80px; width: auto;" />
     </div>
-    
-    <div style="padding: 40px 20px;">
-      <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${safeName}</strong>,
-      </p>
-      
-      <p style="font-size: 16px; margin-bottom: 30px;">
+
+    <!-- Titre -->
+    <div style="text-align: center; padding: 10px 20px 20px;">
+      <h1 style="font-family: Georgia, serif; font-size: 26px; font-weight: 400; color: #1f2937; margin: 0 0 8px 0; border-bottom: 2px solid #1f2937; display: inline-block; padding-bottom: 4px;">📦 Commande expédiée</h1>
+      <p style="font-size: 15px; color: #6b7280; margin: 12px 0 0 0;">Votre commande est en route, ${safeName} !</p>
+    </div>
+
+    <!-- Infos commande -->
+    <div style="margin: 0 24px; padding: 18px 20px; background-color: #faf8f5; border-radius: 6px; border: 1px solid #e8e2da;">
+      <table style="width: 100%; font-size: 14px; color: #374151;" cellpadding="0" cellspacing="0">
+        <tr><td style="padding: 3px 0;"><strong>N° de commande :</strong> ${safeOrderNumber}</td></tr>
+        <tr><td style="padding: 3px 0;"><strong>Email :</strong> ${safeEmail}</td></tr>
+        ${safePhone ? `<tr><td style="padding: 3px 0;"><strong>Téléphone :</strong> ${safePhone}</td></tr>` : ''}
+      </table>
+    </div>
+
+    ${trackingHTML}
+
+    <!-- Message -->
+    <div style="padding: 20px 24px;">
+      <p style="font-size: 15px; color: #374151; margin: 0 0 16px 0;">
         Votre commande <strong>#${safeOrderNumber}</strong> a été expédiée et devrait arriver dans les prochains jours.
+        ${order.trackingNumber ? 'Vous pouvez suivre votre colis en temps réel avec le numéro de suivi ci-dessus.' : ''}
       </p>
-      
-      ${trackingHTML}
-      
-      <p style="font-size: 14px; color: #6b7280; margin: 30px 0;">
-        Vous pouvez suivre votre colis en temps réel avec le numéro de suivi ci-dessus.
-      </p>
-      
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
-           style="display: inline-block; padding: 14px 32px; background-color: #10b981; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-          Voir ma commande
-        </a>
+    </div>
+
+    <!-- Articles -->
+    <div style="padding: 0 24px 16px;">
+      <h2 style="font-family: Georgia, serif; font-size: 18px; font-weight: 400; color: #1f2937; margin: 0 0 16px 0; font-style: italic;">Rappel de votre commande</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tbody>${itemsHTML}</tbody>
+      </table>
+    </div>
+
+    <!-- Adresse -->
+    ${safeAddress ? `
+    <div style="padding: 0 24px 16px;">
+      <p style="font-size: 14px; color: #374151; margin: 0;"><strong>Livraison à domicile</strong></p>
+      <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">${safeAddress.replace(/,/g, '<br>')}</p>
+    </div>
+    ` : ''}
+
+    <!-- Total -->
+    <div style="padding: 0 24px 24px;">
+      <div style="padding-top: 16px; border-top: 2px solid #1f2937;">
+        <table style="width: 100%;">
+          <tr>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937;">Total</td>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937; text-align: right;">${order.totalAmount.toFixed(2).replace('.', ',')} €</td>
+          </tr>
+        </table>
       </div>
     </div>
-    
-    <div style="background-color: #f9fafb; padding: 30px 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
-      <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
-        Des questions ? <a href="mailto:atelier-lbf@outlook.com" style="color: #10b981; text-decoration: none;">atelier-lbf@outlook.com</a>
+
+    <!-- Footer -->
+    <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
+      <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
+        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-        © ${new Date().getFullYear()} Brasero Atelier LBF
+        © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
       </p>
     </div>
   </div>
@@ -431,6 +521,28 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
 function generateOrderProcessingHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeEmail = escapeHtml(order.customerEmail);
+  const safePhone = order.customerPhone ? escapeHtml(order.customerPhone) : '';
+
+  const itemsHTML = order.items
+    .map(
+      (item) => `
+    <tr>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; width: 80px;">
+        ${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;" />` : ''}
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+        <strong style="font-size: 15px; color: #1f2937;">${escapeHtml(item.name)}</strong>
+        <br><span style="font-size: 13px; color: #6b7280;">Quantité : ${item.quantity}</span>
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; text-align: right; white-space: nowrap;">
+        <strong style="font-size: 15px; color: #1f2937;">${(item.price * item.quantity).toFixed(2).replace('.', ',')} €</strong>
+      </td>
+    </tr>
+  `
+    )
+    .join('');
+
   return `
 <!DOCTYPE html>
 <html>
@@ -439,43 +551,71 @@ function generateOrderProcessingHTML(order: OrderEmailData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Commande en fabrication</title>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f9fafb; margin: 0; padding: 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <div style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🔨 Votre brasero est en fabrication !</h1>
+<body style="font-family: Georgia, 'Times New Roman', serif; line-height: 1.6; color: #374151; background-color: #f5f0eb; margin: 0; padding: 20px;">
+  <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+    <!-- Logo -->
+    <div style="padding: 30px 20px 10px; text-align: center;">
+      <img src="https://www.atelier-lbf.fr/logo/Logo1.png" alt="Atelier LBF" style="height: 80px; width: auto;" />
     </div>
-    
-    <div style="padding: 40px 20px;">
-      <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${safeName}</strong>,
-      </p>
-      
-      <p style="font-size: 16px; margin-bottom: 20px;">
+
+    <!-- Titre -->
+    <div style="text-align: center; padding: 10px 20px 20px;">
+      <h1 style="font-family: Georgia, serif; font-size: 26px; font-weight: 400; color: #1f2937; margin: 0 0 8px 0; border-bottom: 2px solid #1f2937; display: inline-block; padding-bottom: 4px;">🔨 En cours de fabrication</h1>
+      <p style="font-size: 15px; color: #6b7280; margin: 12px 0 0 0;">Votre brasero est entre de bonnes mains, ${safeName} !</p>
+    </div>
+
+    <!-- Infos commande -->
+    <div style="margin: 0 24px; padding: 18px 20px; background-color: #faf8f5; border-radius: 6px; border: 1px solid #e8e2da;">
+      <table style="width: 100%; font-size: 14px; color: #374151;" cellpadding="0" cellspacing="0">
+        <tr><td style="padding: 3px 0;"><strong>N° de commande :</strong> ${safeOrderNumber}</td></tr>
+        <tr><td style="padding: 3px 0;"><strong>Email :</strong> ${safeEmail}</td></tr>
+        ${safePhone ? `<tr><td style="padding: 3px 0;"><strong>Téléphone :</strong> ${safePhone}</td></tr>` : ''}
+      </table>
+    </div>
+
+    <!-- Message -->
+    <div style="padding: 20px 24px;">
+      <p style="font-size: 15px; color: #374151; margin: 0 0 16px 0;">
         Bonne nouvelle ! Votre commande <strong>#${safeOrderNumber}</strong> est maintenant en cours de fabrication dans notre atelier.
       </p>
-      
-      <p style="font-size: 16px; margin-bottom: 30px;">
+      <p style="font-size: 15px; color: #374151; margin: 0 0 16px 0;">
         Nos artisans travaillent avec soin pour vous livrer un brasero de qualité. Vous recevrez un email dès que votre commande sera expédiée.
       </p>
-      
-      <div style="background-color: #fffbeb; border-left: 4px solid #d97706; padding: 16px; border-radius: 0 6px 6px 0; margin-bottom: 30px;">
-        <p style="margin: 0; font-size: 14px; color: #92400e;">⏳ Délai estimé : nos braseros artisanaux sont fabriqués sur commande. Comptez quelques jours de fabrication.</p>
-      </div>
-      
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
-           style="display: inline-block; padding: 14px 32px; background-color: #d97706; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-          Suivre ma commande
-        </a>
+
+      <!-- Info délai -->
+      <div style="background-color: #faf8f5; border-left: 4px solid #b45309; padding: 14px 16px; border-radius: 0 6px 6px 0;">
+        <p style="margin: 0; font-size: 14px; color: #78350f;">⏳ Délai estimé : nos braseros artisanaux sont fabriqués sur commande. Comptez quelques jours de fabrication.</p>
       </div>
     </div>
-    
-    <div style="background-color: #f9fafb; padding: 30px 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
-      <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
-        Des questions ? <a href="mailto:atelier-lbf@outlook.com" style="color: #d97706; text-decoration: none;">atelier-lbf@outlook.com</a>
+
+    <!-- Articles -->
+    <div style="padding: 0 24px 16px;">
+      <h2 style="font-family: Georgia, serif; font-size: 18px; font-weight: 400; color: #1f2937; margin: 0 0 16px 0; font-style: italic;">Rappel de votre commande</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tbody>${itemsHTML}</tbody>
+      </table>
+    </div>
+
+    <!-- Total -->
+    <div style="padding: 0 24px 24px;">
+      <div style="padding-top: 16px; border-top: 2px solid #1f2937;">
+        <table style="width: 100%;">
+          <tr>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937;">Total</td>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937; text-align: right;">${order.totalAmount.toFixed(2).replace('.', ',')} €</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
+      <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
+        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-        © ${new Date().getFullYear()} Brasero Atelier LBF
+        © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
       </p>
     </div>
   </div>
@@ -487,6 +627,29 @@ function generateOrderProcessingHTML(order: OrderEmailData): string {
 function generateOrderDeliveredHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeEmail = escapeHtml(order.customerEmail);
+  const safePhone = order.customerPhone ? escapeHtml(order.customerPhone) : '';
+  const safeAddress = order.shippingAddress ? escapeHtml(order.shippingAddress) : '';
+
+  const itemsHTML = order.items
+    .map(
+      (item) => `
+    <tr>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; width: 80px;">
+        ${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;" />` : ''}
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+        <strong style="font-size: 15px; color: #1f2937;">${escapeHtml(item.name)}</strong>
+        <br><span style="font-size: 13px; color: #6b7280;">Quantité : ${item.quantity}</span>
+      </td>
+      <td style="padding: 16px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; text-align: right; white-space: nowrap;">
+        <strong style="font-size: 15px; color: #1f2937;">${(item.price * item.quantity).toFixed(2).replace('.', ',')} €</strong>
+      </td>
+    </tr>
+  `
+    )
+    .join('');
+
   return `
 <!DOCTYPE html>
 <html>
@@ -495,43 +658,79 @@ function generateOrderDeliveredHTML(order: OrderEmailData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Commande livrée</title>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #374151; background-color: #f9fafb; margin: 0; padding: 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 28px;">✅ Votre commande a été livrée !</h1>
+<body style="font-family: Georgia, 'Times New Roman', serif; line-height: 1.6; color: #374151; background-color: #f5f0eb; margin: 0; padding: 20px;">
+  <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+    <!-- Logo -->
+    <div style="padding: 30px 20px 10px; text-align: center;">
+      <img src="https://www.atelier-lbf.fr/logo/Logo1.png" alt="Atelier LBF" style="height: 80px; width: auto;" />
     </div>
-    
-    <div style="padding: 40px 20px;">
-      <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${safeName}</strong>,
-      </p>
-      
-      <p style="font-size: 16px; margin-bottom: 20px;">
+
+    <!-- Titre -->
+    <div style="text-align: center; padding: 10px 20px 20px;">
+      <h1 style="font-family: Georgia, serif; font-size: 26px; font-weight: 400; color: #1f2937; margin: 0 0 8px 0; border-bottom: 2px solid #1f2937; display: inline-block; padding-bottom: 4px;">✅ Commande livrée</h1>
+      <p style="font-size: 15px; color: #6b7280; margin: 12px 0 0 0;">Votre commande a bien été livrée, ${safeName} !</p>
+    </div>
+
+    <!-- Infos commande -->
+    <div style="margin: 0 24px; padding: 18px 20px; background-color: #faf8f5; border-radius: 6px; border: 1px solid #e8e2da;">
+      <table style="width: 100%; font-size: 14px; color: #374151;" cellpadding="0" cellspacing="0">
+        <tr><td style="padding: 3px 0;"><strong>N° de commande :</strong> ${safeOrderNumber}</td></tr>
+        <tr><td style="padding: 3px 0;"><strong>Email :</strong> ${safeEmail}</td></tr>
+        ${safePhone ? `<tr><td style="padding: 3px 0;"><strong>Téléphone :</strong> ${safePhone}</td></tr>` : ''}
+      </table>
+    </div>
+
+    <!-- Message -->
+    <div style="padding: 20px 24px;">
+      <p style="font-size: 15px; color: #374151; margin: 0 0 16px 0;">
         Votre commande <strong>#${safeOrderNumber}</strong> a bien été livrée. Nous espérons que vous apprécierez votre brasero artisanal !
       </p>
-      
-      <p style="font-size: 16px; margin-bottom: 30px;">
+      <p style="font-size: 15px; color: #374151; margin: 0 0 16px 0;">
         N'hésitez pas à nous contacter si vous avez la moindre question sur l'utilisation ou l'entretien de votre brasero.
       </p>
-      
-      <div style="background-color: #ecfdf5; border-left: 4px solid #059669; padding: 16px; border-radius: 0 6px 6px 0; margin-bottom: 30px;">
-        <p style="margin: 0; font-size: 14px; color: #065f46;">💡 Consultez nos <a href="https://www.atelier-lbf.fr/recettes" style="color: #059669; font-weight: 600;">recettes</a> pour profiter pleinement de votre brasero !</p>
-      </div>
-      
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.atelier-lbf.fr/mon-compte/commandes" 
-           style="display: inline-block; padding: 14px 32px; background-color: #059669; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-          Voir ma commande
-        </a>
+
+      <!-- Astuce recettes -->
+      <div style="background-color: #faf8f5; border-left: 4px solid #059669; padding: 14px 16px; border-radius: 0 6px 6px 0;">
+        <p style="margin: 0; font-size: 14px; color: #065f46;">💡 Consultez nos <a href="https://www.atelier-lbf.fr/recettes" style="color: #059669; font-weight: 600; text-decoration: none;">recettes</a> pour profiter pleinement de votre brasero !</p>
       </div>
     </div>
-    
-    <div style="background-color: #f9fafb; padding: 30px 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
-      <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
-        Merci pour votre confiance ! <a href="mailto:atelier-lbf@outlook.com" style="color: #059669; text-decoration: none;">atelier-lbf@outlook.com</a>
+
+    <!-- Articles -->
+    <div style="padding: 0 24px 16px;">
+      <h2 style="font-family: Georgia, serif; font-size: 18px; font-weight: 400; color: #1f2937; margin: 0 0 16px 0; font-style: italic;">Rappel de votre commande</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tbody>${itemsHTML}</tbody>
+      </table>
+    </div>
+
+    <!-- Adresse -->
+    ${safeAddress ? `
+    <div style="padding: 0 24px 16px;">
+      <p style="font-size: 14px; color: #374151; margin: 0;"><strong>Livrée à</strong></p>
+      <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">${safeAddress.replace(/,/g, '<br>')}</p>
+    </div>
+    ` : ''}
+
+    <!-- Total -->
+    <div style="padding: 0 24px 24px;">
+      <div style="padding-top: 16px; border-top: 2px solid #1f2937;">
+        <table style="width: 100%;">
+          <tr>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937;">Total</td>
+            <td style="font-size: 20px; font-weight: 700; color: #1f2937; text-align: right;">${order.totalAmount.toFixed(2).replace('.', ',')} €</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
+      <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
+        Merci pour votre confiance ! <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-        © ${new Date().getFullYear()} Brasero Atelier LBF
+        © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
       </p>
     </div>
   </div>

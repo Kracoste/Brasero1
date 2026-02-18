@@ -235,15 +235,27 @@ async function handleCheckoutCompleted(
   const customerEmail = order.customer_email || session.customer_details?.email || "";
 
   if (customerEmail) {
+    // Récupérer les images des line items Stripe
+    const stripeImages: Record<string, string> = {};
+    for (const li of lineItems.data) {
+      const prod = li.price?.product;
+      if (prod && typeof prod !== 'string' && !('deleted' in prod && prod.deleted) && (prod as Stripe.Product).images?.[0]) {
+        const slug = (prod as Stripe.Product).metadata?.slug;
+        if (slug) stripeImages[slug] = (prod as Stripe.Product).images[0];
+      }
+    }
+
     const emailData = {
       orderNumber: order.id.slice(0, 8).toUpperCase(),
       customerName: order.customer_name || session.customer_details?.name || "Client",
       customerEmail,
+      customerPhone: order.customer_phone || metadata.customer_phone || "",
       totalAmount: order.total_amount,
       items: orderItems.map((item) => ({
         name: item.product_name as string,
         quantity: item.quantity as number,
         price: item.unit_price as number,
+        imageUrl: stripeImages[item.product_slug as string] || "",
       })),
       shippingAddress: [
         metadata.shipping_address,
@@ -253,6 +265,7 @@ async function handleCheckoutCompleted(
       ]
         .filter(Boolean)
         .join(", "),
+      orderDate: new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
     };
 
     try {
