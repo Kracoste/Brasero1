@@ -145,7 +145,7 @@ interface FiltersContentProps {
 }
 
 const FiltersContent = ({
-  showFullLayout,
+  showFullLayout: _showFullLayout,
   priceMin,
   priceMax,
   minPrice,
@@ -437,16 +437,6 @@ const FormatSection = ({
     </div>
   );
 };
-
-const DeliverySection = () => (
-  <div className="border-t border-slate-200 pt-6">
-    <h3 className="text-sm font-bold text-slate-900 mb-4">Livraison</h3>
-    <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-700 hover:text-slate-900">
-      <input type="checkbox" className="rounded border-slate-300 text-slate-900 focus:ring-slate-200" />
-      <span>Chez vous en 24h à 72h</span>
-    </label>
-  </div>
-);
 
 const DimensionSection = ({
   values,

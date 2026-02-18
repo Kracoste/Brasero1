@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
 
     return response
-  } catch (error: any) {
+  } catch (_error: any) {
     // En cas d'erreur, rediriger quand même vers l'accueil
     const url = new URL(request.url)
     return NextResponse.redirect(`${url.origin}/`)

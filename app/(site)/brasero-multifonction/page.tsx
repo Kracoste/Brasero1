@@ -4,7 +4,6 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { 
   Flame,
   ChefHat,
-  Thermometer,
   Users,
   ArrowRight,
   CheckCircle2,

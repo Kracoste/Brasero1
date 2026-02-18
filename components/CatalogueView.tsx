@@ -3,11 +3,10 @@
 import { useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 
-import { FadeIn } from "@/components/FadeIn";
 import { FilterPanel } from "@/components/FilterPanel";
 import { ProductCard } from "@/components/ProductCard";
 import type { Product } from "@/lib/schema";
-import { applyFilters, resolveDiameter, type FilterState } from "@/lib/utils";
+import { applyFilters, type FilterState } from "@/lib/utils";
 
 type CatalogueViewProps = {
   products: Product[];

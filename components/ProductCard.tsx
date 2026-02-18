@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useState } from "react";
 
 import { Price } from "@/components/Price";
@@ -19,7 +19,7 @@ type ProductCardProps = {
 
 export const ProductCard = ({ product, className }: ProductCardProps) => {
   const image = product.images[0];
-  const { addItem, loading } = useCart();
+  const { addItem } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
   const [adding, setAdding] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);

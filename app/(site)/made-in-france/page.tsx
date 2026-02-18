@@ -7,7 +7,6 @@ import {
   MapPin,
   Users,
   Heart,
-  Hammer,
   ArrowRight,
   CheckCircle2,
   Phone,

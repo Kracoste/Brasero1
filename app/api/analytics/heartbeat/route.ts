@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
 import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase/admin";
-import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIP } from "@/lib/rate-limit";
 import { isValidUUID, isAllowedOrigin } from "@/lib/validation";
 
 // POST - Mettre à jour la durée de session (heartbeat)

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Hammer, Truck, Shield, MapPin, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Hammer, Truck, Shield, CheckCircle2, ArrowRight } from 'lucide-react';
 
 const processCards = [
   {

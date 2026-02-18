@@ -5,7 +5,7 @@ import { ProductCarousel } from "@/components/ProductCarousel";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { Product } from "@/lib/schema";
-import { Flame, Truck, Shield, Award, MapPin } from "lucide-react";
+import { Flame, Truck, Shield, Award } from "lucide-react";
 
 // Cache ISR de 60 secondes pour équilibrer performance et fraîcheur des données
 // Pas de cache - les données sont toujours fraîches

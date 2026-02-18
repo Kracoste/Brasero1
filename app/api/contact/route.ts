@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const safeSubject = subject ? escapeHtml(subject.trim()) : '';
 
     // Send email to the store
-    const { data, error } = await resend.emails.send({
+    const { data: _data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [ADMIN_EMAIL],
       replyTo: email.trim(),
@@ -118,13 +118,13 @@ export async function POST(request: NextRequest) {
         </html>
       `,
       text: `
-Nouveau message de ${name.trim()}
+Nouveau message de ${safeName}
 
-Nom: ${name.trim()}
-Email: ${email.trim()}
+Nom: ${safeName}
+Email: ${safeEmail}
 
 Message:
-${message.trim()}
+${safeMessage}
 
 ---
 Envoyé depuis le formulaire de contact - www.atelier-lbf.fr

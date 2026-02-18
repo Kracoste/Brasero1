@@ -25,11 +25,16 @@ const specSchema = z.object({
   fuel: z.string().optional(),
   fuelType: z.array(z.string()).optional(),
   painting: z.string().optional(),
+  planchaMaterial: z.enum(["acier", "inox"]).optional(),
   format: z.string().optional(),
   compatibleAccessories: z.array(z.string()).optional(),
   imageScale: z.number().optional(),
   detailImageScale: z.number().optional(),
   detailImageOffsetX: z.number().optional(),
+  characteristics: z.array(z.object({
+    label: z.string(),
+    value: z.string(),
+  })).optional(),
 });
 
 export const productSchema = z.object({
@@ -55,8 +60,6 @@ export const productSchema = z.object({
   popularScore: z.number(),
   badge: z.string(),
   onDemand: z.boolean().optional(),
-  engravingAvailable: z.boolean().optional(),
-  engravingPrice: z.number().optional(),
   specs: specSchema,
   highlights: z.array(z.string()),
   features: z.array(

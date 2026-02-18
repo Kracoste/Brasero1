@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 // Schéma JSON-LD pour le SEO
-function generateStructuredData(settings: Awaited<ReturnType<typeof getSiteSettings>>) {
+function generateStructuredData() {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -82,7 +82,7 @@ function generateStructuredData(settings: Awaited<ReturnType<typeof getSiteSetti
 
 export default async function ExpeditionPage() {
   const settings = await getSiteSettings();
-  const structuredData = generateStructuredData(settings);
+  const structuredData = generateStructuredData();
 
   const deliveryZones = [
     {

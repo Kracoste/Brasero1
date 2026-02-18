@@ -4,7 +4,6 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { 
   HelpCircle, 
   ArrowRight,
-  Package,
   Truck,
   CreditCard,
   RotateCcw,
@@ -17,7 +16,6 @@ import {
   MapPin,
   MessageSquare,
   ShoppingCart,
-  Ruler,
   Paintbrush
 } from "lucide-react";
 
@@ -51,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 // Schéma JSON-LD FAQPage pour le SEO
-function generateStructuredData(settings: Awaited<ReturnType<typeof getSiteSettings>>) {
+function generateStructuredData() {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -102,7 +100,7 @@ function generateStructuredData(settings: Awaited<ReturnType<typeof getSiteSetti
 
 export default async function FAQPage() {
   const settings = await getSiteSettings();
-  const structuredData = generateStructuredData(settings);
+  const structuredData = generateStructuredData();
 
   const faqCategories = [
     {

@@ -5,7 +5,6 @@ import {
   Shield, 
   Lock, 
   Eye, 
-  FileText, 
   CheckCircle2, 
   ArrowRight,
   Phone,
@@ -14,8 +13,7 @@ import {
   MapPin,
   Database,
   UserCheck,
-  Cookie,
-  Trash2
+  Cookie
 } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {

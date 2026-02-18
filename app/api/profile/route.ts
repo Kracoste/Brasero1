@@ -1,9 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { devError } from '@/lib/supabase/utils';
-import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 const ALLOWED_PROFILE_FIELDS = [
   'first_name',

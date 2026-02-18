@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { Badge } from "@/components/Badge";
 import { Container } from "@/components/Container";
-import { ProductGallery } from "@/components/ProductGallery";
 import { Section } from "@/components/Section";
-import { ProductTabs } from "@/components/ProductTabs";
-import { ProductPurchaseSection } from "@/components/ProductPurchaseSection";
+import { ProductConfigurator } from "@/components/ProductConfigurator";
 import { RelatedProducts } from "@/components/RelatedProducts";
 import { createClient } from "@/lib/supabase/server";
 import { resolveDiameter } from "@/lib/utils";
@@ -71,8 +68,6 @@ const mapDbProductToProduct = (p: any): Product | null => {
     shipping: p.shipping || "",
     popularScore: p.popularScore || p.popular_score || 50,
     onDemand: p.onDemand ?? p.on_demand ?? false,
-    engravingAvailable: p.engravingAvailable ?? p.engraving_available ?? false,
-    engravingPrice: Number(p.engravingPrice ?? p.engraving_price ?? 0),
     specs:
       (specs && Object.keys(specs).length > 0
         ? specs
@@ -166,40 +161,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div className="bg-white pb-16 sm:pb-24">
       <Section className="pt-4 sm:pt-6 lg:pt-10">
         <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
-          <div className="grid gap-4 sm:gap-6 lg:gap-10 lg:grid-cols-2 items-start">
-            <div className="space-y-8 sm:space-y-16">
-              <ProductGallery key={product.slug} product={product} />
-            </div>
-            <div className="space-y-4 sm:space-y-6">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-                  <span>Atelier LBF</span>
-                  <Badge>{product.badge}</Badge>
-                </div>
-                <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900">{product.name}</h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
-                  <span className="font-semibold">
-                    Référence&nbsp;: <span className="font-mono text-slate-900">{reference}</span>
-                  </span>
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                    En stock
-                  </span>
-                </div>
-              </div>
-
-              <ProductPurchaseSection 
-                product={product} 
-                compatibleAccessorySlugs={compatibleAccessorySlugs}
-                preloadedAccessories={compatibleAccessories}
-              />
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      <Section className="py-0 sm:py-4">
-        <Container className="space-y-2 px-4 sm:px-6">
-          <ProductTabs product={product} accessories={[]} />
+          <ProductConfigurator
+            product={product}
+            reference={reference}
+            compatibleAccessorySlugs={compatibleAccessorySlugs}
+            preloadedAccessories={compatibleAccessories}
+          />
         </Container>
       </Section>
 

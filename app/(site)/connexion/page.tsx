@@ -32,23 +32,50 @@ function ConnexionPageContent() {
     return redirectFromQuery;
   }, [searchParams]);
 
-  // Rediriger si déjà connecté (sans redirectTo = visite directe sur /connexion)
+  // Fonction de redirection centralisée
+  const performRedirect = useCallback((userEmail?: string | null) => {
+    if (hasRedirected.current) return;
+    hasRedirected.current = true;
+    setIsRedirecting(true);
+
+    const emailToCheck = userEmail || email.trim();
+    const isAdminUser = isAdmin || isAdminEmail(emailToCheck);
+    const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
+    const finalTarget = getRedirectTarget(target);
+
+    // Synchroniser la session côté serveur AVANT de naviguer
+    // C'est critique : le middleware vérifie la session via les cookies
+    // Si on navigue avant que les cookies soient synchronisés, le middleware rejette la requête
+    const syncAndRedirect = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        await fetch('/api/auth/sync-session', {
+          method: 'POST',
+          credentials: 'include',
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+      } catch {
+        // Continuer même si sync échoue - les cookies du client devraient suffire
+      }
+      // Naviguer vers la cible
+      window.location.href = finalTarget;
+    };
+
+    syncAndRedirect();
+  }, [email, isAdmin, getRedirectTarget]);
+
+  // Rediriger si déjà connecté (visite directe sur /connexion)
   useEffect(() => {
     if (authLoading) return;
     if (!user) return;
     if (hasRedirected.current) return;
+    if (loading) return; // Ne pas interférer pendant un login en cours
     
-    const redirectTarget = searchParams?.get(REDIRECT_PARAM);
-    
-    if (!redirectTarget) {
-      hasRedirected.current = true;
-      setIsRedirecting(true);
-      const isAdminUser = isAdmin || isAdminEmail(user.email);
-      const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
-      window.location.href = target;
-    }
-    // Si redirectTo est présent, on attend que l'utilisateur se connecte
-  }, [authLoading, user, isAdmin, searchParams]);
+    // Si l'utilisateur est déjà connecté et visite /connexion, le rediriger
+    performRedirect(user.email);
+  }, [authLoading, user, loading, performRedirect]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,68 +83,77 @@ function ConnexionPageContent() {
     setLoading(true);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      // Appel REST direct à Supabase Auth pour éviter les locks internes
+      // du client singleton (signInWithPassword peut bloquer indéfiniment)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-      if (signInError) {
-        throw signInError;
-      }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      if (!data.session) {
-        throw new Error('Connexion échouée - pas de session');
-      }
-
-      // Connexion réussie - on a déjà la session, pas besoin de refreshUser
-      // Le onAuthStateChange dans AuthProvider mettra à jour le contexte automatiquement
-
-      // Marquer la redirection immédiatement
-      setIsRedirecting(true);
-      hasRedirected.current = true;
-
-      // Déterminer la cible de redirection
-      const isAdminUser = isAdminEmail(email.trim());
-      const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
-      const finalTarget = getRedirectTarget(target);
-
-      // Synchroniser la session côté serveur avec un timeout de 3s
-      // Si ça prend trop longtemps, on navigue quand même
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
-        await fetch('/api/auth/sync-session', { 
+      const response = await fetch(
+        `${supabaseUrl}/auth/v1/token?grant_type=password`,
+        {
           method: 'POST',
-          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+          },
+          body: JSON.stringify({
+            email: email.trim(),
+            password,
+          }),
           signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-      } catch {
-        // Continue même si sync échoue ou timeout - les cookies client sont déjà là
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      const body = await response.json();
+
+      if (!response.ok) {
+        throw new Error(body.msg || body.error_description || body.message || 'Erreur de connexion');
       }
 
-      // Naviguer vers la cible avec un rechargement complet
-      // window.location.href garantit que le middleware verra les cookies à jour
-      window.location.href = finalTarget;
+      if (!body.access_token || !body.refresh_token) {
+        throw new Error('Connexion échouée - pas de token');
+      }
+
+      // Injecter la session dans le client Supabase (pour les cookies)
+      // On n'attend PAS la résolution complète pour éviter les locks
+      supabase.auth.setSession({
+        access_token: body.access_token,
+        refresh_token: body.refresh_token,
+      }).catch(() => {});
+
+      // Petit délai pour laisser les cookies se mettre en place
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Connexion réussie → rediriger
+      performRedirect(body.user?.email);
       
-    } catch (error: any) {
-      setError(error?.message || 'Une erreur est survenue');
+    } catch (err: any) {
+      const message = err?.message || err?.name || 'Une erreur est survenue';
+      
+      if (err?.name === 'AbortError' || message === 'TIMEOUT') {
+        setError('La connexion a pris trop de temps. Veuillez réessayer.');
+      } else if (message.includes('Invalid login credentials') || message.includes('invalid_credentials')) {
+        setError('Email ou mot de passe incorrect.');
+      } else if (message.includes('Email not confirmed')) {
+        setError('Veuillez confirmer votre email avant de vous connecter.');
+      } else if (message.includes('Too many requests') || message.includes('rate limit') || message.includes('over_request_rate_limit')) {
+        setError('Trop de tentatives. Veuillez patienter quelques minutes.');
+      } else if (message.includes('Failed to fetch') || message.includes('NetworkError') || message.includes('network')) {
+        setError('Erreur réseau. Vérifiez votre connexion internet.');
+      } else {
+        setError(message);
+      }
+      
       setLoading(false);
       setIsRedirecting(false);
       hasRedirected.current = false;
     }
   };
-
-  // Sécurité : si la redirection prend trop longtemps (>8s), réinitialiser
-  useEffect(() => {
-    if (!isRedirecting) return;
-    const timeout = setTimeout(() => {
-      setIsRedirecting(false);
-      hasRedirected.current = false;
-      setLoading(false);
-    }, 8000);
-    return () => clearTimeout(timeout);
-  }, [isRedirecting]);
 
   if (isRedirecting) {
     return (

@@ -2,9 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
 
-const formatCurrency = (value: number) =>
-  value.toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
-
 type PageConfig = {
   title: string;
   content: React.ReactNode;

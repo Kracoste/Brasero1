@@ -254,8 +254,6 @@ export default function CheckoutPage() {
               product_price: item.product_price,
               product_image: item.product_image,
               quantity: item.quantity,
-              engraving_text: item.engraving_text || null,
-              engraving_font: item.engraving_font || null,
             })),
             customerInfo: {
               email: checkoutForm.email,
@@ -798,14 +796,6 @@ export default function CheckoutPage() {
                 <div key={item.id} className="flex justify-between text-sm text-slate-700">
                   <div className="w-2/3">
                     <p className="font-semibold text-slate-900">{item.product_name}</p>
-                    {item.engraving_text && (
-                      <p className="text-xs text-[#8B4513] italic">
-                        ✏️ Gravure : &quot;{item.engraving_text}&quot;
-                        {item.engraving_font && (
-                          <span className="text-[10px] text-slate-500 not-italic ml-1">— {item.engraving_font}</span>
-                        )}
-                      </p>
-                    )}
                   </div>
                   <p className="w-1/3 text-right">
                     {item.quantity} × <Price amount={item.product_price} />

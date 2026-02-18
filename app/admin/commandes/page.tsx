@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Package, Eye, Truck, CheckCircle, XCircle, Clock, Hammer, Send, X, ChevronDown, ChevronUp, Search, Filter } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Clock, Hammer, Send, X, Search } from 'lucide-react';
 
 type OrderItem = {
   product_name: string;
@@ -9,8 +9,6 @@ type OrderItem = {
   quantity: number;
   unit_price: number;
   total_price: number;
-  engraving_text?: string;
-  engraving_font?: string;
 };
 
 type Order = {
@@ -86,8 +84,6 @@ function OrderDetailModal({
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const currentStepIndex = statusFlow.indexOf(order.status);
-  const newStepIndex = statusFlow.indexOf(status);
   const isStatusChanged = status !== order.status;
   const isTrackingChanged = trackingNumber !== (order.tracking_number || '');
   const isCarrierChanged = carrier !== (order.carrier || 'DB Schenker');
@@ -204,13 +200,6 @@ function OrderDetailModal({
                     </span>
                     <div>
                       <span className="text-sm font-medium text-slate-900">{item.product_name}</span>
-                      {item.engraving_text && (
-                        <p className="text-xs text-[#8B4513] italic">✏️ Gravure : &quot;{item.engraving_text}&quot;
-                          {item.engraving_font && (
-                            <span className="text-[10px] text-slate-500 not-italic ml-1">— style : {item.engraving_font}</span>
-                          )}
-                        </p>
-                      )}
                     </div>
                   </div>
                   <span className="text-sm font-semibold text-slate-700">
@@ -569,7 +558,6 @@ export default function CommandesPage() {
                   {(order.items || []).slice(0, 3).map((item, i) => (
                     <span key={i} className="inline-flex items-center gap-1 bg-slate-50 rounded-full px-3 py-1 text-xs text-slate-600">
                       {item.quantity}× {item.product_name}
-                      {item.engraving_text && <span className="text-[#8B4513]">✏️</span>}
                     </span>
                   ))}
                   {(order.items || []).length > 3 && (

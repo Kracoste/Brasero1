@@ -50,7 +50,7 @@ export default function ParametresPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    const { emailOnNewOrder, emailOnLowStock, lowStockThreshold, ...siteSettings } = settings;
+    const { emailOnNewOrder: _emailOnNewOrder, emailOnLowStock: _emailOnLowStock, lowStockThreshold: _lowStockThreshold, ...siteSettings } = settings;
     try {
       const response = await fetch('/api/site-settings', {
         method: 'POST',

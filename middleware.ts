@@ -1,11 +1,11 @@
 import { updateSession } from '@/lib/supabase/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
+import { isAdminEmail } from '@/lib/auth'
 
 // Headers de sécurité HTTP
 const securityHeaders = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',
-  'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
@@ -41,10 +41,7 @@ export async function middleware(request: NextRequest) {
   // Protection admin côté serveur : utiliser le user déjà récupéré par updateSession
   // Plus besoin de créer un second client Supabase (c'était la cause du bug de redirection)
   if (pathname.startsWith('/admin')) {
-    const adminEmails = (process.env.ADMIN_EMAILS || 'allouhugo@gmail.com')
-      .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
-    
-    if (!user?.email || !adminEmails.includes(user.email.toLowerCase())) {
+    if (!user?.email || !isAdminEmail(user.email)) {
       // Copier les cookies de la response updateSession vers la redirect
       // pour ne pas perdre les tokens rafraîchis
       const redirectResponse = NextResponse.redirect(new URL('/connexion', request.url));

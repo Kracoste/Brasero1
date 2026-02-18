@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Timeout de 10 secondes pour éviter le blocage infini
       const timeoutPromise = new Promise<null>((resolve) => {
         setTimeout(() => {
-          console.log('Auth init timeout - using cached state');
+          devLog('Auth init timeout - using cached state');
           resolve(null);
         }, 10000);
       });
@@ -135,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (result === null) {
           // Timeout - utiliser le cache ou null
-          console.log('Auth timeout - keeping cached user:', cachedUser?.email);
+          devLog('Auth timeout - keeping cached user:', cachedUser?.email);
           isInitialized = true;
           setIsLoading(false);
           initInProgress.current = false;
@@ -160,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isInitialized = true;
       } catch (error) {
         devError('Erreur initialisation auth:', error);
-        console.log('Auth init error - keeping cached state');
+        devLog('Auth init error - keeping cached state');
         // Garder le cache en cas d'erreur
       } finally {
         setIsLoading(false);

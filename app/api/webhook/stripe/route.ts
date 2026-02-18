@@ -3,21 +3,30 @@ import Stripe from "stripe";
 import { stripe, hasStripeCredentials } from "@/lib/stripe";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendOrderConfirmationEmail, sendAdminOrderNotification } from "@/lib/email";
+import { createClient } from "@/lib/supabase/server";
+import { isAdminEmail } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
 function log(...args: unknown[]) {
-  console.log("[WEBHOOK]", ...args);
+  if (process.env.NODE_ENV !== 'production') console.log("[WEBHOOK]", ...args);
 }
 function logError(...args: unknown[]) {
   console.error("[WEBHOOK ERROR]", ...args);
 }
 
 /**
- * GET → diagnostic / replay manuel
+ * GET → diagnostic / replay manuel (admin seulement)
  * Usage: /api/webhook/stripe?action=replay-last
  */
 export async function GET(request: NextRequest) {
+  // Vérifier l'authentification admin
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user || !isAdminEmail(user.email)) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+  }
+
   const action = request.nextUrl.searchParams.get("action");
 
   if (action === "replay-last") {
@@ -163,14 +172,6 @@ async function handleCheckoutCompleted(
       unit_price: qty ? amountTotal / qty / 100 : amountTotal / 100,
       total_price: amountTotal / 100,
     };
-
-    // Capturer le texte de gravure si présent
-    if (productMeta?.engraving_text) {
-      orderItem.engraving_text = productMeta.engraving_text;
-    }
-    if (productMeta?.engraving_font) {
-      orderItem.engraving_font = productMeta.engraving_font;
-    }
 
     return orderItem;
   });

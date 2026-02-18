@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
+import { AUTH_ROUTES } from '@/lib/auth';
 import { isValidName, validatePassword, isValidEmail } from '@/lib/validation';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ChevronDown } from 'lucide-react';
 
 export default function InscriptionPage() {
@@ -21,7 +20,6 @@ export default function InscriptionPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();

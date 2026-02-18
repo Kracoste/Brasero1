@@ -5,7 +5,7 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { isAdminEmail } from '@/lib/auth';
 import { sanitizeProductData, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
-import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 // Force dynamic pour éviter le cache en production
 export const dynamic = 'force-dynamic';
@@ -197,7 +197,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      devError('Erreur INSERT produit:', error);
+      return NextResponse.json({ error: 'Erreur lors de la création du produit' }, { status: 500 });
     }
 
     return NextResponse.json(product);

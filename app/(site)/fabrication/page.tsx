@@ -8,7 +8,6 @@ import {
   Heart,
   MapPin,
   ArrowRight,
-  CheckCircle2,
   Shield,
   Clock,
   Phone,

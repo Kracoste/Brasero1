@@ -22,7 +22,7 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [cacheBuster, setCacheBuster] = useState(Date.now());
+  const [_cacheBuster, setCacheBuster] = useState(Date.now());
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
 

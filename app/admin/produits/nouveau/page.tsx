@@ -2,10 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { ArrowLeft, Upload, X, Star, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { ArrowLeft, Upload, Star, Trash2, Plus, GripVertical } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 type ProductImage = {
   id: string;
@@ -23,7 +21,6 @@ const FORMAT_OPTIONS = [
 
 export default function NewProduct() {
   const router = useRouter();
-  const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
@@ -54,17 +51,17 @@ export default function NewProduct() {
     numberOfGuests: '',
     fuelType: [] as string[],
     painting: '',
+    planchaMaterial: '' as '' | 'acier' | 'inox',
     compatibleAccessories: [] as string[],
     imageScale: '100',
     detailImageScale: '100',
     detailImageOffsetX: '0',
-    engravingAvailable: false,
-    engravingPrice: '',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [accessoryDropdownOpen, setAccessoryDropdownOpen] = useState(false);
+  const [characteristics, setCharacteristics] = useState<{label: string, value: string}[]>([]);
 
   const generateSlug = (name: string) => {
     return name
@@ -105,6 +102,13 @@ export default function NewProduct() {
     }));
   };
 
+  const handlePlanchaMaterialChange = (value: '' | 'acier' | 'inox') => {
+    setFormData((prev) => ({
+      ...prev,
+      planchaMaterial: value,
+    }));
+  };
+
   const handleAccessoryChange = (accessorySlug: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -112,6 +116,66 @@ export default function NewProduct() {
         ? prev.compatibleAccessories.filter((a) => a !== accessorySlug)
         : [...prev.compatibleAccessories, accessorySlug],
     }));
+  };
+
+  // Générer les caractéristiques par défaut pour un brasero
+  const generateDefaultCharacteristics = () => {
+    const materialLabels: Record<string, string> = {
+      corten: 'Acier Corten',
+      inox: 'Acier Inoxydable',
+      acier: 'Acier',
+      fonte: 'Fonte',
+    };
+    const formatLabels: Record<string, string> = {
+      rond: 'Ronde',
+      hexagonal: 'Hexagonale',
+      carre: 'Carrée',
+    };
+    const chars: {label: string, value: string}[] = [
+      { label: 'Marque', value: 'Atelier LBF' },
+      { label: 'Type de combustible', value: formData.fuelType.length > 0 ? formData.fuelType.join(' / ') : 'Bois' },
+    ];
+    // Dimensions
+    if (formData.diameter) {
+      const parts: string[] = [];
+      if (formData.length) parts.push(`L${formData.length}`);
+      if (formData.width) parts.push(`l${formData.width}`);
+      if (formData.height) parts.push(`H${formData.height}`);
+      chars.push({ label: 'Dimensions', value: parts.length > 0 ? parts.join('x') + 'cm' : `Ø ${formData.diameter}cm` });
+    }
+    chars.push({ label: 'Matière', value: materialLabels[formData.material] || formData.material });
+    if (formData.format) {
+      chars.push({ label: 'Forme de la plancha', value: formatLabels[formData.format] || formData.format });
+    }
+    if (formData.diameter) {
+      chars.push({ label: 'Dimensions Plancha', value: `Ø ${formData.diameter}cm` });
+    }
+    if (formData.bowlThickness) {
+      chars.push({ label: 'Épaisseur Plancha', value: `${formData.bowlThickness}mm` });
+    }
+    if (formData.planchaMaterial) {
+      chars.push({ label: 'Matière de la plaque', value: formData.planchaMaterial === 'inox' ? 'Inox' : 'Acier carbone' });
+    }
+    if (formData.numberOfGuests) {
+      chars.push({ label: 'Nombre de convives', value: formData.numberOfGuests });
+    }
+    if (formData.weight) {
+      chars.push({ label: 'Poids', value: formData.weight });
+    }
+    chars.push({ label: 'Type', value: 'Braseros' });
+    setCharacteristics(chars);
+  };
+
+  const addCharacteristic = () => {
+    setCharacteristics(prev => [...prev, { label: '', value: '' }]);
+  };
+
+  const removeCharacteristic = (index: number) => {
+    setCharacteristics(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateCharacteristic = (index: number, field: 'label' | 'value', val: string) => {
+    setCharacteristics(prev => prev.map((c, i) => i === index ? { ...c, [field]: val } : c));
   };
 
   // Charger tous les produits disponibles (braséros et accessoires) via API admin
@@ -258,10 +322,15 @@ export default function NewProduct() {
       if (formData.numberOfGuests) specsPayload.numberOfGuests = formData.numberOfGuests;
       if (formData.fuelType.length > 0) specsPayload.fuelType = formData.fuelType;
       if (formData.painting) specsPayload.painting = formData.painting;
+      if (formData.planchaMaterial) specsPayload.planchaMaterial = formData.planchaMaterial;
       if (formData.compatibleAccessories.length > 0) specsPayload.compatibleAccessories = formData.compatibleAccessories;
       if (formData.imageScale && formData.imageScale !== '100') specsPayload.imageScale = parseInt(formData.imageScale);
       if (formData.detailImageScale && formData.detailImageScale !== '100') specsPayload.detailImageScale = parseInt(formData.detailImageScale);
       if (formData.detailImageOffsetX && formData.detailImageOffsetX !== '0') specsPayload.detailImageOffsetX = parseInt(formData.detailImageOffsetX);
+
+      // Caractéristiques du tableau produit
+      const validChars = characteristics.filter(c => c.label.trim() && c.value.trim());
+      if (validChars.length > 0) specsPayload.characteristics = validChars;
 
       const productData = {
         name: formData.name,
@@ -285,8 +354,6 @@ export default function NewProduct() {
         on_demand: formData.onDemand,
         is_featured: formData.isFeatured,
         featured_order: parseInt(formData.featuredOrder),
-        engraving_available: formData.engravingAvailable,
-        engraving_price: formData.engravingPrice ? parseFloat(formData.engravingPrice) : 0,
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
       };
@@ -663,36 +730,7 @@ export default function NewProduct() {
                 />
                 <span className="text-sm font-medium text-slate-700">Produit vedette (page d'accueil)</span>
               </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="engravingAvailable"
-                  checked={formData.engravingAvailable}
-                  onChange={handleInputChange}
-                  className="w-5 h-5 rounded border-slate-300 text-[#8B4513] focus:ring-[#8B4513]"
-                />
-                <span className="text-sm font-medium text-slate-700">Gravure personnalisée disponible</span>
-              </label>
             </div>
-
-            {formData.engravingAvailable && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Prix de la gravure (€) *
-                </label>
-                <input
-                  type="number"
-                  name="engravingPrice"
-                  value={formData.engravingPrice}
-                  onChange={handleInputChange}
-                  min="0"
-                  step="0.01"
-                  placeholder="25.00"
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-                />
-                <p className="text-xs text-slate-500 mt-1">Prix que le client paiera en supplément pour la gravure</p>
-              </div>
-            )}
 
             {formData.isFeatured && (
               <div>
@@ -972,6 +1010,34 @@ export default function NewProduct() {
               </div>
             </div>
 
+            {/* Matière de la plancha */}
+            <div className="mt-6">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Matière de la plancha
+              </label>
+              <p className="text-xs text-slate-500 mb-2">Choisissez la matière de la plancha compatible avec ce braséro. La FAQ s&apos;adaptera automatiquement.</p>
+              <div className="flex gap-3">
+                {[
+                  { value: '' as '' | 'acier' | 'inox', label: 'Non défini' },
+                  { value: 'acier' as '' | 'acier' | 'inox', label: 'Plancha Acier' },
+                  { value: 'inox' as '' | 'acier' | 'inox', label: 'Plancha Inox' },
+                ].map((option) => (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => handlePlanchaMaterialChange(option.value)}
+                    className={`px-4 py-2 rounded-lg border cursor-pointer transition text-sm font-medium ${
+                      formData.planchaMaterial === option.value
+                        ? 'border-slate-900 bg-slate-900 text-white'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Produits compatibles */}
             <div className="mt-6">
               <label className="block text-sm font-medium text-slate-700 mb-3">
@@ -1190,6 +1256,86 @@ export default function NewProduct() {
             </div>
           </div>
         )}
+
+        {/* Tableau des caractéristiques (affiché sur la fiche produit) */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Tableau des caractéristiques</h2>
+              <p className="text-xs text-slate-500 mt-1">Ce tableau sera affiché sur la fiche produit, juste au-dessus de la FAQ.</p>
+            </div>
+            <div className="flex gap-2">
+              {formData.category === 'brasero' && (
+                <button
+                  type="button"
+                  onClick={generateDefaultCharacteristics}
+                  className="px-3 py-1.5 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition"
+                >
+                  Pré-remplir (brasero)
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={addCharacteristic}
+                className="px-3 py-1.5 text-xs font-medium bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition flex items-center gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Ajouter
+              </button>
+            </div>
+          </div>
+
+          {characteristics.length === 0 ? (
+            <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-lg">
+              <GripVertical className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-500">Aucune caractéristique définie</p>
+              <p className="text-xs text-slate-400 mt-1">
+                {formData.category === 'brasero' 
+                  ? 'Cliquez sur "Pré-remplir" pour générer automatiquement ou ajoutez manuellement.'
+                  : 'Cliquez sur "Ajouter" pour définir les caractéristiques.'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {/* En-tête */}
+              <div className="grid grid-cols-[1fr_1.2fr_40px] gap-3 px-2 pb-1">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Label</span>
+                <span className="text-xs font-semibold text-slate-500 uppercase">Valeur</span>
+                <span></span>
+              </div>
+              {characteristics.map((char, index) => (
+                <div
+                  key={index}
+                  className={`grid grid-cols-[1fr_1.2fr_40px] gap-3 items-center px-2 py-2 rounded-lg ${
+                    index % 2 === 0 ? 'bg-slate-50' : 'bg-white'
+                  }`}
+                >
+                  <input
+                    type="text"
+                    value={char.label}
+                    onChange={(e) => updateCharacteristic(index, 'label', e.target.value)}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium"
+                    placeholder="Ex: Matière"
+                  />
+                  <input
+                    type="text"
+                    value={char.value}
+                    onChange={(e) => updateCharacteristic(index, 'value', e.target.value)}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="Ex: Acier Corten"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeCharacteristic(index)}
+                    className="p-1.5 text-slate-400 hover:text-red-500 transition rounded-lg hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-4">

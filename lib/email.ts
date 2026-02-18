@@ -240,12 +240,27 @@ export async function sendAdminOrderNotification(
 // TEMPLATES HTML
 // ============================================================================
 
+/**
+ * Échappe les caractères HTML dangereux pour prévenir les injections XSS dans les emails
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function generateOrderConfirmationHTML(order: OrderEmailData): string {
+  const safeName = escapeHtml(order.customerName);
+  const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeAddress = order.shippingAddress ? escapeHtml(order.shippingAddress) : '';
   const itemsHTML = order.items
     .map(
       (item) => `
     <tr>
-      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.name}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(item.name)}</td>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">${item.price.toFixed(2)} €</td>
     </tr>
@@ -271,11 +286,11 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
     <!-- Content -->
     <div style="padding: 40px 20px;">
       <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${order.customerName}</strong>,
+        Bonjour <strong>${safeName}</strong>,
       </p>
       
       <p style="font-size: 16px; margin-bottom: 30px;">
-        Nous avons bien reçu votre commande <strong>#${order.orderNumber}</strong>. 
+        Nous avons bien reçu votre commande <strong>#${safeOrderNumber}</strong>. 
         Nous préparons votre brasero artisanal avec soin et vous tiendrons informé de l'expédition.
       </p>
       
@@ -303,11 +318,11 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
       </div>
       
       ${
-        order.shippingAddress
+        safeAddress
           ? `
       <div style="margin-bottom: 30px;">
         <h3 style="font-size: 16px; margin-bottom: 10px; color: #1f2937;">Adresse de livraison</h3>
-        <p style="margin: 0; color: #6b7280;">${order.shippingAddress}</p>
+        <p style="margin: 0; color: #6b7280;">${safeAddress}</p>
       </div>
       `
           : ''
@@ -342,6 +357,8 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
 }
 
 function generateOrderShippedHTML(order: OrderEmailData): string {
+  const safeName = escapeHtml(order.customerName);
+  const safeOrderNumber = escapeHtml(order.orderNumber);
   const trackingHTML = order.trackingNumber
     ? `
     <div style="background-color: #dbeafe; padding: 20px; border-radius: 6px; margin: 30px 0; text-align: center;">
@@ -349,11 +366,11 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
         Numéro de suivi
       </p>
       <p style="margin: 0; font-size: 24px; font-weight: 700; color: #1e3a8a; font-family: monospace;">
-        ${order.trackingNumber}
+        ${escapeHtml(order.trackingNumber)}
       </p>
       ${
         order.carrier
-          ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #3b82f6;">Transporteur: ${order.carrier}</p>`
+          ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #3b82f6;">Transporteur: ${escapeHtml(order.carrier)}</p>`
           : ''
       }
     </div>
@@ -376,11 +393,11 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
     
     <div style="padding: 40px 20px;">
       <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${order.customerName}</strong>,
+        Bonjour <strong>${safeName}</strong>,
       </p>
       
       <p style="font-size: 16px; margin-bottom: 30px;">
-        Votre commande <strong>#${order.orderNumber}</strong> a été expédiée et devrait arriver dans les prochains jours.
+        Votre commande <strong>#${safeOrderNumber}</strong> a été expédiée et devrait arriver dans les prochains jours.
       </p>
       
       ${trackingHTML}
@@ -412,6 +429,8 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
 }
 
 function generateOrderProcessingHTML(order: OrderEmailData): string {
+  const safeName = escapeHtml(order.customerName);
+  const safeOrderNumber = escapeHtml(order.orderNumber);
   return `
 <!DOCTYPE html>
 <html>
@@ -428,11 +447,11 @@ function generateOrderProcessingHTML(order: OrderEmailData): string {
     
     <div style="padding: 40px 20px;">
       <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${order.customerName}</strong>,
+        Bonjour <strong>${safeName}</strong>,
       </p>
       
       <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonne nouvelle ! Votre commande <strong>#${order.orderNumber}</strong> est maintenant en cours de fabrication dans notre atelier.
+        Bonne nouvelle ! Votre commande <strong>#${safeOrderNumber}</strong> est maintenant en cours de fabrication dans notre atelier.
       </p>
       
       <p style="font-size: 16px; margin-bottom: 30px;">
@@ -466,6 +485,8 @@ function generateOrderProcessingHTML(order: OrderEmailData): string {
 }
 
 function generateOrderDeliveredHTML(order: OrderEmailData): string {
+  const safeName = escapeHtml(order.customerName);
+  const safeOrderNumber = escapeHtml(order.orderNumber);
   return `
 <!DOCTYPE html>
 <html>
@@ -482,11 +503,11 @@ function generateOrderDeliveredHTML(order: OrderEmailData): string {
     
     <div style="padding: 40px 20px;">
       <p style="font-size: 16px; margin-bottom: 20px;">
-        Bonjour <strong>${order.customerName}</strong>,
+        Bonjour <strong>${safeName}</strong>,
       </p>
       
       <p style="font-size: 16px; margin-bottom: 20px;">
-        Votre commande <strong>#${order.orderNumber}</strong> a bien été livrée. Nous espérons que vous apprécierez votre brasero artisanal !
+        Votre commande <strong>#${safeOrderNumber}</strong> a bien été livrée. Nous espérons que vous apprécierez votre brasero artisanal !
       </p>
       
       <p style="font-size: 16px; margin-bottom: 30px;">
@@ -520,8 +541,12 @@ function generateOrderDeliveredHTML(order: OrderEmailData): string {
 }
 
 function generateAdminOrderNotificationHTML(order: OrderEmailData): string {
+  const safeName = escapeHtml(order.customerName);
+  const safeEmail = escapeHtml(order.customerEmail);
+  const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeAddress = order.shippingAddress ? escapeHtml(order.shippingAddress) : '';
   const itemsHTML = order.items
-    .map((item) => `<li>${item.quantity}x ${item.name} - ${item.price.toFixed(2)} €</li>`)
+    .map((item) => `<li>${item.quantity}x ${escapeHtml(item.name)} - ${item.price.toFixed(2)} €</li>`)
     .join('');
 
   return `
@@ -530,14 +555,14 @@ function generateAdminOrderNotificationHTML(order: OrderEmailData): string {
 <head><meta charset="utf-8"></head>
 <body style="font-family: sans-serif; padding: 20px;">
   <h2 style="color: #8B4513;">🛒 Nouvelle commande reçue</h2>
-  <p><strong>Commande:</strong> #${order.orderNumber}</p>
-  <p><strong>Client:</strong> ${order.customerName} (${order.customerEmail})</p>
+  <p><strong>Commande:</strong> #${safeOrderNumber}</p>
+  <p><strong>Client:</strong> ${safeName} (${safeEmail})</p>
   <p><strong>Montant:</strong> ${order.totalAmount.toFixed(2)} €</p>
   
   <h3>Articles:</h3>
   <ul>${itemsHTML}</ul>
   
-  ${order.shippingAddress ? `<p><strong>Adresse:</strong><br>${order.shippingAddress}</p>` : ''}
+  ${safeAddress ? `<p><strong>Adresse:</strong><br>${safeAddress}</p>` : ''}
   
   <p style="margin-top: 30px;">
     <a href="https://www.atelier-lbf.fr/admin/commandes" 

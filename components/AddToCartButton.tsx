@@ -22,13 +22,10 @@ type AddToCartButtonProps = {
     onDemand?: boolean;
   };
   selectedAccessories?: SelectedAccessory[];
-  engravingText?: string;
-  engravingFont?: string;
-  engravingPrice?: number;
   className?: string;
 };
 
-export function AddToCartButton({ product, selectedAccessories = [], engravingText, engravingFont, engravingPrice, className = '' }: AddToCartButtonProps) {
+export function AddToCartButton({ product, selectedAccessories = [], className = '' }: AddToCartButtonProps) {
   const { addItem, totalPrice: cartTotal, itemCount: cartItemsCount } = useCart();
   const { trackAddToCart } = useAnalytics();
   const [quantity, setQuantity] = useState(1);
@@ -59,7 +56,7 @@ export function AddToCartButton({ product, selectedAccessories = [], engravingTe
   const handleAddToCart = async () => {
     setAdding(true);
     try {
-      // Ajouter le produit principal (avec gravure si présente)
+      // Ajouter le produit principal
       await addItem(
         {
           slug: product.slug,
@@ -67,23 +64,8 @@ export function AddToCartButton({ product, selectedAccessories = [], engravingTe
           price: product.price,
           image: product.images[0]?.src,
         },
-        quantity,
-        engravingText,
-        engravingFont
+        quantity
       );
-
-      // Si gravure, ajouter une ligne séparée pour le prix de la gravure
-      if (engravingText && engravingPrice && engravingPrice > 0) {
-        await addItem(
-          {
-            slug: `${product.slug}-gravure`,
-            name: `Gravure : "${engravingText}"`,
-            price: engravingPrice,
-            image: product.images[0]?.src,
-          },
-          1
-        );
-      }
 
       // Ajouter les accessoires sélectionnés
       if (selectedAccessories.length > 0) {

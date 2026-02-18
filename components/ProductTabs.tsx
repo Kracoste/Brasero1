@@ -1,31 +1,44 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Users, Flame, Box, Ruler, Weight, Paintbrush } from "lucide-react";
+import { useRef, useState, useMemo } from "react";
+import { Users, Flame, Box, Ruler, Weight, Paintbrush, CookingPot } from "lucide-react";
 
 import { AccessoryGrid } from "@/components/AccessoryGrid";
+import { FAQ } from "@/components/FAQ";
+import { getProductFAQ, type FAQOptions } from "@/lib/product-faq";
 import type { Product } from "@/lib/schema";
 import { cn, formatDimensions } from "@/lib/utils";
 
 type ProductTabsProps = {
   product: Product;
   accessories?: Product[];
+  /** Options pour la FAQ dynamique (quand le client change de variante) */
+  faqOptions?: FAQOptions;
 };
 
 const tabs = [
   { id: "description", label: "Description du produit" },
   { id: "specifications", label: "Spécifications" },
+  { id: "faq", label: "FAQ" },
   { id: "critiques", label: "Critiques" },
 ];
 
-export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => {
+export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTabsProps) => {
   const [activeTab, setActiveTab] = useState("description");
   const descriptionRef = useRef<HTMLDivElement | null>(null);
+  const faqRef = useRef<HTMLDivElement | null>(null);
   const reviewsRef = useRef<HTMLDivElement | null>(null);
+
+  // Générer la FAQ dynamique en fonction du produit et des options (variantes)
+  const dynamicFAQ = useMemo(
+    () => getProductFAQ(product, faqOptions),
+    [product, faqOptions]
+  );
 
   const tabToRef: Record<string, React.RefObject<HTMLDivElement | null>> = {
     description: descriptionRef,
     specifications: descriptionRef,
+    faq: faqRef,
     critiques: reviewsRef,
   };
 
@@ -158,6 +171,18 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
                       </div>
                     </div>
                   )}
+                  {/* Matière plancha - seulement si défini */}
+                  {product.specs?.planchaMaterial && (
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                        <CookingPot className="h-6 w-6 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Plancha</p>
+                        <p className="font-semibold text-gray-900">{product.specs.planchaMaterial === 'inox' ? 'Inox' : 'Acier'}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -175,6 +200,7 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
                     product.specs?.epaisseur ? { label: "Épaisseur bol", value: product.specs.epaisseur } : null,
                     product.specs?.dimensions ? { label: "Dimensions", value: product.specs.dimensions } : null,
                     product.specs?.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
+                    product.specs?.planchaMaterial ? { label: "Matière plancha", value: product.specs.planchaMaterial === 'inox' ? 'Inox' : 'Acier' } : null,
                   ])!
                   .filter(Boolean)
                   .map((item, idx) => (
@@ -193,6 +219,68 @@ export const ProductTabs = ({ product, accessories = [] }: ProductTabsProps) => 
             </div>
           </div>
         </div>
+
+        {/* Tableau des caractéristiques (style brasero.com) */}
+        {product.specs?.characteristics && product.specs.characteristics.length > 0 && (
+          <div className="scroll-mt-32">
+            <h2 className="font-display text-2xl font-bold text-slate-900 uppercase tracking-wide mb-6">
+              Caractéristiques
+            </h2>
+            <div className="rounded-xl overflow-hidden border border-amber-100">
+              {/* Titre du produit en en-tête */}
+              <div className="bg-amber-50/80 px-6 py-4 border-b border-amber-100">
+                <p className="font-bold text-slate-900 uppercase text-sm tracking-wide">{product.name}</p>
+              </div>
+              {/* Lignes du tableau */}
+              <dl>
+                {product.specs.characteristics.map((item: { label: string; value: string }, idx: number) => (
+                  <div
+                    key={item.label}
+                    className={cn(
+                      "grid grid-cols-[minmax(180px,1fr)_1.5fr] gap-6 px-6 py-4",
+                      idx % 2 === 0 ? "bg-amber-50/40" : "bg-white"
+                    )}
+                  >
+                    <dt className="font-bold text-slate-900 text-sm">{item.label}</dt>
+                    <dd className="text-slate-700 text-sm">{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        )}
+
+        {/* Section FAQ dynamique */}
+        {dynamicFAQ.length > 0 && (
+          <div ref={faqRef} className="space-y-6 scroll-mt-32">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Questions fréquentes</h2>
+              <p className="text-sm text-gray-500 mb-6">
+                Tout ce que vous devez savoir sur ce produit
+              </p>
+              <FAQ items={dynamicFAQ} />
+            </div>
+
+            {/* JSON-LD FAQPage pour le SEO */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  mainEntity: dynamicFAQ.map((item) => ({
+                    "@type": "Question",
+                    name: item.question,
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: item.answer,
+                    },
+                  })),
+                }),
+              }}
+            />
+          </div>
+        )}
 
         <div ref={reviewsRef} className="space-y-6 scroll-mt-32">
           {/* Section avis Google à venir */}

@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { getSiteSettings } from "@/lib/site-settings";
 import { 
   Users, 
@@ -8,7 +7,6 @@ import {
   CheckCircle2,
   Flame,
   Heart,
-  Award,
   MapPin,
   Clock,
   Mail,
