@@ -55,7 +55,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
       <div className="space-y-3 sm:space-y-4">
         {!product.onDemand && (
           <div className="space-y-1">
-            <Price amount={product.price} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
+            <Price amount={product.price} className="text-2xl sm:text-3xl lg:text-4xl font-bold" showHT />
             {selectedAccessories.length > 0 && (
               <div className="text-lg text-slate-600">
                 <span className="text-green-600 font-semibold">

@@ -113,7 +113,7 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} TTC</span>
             </div>
           ) : !product.onDemand ? (
-            <Price amount={product.price} className="product-card__price" tone="light" />
+            <Price amount={product.price} className="product-card__price" tone="light" showHT />
           ) : (
             <div className="product-card__price-placeholder" style={{ height: '2.5rem' }} />
           )}
