@@ -58,6 +58,7 @@ export default function NewProduct() {
     detailImageOffsetX: '0',
   });
   const [images, setImages] = useState<ProductImage[]>([]);
+  const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [accessoryDropdownOpen, setAccessoryDropdownOpen] = useState(false);
@@ -228,6 +229,41 @@ export default function NewProduct() {
         isCardImage: img.id === id,
       }))
     );
+  };
+
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedImageId(id);
+    e.dataTransfer.effectAllowed = 'move';
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '0.5';
+    }
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    setDraggedImageId(null);
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '1';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!draggedImageId || draggedImageId === targetId) return;
+    setImages((prev) => {
+      const copy = [...prev];
+      const fromIndex = copy.findIndex((img) => img.id === draggedImageId);
+      const toIndex = copy.findIndex((img) => img.id === targetId);
+      if (fromIndex === -1 || toIndex === -1) return prev;
+      const [moved] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, moved);
+      return copy;
+    });
+    setDraggedImageId(null);
   };
 
   const validateForm = () => {
@@ -532,7 +568,7 @@ export default function NewProduct() {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Images du produit</h2>
           <p className="text-sm text-slate-600 mb-4">
-            Ajoutez plusieurs images. L'image avec l'étoile sera affichée sur la carte produit.
+            Ajoutez plusieurs images. Glissez-déposez pour changer l'ordre. L'image avec l'étoile ⭐ sera affichée sur la carte produit.
           </p>
 
           {errors.images && (
@@ -540,18 +576,27 @@ export default function NewProduct() {
           )}
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            {images.map((image) => (
+            {images.map((image, index) => (
               <div
                 key={image.id}
-                className={`relative aspect-square rounded-lg border-2 overflow-hidden group ${
+                draggable
+                onDragStart={(e) => handleDragStart(e, image.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, image.id)}
+                className={`relative aspect-square rounded-lg border-2 overflow-hidden group cursor-grab active:cursor-grabbing transition-all ${
                   image.isCardImage ? 'border-green-500' : 'border-slate-200'
-                }`}
+                } ${draggedImageId && draggedImageId !== image.id ? 'border-dashed border-blue-400' : ''}`}
               >
                 <img
                   src={image.preview}
                   alt="Preview"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover pointer-events-none"
                 />
+                {/* Numéro d'ordre */}
+                <div className="absolute top-2 right-2 bg-black/60 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold">
+                  {index + 1}
+                </div>
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
                   <button
                     type="button"
