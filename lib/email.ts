@@ -341,46 +341,52 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
       </table>
     </div>
 
-    <!-- Récapitulatif prix -->
+    <!-- Récapitulatif prix en 2 colonnes -->
     <div style="padding: 0 24px 24px;">
       <table style="width: 100%; border-collapse: collapse;">
         <tr>
-          <td style="padding: 6px 0; font-size: 14px; color: #374151;"><strong>Sous-total</strong></td>
-          <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${subtotal.toFixed(2).replace('.', ',')} €</td>
-          <td style="padding: 6px 0; padding-left: 30px; font-size: 14px; color: #374151;"><strong>Livraison</strong></td>
-          <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${shippingCost > 0 ? shippingCost.toFixed(2).replace('.', ',') + ' €' : 'Offerte'}</td>
+          <td style="vertical-align: top; width: 50%; padding-right: 12px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151;"><strong>Sous-total</strong></td>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${subtotal.toFixed(2).replace('.', ',')} €</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151;"><strong>Livraison</strong></td>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${subtotal.toFixed(2).replace('.', ',')} €</td>
+              </tr>
+            </table>
+            ${safeAddress ? `
+            <div style="margin-top: 12px;">
+              <p style="font-size: 14px; color: #374151; margin: 0;"><strong>Livraison à domicile</strong></p>
+              <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">${safeAddress.replace(/,/g, '<br>')}</p>
+              <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">Référence : ${safeOrderNumber}</p>
+            </div>
+            ` : ''}
+          </td>
+          <td style="vertical-align: top; width: 50%; padding-left: 12px; border-left: 1px solid #e5e7eb;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151;">Livraison</td>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${shippingCost > 0 ? shippingCost.toFixed(2).replace('.', ',') + ' €' : 'Offerte'}</td>
+              </tr>
+              ${discount > 0 ? `
+              <tr>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151;">Remise</td>
+                <td style="padding: 6px 0; font-size: 14px; color: #059669; text-align: right;">-${discount.toFixed(2).replace('.', ',')} €</td>
+              </tr>
+              ` : ''}
+              <tr>
+                <td style="padding: 12px 0 6px; font-size: 20px; font-weight: 700; color: #1f2937; border-top: 2px solid #1f2937;"><strong>Total</strong></td>
+                <td style="padding: 12px 0 6px; font-size: 20px; font-weight: 700; color: #1f2937; text-align: right; border-top: 2px solid #1f2937;">${order.totalAmount.toFixed(2).replace('.', ',')} €</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="font-size: 13px; color: #6b7280; padding-top: 2px;">TVA : 20 % incluse (${tvaAmount.toFixed(2).replace('.', ',')} €)</td>
+              </tr>
+            </table>
+          </td>
         </tr>
-        ${discount > 0 ? `
-        <tr>
-          <td style="padding: 6px 0; font-size: 14px; color: #374151;"></td>
-          <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;"></td>
-          <td style="padding: 6px 0; padding-left: 30px; font-size: 14px; color: #374151;"><strong>Remise</strong></td>
-          <td style="padding: 6px 0; font-size: 14px; color: #059669; text-align: right;">-${discount.toFixed(2).replace('.', ',')} €</td>
-        </tr>
-        ` : ''}
       </table>
-
-      <!-- Adresse de livraison -->
-      ${safeAddress ? `
-      <div style="margin-top: 16px;">
-        <p style="font-size: 14px; color: #374151; margin: 0;"><strong>Livraison à domicile</strong></p>
-        <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">${safeAddress.replace(/,/g, '<br>')}</p>
-        <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">Référence : ${safeOrderNumber}</p>
-      </div>
-      ` : ''}
-
-      <!-- Total -->
-      <div style="margin-top: 20px; padding-top: 16px; border-top: 2px solid #1f2937;">
-        <table style="width: 100%;">
-          <tr>
-            <td style="font-size: 20px; font-weight: 700; color: #1f2937;">Total</td>
-            <td style="font-size: 20px; font-weight: 700; color: #1f2937; text-align: right;">${order.totalAmount.toFixed(2).replace('.', ',')} €</td>
-          </tr>
-          <tr>
-            <td colspan="2" style="font-size: 13px; color: #6b7280; text-align: right; padding-top: 2px;">TVA : 20 % incuse (${tvaAmount.toFixed(2).replace('.', ',')} €)</td>
-          </tr>
-        </table>
-      </div>
     </div>
 
     <!-- Footer -->
