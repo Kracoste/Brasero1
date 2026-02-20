@@ -366,6 +366,8 @@ export const mapSupabaseProduct = (p: Record<string, unknown>): Product | null =
     thickness: (p.thickness as number) || 0,
     height: (p.height as number) || 0,
     weight: (p.weight as number) || 0,
+    bowlThickness: (p.bowl_thickness ?? p.bowlThickness ?? undefined) as number | undefined,
+    baseThickness: (p.base_thickness ?? p.baseThickness ?? undefined) as number | undefined,
     warranty: (p.warranty || "Garantie atelier") as string,
     availability: (p.availability || "En stock") as string,
     shipping: (p.shipping || "") as string,

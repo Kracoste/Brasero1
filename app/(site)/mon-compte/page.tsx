@@ -51,18 +51,27 @@ export default function MonComptePage() {
     }
   }, [user, isLoading]);
 
-  // Loading state
-  if (isLoading || !user) {
-    return (
-      <Section className="py-24">
-        <Container className="max-w-3xl">
-          <div className="text-center">
-            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-4 border-slate-300 border-t-slate-900"></div>
-            <p className="mt-4 text-slate-600">Chargement...</p>
-          </div>
-        </Container>
-      </Section>
-    );
+  // Skeleton pour le profil
+  const ProfileSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="grid grid-cols-2 gap-4">
+        <div><div className="h-4 w-20 bg-slate-200 rounded mb-2" /><div className="h-10 bg-slate-100 rounded" /></div>
+        <div><div className="h-4 w-20 bg-slate-200 rounded mb-2" /><div className="h-10 bg-slate-100 rounded" /></div>
+      </div>
+      <div><div className="h-4 w-16 bg-slate-200 rounded mb-2" /><div className="h-10 bg-slate-100 rounded" /></div>
+      <div><div className="h-4 w-24 bg-slate-200 rounded mb-2" /><div className="h-10 bg-slate-100 rounded" /></div>
+      <div><div className="h-4 w-20 bg-slate-200 rounded mb-2" /><div className="h-10 bg-slate-100 rounded" /></div>
+      <div className="grid grid-cols-2 gap-4">
+        <div><div className="h-4 w-24 bg-slate-200 rounded mb-2" /><div className="h-10 bg-slate-100 rounded" /></div>
+        <div><div className="h-4 w-12 bg-slate-200 rounded mb-2" /><div className="h-10 bg-slate-100 rounded" /></div>
+      </div>
+      <div className="h-12 w-40 bg-slate-200 rounded" />
+    </div>
+  );
+
+  // Pas connecté et auth terminé → redirection gérée par useEffect
+  if (!isLoading && !user) {
+    return null;
   }
 
   return (
@@ -74,10 +83,8 @@ export default function MonComptePage() {
         </div>
 
         <div className="mt-8">
-          {profileLoading ? (
-            <div className="text-center py-8">
-              <div className="h-6 w-6 mx-auto animate-spin rounded-full border-4 border-slate-300 border-t-slate-900"></div>
-            </div>
+          {isLoading || profileLoading || !user ? (
+            <ProfileSkeleton />
           ) : (
             <ProfileForm user={user} initialProfile={profile} />
           )}

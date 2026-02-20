@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback, useMemo, u
 import { createClient } from '@/lib/supabase/client';
 import { isAdminEmail, AUTH_ROUTES } from '@/lib/auth';
 import { devLog, devError } from '@/lib/supabase/utils';
-import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
+import type { User, AuthChangeEvent, Session, UserResponse } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
@@ -115,27 +115,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     initInProgress.current = true;
     
-    // Initialisation - forcer une vérification serveur avec timeout
+    // Phase 1 : getSession() local = INSTANTANÉ (pas de requête réseau)
+    // Phase 2 : getUser() en arrière-plan pour vérifier avec le serveur
     const init = async () => {
-      setIsLoading(true);
-      
-      // Timeout de 10 secondes pour éviter le blocage infini
-      const timeoutPromise = new Promise<null>((resolve) => {
-        setTimeout(() => {
-          devLog('Auth init timeout - using cached state');
-          resolve(null);
-        }, 10000);
-      });
-      
       try {
-        // Utiliser getUser() directement car c'est plus fiable que getSession()
-        // getUser() vérifie avec le serveur Supabase
-        const userPromise = supabase.auth.getUser();
-        const result = await Promise.race([userPromise, timeoutPromise]);
+        // Phase 1 : session locale (instantanée, depuis le cookie)
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (!sessionError && session?.user) {
+          devLog('Init auth (fast) - session locale trouvée:', session.user.email);
+          updateUser(session.user);
+          isInitialized = true;
+          setIsLoading(false);
+          initInProgress.current = false;
+          
+          // Phase 2 : vérifier en arrière-plan avec le serveur (non bloquant)
+          supabase.auth.getUser().then((res: UserResponse) => {
+            const verifiedUser = res.data?.user ?? null;
+            const err = res.error;
+            if (err || !verifiedUser) {
+              devLog('Background verify - session invalide, déconnexion');
+              if (!err?.message?.includes('network') && !err?.message?.includes('fetch')) {
+                updateUser(null);
+                isInitialized = false;
+              }
+            } else {
+              updateUser(verifiedUser);
+            }
+          }).catch(() => {
+            // Ignorer les erreurs réseau en background
+          });
+          return;
+        }
+        
+        // Pas de session locale - essayer getUser() avec timeout court
+        const timeoutPromise = new Promise<null>((resolve) => {
+          setTimeout(() => resolve(null), 3000);
+        });
+        
+        const result = await Promise.race([supabase.auth.getUser(), timeoutPromise]);
         
         if (result === null) {
-          // Timeout - utiliser le cache ou null
-          devLog('Auth timeout - keeping cached user:', cachedUser?.email);
+          devLog('Auth timeout - no user');
+          updateUser(null);
           isInitialized = true;
           setIsLoading(false);
           initInProgress.current = false;
@@ -146,7 +168,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (error) {
           devLog('Init auth - pas de session:', error.message);
-          // Ne pas effacer le cache si c'est juste une erreur réseau
           if (!error.message.includes('network') && !error.message.includes('fetch')) {
             updateUser(null);
           }
@@ -160,8 +181,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isInitialized = true;
       } catch (error) {
         devError('Erreur initialisation auth:', error);
-        devLog('Auth init error - keeping cached state');
-        // Garder le cache en cas d'erreur
       } finally {
         setIsLoading(false);
         initInProgress.current = false;

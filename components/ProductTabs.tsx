@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useMemo } from "react";
-import { Users, Flame, Box, Ruler, Weight, Paintbrush, CookingPot } from "lucide-react";
+import { Users, Flame, Box, Ruler, Weight, Paintbrush, CookingPot, Layers } from "lucide-react";
 
 import { AccessoryGrid } from "@/components/AccessoryGrid";
 import { FAQ } from "@/components/FAQ";
@@ -150,6 +150,28 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                       </div>
                     </div>
                   )}
+                  {product.bowlThickness && (
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                        <Layers className="h-6 w-6 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Épaisseur bol</p>
+                        <p className="font-semibold text-gray-900">{product.bowlThickness} mm</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.baseThickness && (
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+                        <Layers className="h-6 w-6 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Épaisseur socle</p>
+                        <p className="font-semibold text-gray-900">{product.baseThickness} mm</p>
+                      </div>
+                    </div>
+                  )}
                   {product.specs?.painting && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
@@ -185,8 +207,9 @@ export const ProductTabs = ({ product, accessories = [], faqOptions }: ProductTa
                     { label: "Hauteur", value: `${product.height} cm` },
                     { label: "Épaisseur", value: `${product.thickness} mm` },
                     { label: "Poids", value: `${product.weight} kg` },
+                    product.bowlThickness ? { label: "Épaisseur bol", value: `${product.bowlThickness} mm` } : (product.specs?.epaisseur ? { label: "Épaisseur bol", value: product.specs.epaisseur } : null),
+                    product.baseThickness ? { label: "Épaisseur socle", value: `${product.baseThickness} mm` } : null,
                     product.specs?.acier ? { label: "Acier", value: product.specs.acier } : null,
-                    product.specs?.epaisseur ? { label: "Épaisseur bol", value: product.specs.epaisseur } : null,
                     product.specs?.dimensions ? { label: "Dimensions", value: product.specs.dimensions } : null,
                     product.specs?.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
                     product.specs?.planchaMaterial ? { label: "Matière plancha", value: product.specs.planchaMaterial === 'inox' ? 'Inox' : 'Acier' } : null,

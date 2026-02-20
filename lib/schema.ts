@@ -54,6 +54,8 @@ export const productSchema = z.object({
   thickness: z.number(),
   height: z.number(),
   weight: z.number(),
+  bowlThickness: z.number().optional(),
+  baseThickness: z.number().optional(),
   warranty: z.string(),
   availability: z.string(),
   shipping: z.string(),

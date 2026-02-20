@@ -328,18 +328,32 @@ export default function MesCommandesPage() {
     }
   }, [user]);
 
-  // Loading
-  if (authLoading || !user) {
-    return (
-      <Section className="py-24">
-        <Container className="max-w-3xl">
-          <div className="text-center">
-            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-4 border-slate-300 border-t-slate-900" />
-            <p className="mt-4 text-slate-600">Chargement...</p>
+  // Skeleton pour les commandes
+  const OrderSkeleton = () => (
+    <div className="space-y-4 animate-pulse">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-slate-100" />
+              <div>
+                <div className="h-4 w-40 bg-slate-200 rounded mb-2" />
+                <div className="h-3 w-28 bg-slate-100 rounded" />
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="h-6 w-24 bg-slate-100 rounded-full" />
+              <div className="h-5 w-16 bg-slate-200 rounded" />
+            </div>
           </div>
-        </Container>
-      </Section>
-    );
+        </div>
+      ))}
+    </div>
+  );
+
+  // Pas connecté et auth terminé → redirection gérée par useEffect
+  if (!authLoading && !user) {
+    return null;
   }
 
   return (
@@ -360,11 +374,8 @@ export default function MesCommandesPage() {
         </div>
 
         {/* Contenu */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-4 border-slate-300 border-t-slate-900" />
-            <p className="mt-4 text-slate-600">Chargement de vos commandes...</p>
-          </div>
+        {authLoading || loading ? (
+          <OrderSkeleton />
         ) : error ? (
           <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
             <p className="text-red-700">{error}</p>
