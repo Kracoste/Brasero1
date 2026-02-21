@@ -46,8 +46,9 @@ export default function MonComptePage() {
 
     if (user) {
       loadProfile();
-    } else if (!isLoading) {
-      setProfileLoading(false);
+    } else {
+      // Auth terminé sans user = pas de profil à charger
+      if (!isLoading) setProfileLoading(false);
     }
   }, [user, isLoading]);
 

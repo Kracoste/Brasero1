@@ -325,8 +325,10 @@ export default function MesCommandesPage() {
 
     if (user) {
       loadOrders();
+    } else if (!authLoading) {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   // Skeleton pour les commandes
   const OrderSkeleton = () => (

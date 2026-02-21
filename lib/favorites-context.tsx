@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
+import { useAuth } from '@/lib/auth-context';
 
 export type FavoriteItem = {
   id: string;
@@ -55,31 +55,33 @@ const persistGuestFavorites = (slugs: Set<string>) => {
 };
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [guestFavorites, setGuestFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
   const supabaseRef = useRef(createClient());
-  const [mounted, setMounted] = useState(false);
+  const prevUserIdRef = useRef<string | null>(null);
 
-  // Initialiser les favoris invités après le montage
+  // Initialiser les favoris invités au montage
   useEffect(() => {
-    setMounted(true);
     const guestFavs = readGuestFavorites();
     setGuestFavorites(guestFavs);
+    setLoading(false);
   }, []);
 
+  // Synchroniser avec Supabase quand l'utilisateur change (via useAuth)
   useEffect(() => {
-    if (!mounted) return;
-    
-    const supabase = supabaseRef.current;
-    
-    const initFavorites = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+    const currentUserId = user?.id ?? null;
+    const prevUserId = prevUserIdRef.current;
 
-        if (user) {
+    // Même utilisateur, pas besoin de re-sync
+    if (currentUserId === prevUserId) return;
+    prevUserIdRef.current = currentUserId;
+
+    if (currentUserId) {
+      const loadFavorites = async () => {
+        try {
+          const supabase = supabaseRef.current;
           const { data, error } = await supabase
             .from('favorites')
             .select('*')
@@ -87,36 +89,16 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
           if (!error && data) {
             setFavorites(data);
           }
+        } catch (error) {
+          console.error('Error loading favorites:', error);
         }
-      } catch (error) {
-        console.error('Error initializing favorites:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initFavorites();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
-      const newUser = session?.user ?? null;
-      setUser(newUser);
-
-      if (newUser) {
-        const { data, error } = await supabase
-          .from('favorites')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (!error && data) {
-          setFavorites(data);
-        }
-      } else {
-        setFavorites([]);
-        setGuestFavorites(readGuestFavorites());
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [mounted]);
+      };
+      loadFavorites();
+    } else {
+      setFavorites([]);
+      setGuestFavorites(readGuestFavorites());
+    }
+  }, [user]);
 
   const isFavorite = (productSlug: string): boolean => {
     if (user) {
