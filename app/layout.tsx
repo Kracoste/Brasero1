@@ -91,15 +91,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Critical: Block Google Translate banner BEFORE it renders */}
         <style dangerouslySetInnerHTML={{ __html: `
           .goog-te-banner-frame, iframe.goog-te-banner-frame,
-          .skiptranslate, body > .skiptranslate,
-          #goog-gt-tt, .goog-te-balloon-frame, .goog-te-gadget {
-            display:none!important; height:0!important; max-height:0!important;
-            overflow:hidden!important; visibility:hidden!important;
+          #goog-gt-tt, .goog-te-balloon-frame,
+          .VIpgJd-ZVi9od-ORHb-OEVmcd, .VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+          .VIpgJd-ZVi9od-SmfZ-hSRGPd, .VIpgJd-ZVi9od-xl07Ob-lTBxed,
+          div.skiptranslate, body > .skiptranslate {
+            display:none!important; height:0!important; max-height:0!important; width:0!important;
+            overflow:hidden!important; visibility:hidden!important; opacity:0!important;
             border:0!important; margin:0!important; padding:0!important;
-            position:absolute!important; left:-9999px!important; top:-9999px!important;
+            position:fixed!important; left:-9999px!important; top:-9999px!important;
+            z-index:-1!important; pointer-events:none!important;
           }
-          body { top:0!important; position:static!important; margin-top:0!important; padding-top:0!important; }
-          html { margin-top:0!important; padding-top:0!important; }
+          body { top:0!important; bottom:auto!important; position:static!important; margin-top:0!important; padding-top:0!important; margin-bottom:0!important; padding-bottom:0!important; }
+          html { margin-top:0!important; padding-top:0!important; margin-bottom:0!important; padding-bottom:0!important; }
           html.translated-ltr, html.translated-rtl { margin-top:0!important; overflow:visible!important; }
           html.translated-ltr body, html.translated-rtl body { top:0!important; position:static!important; }
         `}} />
@@ -118,16 +121,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <body suppressHydrationWarning className={`${geistSans.variable} ${displayFont.variable} antialiased`}>
         {/* GT container — hidden off-screen */}
         <div id="google_translate_element" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: '-9999px', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }} />
-        {/* Inline script: force body.top=0 whenever GT tries to change it */}
+        {/* Inline script: force body position and hide GT bars (top & bottom) */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
           function fix(){
-            document.body.style.setProperty('top','0','important');
-            document.body.style.setProperty('position','static','important');
-            document.body.style.setProperty('margin-top','0','important');
-            document.documentElement.style.setProperty('margin-top','0','important');
+            var b=document.body.style,h=document.documentElement.style;
+            b.setProperty('top','0','important');
+            b.setProperty('bottom','auto','important');
+            b.setProperty('position','static','important');
+            b.setProperty('margin-top','0','important');
+            b.setProperty('margin-bottom','0','important');
+            b.setProperty('padding-bottom','0','important');
+            h.setProperty('margin-top','0','important');
+            h.setProperty('margin-bottom','0','important');
+            var sels='.goog-te-banner-frame,iframe.goog-te-banner-frame,div.skiptranslate,body>.skiptranslate,#goog-gt-tt,.goog-te-balloon-frame,[class*=VIpgJd-ZVi9od]';
+            document.querySelectorAll(sels).forEach(function(e){
+              e.style.setProperty('display','none','important');
+              e.style.setProperty('height','0','important');
+              e.style.setProperty('width','0','important');
+              e.style.setProperty('visibility','hidden','important');
+              e.style.setProperty('position','fixed','important');
+              e.style.setProperty('left','-9999px','important');
+              e.style.setProperty('top','-9999px','important');
+              e.style.setProperty('z-index','-1','important');
+            });
           }
           fix();
-          new MutationObserver(fix).observe(document.body,{attributes:true,attributeFilter:['style']});
+          new MutationObserver(fix).observe(document.body,{attributes:true,attributeFilter:['style'],childList:true});
           new MutationObserver(fix).observe(document.documentElement,{attributes:true,attributeFilter:['style']});
         })();`}} />
         {/* Google Tag Manager (noscript) */}
