@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Upload, Star, Trash2, Plus, GripVertical } from 'lucide-react';
+import { ArrowLeft, Upload, Star, Trash2, Plus, GripVertical, Ruler } from 'lucide-react';
 import Link from 'next/link';
 
 type ProductImage = {
@@ -12,7 +12,19 @@ type ProductImage = {
   isCardImage: boolean;
 };
 
+type PriceGridRow = {
+  id: string;
+  diameter: number;
+  priceBrasero: string;
+  priceAcier: string;
+  priceInox: string;
+};
+
 const DIAMETER_OPTIONS = [50, 80, 100];
+const PLANCHA_OPTIONS = [
+  { label: 'Acier', value: 'acier' as const },
+  { label: 'Inox', value: 'inox' as const },
+];
 const FORMAT_OPTIONS = [
   { label: 'Rond', value: 'rond' },
   { label: 'Hexagonal', value: 'hexagonal' },
@@ -63,6 +75,8 @@ export default function NewProduct() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [accessoryDropdownOpen, setAccessoryDropdownOpen] = useState(false);
   const [characteristics, setCharacteristics] = useState<{label: string, value: string}[]>([]);
+  const [priceGrid, setPriceGrid] = useState<PriceGridRow[]>([]);
+  const availableFinishes = ['corten', 'peint'] as const;
 
   const generateSlug = (name: string) => {
     return name
@@ -392,6 +406,47 @@ export default function NewProduct() {
         featured_order: parseInt(formData.featuredOrder),
         images: uploadedImages,
         cardImage: uploadedImages.find((img) => img.isCard)?.src || uploadedImages[0]?.src,
+        variants: (() => {
+          const result: any[] = [];
+          for (const row of priceGrid) {
+            const braseroPrice = row.priceBrasero.trim() ? parseFloat(row.priceBrasero) : 0;
+            for (const finish of availableFinishes) {
+              // Plancha Acier
+              if (row.priceAcier.trim()) {
+                const planchaPrice = parseFloat(row.priceAcier);
+                const parts: string[] = [`Ø${row.diameter} cm`];
+                parts.push(finish === 'corten' ? 'Corten' : 'Peint');
+                parts.push('Plancha acier');
+                result.push({
+                  label: parts.join(' — '),
+                  diameter: row.diameter,
+                  finish,
+                  planchaMaterial: 'acier',
+                  priceBrasero: braseroPrice,
+                  pricePlancha: planchaPrice,
+                  price: braseroPrice + planchaPrice,
+                });
+              }
+              // Plancha Inox
+              if (row.priceInox.trim()) {
+                const planchaPrice = parseFloat(row.priceInox);
+                const parts: string[] = [`Ø${row.diameter} cm`];
+                parts.push(finish === 'corten' ? 'Corten' : 'Peint');
+                parts.push('Plancha inox');
+                result.push({
+                  label: parts.join(' — '),
+                  diameter: row.diameter,
+                  finish,
+                  planchaMaterial: 'inox',
+                  priceBrasero: braseroPrice,
+                  pricePlancha: planchaPrice,
+                  price: braseroPrice + planchaPrice,
+                });
+              }
+            }
+          }
+          return result.length > 0 ? result : null;
+        })(),
       };
 
       // Utiliser l'API route pour bypass RLS
@@ -469,7 +524,7 @@ export default function NewProduct() {
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
                   errors.name ? 'border-red-500' : 'border-slate-200'
                 }`}
-                placeholder="Braséro Atelier LBF en Acier Ø60"
+                placeholder="Atelier LBF en Acier Ø60"
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
@@ -838,6 +893,126 @@ export default function NewProduct() {
             )}
           </div>
         </div>
+
+        {/* Grille de prix par diamètre */}
+        {(formData.category === 'brasero' || formData.category === 'fendeur') && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Ruler className="h-5 w-5 text-slate-600" />
+                <h2 className="text-lg font-semibold text-slate-900">Grille de prix</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const usedDiams = new Set(priceGrid.map(r => r.diameter));
+                  const next = DIAMETER_OPTIONS.find(d => !usedDiams.has(d));
+                  if (!next) return;
+                  setPriceGrid(prev => [...prev, {
+                    id: `grid-${next}-${Date.now()}`,
+                    diameter: next,
+                    priceBrasero: '',
+                    priceAcier: '',
+                    priceInox: '',
+                  }]);
+                }}
+                disabled={priceGrid.length >= DIAMETER_OPTIONS.length}
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Plus className="h-4 w-4" />
+                Ajouter un diamètre
+              </button>
+            </div>
+            <p className="text-sm text-slate-500 mb-4">
+              Le prix total = prix du brasero + prix de la plancha choisie.
+            </p>
+
+            {priceGrid.length === 0 ? (
+              <div className="text-center py-8 text-slate-400">
+                <Ruler className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Aucune grille — le prix du produit sera utilisé tel quel.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {priceGrid.map((row) => {
+                  const updateRow = (field: string, value: any) => {
+                    setPriceGrid(prev => prev.map(r => r.id === row.id ? { ...r, [field]: value } : r));
+                  };
+                  const brasero = parseFloat(row.priceBrasero) || 0;
+                  const acier = parseFloat(row.priceAcier) || 0;
+                  const inox = parseFloat(row.priceInox) || 0;
+                  return (
+                    <div key={row.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <select
+                          value={row.diameter}
+                          onChange={(e) => updateRow('diameter', parseInt(e.target.value))}
+                          className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-slate-900"
+                        >
+                          {DIAMETER_OPTIONS.map(d => (
+                            <option key={d} value={d}>Ø{d} cm</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setPriceGrid(prev => prev.filter(r => r.id !== row.id))}
+                          className="text-red-400 hover:text-red-600 transition-colors p-1"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Brasero (€)</label>
+                          <input
+                            type="number"
+                            value={row.priceBrasero}
+                            onChange={(e) => updateRow('priceBrasero', e.target.value)}
+                            placeholder="1200"
+                            min="0"
+                            step="0.01"
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Plancha acier (€)</label>
+                          <input
+                            type="number"
+                            value={row.priceAcier}
+                            onChange={(e) => updateRow('priceAcier', e.target.value)}
+                            placeholder="200"
+                            min="0"
+                            step="0.01"
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Plancha inox (€)</label>
+                          <input
+                            type="number"
+                            value={row.priceInox}
+                            onChange={(e) => updateRow('priceInox', e.target.value)}
+                            placeholder="350"
+                            min="0"
+                            step="0.01"
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          />
+                        </div>
+                      </div>
+                      {brasero > 0 && (acier > 0 || inox > 0) && (
+                        <div className="mt-2 text-xs text-slate-400">
+                          {acier > 0 && <span>Total acier : {(brasero + acier).toFixed(0)} €</span>}
+                          {acier > 0 && inox > 0 && <span className="mx-2">·</span>}
+                          {inox > 0 && <span>Total inox : {(brasero + inox).toFixed(0)} €</span>}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Caractéristiques / Dimensions */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">

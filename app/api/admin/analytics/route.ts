@@ -30,7 +30,7 @@ type ConversionFunnel = {
 };
 
 // Cache simple en mémoire pour réduire les requêtes
-let analyticsCache: { data: any; timestamp: number } | null = null;
+let analyticsCache: { data: Record<string, unknown>; timestamp: number } | null = null;
 const CACHE_TTL = 15 * 60 * 1000; // 15 minutes (amélioré pour réduire la charge)
 
 export async function GET(request: NextRequest) {
@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
     // Top produits vus
     const productViewEvents = events.filter(e => e.event_type === 'product_view' && e.product_slug);
     const productViewCounts = new Map<string, { slug: string; name: string; count: number }>();
-    productViewEvents.forEach((p: any) => {
+    productViewEvents.forEach((p: { product_slug: string; product_name?: string }) => {
       const key = p.product_slug;
       if (!productViewCounts.has(key)) {
         productViewCounts.set(key, { slug: key, name: p.product_name || key, count: 0 });
@@ -178,7 +178,7 @@ export async function GET(request: NextRequest) {
     // Top produits ajoutés au panier
     const cartEvents = events.filter(e => e.event_type === 'add_to_cart' && e.product_slug);
     const productCartCounts = new Map<string, { slug: string; name: string; count: number; quantity: number }>();
-    cartEvents.forEach((p: any) => {
+    cartEvents.forEach((p: { product_slug: string; product_name?: string; quantity?: number }) => {
       const key = p.product_slug;
       if (!productCartCounts.has(key)) {
         productCartCounts.set(key, { slug: key, name: p.product_name || key, count: 0, quantity: 0 });
@@ -196,11 +196,11 @@ export async function GET(request: NextRequest) {
     const ordersMonth = orders.filter(o => o.created_at >= startOfMonth);
     const ordersYear = orders.filter(o => o.created_at >= startOfYear);
 
-    const calcRevenue = (data: any[]) => data.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+    const calcRevenue = (data: { total_amount?: number }[]) => data.reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
     // Données journalières
     const dailyMap = new Map<string, DailyData>();
-    sessions.forEach((s: any) => {
+    sessions.forEach((s) => {
       const date = s.started_at.split('T')[0];
       if (!dailyMap.has(date)) {
         dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
@@ -210,7 +210,7 @@ export async function GET(request: NextRequest) {
 
     // Visiteurs uniques par jour
     const visitorsByDay = new Map<string, Set<string>>();
-    sessions.forEach((s: any) => {
+    sessions.forEach((s) => {
       const date = s.started_at.split('T')[0];
       if (!visitorsByDay.has(date)) visitorsByDay.set(date, new Set());
       visitorsByDay.get(date)!.add(s.visitor_id);
@@ -221,7 +221,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    orders.forEach((o: any) => {
+    orders.forEach((o) => {
       const date = o.created_at.split('T')[0];
       if (!dailyMap.has(date)) {
         dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
@@ -232,7 +232,7 @@ export async function GET(request: NextRequest) {
 
     // Page views par jour
     const pageViews = pageViewsYear.data || [];
-    pageViews.forEach((p: any) => {
+    pageViews.forEach((p) => {
       const date = p.viewed_at.split('T')[0];
       if (!dailyMap.has(date)) {
         dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
     const dailyData = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
 
     // Commandes récentes formatées
-    const formattedRecentOrders = (recentOrders.data || []).map((order: any) => ({
+    const formattedRecentOrders = (recentOrders.data || []).map((order: { id: string; customer_name?: string; total_amount?: number; created_at: string; status?: string }) => ({
       id: order.id,
       customer: order.customer_name || 'Client',
       amount: order.total_amount || 0,

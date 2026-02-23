@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { ProductGallery } from '@/components/ProductGallery';
-import { ProductPurchaseSection } from '@/components/ProductPurchaseSection';
+import { ProductPurchaseSection, type ProductSelections } from '@/components/ProductPurchaseSection';
 import { ProductTabs } from '@/components/ProductTabs';
 import { Badge } from '@/components/Badge';
-import type { Product } from '@/lib/schema';
-import type { FAQOptions } from '@/lib/product-faq';
+import type { Product, ProductVariant } from '@/lib/schema';
+import type { FAQOptions, MaterialType, PlanchaType } from '@/lib/product-faq';
 
 type ProductConfiguratorProps = {
   product: Product;
@@ -18,8 +18,8 @@ type ProductConfiguratorProps = {
 /**
  * Composant orchestrateur : coordonne la galerie,
  * les options d'achat, et les ProductTabs (dont la FAQ dynamique).
- * 
- * La matière de plancha est définie par l'admin uniquement et affichée dans les specs.
+ *
+ * Quand le client choisit une variante, les specs et la FAQ changent dynamiquement.
  */
 export function ProductConfigurator({
   product,
@@ -27,10 +27,56 @@ export function ProductConfigurator({
   compatibleAccessorySlugs,
   preloadedAccessories,
 }: ProductConfiguratorProps) {
-  // Options FAQ dynamiques basées sur la matière plancha définie par l'admin
-  const faqOptions: FAQOptions = useMemo(() => ({
-    overridePlanchaType: product.specs?.planchaMaterial || 'aucune',
-  }), [product.specs?.planchaMaterial]);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [selections, setSelections] = useState<ProductSelections>({ diameter: null, finish: null, plancha: null });
+
+  const handleVariantChange = useCallback((variant: ProductVariant | null) => {
+    setSelectedVariant(variant);
+  }, []);
+
+  const handleSelectionChange = useCallback((sel: ProductSelections) => {
+    setSelections(sel);
+  }, []);
+
+  // Calculer les options FAQ dynamiques en fonction des sélections du client
+  const faqOptions: FAQOptions = useMemo(() => {
+    const opts: FAQOptions = {};
+
+    // Finition → matériau pour la FAQ (utilise les sélections, pas le variant)
+    if (selections.finish === 'corten') {
+      opts.overrideMaterial = 'corten' as MaterialType;
+    } else if (selections.finish === 'peint') {
+      opts.overrideMaterial = 'acier-peint' as MaterialType;
+    }
+
+    // Plancha (utilise les sélections)
+    if (selections.plancha) {
+      opts.overridePlanchaType = selections.plancha as PlanchaType;
+    }
+
+    // Fallback sur les specs du produit
+    if (!opts.overridePlanchaType && product.specs?.planchaMaterial) {
+      opts.overridePlanchaType = product.specs.planchaMaterial as PlanchaType;
+    }
+
+    return opts;
+  }, [selections, product.specs?.planchaMaterial]);
+
+  // Overrides de specs pour ProductTabs en fonction des sélections du client
+  const specsOverrides = useMemo(() => {
+    // Toujours envoyer les overrides si le client a fait des sélections
+    const hasSelections = selections.diameter !== null || selections.finish !== null || selections.plancha !== null;
+    if (!hasSelections) return undefined;
+
+    return {
+      diameter: selections.diameter ?? undefined,
+      height: selectedVariant?.height,
+      weight: selectedVariant?.weight,
+      finish: (selections.finish as 'corten' | 'peint') ?? undefined,
+      paintType: selectedVariant?.paintType,
+      planchaMaterial: (selections.plancha as 'acier' | 'inox') ?? undefined,
+    };
+  }, [selections, selectedVariant]);
 
   return (
     <>
@@ -60,18 +106,25 @@ export function ProductConfigurator({
             </div>
           </div>
 
-          {/* Section d'achat */}
+          {/* Section d'achat avec configurateur */}
           <ProductPurchaseSection
             product={product}
             compatibleAccessorySlugs={compatibleAccessorySlugs}
             preloadedAccessories={preloadedAccessories}
+            onVariantChange={handleVariantChange}
+            onSelectionChange={handleSelectionChange}
           />
         </div>
       </div>
 
-      {/* ProductTabs avec FAQ dynamique */}
+      {/* ProductTabs avec FAQ et specs dynamiques */}
       <div className="mt-8 sm:mt-12">
-        <ProductTabs product={product} accessories={[]} faqOptions={faqOptions} />
+        <ProductTabs
+          product={product}
+          accessories={[]}
+          faqOptions={faqOptions}
+          specsOverrides={specsOverrides}
+        />
       </div>
     </>
   );

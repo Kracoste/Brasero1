@@ -5,13 +5,6 @@ import { isAdminEmail } from '@/lib/auth';
 import { ALLOWED_STORAGE_BUCKETS, sanitizeFileName, devError } from '@/lib/supabase/utils';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
-// Augmenter la limite de taille du body pour les uploads d'images (par défaut 4.5MB sur Vercel)
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 // Augmenter le timeout pour les uploads
 export const maxDuration = 30;
 

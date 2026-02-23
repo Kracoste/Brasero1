@@ -1,4 +1,4 @@
-# Brasero Atelier
+# Atelier LBF
 
 Site e-commerce Next.js (App Router + TypeScript) pour présenter quatre modèles de braséros fabriqués à Moncoutant ainsi qu’un fendeur à bûches premium.
 

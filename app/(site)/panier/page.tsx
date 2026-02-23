@@ -100,6 +100,11 @@ export default function PanierPage() {
                       <Link href={`/produits/${item.product_slug}`} className="font-semibold text-clay-900 hover:text-clay-700">
                         {item.product_name}
                       </Link>
+                      {item.variant_label && (
+                        <span className="ml-2 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                          {item.variant_label}
+                        </span>
+                      )}
                       <p className="mt-1 text-sm text-slate-500">
                         <Price amount={item.product_price} /> / unité
                       </p>

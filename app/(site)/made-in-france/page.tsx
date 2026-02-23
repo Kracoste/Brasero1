@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "brasero fabriqué en France",
       "brasero artisan français",
       "brasero production française",
-      "brasero atelier français",
+      "atelier lbf français",
       "brasero local Deux-Sèvres",
       settings.storeName,
     ],

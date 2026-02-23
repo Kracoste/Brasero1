@@ -10,6 +10,7 @@ export type CartItem = {
   product_name: string;
   product_price: number;
   product_image: string | null;
+  variant_label?: string;
   quantity: number;
 };
 
@@ -23,6 +24,7 @@ type CartContextType = {
     name: string;
     price: number;
     image?: string;
+    variantLabel?: string;
   }, quantity?: number) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
@@ -85,7 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const addGuestItem = (
-    product: { slug: string; name: string; price: number; image?: string },
+    product: { slug: string; name: string; price: number; image?: string; variantLabel?: string },
     quantity: number,
   ) => {
     syncGuestCart(prev => {
@@ -95,8 +97,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return prev;
       }
 
+      // Identifier par slug + variante (deux tailles différentes = deux lignes)
+      const itemKey = product.variantLabel 
+        ? `${product.slug}::${product.variantLabel}` 
+        : product.slug;
       const existing = prev.find(
-        (item) => isGuestItem(item) && item.product_slug === product.slug,
+        (item) => isGuestItem(item) && `${item.product_slug}${item.variant_label ? `::${item.variant_label}` : ''}` === itemKey,
       );
       if (existing) {
         return prev.map((item) =>
@@ -111,6 +117,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         product_name: product.name,
         product_price: product.price,
         product_image: product.image || null,
+        variant_label: product.variantLabel || undefined,
         quantity: Math.min(quantity, MAX_QUANTITY_PER_ITEM),
       };
       return [...prev, newItem];
@@ -234,7 +241,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Ajouter un article au panier
   const addItem = async (
-    product: { slug: string; name: string; price: number; image?: string },
+    product: { slug: string; name: string; price: number; image?: string; variantLabel?: string },
     quantity: number = 1,
   ) => {
     // Toujours ajouter d'abord localement pour une réponse instantanée
@@ -245,8 +252,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const ensuredCartId = cartId ?? (await loadCart(user.id));
       if (ensuredCartId) {
         try {
+          // Identifier par slug + variante
+          const itemKey = product.variantLabel 
+            ? `${product.slug}::${product.variantLabel}` 
+            : product.slug;
           const existingItem = items.find(
-            item => !isGuestItem(item) && item.product_slug === product.slug
+            item => !isGuestItem(item) && 
+              `${item.product_slug}${item.variant_label ? `::${item.variant_label}` : ''}` === itemKey
           );
 
           if (existingItem) {

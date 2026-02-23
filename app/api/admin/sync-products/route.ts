@@ -33,15 +33,20 @@ export async function POST(request: NextRequest) {
       skipped: 0,
     };
 
+    // Pré-charger tous les produits existants en une seule requête (éviter N+1)
+    const { data: existingProducts } = await adminClient
+      .from('products')
+      .select('id, slug, specs');
+
+    const existingBySlug = new Map(
+      (existingProducts || []).map((p: { id: string; slug: string; specs: unknown }) => [p.slug, p])
+    );
+
     // Synchroniser chaque produit
     for (const product of contentProducts) {
       try {
         // Vérifier si le produit existe déjà
-        const { data: existing } = await adminClient
-          .from('products')
-          .select('id, slug, specs')
-          .eq('slug', product.slug)
-          .single();
+        const existing = existingBySlug.get(product.slug) || null;
 
         // Préparer les specs avec compatibleAccessories
         const specs = {

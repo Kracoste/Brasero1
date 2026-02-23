@@ -253,6 +253,7 @@ export default function CheckoutPage() {
               product_name: item.product_name,
               product_price: item.product_price,
               product_image: item.product_image,
+              variant_label: item.variant_label,
               quantity: item.quantity,
             })),
             customerInfo: {

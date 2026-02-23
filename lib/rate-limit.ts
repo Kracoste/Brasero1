@@ -12,6 +12,21 @@ const rateLimitMap = new Map<string, RateLimitRecord>();
 const DEFAULT_WINDOW_MS = 60 * 1000; // 1 minute
 const DEFAULT_MAX_REQUESTS = 60;
 
+// Auto-cleanup: purge toutes les 5 minutes
+const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+let lastCleanup = Date.now();
+
+function autoCleanup(): void {
+  const now = Date.now();
+  if (now - lastCleanup < CLEANUP_INTERVAL_MS) return;
+  lastCleanup = now;
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetAt) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
+
 /**
  * Vérifie si une requête est autorisée selon le rate limiting
  * @param identifier - Identifiant unique (généralement IP client)
@@ -24,6 +39,8 @@ export function checkRateLimit(
   maxRequests: number = DEFAULT_MAX_REQUESTS,
   windowMs: number = DEFAULT_WINDOW_MS
 ): boolean {
+  autoCleanup();
+
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
   
@@ -38,19 +55,6 @@ export function checkRateLimit(
   
   record.count++;
   return true;
-}
-
-/**
- * Nettoie les entrées expirées de la map
- * À appeler périodiquement si nécessaire
- */
-export function cleanupRateLimitMap(): void {
-  const now = Date.now();
-  for (const [key, value] of rateLimitMap.entries()) {
-    if (now > value.resetAt) {
-      rateLimitMap.delete(key);
-    }
-  }
 }
 
 /**

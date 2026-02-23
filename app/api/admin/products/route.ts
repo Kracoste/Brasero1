@@ -100,6 +100,12 @@ export async function GET(request: NextRequest) {
 // PUT: Mettre à jour un produit
 export async function PUT(request: NextRequest) {
   try {
+    // Rate limiting admin
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`admin-products-put-${clientIP}`, 30, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('id');
 
@@ -173,6 +179,12 @@ export async function PUT(request: NextRequest) {
 // POST: Créer un nouveau produit
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting admin
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`admin-products-post-${clientIP}`, 10, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     // Vérifier l'authentification admin
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -211,6 +223,12 @@ export async function POST(request: NextRequest) {
 // DELETE: Supprimer un produit
 export async function DELETE(request: NextRequest) {
   try {
+    // Rate limiting admin
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`admin-products-delete-${clientIP}`, 10, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('id');
 

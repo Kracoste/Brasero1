@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from "next/script";
 import "@/styles/globals.css";
 
 import { getSiteSettings } from "@/lib/site-settings";
@@ -87,21 +88,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
-        {/* Google Translate */}
-        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              function googleTranslateElementInit() {
-                new google.translate.TranslateElement({
-                  pageLanguage: 'fr',
-                  includedLanguages: 'fr,en,de,es,nl',
-                  autoDisplay: false
-                }, 'google_translate_element');
-              }
-            `,
-          }}
-        />
+        {/* Critical: Block Google Translate banner BEFORE it renders */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          .goog-te-banner-frame, iframe.goog-te-banner-frame,
+          .skiptranslate, body > .skiptranslate,
+          #goog-gt-tt, .goog-te-balloon-frame, .goog-te-gadget {
+            display:none!important; height:0!important; max-height:0!important;
+            overflow:hidden!important; visibility:hidden!important;
+            border:0!important; margin:0!important; padding:0!important;
+            position:absolute!important; left:-9999px!important; top:-9999px!important;
+          }
+          body { top:0!important; position:static!important; margin-top:0!important; padding-top:0!important; }
+          html { margin-top:0!important; padding-top:0!important; }
+          html.translated-ltr, html.translated-rtl { margin-top:0!important; overflow:visible!important; }
+          html.translated-ltr body, html.translated-rtl body { top:0!important; position:static!important; }
+        `}} />
+        {/* Google Translate — loaded via next/script for proper hydration */}
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
@@ -114,7 +116,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         />
       </head>
       <body suppressHydrationWarning className={`${geistSans.variable} ${displayFont.variable} antialiased`}>
-        <div id="google_translate_element" style={{ display: 'none' }} />
+        {/* GT container — hidden off-screen */}
+        <div id="google_translate_element" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: '-9999px', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }} />
+        {/* Inline script: force body.top=0 whenever GT tries to change it */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){
+          function fix(){
+            document.body.style.setProperty('top','0','important');
+            document.body.style.setProperty('position','static','important');
+            document.body.style.setProperty('margin-top','0','important');
+            document.documentElement.style.setProperty('margin-top','0','important');
+          }
+          fix();
+          new MutationObserver(fix).observe(document.body,{attributes:true,attributeFilter:['style']});
+          new MutationObserver(fix).observe(document.documentElement,{attributes:true,attributeFilter:['style']});
+        })();`}} />
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
@@ -133,6 +148,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <Analytics />
           <SpeedInsights />
         </SiteSettingsProvider>
+        {/* Google Translate: callback then script, afterInteractive ensures client execution */}
+        <Script id="gt-init" strategy="beforeInteractive">{`
+          function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+              pageLanguage: 'fr',
+              includedLanguages: 'fr,en,de,es,nl',
+              autoDisplay: false
+            }, 'google_translate_element');
+          }
+        `}</Script>
+        <Script
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

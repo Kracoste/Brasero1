@@ -165,7 +165,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-horizon-60",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 590,
     shortDescription: "Compact et léger, idéal pour les terrasses urbaines.",
@@ -249,7 +249,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-origine-100",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 1290,
     shortDescription: "Format spectaculaire pour les événements et tables XL.",
@@ -340,12 +340,12 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-compact-55",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 420,
     shortDescription: "Le compagnon des balcons et petites terrasses.",
     description:
-      "Le Braséro Compact 55 est spécialement conçu pour les petits espaces extérieurs, balcons et terrasses urbaines. Avec ses 55 cm de diamètre et seulement 24 kg, il reste facilement maniable tout en offrant la qualité de fabrication Brasero Atelier. Idéal pour 4 à 6 convives, il crée une ambiance chaleureuse sans encombrer votre espace. Fabriqué en acier brut thermolaqué de 3 mm avec un bol de 5 mm, il résiste aux intempéries et conserve son aspect élégant. Sa hauteur de 35 cm le rend parfait pour des assises basses ou des tabourets. Les pieds réglables assurent une parfaite stabilité sur tous les sols. Le capot anti-pluie inclus protège votre braséro entre chaque utilisation. Les poignées latérales discrètes permettent de le déplacer facilement une fois refroidi. Compatible avec la grille inox 50 cm pour vos grillades. En stock et expédié sous 4 à 5 jours. Garantie 2 ans structure, fabrication française à Moncoutant.",
+      "Le Braséro Compact 55 est spécialement conçu pour les petits espaces extérieurs, balcons et terrasses urbaines. Avec ses 55 cm de diamètre et seulement 24 kg, il reste facilement maniable tout en offrant la qualité de fabrication Atelier LBF. Idéal pour 4 à 6 convives, il crée une ambiance chaleureuse sans encombrer votre espace. Fabriqué en acier brut thermolaqué de 3 mm avec un bol de 5 mm, il résiste aux intempéries et conserve son aspect élégant. Sa hauteur de 35 cm le rend parfait pour des assises basses ou des tabourets. Les pieds réglables assurent une parfaite stabilité sur tous les sols. Le capot anti-pluie inclus protège votre braséro entre chaque utilisation. Les poignées latérales discrètes permettent de le déplacer facilement une fois refroidi. Compatible avec la grille inox 50 cm pour vos grillades. En stock et expédié sous 4 à 5 jours. Garantie 2 ans structure, fabrication française à Moncoutant.",
     madeIn: "France",
     material: "Acier brut thermolaqué",
     diameter: 55,
@@ -431,7 +431,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-canyon-70",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 760,
     shortDescription: "Silhouette sculpturale et large rebord pour jouer avec les braises.",
@@ -521,7 +521,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-nomade-45",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 320,
     shortDescription: "Format léger avec poignée intégrée pour suivre vos escapades.",
@@ -611,7 +611,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-atlas-90",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 990,
     shortDescription: "Un disque monumental avec plateau log pour scenographier vos repas.",
@@ -701,7 +701,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-zenith-50",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 370,
     shortDescription: "Une capsule compacte avec anneau lumineux intégré.",
@@ -784,7 +784,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-dune-75",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 680,
     shortDescription: "Inspiration désertique avec courbes asymétriques.",
@@ -867,7 +867,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-lumina-65",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "brasero",
     price: 540,
     shortDescription: "Format vertical avec niches pour bougies et accessoires.",
@@ -950,7 +950,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "fendeur-buches-atelier",
-    name: "Braséro Atelier LBF en Acier",
+    name: "Atelier LBF en Acier",
     category: "fendeur",
     price: 270,
     shortDescription: "Préparez vos bûches en toute sécurité, sans effort.",
@@ -1918,7 +1918,7 @@ const rawProducts: Product[] = [
   },
   {
     slug: "brasero-hexa-atelier",
-    name: "Braséro Atelier Hexa",
+    name: "Atelier LBF Hexa",
     category: "brasero",
     price: 690,
     shortDescription: "Braséro hexagonal en acier corten avec large surface de chauffe.",
@@ -1967,7 +1967,7 @@ const rawProducts: Product[] = [
     const diameter = Number(diameterStr);
     return {
       slug: `brasero-visuel-${index + 1}`,
-      name: `Braséro Atelier LBF Ø${diameter}`,
+      name: `Atelier LBF Ø${diameter}`,
       category: "brasero" as const,
       price: 590 + index * 30,
       shortDescription: "Braséro visuel présenté avec notre image Brasero.png.",
@@ -1999,7 +1999,7 @@ const rawProducts: Product[] = [
       images: [
         {
           src: "/Brasero.png",
-          alt: "Braséro Atelier visuel",
+          alt: "Atelier LBF visuel",
           width: 1200,
           height: 900,
           blurDataURL: blurPlaceholder,

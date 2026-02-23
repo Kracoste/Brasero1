@@ -58,6 +58,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [checkIsAdmin]);
 
   const refreshUser = useCallback(async () => {
+    // Ne pas faire de requête réseau si aucun utilisateur n'est connecté
+    if (!cachedUser) return;
+    
     try {
       const { data: { user: currentUser }, error } = await supabase.auth.getUser();
       if (!error && currentUser) {
@@ -71,9 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         updateUser(null);
       }
-    } catch (error) {
-      devError('Erreur lors du rafraîchissement utilisateur:', error);
-      // Ne pas effacer en cas d'erreur réseau
+    } catch {
+      // Ignorer les erreurs réseau silencieusement
     }
   }, [supabase, updateUser]);
 
@@ -148,35 +150,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
         
-        // Pas de session locale - essayer getUser() avec timeout court
-        const timeoutPromise = new Promise<null>((resolve) => {
-          setTimeout(() => resolve(null), 3000);
-        });
-        
-        const result = await Promise.race([supabase.auth.getUser(), timeoutPromise]);
-        
-        if (result === null) {
-          devLog('Auth timeout - no user');
-          updateUser(null);
-          isInitialized = true;
-          setIsLoading(false);
-          initInProgress.current = false;
-          return;
-        }
-        
-        const { data: { user: currentUser }, error } = result;
-        
-        if (error) {
-          devLog('Init auth - pas de session:', error.message);
-          if (!error.message.includes('network') && !error.message.includes('fetch')) {
-            updateUser(null);
-          }
-        } else if (currentUser) {
-          devLog('Init auth - utilisateur trouvé:', currentUser.email);
-          updateUser(currentUser);
-        } else {
-          updateUser(null);
-        }
+        // Pas de session locale = visiteur anonyme, pas besoin de vérifier avec le serveur
+        devLog('Init auth - pas de session locale, visiteur anonyme');
+        updateUser(null);
         
         isInitialized = true;
       } catch (error) {
@@ -226,17 +202,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    // Rafraîchir quand la page devient visible
+    // Rafraîchir quand la page devient visible (seulement si connecté)
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && cachedUser) {
         refreshUser();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Rafraîchir quand la fenêtre reprend le focus
+    // Rafraîchir quand la fenêtre reprend le focus (seulement si connecté)
     const handleFocus = () => {
-      refreshUser();
+      if (cachedUser) {
+        refreshUser();
+      }
     };
     window.addEventListener('focus', handleFocus);
 

@@ -2,12 +2,24 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
 import { isAdminEmail } from '@/lib/auth'
 
-// Headers de sécurité HTTP (sans CSP pour éviter de bloquer les appels Supabase/Stripe)
-const securityHeaders = {
+// Headers de sécurité HTTP
+const securityHeaders: Record<string, string> = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googleapis.com https://*.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com",
+    "style-src 'self' 'unsafe-inline' https://*.googleapis.com",
+    "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.googleapis.com https://*.google.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.google.com https://www.googletagmanager.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self' https://js.stripe.com",
+  ].join('; '),
 };
 
 export async function middleware(request: NextRequest) {

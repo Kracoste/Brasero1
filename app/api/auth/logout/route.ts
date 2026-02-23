@@ -24,7 +24,8 @@ export async function POST() {
     })
 
     return response
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 })
+  } catch (error) {
+    console.error('[Logout] Error:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

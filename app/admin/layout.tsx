@@ -64,7 +64,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <AuthProvider>
       <div className="flex h-screen bg-white">
-        {/* Mobile header */}
+        {/* Mobile header - only visible when sidebar is hidden */}
         <div className="fixed top-0 left-0 right-0 z-40 flex items-center gap-3 px-4 py-3 text-white lg:hidden" style={{ background: 'linear-gradient(to right, #8B4513, #5D3A1A)' }}>
           <button
             onClick={() => setSidebarOpen(true)}

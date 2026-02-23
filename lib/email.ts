@@ -45,9 +45,15 @@ export interface OrderEmailData {
   carrier?: string;
 }
 
+// Type minimal pour le client Supabase (admin ou server)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseClientLike = {
+  from: (table: string) => { insert: (data: Record<string, unknown>) => unknown };
+};
+
 // Fonction helper pour logger les emails envoyés
 export async function logEmail(
-  supabase: any,
+  supabase: SupabaseClientLike,
   emailType: EmailType,
   recipientEmail: string,
   orderId?: string,
@@ -76,7 +82,7 @@ export async function logEmail(
  */
 export async function sendOrderConfirmationEmail(
   orderData: OrderEmailData,
-  supabase: any,
+  supabase: SupabaseClientLike,
   orderId?: string,
   userId?: string
 ): Promise<{ success: boolean; error?: string }> {
@@ -112,7 +118,7 @@ export async function sendOrderConfirmationEmail(
  */
 export async function sendOrderShippedEmail(
   orderData: OrderEmailData,
-  supabase: any,
+  supabase: SupabaseClientLike,
   orderId?: string,
   userId?: string
 ): Promise<{ success: boolean; error?: string }> {
@@ -147,7 +153,7 @@ export async function sendOrderShippedEmail(
  */
 export async function sendOrderProcessingEmail(
   orderData: OrderEmailData,
-  supabase: any,
+  supabase: SupabaseClientLike,
   orderId?: string,
   userId?: string
 ): Promise<{ success: boolean; error?: string }> {
@@ -182,7 +188,7 @@ export async function sendOrderProcessingEmail(
  */
 export async function sendOrderDeliveredEmail(
   orderData: OrderEmailData,
-  supabase: any,
+  supabase: SupabaseClientLike,
   orderId?: string,
   userId?: string
 ): Promise<{ success: boolean; error?: string }> {
@@ -217,7 +223,7 @@ export async function sendOrderDeliveredEmail(
  */
 export async function sendAdminOrderNotification(
   orderData: OrderEmailData,
-  supabase: any,
+  supabase: SupabaseClientLike,
   orderId?: string
 ): Promise<{ success: boolean; error?: string }> {
   if (!hasResendCredentials() || !resend) {
@@ -249,7 +255,7 @@ export async function sendAdminOrderNotification(
 /**
  * Échappe les caractères HTML dangereux pour prévenir les injections XSS dans les emails
  */
-function escapeHtml(str: string): string {
+export function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -353,7 +359,7 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
               </tr>
               <tr>
                 <td style="padding: 6px 0; font-size: 14px; color: #374151;"><strong>Livraison</strong></td>
-                <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${subtotal.toFixed(2).replace('.', ',')} €</td>
+                <td style="padding: 6px 0; font-size: 14px; color: #374151; text-align: right;">${shippingCost > 0 ? shippingCost.toFixed(2).replace('.', ',') + ' €' : 'Offerte'}</td>
               </tr>
             </table>
             ${safeAddress ? `

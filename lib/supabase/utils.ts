@@ -92,6 +92,7 @@ export const ALLOWED_PRODUCT_FIELDS = [
   'material',
   'bowl_thickness',
   'base_thickness',
+  'variants',
   'in_stock',
   'on_demand',
   'is_featured',

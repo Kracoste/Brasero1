@@ -17,7 +17,7 @@ export default function MentionsLegalesPage() {
         </p>
         <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-700">
           <p>
-            Éditeur : Brasero Atelier — SAS au capital de 50 000 €, RCS Niort 000 000 000,
+            Éditeur : Atelier LBF — SAS au capital de 50 000 €, RCS Niort 000 000 000,
             siège social Rue du Moulin, 79320 Moncoutant-sur-Sèvre.
           </p>
           <p>Directeur de la publication : Hugo Allou.</p>

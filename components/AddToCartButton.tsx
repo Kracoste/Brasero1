@@ -22,10 +22,12 @@ type AddToCartButtonProps = {
     onDemand?: boolean;
   };
   selectedAccessories?: SelectedAccessory[];
+  selectedVariantLabel?: string;
+  disabled?: boolean;
   className?: string;
 };
 
-export function AddToCartButton({ product, selectedAccessories = [], className = '' }: AddToCartButtonProps) {
+export function AddToCartButton({ product, selectedAccessories = [], selectedVariantLabel, disabled = false, className = '' }: AddToCartButtonProps) {
   const { addItem, totalPrice: cartTotal, itemCount: cartItemsCount } = useCart();
   const { trackAddToCart } = useAnalytics();
   const [quantity, setQuantity] = useState(1);
@@ -60,9 +62,10 @@ export function AddToCartButton({ product, selectedAccessories = [], className =
       await addItem(
         {
           slug: product.slug,
-          name: product.name,
+          name: selectedVariantLabel ? `${product.name} — ${selectedVariantLabel}` : product.name,
           price: product.price,
           image: product.images[0]?.src,
+          variantLabel: selectedVariantLabel,
         },
         quantity
       );
@@ -138,7 +141,7 @@ export function AddToCartButton({ product, selectedAccessories = [], className =
       <button
         type="button"
         onClick={handleAddToCart}
-        disabled={adding || added}
+        disabled={adding || added || disabled}
         className={`flex items-center justify-center gap-2 px-6 py-3 font-medium tracking-wide uppercase transition ${
           added
             ? "bg-emerald-600 text-white hover:bg-emerald-700"

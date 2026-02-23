@@ -4,20 +4,24 @@
  */
 
 // Liste des emails administrateurs
-// Configurable via la variable d'env ADMIN_EMAILS (séparés par des virgules)
-const envAdminEmails = process.env.ADMIN_EMAILS
-  ? process.env.ADMIN_EMAILS.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  : [];
+// ADMIN_EMAILS côté serveur, NEXT_PUBLIC_ADMIN_EMAILS côté client
+const rawEmails = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || '';
+const envAdminEmails = rawEmails
+  .split(',')
+  .map(e => e.trim().toLowerCase())
+  .filter(Boolean);
 
-export const ADMIN_EMAILS: string[] = envAdminEmails.length > 0
-  ? envAdminEmails
-  : ['allouhugo@gmail.com'];
+export const ADMIN_EMAILS: string[] = envAdminEmails;
 
 /**
  * Vérifie si un email est celui d'un administrateur
  */
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
+  if (ADMIN_EMAILS.length === 0) {
+    console.error('CRITICAL: ADMIN_EMAILS environment variable is not set. No admin access allowed.');
+    return false;
+  }
   return ADMIN_EMAILS.includes(email.toLowerCase());
 }
 

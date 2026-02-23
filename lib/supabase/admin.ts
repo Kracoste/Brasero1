@@ -6,7 +6,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const missingCredentials = !supabaseUrl || !serviceRoleKey;
 
 export const supabaseAdminClient: SupabaseClient | null = !missingCredentials
-  ? createClient(supabaseUrl!, serviceRoleKey!, {
+  ? createClient(supabaseUrl as string, serviceRoleKey as string, {
       auth: {
         persistSession: false,
         autoRefreshToken: false,

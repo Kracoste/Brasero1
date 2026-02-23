@@ -12,6 +12,7 @@ type CartItem = {
   product_name: string;
   product_price: number;
   product_image: string | null;
+  variant_label?: string;
   quantity: number;
 };
 
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
     const normalizedItems = items
       .map((item) => ({
         slug: typeof item.product_slug === 'string' ? item.product_slug.trim() : '',
+        variantLabel: typeof item.variant_label === 'string' ? item.variant_label.trim() : undefined,
         quantity: parseQuantity(item.quantity),
       }))
       .filter((item) => item.slug && item.quantity);
@@ -107,7 +109,7 @@ export async function POST(request: NextRequest) {
     const productClient = getSupabaseAdminClient() ?? supabase;
     const { data: products, error: productsError } = await productClient
       .from('products')
-      .select('slug, name, price, images')
+      .select('slug, name, price, images, variants')
       .in('slug', productSlugs);
 
     if (productsError) {
@@ -144,7 +146,18 @@ export async function POST(request: NextRequest) {
     const lineItems = [];
     for (const item of normalizedItems) {
       const product = productsBySlug.get(item.slug);
-      const price = Number(product?.price ?? 0);
+
+      // Résoudre le prix : si variante, chercher dans le tableau variants
+      let price = Number(product?.price ?? 0);
+      let itemName = product?.name || 'Produit';
+
+      if (item.variantLabel && Array.isArray(product?.variants)) {
+        const variant = product.variants.find((v: any) => v.label === item.variantLabel);
+        if (variant && typeof variant.price === 'number' && variant.price > 0) {
+          price = variant.price;
+          itemName = `${itemName} — ${item.variantLabel}`;
+        }
+      }
 
       if (!Number.isFinite(price) || price <= 0) {
         return NextResponse.json(
@@ -160,12 +173,15 @@ export async function POST(request: NextRequest) {
           : images[0]?.src ?? null;
 
       const productMetadata: Record<string, string> = { slug: item.slug };
+      if (item.variantLabel) {
+        productMetadata.variant = item.variantLabel;
+      }
 
       lineItems.push({
         price_data: {
           currency: 'eur',
           product_data: {
-            name: product?.name || 'Produit',
+            name: itemName,
             images: getAbsoluteImageUrl(firstImage),
             metadata: productMetadata,
           },

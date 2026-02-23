@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { isAdminEmail } from '@/lib/auth';
+import { escapeHtml as esc } from '@/lib/email';
 
 // Ce fichier est temporaire — pour prévisualiser les templates email
 // Supprimez-le avant la mise en production si vous ne voulez pas le garder
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     orderNumber: '3A5B6C7D',
     customerName: 'Jean Dupont',
     customerEmail: 'jean.dupont@email.com',
-    customerPhone: '06.78.12.34.56',
+    customerPhone: '06.85.64.33.40',
     totalAmount: 729.00,
     shippingCost: 200.00,
     discount: 40.00,
@@ -89,10 +90,6 @@ export async function GET(request: NextRequest) {
 // ============================================================================
 // COPIES des templates (identiques à lib/email.ts) pour la prévisualisation
 // ============================================================================
-
-function esc(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
 
 type MockOrder = {
   orderNumber: string;
@@ -192,7 +189,7 @@ function generateConfirmationPreview(o: MockOrder): string {
           <td style="vertical-align: top; width: 50%; padding-right: 12px;">
             <table style="width: 100%; border-collapse: collapse;">
               <tr><td style="padding: 6px 0; font-size: 14px;"><strong>Sous-total</strong></td><td style="padding: 6px 0; font-size: 14px; text-align: right;">${subtotal.toFixed(2).replace('.', ',')} €</td></tr>
-              <tr><td style="padding: 6px 0; font-size: 14px;"><strong>Livraison</strong></td><td style="padding: 6px 0; font-size: 14px; text-align: right;">${subtotal.toFixed(2).replace('.', ',')} €</td></tr>
+              <tr><td style="padding: 6px 0; font-size: 14px;"><strong>Livraison</strong></td><td style="padding: 6px 0; font-size: 14px; text-align: right;">${ship > 0 ? ship.toFixed(2).replace('.', ',') + ' €' : 'Offerte'}</td></tr>
             </table>
             ${addr ? `<div style="margin-top: 12px;"><p style="font-size: 14px; margin: 0;"><strong>Livraison à domicile</strong></p><p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">${addr.replace(/,/g, '<br>')}</p><p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">Référence : ${esc(o.orderNumber)}</p></div>` : ''}
           </td>

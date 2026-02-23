@@ -1,9 +1,9 @@
 export const STORE_SETTINGS_ID = "default";
 
 export const DEFAULT_SITE_SETTINGS = {
-  storeName: "Brasero Atelier",
+  storeName: "Atelier LBF",
   storeEmail: "atelier-lbf@outlook.com",
-  storePhone: "05 49 XX XX XX",
+  storePhone: "06 85 64 33 40",
   storeAddress: "Moncoutant, 79320 France",
   schedules: [
     "Lundi – Vendredi : 9h00 – 18h00",

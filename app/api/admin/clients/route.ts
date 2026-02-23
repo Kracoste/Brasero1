@@ -47,6 +47,12 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: Request) {
   try {
+    // Rate limiting admin
+    const clientIP = getClientIP(request.headers as unknown as Headers);
+    if (!checkRateLimit(`admin-clients-put-${clientIP}`, 20, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -91,6 +97,12 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    // Rate limiting admin
+    const clientIP = getClientIP(request.headers as unknown as Headers);
+    if (!checkRateLimit(`admin-clients-delete-${clientIP}`, 10, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -124,6 +136,13 @@ export async function DELETE(request: Request) {
     if (error) {
       devError('Erreur suppression client:', error);
       return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    }
+
+    // Supprimer l'utilisateur de Supabase Auth
+    const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(clientId);
+    if (authDeleteError) {
+      devError('Erreur suppression auth user:', authDeleteError);
+      // Le profil est déjà supprimé, on log mais on continue
     }
 
     return NextResponse.json({ success: true });

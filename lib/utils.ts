@@ -373,6 +373,7 @@ export const mapSupabaseProduct = (p: Record<string, unknown>): Product | null =
     shipping: (p.shipping || "") as string,
     popularScore: ((p.popularScore || p.popular_score || 50) as number),
     onDemand: (p.onDemand ?? p.on_demand ?? false) as boolean,
+    variants: (Array.isArray(p.variants) && p.variants.length > 0 ? p.variants : undefined) as Product["variants"],
     specs:
       (specs && Object.keys(specs).length > 0
         ? specs

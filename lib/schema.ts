@@ -37,6 +37,21 @@ const specSchema = z.object({
   })).optional(),
 });
 
+export const productVariantSchema = z.object({
+  label: z.string(),
+  diameter: z.number().optional(),
+  finish: z.enum(["corten", "peint"]).optional(),
+  paintType: z.string().optional(),
+  planchaMaterial: z.enum(["acier", "inox"]).optional(),
+  height: z.number().optional(),
+  weight: z.union([z.string(), z.number()]).optional(),
+  priceBrasero: z.number().optional(),
+  pricePlancha: z.number().optional(),
+  price: z.number(),
+});
+
+export type ProductVariant = z.infer<typeof productVariantSchema>;
+
 export const productSchema = z.object({
   slug: z.string(),
   name: z.string(),
@@ -79,6 +94,7 @@ export const productSchema = z.object({
       answer: z.string(),
     }),
   ),
+  variants: z.array(productVariantSchema).optional(),
   customSpecs: z
     .array(
       z.object({
