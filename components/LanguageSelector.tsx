@@ -46,9 +46,18 @@ export default function LanguageSelector() {
 
   const clearCookies = () => {
     const h = window.location.hostname;
-    ['', h, '.' + h].forEach((d) => {
+    // Build list of all possible cookie domains
+    // e.g. for www.atelier-lbf.fr → ['', 'www.atelier-lbf.fr', '.www.atelier-lbf.fr', '.atelier-lbf.fr', 'atelier-lbf.fr']
+    const domains = ['', h, '.' + h];
+    const parts = h.split('.');
+    if (parts.length > 2) {
+      const rootDomain = parts.slice(1).join('.');
+      domains.push(rootDomain, '.' + rootDomain);
+    }
+    domains.forEach((d) => {
       const dp = d ? '; domain=' + d : '';
       document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/' + dp;
+      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax' + dp;
     });
   };
 
@@ -68,7 +77,14 @@ export default function LanguageSelector() {
     if (langCode === 'fr') {
       clearCookies();
       setCurrentLang('fr');
-      window.location.reload();
+      // Also tell GT to switch back to original language
+      const sel = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+      if (sel) {
+        sel.value = 'fr';
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      // Small delay to let GT process the change, then reload
+      setTimeout(() => window.location.reload(), 100);
       return;
     }
 

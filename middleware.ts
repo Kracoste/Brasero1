@@ -53,7 +53,15 @@ export async function middleware(request: NextRequest) {
   // Protection admin côté serveur : utiliser le user déjà récupéré par updateSession
   // Plus besoin de créer un second client Supabase (c'était la cause du bug de redirection)
   if (pathname.startsWith('/admin')) {
-    if (!user?.email || !isAdminEmail(user.email)) {
+    const emailOk = user?.email ? isAdminEmail(user.email) : false;
+    if (!user?.email || !emailOk) {
+      if (process.env.NODE_ENV === 'production') {
+        console.log('[middleware] Admin access denied:', { 
+          email: user?.email || 'no user', 
+          emailOk,
+          adminEmailsConfigured: (process.env.ADMIN_EMAILS || '').length > 0
+        });
+      }
       // Copier les cookies de la response updateSession vers la redirect
       // pour ne pas perdre les tokens rafraîchis
       const redirectResponse = NextResponse.redirect(new URL('/connexion', request.url));
