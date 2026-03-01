@@ -7,16 +7,35 @@ import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 
+type ProductImage = Product['images'][number];
+
 type ProductGalleryProps = {
   product: Product;
+  /** Images de configuration qui remplacent product.images quand présentes */
+  configurationImages?: ProductImage[];
 };
 
-export const ProductGallery = ({ product }: ProductGalleryProps) => {
+export const ProductGallery = ({ product, configurationImages }: ProductGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
 
-  const activeImage = product.images[activeIndex];
+  // Utiliser les images de configuration si disponibles, sinon fallback sur product.images
+  const images = configurationImages && configurationImages.length > 0 ? configurationImages : product.images;
+
+  const activeImage = images[activeIndex];
   const isAccessory = product.category === 'accessoire';
+
+  // Reset l'index à 0 quand les images changent (changement de configuration)
+  const prevImagesRef = useRef(images);
+  useEffect(() => {
+    if (prevImagesRef.current !== images) {
+      setActiveIndex(0);
+      prevImagesRef.current = images;
+      if (thumbnailsRef.current) {
+        thumbnailsRef.current.scrollTo({ left: 0 });
+      }
+    }
+  }, [images]);
 
   // Scroll la barre de miniatures vers l'index actif
   const scrollToThumbnail = (index: number) => {
@@ -38,13 +57,13 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
   }, []);
 
   const goToPrevious = () => {
-    const newIndex = activeIndex === 0 ? product.images.length - 1 : activeIndex - 1;
+    const newIndex = activeIndex === 0 ? images.length - 1 : activeIndex - 1;
     setActiveIndex(newIndex);
     scrollToThumbnail(newIndex);
   };
 
   const goToNext = () => {
-    const newIndex = activeIndex === product.images.length - 1 ? 0 : activeIndex + 1;
+    const newIndex = activeIndex === images.length - 1 ? 0 : activeIndex + 1;
     setActiveIndex(newIndex);
     scrollToThumbnail(newIndex);
   };
@@ -85,7 +104,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
         }}
       >
         {/* Flèche gauche */}
-        {product.images.length > 1 ? (
+        {images.length > 1 ? (
           <button
             type="button"
             onClick={(e) => {
@@ -108,7 +127,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
           className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-1 mx-2 items-center"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {product.images.map((image, index) => (
+          {images.map((image, index) => (
             <button
               key={image.src}
               type="button"
@@ -135,7 +154,7 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
         </div>
         
         {/* Flèche droite - alignée au bord droit */}
-        {product.images.length > 1 ? (
+        {images.length > 1 ? (
           <button
             type="button"
             onClick={goToNext}

@@ -4,6 +4,9 @@ import { createContext, useContext, useEffect, useState, ReactNode, useRef, useC
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 
+const isDev = process.env.NODE_ENV === 'development';
+function devWarn(msg: string, ...args: unknown[]) { if (isDev) console.warn(msg, ...args); }
+
 export type CartItem = {
   id: string;
   product_slug: string;
@@ -93,7 +96,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     syncGuestCart(prev => {
       // Vérifier si on a atteint la limite
       if (prev.length >= MAX_CART_ITEMS) {
-        console.warn('Limite du panier atteinte');
+        devWarn('Limite du panier atteinte');
         return prev;
       }
 
@@ -184,7 +187,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             await loadCart(currentUserId);
           }
         } catch (error) {
-          console.error('Error syncing cart:', error);
+          devWarn('Error syncing cart:', error);
         }
       };
       syncCart();
@@ -207,16 +210,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       let cart = existingCart;
 
-      if (cartError && cartError.code === 'PGRST116') {
-        // Le panier n'existe pas, le créer
-        const { data: newCart, error: createError } = await supabase
-          .from('cart')
-          .insert({ user_id: userId })
-          .select('id')
-          .single();
+      if (cartError) {
+        if (cartError.code === 'PGRST116') {
+          // Le panier n'existe pas, le créer
+          const { data: newCart, error: createError } = await supabase
+            .from('cart')
+            .insert({ user_id: userId })
+            .select('id')
+            .single();
 
-        if (createError) throw createError;
-        cart = newCart;
+          if (createError) throw createError;
+          cart = newCart;
+        } else {
+          // Autre erreur (RLS, réseau, etc.) — on ne crash pas
+          throw cartError;
+        }
       }
 
       if (!cart) return null;
@@ -226,7 +234,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Charger les articles du panier
       const { data: cartItems, error: itemsError } = await supabase
         .from('cart_items')
-        .select('*')
+        .select('id, product_slug, product_name, product_price, product_image, variant_label, quantity')
         .eq('cart_id', cart.id);
 
       if (itemsError) throw itemsError;
@@ -234,7 +242,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setItems(cartItems || []);
       return cart.id as string;
     } catch (error) {
-      console.error('Error loading cart:', error);
+      devWarn('Error loading cart:', error);
       return null;
     }
   };
@@ -282,7 +290,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           // Recharger le panier depuis la DB pour synchroniser
           await loadCart(user.id);
         } catch (error) {
-          console.error('Error syncing item to DB:', error);
+          devWarn('Error syncing item to DB:', error);
           // L'item est déjà dans le panier local, donc pas de problème
         }
       }
@@ -319,7 +327,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         prev.map(item => (item.id === itemId ? { ...item, quantity } : item))
       );
     } catch (error) {
-      console.error('Error updating quantity:', error);
+      devWarn('Error updating quantity:', error);
       updateGuestItem(itemId, quantity);
       throw error;
     }
@@ -348,7 +356,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       setItems(prev => prev.filter(item => item.id !== itemId));
     } catch (error) {
-      console.error('Error removing item:', error);
+      devWarn('Error removing item:', error);
       removeGuestItem(itemId);
       throw error;
     }
@@ -376,11 +384,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         .eq('cart_id', ensuredCartId);
 
       if (error) {
-        console.error('Error clearing cart in DB:', error);
+        devWarn('Error clearing cart in DB:', error);
         // Pas de throw, on a déjà vidé localement
       }
     } catch (error) {
-      console.error('Error clearing cart:', error);
+      devWarn('Error clearing cart:', error);
       // Pas de throw, on a déjà vidé localement
     }
   };

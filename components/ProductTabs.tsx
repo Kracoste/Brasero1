@@ -16,6 +16,8 @@ type SpecsOverrides = {
   finish?: 'corten' | 'peint';
   paintType?: string;
   planchaMaterial?: 'acier' | 'inox';
+  bowlThickness?: number;
+  baseThickness?: number;
 };
 
 type ProductTabsProps = {
@@ -25,9 +27,15 @@ type ProductTabsProps = {
   faqOptions?: FAQOptions;
   /** Overrides de specs quand le client sélectionne une variante */
   specsOverrides?: SpecsOverrides;
+  /** Description override depuis la sous-fiche de configuration */
+  overrideDescription?: string;
+  /** FAQ override depuis la sous-fiche de configuration */
+  overrideFAQ?: { question: string; answer: string }[];
+  /** Caractéristiques override depuis la sous-fiche de configuration */
+  overrideCharacteristics?: { label: string; value: string }[];
 };
 
-export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverrides }: ProductTabsProps) => {
+export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverrides, overrideDescription, overrideFAQ, overrideCharacteristics }: ProductTabsProps) => {
   const [activeTab, setActiveTab] = useState("description");
   const contentRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,14 +59,24 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
       ? 'Acier peint'
       : product.material;
 
-  const hasCharacteristics = product.specs?.characteristics && product.specs.characteristics.length > 0;
+  // FAQ : priorité override (sous-fiche) > FAQ dynamique générée
+  const effectiveFAQ = overrideFAQ && overrideFAQ.length > 0 ? overrideFAQ : dynamicFAQ;
+
+  // Caractéristiques : priorité override (sous-fiche) > produit
+  const effectiveCharacteristics = overrideCharacteristics && overrideCharacteristics.length > 0
+    ? overrideCharacteristics
+    : product.specs?.characteristics;
+  const hasCharacteristics = effectiveCharacteristics && effectiveCharacteristics.length > 0;
+
+  // Description : priorité override (sous-fiche) > produit
+  const effectiveDescription = overrideDescription || product.description;
 
   // Construire les onglets dynamiquement
   const tabs = [
     { id: "description", label: "Description du produit" },
     { id: "specifications", label: "Spécifications" },
     ...(hasCharacteristics ? [{ id: "characteristics", label: "Caractéristiques" }] : []),
-    ...(dynamicFAQ.length > 0 ? [{ id: "faq", label: "FAQ" }] : []),
+    ...(effectiveFAQ.length > 0 ? [{ id: "faq", label: "FAQ" }] : []),
     { id: "critiques", label: "Critiques" },
   ];
 
@@ -109,7 +127,7 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
         {(activeTab === "description" || activeTab === "specifications") && (
           <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(450px,1.2fr)]">
             <div className="space-y-4 text-gray-700">
-              <p className="leading-relaxed text-[15px]">{product.description}</p>
+              <p className="leading-relaxed text-[15px]">{effectiveDescription}</p>
             </div>
 
             <div className="rounded-lg border border-gray-200 bg-white shadow-sm h-fit">
@@ -271,7 +289,7 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
               </div>
               {/* Lignes */}
               <dl className="divide-y divide-slate-200">
-                {product.specs!.characteristics!.map((item: { label: string; value: string }, idx: number) => (
+                {effectiveCharacteristics!.map((item: { label: string; value: string }, idx: number) => (
                   <div
                     key={item.label}
                     className="flex items-baseline justify-between py-4 gap-8"
@@ -286,14 +304,14 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
         )}
 
         {/* === FAQ === */}
-        {activeTab === "faq" && dynamicFAQ.length > 0 && (
+        {activeTab === "faq" && effectiveFAQ.length > 0 && (
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Questions fréquentes</h2>
               <p className="text-sm text-gray-500 mb-6">
                 Tout ce que vous devez savoir sur ce produit
               </p>
-              <FAQ items={dynamicFAQ} />
+              <FAQ items={effectiveFAQ} />
             </div>
 
             {/* JSON-LD FAQPage pour le SEO */}
@@ -303,7 +321,7 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
                 __html: JSON.stringify({
                   "@context": "https://schema.org",
                   "@type": "FAQPage",
-                  mainEntity: dynamicFAQ.map((item) => ({
+                  mainEntity: effectiveFAQ.map((item) => ({
                     "@type": "Question",
                     name: item.question,
                     acceptedAnswer: {

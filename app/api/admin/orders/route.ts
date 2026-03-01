@@ -78,7 +78,7 @@ export async function PUT(request: NextRequest) {
     // Récupérer la commande actuelle
     const { data: currentOrder, error: fetchError } = await adminClient
       .from('orders')
-      .select('*')
+      .select('id, status, customer_name, customer_email, total_amount, items, shipping_address, shipping_postal_code, shipping_city, tracking_number, carrier, user_id')
       .eq('id', orderId)
       .single();
 
@@ -101,20 +101,16 @@ export async function PUT(request: NextRequest) {
       updateData.carrier = carrier || null;
     }
 
-    if (Object.keys(updateData).length === 0) {
-      return NextResponse.json({ error: 'Aucune donnée à mettre à jour' }, { status: 400 });
-    }
-
-    // Mettre à jour les dates automatiquement (dans un try séparé car les colonnes peuvent ne pas exister)
+    // Ajouter les timestamps automatiques selon le statut
     if (status === 'shipped') {
-      try {
-        await adminClient.from('orders').update({ shipped_at: new Date().toISOString() }).eq('id', orderId);
-      } catch { /* colonne peut ne pas exister */ }
+      updateData.shipped_at = new Date().toISOString();
     }
     if (status === 'delivered') {
-      try {
-        await adminClient.from('orders').update({ delivered_at: new Date().toISOString() }).eq('id', orderId);
-      } catch { /* colonne peut ne pas exister */ }
+      updateData.delivered_at = new Date().toISOString();
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'Aucune donnée à mettre à jour' }, { status: 400 });
     }
 
     // Mettre à jour la commande

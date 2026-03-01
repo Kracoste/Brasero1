@@ -36,19 +36,15 @@ type SessionPayload = {
 };
 
 // Helpers
-const sanitizeText = (value?: string | null, maxLength = 512) => {
-  if (!value) return undefined;
-  return value.replace(/[<>\"'`;\\]/g, '').slice(0, maxLength);
-};
 
 const hashIP = (ip: string): string => {
   // Utiliser une clé secrète pour le hash (plus sécurisé)
-  // En production, ANALYTICS_SECRET doit être défini. Le fallback utilise une combinaison unique.
+  // En production, ANALYTICS_SECRET doit être défini.
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
   const secret = process.env.ANALYTICS_SECRET || 
     (serviceKey.slice(0, 32) + supabaseUrl) || 
-    'dev-only-fallback-' + Date.now();
+    'dev-only-static-fallback-key';
   return createHash('sha256').update(ip + secret).digest('hex').slice(0, 32);
 };
 
@@ -174,7 +170,7 @@ export async function POST(request: Request) {
     const language = sanitizeString(body.language, 10);
 
     // Informations du navigateur
-    const userAgent = sanitizeText(headersList.get("user-agent"));
+    const userAgent = sanitizeString(headersList.get("user-agent") ?? undefined, 512);
     const { deviceType, browser, os } = parseUserAgent(userAgent || '');
     
     // IP déjà récupérée pour le rate limiting, on la hash pour RGPD
@@ -194,15 +190,28 @@ export async function POST(request: Request) {
     
     // Chercher une session récente avec la même IP (dernières 24h)
     // pour corréler les visiteurs qui ont effacé leurs cookies
-    const { data: recentIpSession } = await adminClient
-      .from("visitor_sessions")
-      .select("visitor_id")
-      .eq("ip_address", hashedIP)
-      .eq("is_admin", false)
-      .gte("started_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-      .order("started_at", { ascending: false })
-      .limit(1)
-      .single();
+    // PERF: Paralléliser les deux premières requêtes (indépendantes)
+    const [recentIpResult, sessionByVisitorResult] = await Promise.all([
+      adminClient
+        .from("visitor_sessions")
+        .select("visitor_id")
+        .eq("ip_address", hashedIP)
+        .eq("is_admin", false)
+        .gte("started_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+        .order("started_at", { ascending: false })
+        .limit(1)
+        .single(),
+      adminClient
+        .from("visitor_sessions")
+        .select("id, page_count, started_at, visitor_id")
+        .eq("visitor_id", visitorId)
+        .gte("last_activity_at", new Date(Date.now() - SESSION_TIMEOUT_MS).toISOString())
+        .order("last_activity_at", { ascending: false })
+        .limit(1)
+        .single(),
+    ]);
+
+    const recentIpSession = recentIpResult.data;
     
     // Si on trouve un ancien visitor_id pour cette IP, on peut le noter
     // mais on garde le nouveau pour respecter le localStorage de l'utilisateur
@@ -210,22 +219,9 @@ export async function POST(request: Request) {
     const isReturningByIp = correlatedVisitorId && correlatedVisitorId !== visitorId;
     
     // Chercher une session existante (moins de 30 min d'inactivité)
-    // D'abord par visitorId, puis par IP hashée comme fallback
-    let existingSession = null;
+    let existingSession = sessionByVisitorResult.data;
     
-    // Essayer avec le visitorId
-    const { data: sessionByVisitor } = await adminClient
-      .from("visitor_sessions")
-      .select("id, page_count, started_at, visitor_id")
-      .eq("visitor_id", visitorId)
-      .gte("last_activity_at", new Date(Date.now() - SESSION_TIMEOUT_MS).toISOString())
-      .order("last_activity_at", { ascending: false })
-      .limit(1)
-      .single();
-    
-    if (sessionByVisitor) {
-      existingSession = sessionByVisitor;
-    } else {
+    if (!existingSession) {
       // Fallback: chercher par IP hashée (même appareil, cookies effacés)
       const { data: sessionByIp } = await adminClient
         .from("visitor_sessions")

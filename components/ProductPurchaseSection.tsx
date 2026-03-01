@@ -5,7 +5,7 @@ import { CompatibleAccessories } from '@/components/CompatibleAccessories';
 import { AddToCartButton } from '@/components/AddToCartButton';
 import { Price } from '@/components/Price';
 import { useAnalytics } from '@/lib/analytics-context';
-import type { Product, ProductVariant } from '@/lib/schema';
+import type { Product, ProductVariant, ProductConfiguration, DiameterData } from '@/lib/schema';
 
 type Accessory = {
   id: string;
@@ -28,6 +28,10 @@ type ProductPurchaseSectionProps = {
   preloadedAccessories?: Accessory[];
   onVariantChange?: (variant: ProductVariant | null) => void;
   onSelectionChange?: (selections: ProductSelections) => void;
+  /** Sous-fiche de configuration active (peut override le prix) */
+  activeConfig?: ProductConfiguration;
+  /** Données spécifiques au diamètre sélectionné (prix, dimensions) */
+  activeDiameterData?: DiameterData;
 };
 
 const FINISH_LABELS: Record<string, string> = {
@@ -74,12 +78,15 @@ function buildOptions<T extends string | number>(
   return options;
 }
 
-export function ProductPurchaseSection({ product, compatibleAccessorySlugs, preloadedAccessories, onVariantChange, onSelectionChange }: ProductPurchaseSectionProps) {
+export function ProductPurchaseSection({ product, compatibleAccessorySlugs, preloadedAccessories, onVariantChange, onSelectionChange, activeConfig, activeDiameterData }: ProductPurchaseSectionProps) {
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   const { trackProductView } = useAnalytics();
 
   const variants = product.variants ?? [];
   const hasVariants = variants.length > 0;
+  const hasConfigurations = !!product.configurations && Object.keys(product.configurations).length > 0;
+  // Afficher les sélecteurs si on a des variants OU des configurations
+  const showSelectors = hasVariants || hasConfigurations;
 
   // --- Extraire la matière du produit de base ---
   const baseMaterial = product.material?.toLowerCase() ?? '';
@@ -90,32 +97,66 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
   const basePlancha = product.specs?.planchaMaterial ?? undefined;
   const baseDiameter = product.diameter ?? undefined;
 
-  // --- Construire les options de chaque sélecteur (base + variants) ---
+  // --- Extraire les options depuis les configurations (sous-fiches) ---
+  const configDiameters = useMemo(() => {
+    if (!product.configurations) return [] as number[];
+    const diams = new Set<number>();
+    for (const cfg of Object.values(product.configurations)) {
+      if (cfg.diameters) {
+        for (const d of Object.keys(cfg.diameters)) {
+          diams.add(parseInt(d));
+        }
+      }
+    }
+    return Array.from(diams).sort((a, b) => a - b);
+  }, [product.configurations]);
+
+  const configFinishes = useMemo(() => {
+    if (!product.configurations) return [] as string[];
+    const finishes = new Set<string>();
+    for (const key of Object.keys(product.configurations)) {
+      const parts = key.split('-');
+      if (parts[0]) finishes.add(parts[0]);
+    }
+    return Array.from(finishes);
+  }, [product.configurations]);
+
+  const configPlanchas = useMemo(() => {
+    if (!product.configurations) return [] as string[];
+    const planchas = new Set<string>();
+    for (const key of Object.keys(product.configurations)) {
+      const parts = key.split('-');
+      if (parts[1]) planchas.add(parts[1]);
+    }
+    return Array.from(planchas);
+  }, [product.configurations]);
+
+  // --- Construire les options de chaque sélecteur (base + variants + configurations) ---
   const diameterOptions = useMemo(() => {
-    if (!hasVariants) return [];
+    if (!showSelectors) return [];
     return buildOptions(
       baseDiameter,
-      variants.map(v => v.diameter),
+      [...variants.map(v => v.diameter), ...configDiameters],
     ).sort((a, b) => Number(a.value) - Number(b.value));
-  }, [hasVariants, baseDiameter, variants]);
+  }, [showSelectors, baseDiameter, variants, configDiameters]);
 
   const finishOptions = useMemo(() => {
-    if (!hasVariants) return [];
+    if (!showSelectors) return [];
     return buildOptions(
       baseFinish,
-      variants.map(v => v.finish),
+      [...variants.map(v => v.finish), ...configFinishes],
       FINISH_LABELS,
     );
-  }, [hasVariants, baseFinish, variants]);
+  }, [showSelectors, baseFinish, variants, configFinishes]);
 
   const planchaOptions = useMemo(() => {
-    if (!hasVariants) return [];
+    if (!showSelectors) return [];
     return buildOptions(
       basePlancha,
-      variants.map(v => v.planchaMaterial),
+      [...variants.map(v => v.planchaMaterial), ...configPlanchas],
       PLANCHA_LABELS,
     );
-  }, [hasVariants, basePlancha, variants]);
+  }, [showSelectors, basePlancha, variants, configPlanchas]);
 
   // --- État des sélections : initialisé aux valeurs du produit de base ---
   const [selectedDiameter, setSelectedDiameter] = useState<number | null>(
@@ -155,11 +196,12 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
     return match;
   }, [hasVariants, isBaseProduct, variants, selectedDiameter, selectedFinish, selectedPlancha]);
 
-  // La sélection est valide si c'est le produit de base OU un variant trouvé
-  const isSelectionValid = isBaseProduct || matchedVariant !== null;
-  const activePrice = matchedVariant ? matchedVariant.price : product.price;
-  const activePriceBrasero = matchedVariant?.priceBrasero ?? null;
-  const activePricePlancha = matchedVariant?.pricePlancha ?? null;
+  // La sélection est valide si : configurations existe, OU c'est le produit de base, OU un variant trouvé
+  const isSelectionValid = hasConfigurations || isBaseProduct || matchedVariant !== null;
+  // Prix : priorité diameterData > variant > produit de base
+  const activePrice = activeDiameterData?.price ?? (matchedVariant ? matchedVariant.price : product.price);
+  const activePriceBrasero = activeDiameterData?.priceBrasero ?? matchedVariant?.priceBrasero ?? null;
+  const activePricePlancha = activeDiameterData?.pricePlancha ?? matchedVariant?.pricePlancha ?? null;
   const showPriceBreakdown = activePriceBrasero !== null && activePricePlancha !== null && activePriceBrasero > 0 && activePricePlancha > 0;
 
   // Notifier le parent quand la variante change
@@ -216,7 +258,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
   return (
     <div className="space-y-4">
       {/* Sélecteurs de configuration — menus déroulants alignés */}
-      {hasVariants && (
+      {showSelectors && (
         <div className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Diamètre */}
@@ -327,7 +369,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
           product={productWithVariantPrice} 
           selectedAccessories={selectedAccessories}
           selectedVariantLabel={variantLabel}
-          disabled={hasVariants && !isSelectionValid}
+          disabled={showSelectors && !isSelectionValid}
         />
       </div>
     </div>

@@ -52,6 +52,39 @@ export const productVariantSchema = z.object({
 
 export type ProductVariant = z.infer<typeof productVariantSchema>;
 
+/**
+ * Sous-fiche de configuration : contient toutes les données spécifiques
+ * à une combinaison (finition × plancha × diamètre).
+ * Stocké dans le champ `configurations` du produit (JSONB en base).
+ */
+/**
+ * Données spécifiques à un diamètre dans une sous-fiche.
+ * Chaque diamètre coché a son propre prix et ses dimensions.
+ */
+const diameterDataSchema = z.object({
+  price: z.number().optional(),
+  priceBrasero: z.number().optional(),
+  pricePlancha: z.number().optional(),
+  weight: z.union([z.string(), z.number()]).optional(),
+  height: z.number().optional(),
+  bowlThickness: z.number().optional(),
+  baseThickness: z.number().optional(),
+});
+
+export type DiameterData = z.infer<typeof diameterDataSchema>;
+
+const productConfigurationSchema = z.object({
+  images: z.array(productImageSchema).optional(),
+  description: z.string().optional(),
+  faq: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
+  characteristics: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
+  painting: z.string().optional(),
+  /** Données par diamètre : clé = "50" | "80" | "100" */
+  diameters: z.record(z.string(), diameterDataSchema).optional(),
+});
+
+export type ProductConfiguration = z.infer<typeof productConfigurationSchema>;
+
 export const productSchema = z.object({
   slug: z.string(),
   name: z.string(),
@@ -95,6 +128,9 @@ export const productSchema = z.object({
     }),
   ),
   variants: z.array(productVariantSchema).optional(),
+  configImages: z.record(z.string(), z.array(productImageSchema)).optional(),
+  /** Sous-fiches complètes par combinaison (clé: "finish-plancha", ex: "corten-inox") */
+  configurations: z.record(z.string(), productConfigurationSchema).optional(),
   customSpecs: z
     .array(
       z.object({

@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description: "Parcourez nos braséros en acier corten et notre fendeur à bûches Made in France.",
 };
 
-// Force dynamic rendering — données toujours fraîches depuis Supabase
-export const dynamic = 'force-dynamic';
+// ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
+export const revalidate = 60;
 
 type SearchParams = {
   category?: string;
@@ -30,9 +30,10 @@ export default async function ProductsPage({ searchParams }: Props) {
   
   // Récupérer les produits depuis Supabase uniquement
   const supabase = await createClient();
+  const PRODUCT_LIST_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations';
   const { data: supabaseProducts } = await supabase
     .from('products')
-    .select('*')
+    .select(PRODUCT_LIST_COLUMNS)
     .order('created_at', { ascending: false });
 
   // Transformer les produits Supabase au format attendu

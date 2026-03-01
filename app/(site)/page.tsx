@@ -8,8 +8,8 @@ import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 import { Flame, Truck, Shield, Award } from "lucide-react";
 
-// Force dynamic rendering — données toujours fraîches depuis Supabase
-export const dynamic = 'force-dynamic';
+// ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -43,9 +43,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   // Récupérer les produits vedettes depuis Supabase (priorité aux produits marqués is_featured)
   const supabase = await createClient();
+  const PRODUCT_LIST_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations';
   const { data: braseroProduits } = await supabase
     .from('products')
-    .select('*')
+    .select(PRODUCT_LIST_COLUMNS)
     .eq('category', 'brasero')
     .eq('is_featured', true)
     .order('featured_order', { ascending: true })
@@ -56,7 +57,7 @@ export default async function HomePage() {
   if (allProducts.length < 4) {
     const { data: moreProducts } = await supabase
       .from('products')
-      .select('*')
+      .select(PRODUCT_LIST_COLUMNS)
       .eq('category', 'brasero')
       .eq('is_featured', false)
       .order('popularScore', { ascending: false })

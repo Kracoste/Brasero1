@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     // Récupérer le coupon
     const { data: coupon, error } = await supabase
       .from('coupons')
-      .select('*')
+      .select('id, code, discount_type, discount_value, min_purchase_amount, max_uses, current_uses, expires_at, is_active')
       .eq('code', code.toUpperCase())
       .eq('is_active', true)
       .single();

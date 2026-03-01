@@ -29,16 +29,16 @@ export default function MonComptePage() {
         const supabase = createClient();
         const { data, error } = await supabase
           .from('profiles')
-          .select('*')
+          .select('id, first_name, last_name, phone, address, postal_code, city, country')
           .eq('id', user.id)
           .single();
         
         if (error) {
-          console.error('Erreur chargement profil:', error);
+          if (process.env.NODE_ENV === 'development') console.error('Erreur chargement profil:', error);
         }
         setProfile(data);
       } catch (error) {
-        console.error('Erreur chargement profil:', error);
+        if (process.env.NODE_ENV === 'development') console.error('Erreur chargement profil:', error);
       } finally {
         setProfileLoading(false);
       }

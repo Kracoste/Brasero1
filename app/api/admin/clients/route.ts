@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await adminClient
       .from('profiles')
-      .select('*')
+      .select('id, email, first_name, last_name, phone, address, postal_code, city, country, role, created_at, updated_at')
       .order('created_at', { ascending: false });
 
     if (error) {

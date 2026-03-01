@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resend, FROM_EMAIL, ADMIN_EMAIL } from "@/lib/email";
+import { resend, FROM_EMAIL, ADMIN_EMAIL, escapeHtml } from "@/lib/email";
 import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 import { isValidEmail } from "@/lib/validation";
-
-/**
- * Échappe les caractères HTML dangereux pour prévenir les injections XSS
- */
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 export async function POST(request: NextRequest) {
   try {

@@ -66,6 +66,8 @@ const CAMEL_TO_SNAKE_MAP: Record<string, string> = {
   onDemand: 'on_demand',
   isFeatured: 'is_featured',
   featuredOrder: 'featured_order',
+  configImages: 'config_images',
+  configurations: 'configurations',
 };
 
 /**
@@ -93,6 +95,8 @@ export const ALLOWED_PRODUCT_FIELDS = [
   'bowl_thickness',
   'base_thickness',
   'variants',
+  'config_images',
+  'configurations',
   'in_stock',
   'on_demand',
   'is_featured',

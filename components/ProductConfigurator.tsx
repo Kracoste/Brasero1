@@ -5,7 +5,7 @@ import { ProductGallery } from '@/components/ProductGallery';
 import { ProductPurchaseSection, type ProductSelections } from '@/components/ProductPurchaseSection';
 import { ProductTabs } from '@/components/ProductTabs';
 import { Badge } from '@/components/Badge';
-import type { Product, ProductVariant } from '@/lib/schema';
+import type { Product, ProductVariant, ProductConfiguration, DiameterData } from '@/lib/schema';
 import type { FAQOptions, MaterialType, PlanchaType } from '@/lib/product-faq';
 
 type ProductConfiguratorProps = {
@@ -19,7 +19,8 @@ type ProductConfiguratorProps = {
  * Composant orchestrateur : coordonne la galerie,
  * les options d'achat, et les ProductTabs (dont la FAQ dynamique).
  *
- * Quand le client choisit une variante, les specs et la FAQ changent dynamiquement.
+ * Quand le client choisit une variante, TOUT change dynamiquement :
+ * images, description, prix, FAQ, specs, caractéristiques.
  */
 export function ProductConfigurator({
   product,
@@ -38,45 +39,82 @@ export function ProductConfigurator({
     setSelections(sel);
   }, []);
 
+  // --- Résoudre la sous-fiche de configuration active ---
+  // Clé de recherche : "finish-plancha" (ex: "corten-inox")
+  // Les données de diamètre sont dans config.diameters[diameter]
+  const activeConfig: ProductConfiguration | undefined = useMemo(() => {
+    if (!product.configurations) return undefined;
+    const { finish, plancha } = selections;
+    if (!finish || !plancha) return undefined;
+
+    const key = `${finish}-${plancha}`;
+    return product.configurations[key] ?? undefined;
+  }, [product.configurations, selections]);
+
+  // --- Données spécifiques au diamètre sélectionné dans la sous-fiche ---
+  const activeDiameterData: DiameterData | undefined = useMemo(() => {
+    if (!activeConfig?.diameters || !selections.diameter) return undefined;
+    return activeConfig.diameters[String(selections.diameter)] ?? undefined;
+  }, [activeConfig, selections.diameter]);
+
+  // --- Images dynamiques (config > configImages > product.images) ---
+  const configurationImages = useMemo(() => {
+    // Priorité 1 : images de la sous-fiche configurations
+    if (activeConfig?.images && activeConfig.images.length > 0) return activeConfig.images;
+    // Priorité 2 : ancien système configImages (rétrocompatibilité)
+    if (product.configImages) {
+      const finish = selections.finish;
+      const plancha = selections.plancha;
+      if (finish && plancha) {
+        const key = `${finish}-${plancha}`;
+        if (product.configImages[key]) return product.configImages[key];
+      }
+    }
+    return undefined;
+  }, [activeConfig, product.configImages, selections.finish, selections.plancha]);
+
+  // --- Description dynamique ---
+  const activeDescription = activeConfig?.description || product.description;
+
+  // --- FAQ dynamique ---
+  const activeFAQ = activeConfig?.faq;
+
+  // --- Caractéristiques dynamiques ---
+  const activeCharacteristics = activeConfig?.characteristics;
+
   // Calculer les options FAQ dynamiques en fonction des sélections du client
   const faqOptions: FAQOptions = useMemo(() => {
     const opts: FAQOptions = {};
-
-    // Finition → matériau pour la FAQ (utilise les sélections, pas le variant)
     if (selections.finish === 'corten') {
       opts.overrideMaterial = 'corten' as MaterialType;
     } else if (selections.finish === 'peint') {
       opts.overrideMaterial = 'acier-peint' as MaterialType;
     }
-
-    // Plancha (utilise les sélections)
     if (selections.plancha) {
       opts.overridePlanchaType = selections.plancha as PlanchaType;
     }
-
-    // Fallback sur les specs du produit
     if (!opts.overridePlanchaType && product.specs?.planchaMaterial) {
       opts.overridePlanchaType = product.specs.planchaMaterial as PlanchaType;
     }
-
     return opts;
   }, [selections, product.specs?.planchaMaterial]);
 
-  // Overrides de specs pour ProductTabs en fonction des sélections du client
+  // Overrides de specs pour ProductTabs en fonction des sélections + sous-fiche
   const specsOverrides = useMemo(() => {
-    // Toujours envoyer les overrides si le client a fait des sélections
     const hasSelections = selections.diameter !== null || selections.finish !== null || selections.plancha !== null;
     if (!hasSelections) return undefined;
 
     return {
       diameter: selections.diameter ?? undefined,
-      height: selectedVariant?.height,
-      weight: selectedVariant?.weight,
+      height: activeDiameterData?.height ?? selectedVariant?.height,
+      weight: activeDiameterData?.weight ?? selectedVariant?.weight,
       finish: (selections.finish as 'corten' | 'peint') ?? undefined,
-      paintType: selectedVariant?.paintType,
+      paintType: activeConfig?.painting ?? selectedVariant?.paintType,
       planchaMaterial: (selections.plancha as 'acier' | 'inox') ?? undefined,
+      bowlThickness: activeDiameterData?.bowlThickness,
+      baseThickness: activeDiameterData?.baseThickness,
     };
-  }, [selections, selectedVariant]);
+  }, [selections, selectedVariant, activeConfig, activeDiameterData]);
 
   return (
     <>
@@ -84,7 +122,7 @@ export function ProductConfigurator({
       <div className="grid gap-4 sm:gap-6 lg:gap-10 lg:grid-cols-2 items-start">
         {/* Colonne gauche : Galerie */}
         <div className="space-y-8 sm:space-y-16">
-          <ProductGallery key={product.slug} product={product} />
+          <ProductGallery key={product.slug} product={product} configurationImages={configurationImages} />
         </div>
 
         {/* Colonne droite : Infos produit + Options d'achat */}
@@ -113,6 +151,8 @@ export function ProductConfigurator({
             preloadedAccessories={preloadedAccessories}
             onVariantChange={handleVariantChange}
             onSelectionChange={handleSelectionChange}
+            activeConfig={activeConfig}
+            activeDiameterData={activeDiameterData}
           />
         </div>
       </div>
@@ -124,6 +164,9 @@ export function ProductConfigurator({
           accessories={[]}
           faqOptions={faqOptions}
           specsOverrides={specsOverrides}
+          overrideDescription={activeDescription !== product.description ? activeDescription : undefined}
+          overrideFAQ={activeFAQ}
+          overrideCharacteristics={activeCharacteristics}
         />
       </div>
     </>

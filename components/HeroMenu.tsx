@@ -116,7 +116,7 @@ export const HeroMenu = () => {
                 className="inline-flex items-center gap-2 bg-[#CD853F] hover:bg-[#8B4513] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
               >
                 <CheckCircle2 className="w-5 h-5" />
-                Découvrir nos braseros
+                Découvrir nos produits
               </Link>
               <Link
                 href="/info/a-propos-de-nous"

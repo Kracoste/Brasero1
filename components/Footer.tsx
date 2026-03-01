@@ -1,9 +1,6 @@
-'use client';
-
 import Link from "next/link";
 
 import { Container } from "@/components/Container";
-import { useSiteSettings } from "@/components/SiteSettingsProvider";
 
 const serviceLinks = [
   { href: "/info/service-clientele", label: "Service à la clientèle" },
@@ -34,8 +31,12 @@ const categoryLinks = [
   { href: "/accessoires", label: "Accessoires" },
 ];
 
-export const Footer = () => {
-  const settings = useSiteSettings();
+type FooterProps = {
+  storeName: string;
+  atelierCity: string;
+};
+
+export const Footer = ({ storeName, atelierCity }: FooterProps) => {
 
   return (
     <footer className="border-t border-gray-200 bg-[#f6f1e9] text-gray-800">
@@ -81,7 +82,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">À propos de {settings.storeName}</p>
+            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">À propos de {storeName}</p>
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {aboutLinks.map((link) => (
                 <li key={link.href}>
@@ -95,7 +96,7 @@ export const Footer = () => {
         </div>
       </Container>
       <div className="border-t border-gray-200 py-3 sm:py-4 text-center text-[10px] sm:text-xs text-gray-500">
-        © {new Date().getFullYear()} {settings.storeName} — Fabriqué à {settings.atelier.city} (79)
+        © {new Date().getFullYear()} {storeName} — Fabriqué à {atelierCity} (79)
       </div>
     </footer>
   );

@@ -9,8 +9,8 @@ import { createClient } from "@/lib/supabase/server";
 import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 
-// Force dynamic rendering — données toujours fraîches depuis Supabase
-export const dynamic = 'force-dynamic';
+// ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
+export const revalidate = 60;
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -21,19 +21,22 @@ async function getProduct(slug: string) {
   const supabase = await createClient();
   const { data: p } = await supabase
     .from('products')
-    .select('*')
+    .select(PRODUCT_COLUMNS)
     .eq('slug', slug)
     .single();
 
+  if (!p) return null;
   return mapSupabaseProduct(p);
 }
 
 // Fonction pour récupérer les produits similaires (même catégorie, excluant le produit actuel)
+const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations';
+
 async function getRelatedProducts(currentSlug: string, category: string, limit: number = 8) {
   const supabase = await createClient();
   const { data: products } = await supabase
     .from('products')
-    .select('*')
+    .select(PRODUCT_COLUMNS)
     .eq('category', category)
     .neq('slug', currentSlug)
     .limit(limit);

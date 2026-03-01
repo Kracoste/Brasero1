@@ -264,7 +264,7 @@ export function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;');
 }
 
-function generateOrderConfirmationHTML(order: OrderEmailData): string {
+export function generateOrderConfirmationHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
   const safeEmail = escapeHtml(order.customerEmail);
@@ -410,7 +410,7 @@ function generateOrderConfirmationHTML(order: OrderEmailData): string {
   `;
 }
 
-function generateOrderShippedHTML(order: OrderEmailData): string {
+export function generateOrderShippedHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
   const safeEmail = escapeHtml(order.customerEmail);
@@ -530,7 +530,7 @@ function generateOrderShippedHTML(order: OrderEmailData): string {
   `;
 }
 
-function generateOrderProcessingHTML(order: OrderEmailData): string {
+export function generateOrderProcessingHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
   const safeEmail = escapeHtml(order.customerEmail);
@@ -636,7 +636,7 @@ function generateOrderProcessingHTML(order: OrderEmailData): string {
   `;
 }
 
-function generateOrderDeliveredHTML(order: OrderEmailData): string {
+export function generateOrderDeliveredHTML(order: OrderEmailData): string {
   const safeName = escapeHtml(order.customerName);
   const safeOrderNumber = escapeHtml(order.orderNumber);
   const safeEmail = escapeHtml(order.customerEmail);

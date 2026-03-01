@@ -4,6 +4,9 @@ import { createContext, useContext, useEffect, useState, ReactNode, useRef } fro
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 
+const isDev = process.env.NODE_ENV === 'development';
+function devError(msg: string, ...args: unknown[]) { if (isDev) console.error(msg, ...args); }
+
 export type FavoriteItem = {
   id: string;
   user_id: string;
@@ -84,13 +87,13 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
           const supabase = supabaseRef.current;
           const { data, error } = await supabase
             .from('favorites')
-            .select('*')
+            .select('id, user_id, product_slug, product_name, product_price, product_image, created_at')
             .order('created_at', { ascending: false });
           if (!error && data) {
             setFavorites(data);
           }
         } catch (error) {
-          console.error('Error loading favorites:', error);
+          devError('Error loading favorites:', error);
         }
       };
       loadFavorites();
@@ -141,7 +144,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
       setFavorites(prev => [data, ...prev]);
     } catch (error) {
-      console.error('Error adding favorite:', error);
+      devError('Error adding favorite:', error);
       // Fallback sur localStorage
       const newGuestFavorites = new Set(guestFavorites);
       newGuestFavorites.add(product.slug);
@@ -173,7 +176,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
       setFavorites(prev => prev.filter(fav => fav.product_slug !== productSlug));
     } catch (error) {
-      console.error('Error removing favorite:', error);
+      devError('Error removing favorite:', error);
       // Fallback sur localStorage
       const newGuestFavorites = new Set(guestFavorites);
       newGuestFavorites.delete(productSlug);
@@ -195,7 +198,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         await addFavorite(product);
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      devError('Error toggling favorite:', error);
       // Fallback sur localStorage en cas d'erreur
       const newGuestFavorites = new Set(guestFavorites);
       if (newGuestFavorites.has(product.slug)) {

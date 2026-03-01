@@ -101,6 +101,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Bucket non autorisé' }, { status: 400 });
     }
 
+    // Sanitize le nom du fichier pour éviter les path traversal
+    const sanitizedFileName = sanitizeFileName(fileName);
+
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
@@ -109,7 +112,7 @@ export async function DELETE(request: NextRequest) {
 
     const { error } = await adminClient.storage
       .from(bucket)
-      .remove([fileName]);
+      .remove([sanitizedFileName]);
 
     if (error) {
       devError('Erreur suppression fichier:', error);

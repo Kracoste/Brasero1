@@ -8,12 +8,15 @@ import { CartProvider } from "@/lib/cart-context";
 import { FavoritesProvider } from "@/lib/favorites-context";
 import { AuthProvider } from "@/lib/auth-context";
 import { AnalyticsProvider } from "@/lib/analytics-context";
+import { getSiteSettings } from "@/lib/site-settings";
 
 type SiteLayoutProps = {
   children: ReactNode;
 };
 
-export default function SiteLayout({ children }: SiteLayoutProps) {
+export default async function SiteLayout({ children }: SiteLayoutProps) {
+  const settings = await getSiteSettings();
+
   return (
     <AuthProvider>
       <AnalyticsProvider>
@@ -23,7 +26,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               <Header />
               <main className="flex-1 overflow-x-hidden">{children}</main>
               <Commitments />
-              <Footer />
+              <Footer storeName={settings.storeName} atelierCity={settings.atelier.city} />
               <FloatingCart />
             </div>
           </FavoritesProvider>

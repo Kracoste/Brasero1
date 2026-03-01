@@ -29,9 +29,10 @@ type ConversionFunnel = {
   purchaseRate: number;
 };
 
-// Cache simple en mémoire pour réduire les requêtes
+// Cache simple en mémoire (best-effort : réinitialisé à chaque cold start en serverless).
+// Pour une mise en cache fiable, migrer vers Redis/Upstash.
 let analyticsCache: { data: Record<string, unknown>; timestamp: number } | null = null;
-const CACHE_TTL = 15 * 60 * 1000; // 15 minutes (amélioré pour réduire la charge)
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,57 +72,111 @@ export async function GET(request: NextRequest) {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    // OPTIMISATION: Réduire à 8 requêtes principales au lieu de 27
+    // OPTIMISATION: Utiliser les filtres Supabase côté serveur (gte/lte) pour limiter
+    // les données transférées. Les counts par période utilisent head:true + count:'exact'
+    // quand possible pour éviter de charger toutes les lignes.
     const [
-      // 1. Toutes les sessions de l'année (on filtre côté JS)
-      allSessions,
-      // 2. Événements de conversion ce mois
+      // Counts de sessions par période (légers, head-only)
+      sessionsTodayCount,
+      sessionsWeekCount,
+      sessionsMonthCount,
+      sessionsYearCount,
+      sessionsTotalCount,
+      // Sessions du mois (avec métriques de qualité : bounce, durée, pages)
+      sessionsMonthData,
+      // Sessions de l'année (champs minimaux pour le graphique journalier)
+      sessionsYearDaily,
+      // Unique visitors par période (nécessite visitor_id)
+      uniqueVisitorsToday,
+      uniqueVisitorsWeek,
+      uniqueVisitorsMonth,
+      uniqueVisitorsYear,
+      uniqueVisitorsTotal,
+      // Événements de conversion ce mois
       conversionEvents,
-      // 3. Toutes les commandes
-      allOrders,
-      // 4. Commandes récentes (5)
+      // Commandes filtrées par période (counts)
+      ordersTodayData,
+      ordersWeekData,
+      ordersMonthData,
+      ordersYearData,
+      ordersTotalData,
+      // Commandes récentes (5)
       recentOrders,
-      // 5. Page views de l'année
+      // Commandes de l'année (pour le graphique journalier)
+      ordersYearDaily,
+      // Page views de l'année (pour le graphique journalier)
       pageViewsYear,
-      // 6. Count produits
+      // Counts
       productsCount,
-      // 7. Count clients
       customersCount,
     ] = await Promise.all([
+      // Session counts par période
+      adminClient.from('visitor_sessions').select('id', { count: 'exact', head: true })
+        .eq('is_admin', false).gte('started_at', startOfDay),
+      adminClient.from('visitor_sessions').select('id', { count: 'exact', head: true })
+        .eq('is_admin', false).gte('started_at', startOfWeek),
+      adminClient.from('visitor_sessions').select('id', { count: 'exact', head: true })
+        .eq('is_admin', false).gte('started_at', startOfMonth),
+      adminClient.from('visitor_sessions').select('id', { count: 'exact', head: true })
+        .eq('is_admin', false).gte('started_at', startOfYear),
+      adminClient.from('visitor_sessions').select('id', { count: 'exact', head: true })
+        .eq('is_admin', false).gte('started_at', oneYearAgo.toISOString()),
+      // Sessions du mois avec métriques de qualité
       adminClient.from('visitor_sessions')
-        .select('id, visitor_id, started_at, page_count, duration_seconds, is_bounce, is_admin')
+        .select('page_count, duration_seconds, is_bounce')
+        .eq('is_admin', false)
+        .gte('started_at', startOfMonth),
+      // Sessions de l'année (minimal : date + visitor_id pour daily chart)
+      adminClient.from('visitor_sessions')
+        .select('started_at, visitor_id')
         .eq('is_admin', false)
         .gte('started_at', oneYearAgo.toISOString()),
+      // Unique visitors par période (only visitor_id)
+      adminClient.from('visitor_sessions').select('visitor_id')
+        .eq('is_admin', false).gte('started_at', startOfDay),
+      adminClient.from('visitor_sessions').select('visitor_id')
+        .eq('is_admin', false).gte('started_at', startOfWeek),
+      adminClient.from('visitor_sessions').select('visitor_id')
+        .eq('is_admin', false).gte('started_at', startOfMonth),
+      adminClient.from('visitor_sessions').select('visitor_id')
+        .eq('is_admin', false).gte('started_at', startOfYear),
+      adminClient.from('visitor_sessions').select('visitor_id')
+        .eq('is_admin', false).gte('started_at', oneYearAgo.toISOString()),
+      // Conversion events (mois courant)
       adminClient.from('conversion_events')
         .select('event_type, session_id, product_slug, product_name, quantity')
         .gte('created_at', startOfMonth),
+      // Orders par période
       adminClient.from('orders')
-        .select('id, customer_name, total_amount, created_at, status'),
+        .select('total_amount').gte('created_at', startOfDay),
+      adminClient.from('orders')
+        .select('total_amount').gte('created_at', startOfWeek),
+      adminClient.from('orders')
+        .select('total_amount').gte('created_at', startOfMonth),
+      adminClient.from('orders')
+        .select('total_amount').gte('created_at', startOfYear),
+      adminClient.from('orders')
+        .select('total_amount').gte('created_at', oneYearAgo.toISOString()),
+      // Commandes récentes
       adminClient.from('orders')
         .select('id, customer_name, total_amount, created_at, status')
         .order('created_at', { ascending: false })
         .limit(5),
+      // Commandes de l'année (champs minimaux pour daily chart)
+      adminClient.from('orders')
+        .select('total_amount, created_at')
+        .gte('created_at', oneYearAgo.toISOString()),
+      // Page views de l'année
       adminClient.from('page_views')
         .select('viewed_at')
         .gte('viewed_at', oneYearAgo.toISOString()),
-      adminClient.from('products').select('*', { count: 'exact', head: true }),
-      adminClient.from('profiles').select('*', { count: 'exact', head: true }),
+      // Counts
+      adminClient.from('products').select('id', { count: 'exact', head: true }),
+      adminClient.from('profiles').select('id', { count: 'exact', head: true }),
     ]);
 
-    const sessions = allSessions.data || [];
-    const orders = allOrders.data || [];
-
-    // Filtrer les sessions par période côté JS
-    const sessionsToday = sessions.filter(s => s.started_at >= startOfDay);
-    const sessionsWeek = sessions.filter(s => s.started_at >= startOfWeek);
-    const sessionsMonth = sessions.filter(s => s.started_at >= startOfMonth);
-    const sessionsYear = sessions.filter(s => s.started_at >= startOfYear);
-
-    // Calculer les visiteurs uniques
-    const countUnique = (data: { visitor_id: string }[]) => new Set(data.map(v => v.visitor_id)).size;
-
     // Métriques moyennes (ce mois)
-    const monthMetrics = sessionsMonth;
+    const monthMetrics = sessionsMonthData.data || [];
     const totalSessionsMonth = monthMetrics.length;
     const avgPagesPerSession = totalSessionsMonth > 0 
       ? monthMetrics.reduce((sum, m) => sum + (m.page_count || 0), 0) / totalSessionsMonth 
@@ -132,6 +187,9 @@ export async function GET(request: NextRequest) {
       : 0;
     const bounceCount = monthMetrics.filter(m => m.is_bounce).length;
     const bounceRate = totalSessionsMonth > 0 ? (bounceCount / totalSessionsMonth) * 100 : 0;
+
+    // Visiteurs uniques par période
+    const countUnique = (data: { visitor_id: string }[] | null) => new Set((data || []).map(v => v.visitor_id)).size;
 
     // Entonnoir de conversion
     const events = conversionEvents.data || [];
@@ -190,17 +248,13 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    // Filtrer les commandes par période
-    const ordersToday = orders.filter(o => o.created_at >= startOfDay);
-    const ordersWeek = orders.filter(o => o.created_at >= startOfWeek);
-    const ordersMonth = orders.filter(o => o.created_at >= startOfMonth);
-    const ordersYear = orders.filter(o => o.created_at >= startOfYear);
+    // Revenue helper
+    const calcRevenue = (data: { total_amount?: number }[] | null) => (data || []).reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
-    const calcRevenue = (data: { total_amount?: number }[]) => data.reduce((sum, o) => sum + (o.total_amount || 0), 0);
-
-    // Données journalières
+    // Données journalières (sessions)
     const dailyMap = new Map<string, DailyData>();
-    sessions.forEach((s) => {
+    const yearSessions = sessionsYearDaily.data || [];
+    yearSessions.forEach((s) => {
       const date = s.started_at.split('T')[0];
       if (!dailyMap.has(date)) {
         dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
@@ -210,7 +264,7 @@ export async function GET(request: NextRequest) {
 
     // Visiteurs uniques par jour
     const visitorsByDay = new Map<string, Set<string>>();
-    sessions.forEach((s) => {
+    yearSessions.forEach((s) => {
       const date = s.started_at.split('T')[0];
       if (!visitorsByDay.has(date)) visitorsByDay.set(date, new Set());
       visitorsByDay.get(date)!.add(s.visitor_id);
@@ -221,7 +275,9 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    orders.forEach((o) => {
+    // Orders journaliers
+    const yearOrders = ordersYearDaily.data || [];
+    yearOrders.forEach((o) => {
       const date = o.created_at.split('T')[0];
       if (!dailyMap.has(date)) {
         dailyMap.set(date, { date, sessions: 0, uniqueVisitors: 0, pageViews: 0, revenue: 0, sales: 0 });
@@ -252,26 +308,26 @@ export async function GET(request: NextRequest) {
     }));
 
     const responseData = {
-      // Sessions (nouvelles métriques)
-      totalSessions: sessions.length,
-      sessionsToday: sessionsToday.length,
-      sessionsThisWeek: sessionsWeek.length,
-      sessionsThisMonth: sessionsMonth.length,
-      sessionsThisYear: sessionsYear.length,
+      // Sessions
+      totalSessions: sessionsTotalCount.count || 0,
+      sessionsToday: sessionsTodayCount.count || 0,
+      sessionsThisWeek: sessionsWeekCount.count || 0,
+      sessionsThisMonth: sessionsMonthCount.count || 0,
+      sessionsThisYear: sessionsYearCount.count || 0,
       
       // Alias pour rétrocompatibilité avec /api/admin/stats
-      totalVisits: sessions.length,
-      visitsToday: sessionsToday.length,
-      visitsThisWeek: sessionsWeek.length,
-      visitsThisMonth: sessionsMonth.length,
-      visitsThisYear: sessionsYear.length,
+      totalVisits: sessionsTotalCount.count || 0,
+      visitsToday: sessionsTodayCount.count || 0,
+      visitsThisWeek: sessionsWeekCount.count || 0,
+      visitsThisMonth: sessionsMonthCount.count || 0,
+      visitsThisYear: sessionsYearCount.count || 0,
       
       // Visiteurs uniques
-      uniqueVisitors: countUnique(sessions),
-      uniqueVisitorsToday: countUnique(sessionsToday),
-      uniqueVisitorsThisWeek: countUnique(sessionsWeek),
-      uniqueVisitorsThisMonth: countUnique(sessionsMonth),
-      uniqueVisitorsThisYear: countUnique(sessionsYear),
+      uniqueVisitors: countUnique(uniqueVisitorsTotal.data),
+      uniqueVisitorsToday: countUnique(uniqueVisitorsToday.data),
+      uniqueVisitorsThisWeek: countUnique(uniqueVisitorsWeek.data),
+      uniqueVisitorsThisMonth: countUnique(uniqueVisitorsMonth.data),
+      uniqueVisitorsThisYear: countUnique(uniqueVisitorsYear.data),
       
       // Métriques de qualité
       avgPagesPerSession: Math.round(avgPagesPerSession * 10) / 10,
@@ -286,18 +342,18 @@ export async function GET(request: NextRequest) {
       topProductsCarted: topCarted,
       
       // Ventes
-      totalSales: orders.length,
-      salesToday: ordersToday.length,
-      salesThisWeek: ordersWeek.length,
-      salesThisMonth: ordersMonth.length,
-      salesThisYear: ordersYear.length,
+      totalSales: (ordersTotalData.data || []).length,
+      salesToday: (ordersTodayData.data || []).length,
+      salesThisWeek: (ordersWeekData.data || []).length,
+      salesThisMonth: (ordersMonthData.data || []).length,
+      salesThisYear: (ordersYearData.data || []).length,
       
       // Revenue
-      totalRevenue: calcRevenue(orders),
-      revenueToday: calcRevenue(ordersToday),
-      revenueThisWeek: calcRevenue(ordersWeek),
-      revenueThisMonth: calcRevenue(ordersMonth),
-      revenueThisYear: calcRevenue(ordersYear),
+      totalRevenue: calcRevenue(ordersTotalData.data),
+      revenueToday: calcRevenue(ordersTodayData.data),
+      revenueThisWeek: calcRevenue(ordersWeekData.data),
+      revenueThisMonth: calcRevenue(ordersMonthData.data),
+      revenueThisYear: calcRevenue(ordersYearData.data),
       
       // Autres
       totalProducts: productsCount.count || 0,
