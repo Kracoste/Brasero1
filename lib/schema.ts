@@ -67,8 +67,11 @@ const diameterDataSchema = z.object({
   pricePlancha: z.number().optional(),
   weight: z.union([z.string(), z.number()]).optional(),
   height: z.number().optional(),
+  length: z.number().optional(),
+  width: z.number().optional(),
   bowlThickness: z.number().optional(),
   baseThickness: z.number().optional(),
+  description: z.string().optional(),
 });
 
 export type DiameterData = z.infer<typeof diameterDataSchema>;

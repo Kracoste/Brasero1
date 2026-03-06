@@ -73,8 +73,8 @@ export function ProductConfigurator({
     return undefined;
   }, [activeConfig, product.configImages, selections.finish, selections.plancha]);
 
-  // --- Description dynamique ---
-  const activeDescription = activeConfig?.description || product.description;
+  // --- Description dynamique (diamètre > sous-fiche > produit) ---
+  const activeDescription = activeDiameterData?.description || activeConfig?.description || product.description;
 
   // --- FAQ dynamique ---
   const activeFAQ = activeConfig?.faq;
@@ -107,6 +107,8 @@ export function ProductConfigurator({
     return {
       diameter: selections.diameter ?? undefined,
       height: activeDiameterData?.height ?? selectedVariant?.height,
+      length: activeDiameterData?.length,
+      width: activeDiameterData?.width,
       weight: activeDiameterData?.weight ?? selectedVariant?.weight,
       finish: (selections.finish as 'corten' | 'peint') ?? undefined,
       paintType: activeConfig?.painting ?? selectedVariant?.paintType,

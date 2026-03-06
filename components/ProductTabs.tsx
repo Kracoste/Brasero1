@@ -12,6 +12,8 @@ import { cn, formatDimensions } from "@/lib/utils";
 type SpecsOverrides = {
   diameter?: number;
   height?: number;
+  length?: number;
+  width?: number;
   weight?: string | number;
   finish?: 'corten' | 'peint';
   paintType?: string;
@@ -48,6 +50,8 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
   // Valeurs effectives (overridées par la variante sélectionnée ou valeurs du produit)
   const effectiveDiameter = specsOverrides?.diameter ?? product.diameter;
   const effectiveHeight = specsOverrides?.height ?? product.height;
+  const effectiveLength = specsOverrides?.length;
+  const effectiveWidth = specsOverrides?.width;
   const effectiveWeight = specsOverrides?.weight ?? (product.specs?.poids || (product.weight ? `${product.weight} kg` : undefined));
   const effectivePlanchaMaterial = specsOverrides?.planchaMaterial ?? product.specs?.planchaMaterial;
   const effectivePainting = specsOverrides?.finish === 'peint'
@@ -171,14 +175,14 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
                       </div>
                     </div>
                   )}
-                  {(product.length || product.width || effectiveHeight || effectiveDiameter) && (
+                  {(effectiveLength || effectiveWidth || product.length || product.width || effectiveHeight || effectiveDiameter) && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
                         <Ruler className="h-6 w-6 text-red-600" />
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Dimensions</p>
-                        <p className="font-semibold text-gray-900">{formatDimensions({ ...product, diameter: effectiveDiameter, height: effectiveHeight })}</p>
+                        <p className="font-semibold text-gray-900">{formatDimensions({ ...product, diameter: effectiveDiameter, height: effectiveHeight, length: effectiveLength ?? product.length, width: effectiveWidth ?? product.width })}</p>
                       </div>
                     </div>
                   )}

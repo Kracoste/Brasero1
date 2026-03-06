@@ -1,9 +1,16 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Upload, Star, Trash2, Plus, GripVertical, Ruler, ChevronDown, X } from 'lucide-react';
+import { ArrowLeft, Upload, Star, Trash2, Plus, GripVertical, Ruler, ChevronDown, X, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import {
+  FAQ_ACIER_CORTEN,
+  FAQ_ACIER_PEINT,
+  FAQ_ENTRETIEN_BRASERO_GENERAL,
+  FAQ_PLANCHA_ACIER,
+  FAQ_PLANCHA_INOX,
+} from '@/lib/product-faq';
 
 // ────────────────────────────── Types ──────────────────────────────
 
@@ -32,8 +39,11 @@ type DiameterEntry = {
   pricePlancha: string;
   weight: string;
   height: string;
+  length: string;
+  width: string;
   bowlThickness: string;
   baseThickness: string;
+  description: string;
 };
 
 type SubFiche = {
@@ -99,8 +109,43 @@ const FORMAT_OPTIONS = [
   { label: 'Carré', value: 'carre' },
 ];
 
+/**
+ * Génère automatiquement la FAQ adaptée à une combinaison finition × plancha.
+ * Ex: "corten-inox" → FAQ Corten + FAQ entretien braséro + FAQ plancha inox + comparaison
+ */
+function generateFAQForConfigKey(configKey: string): { question: string; answer: string }[] {
+  const [finish, plancha] = configKey.split('-');
+  const faq: { question: string; answer: string }[] = [];
+
+  // FAQ matériau
+  if (finish === 'corten') {
+    faq.push(...FAQ_ACIER_CORTEN);
+  } else if (finish === 'peint') {
+    faq.push(...FAQ_ACIER_PEINT);
+  }
+
+  // FAQ entretien braséro général
+  faq.push(...FAQ_ENTRETIEN_BRASERO_GENERAL);
+
+  // FAQ plancha
+  if (plancha === 'acier') {
+    faq.push(...FAQ_PLANCHA_ACIER);
+  } else if (plancha === 'inox') {
+    faq.push(...FAQ_PLANCHA_INOX);
+  }
+
+  // Dédupliquer
+  const seen = new Set<string>();
+  return faq.filter(item => {
+    const key = item.question.toLowerCase().trim();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 const emptyDiameterEntry = (): DiameterEntry => ({
-  price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', bowlThickness: '', baseThickness: '',
+  price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', length: '', width: '', bowlThickness: '', baseThickness: '', description: '',
 });
 
 const emptySubFiche = (): SubFiche => ({
@@ -398,8 +443,11 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                     pricePlancha: dv.pricePlancha?.toString() || '',
                     weight: dv.weight?.toString() || '',
                     height: dv.height?.toString() || '',
+                    length: dv.length?.toString() || '',
+                    width: dv.width?.toString() || '',
                     bowlThickness: dv.bowlThickness?.toString() || '',
                     baseThickness: dv.baseThickness?.toString() || '',
+                    description: dv.description || '',
                   };
                 }
               }
@@ -783,15 +831,18 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                 if (dd.pricePlancha) entry.pricePlancha = parseFloat(dd.pricePlancha);
                 if (dd.weight) entry.weight = dd.weight;
                 if (dd.height) entry.height = parseFloat(dd.height);
+                if (dd.length) entry.length = parseFloat(dd.length);
+                if (dd.width) entry.width = parseFloat(dd.width);
                 if (dd.bowlThickness) entry.bowlThickness = parseFloat(dd.bowlThickness);
                 if (dd.baseThickness) entry.baseThickness = parseFloat(dd.baseThickness);
+                if (dd.description?.trim()) entry.description = dd.description.trim();
                 if (Object.keys(entry).length > 0) diametersData[String(d)] = entry;
               }
             }
 
             result[key] = {
               ...(sfUploadedImages.length > 0 && { images: sfUploadedImages }),
-              ...(sf.description && { description: sf.description }),
+              ...(sf.description?.trim() && { description: sf.description.trim() }),
               ...(sf.price && { price: parseFloat(sf.price) }),
               ...(sf.priceBrasero && { priceBrasero: parseFloat(sf.priceBrasero) }),
               ...(sf.pricePlancha && { pricePlancha: parseFloat(sf.pricePlancha) }),
@@ -1273,102 +1324,6 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
             )}
           </div>
         </div>
-
-        {/* Grille de prix par diamètre */}
-        {(formData.category === 'brasero' || formData.category === 'fendeur') && (
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Ruler className="h-5 w-5 text-slate-600" />
-                <h2 className="text-lg font-semibold text-slate-900">Grille de prix</h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const usedDiams = new Set(priceGrid.map(r => r.diameter));
-                  const next = DIAMETER_OPTIONS.find(d => !usedDiams.has(d));
-                  if (!next) return;
-                  setPriceGrid(prev => [...prev, {
-                    id: `grid-${next}-${Date.now()}`,
-                    diameter: next,
-                    priceBrasero: '',
-                    priceAcier: '',
-                    priceInox: '',
-                  }]);
-                }}
-                disabled={priceGrid.length >= DIAMETER_OPTIONS.length}
-                className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <Plus className="h-4 w-4" />
-                Ajouter un diamètre
-              </button>
-            </div>
-            <p className="text-sm text-slate-500 mb-4">
-              Le prix total = prix du brasero + prix de la plancha choisie.
-            </p>
-
-            {priceGrid.length === 0 ? (
-              <div className="text-center py-8 text-slate-400">
-                <Ruler className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Aucune grille — le prix du produit sera utilisé tel quel.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {priceGrid.map((row) => {
-                  const updateRow = (field: string, value: any) => {
-                    setPriceGrid(prev => prev.map(r => r.id === row.id ? { ...r, [field]: value } : r));
-                  };
-                  const brasero = parseFloat(row.priceBrasero) || 0;
-                  const acier = parseFloat(row.priceAcier) || 0;
-                  const inox = parseFloat(row.priceInox) || 0;
-                  return (
-                    <div key={row.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <select
-                          value={row.diameter}
-                          onChange={(e) => updateRow('diameter', parseInt(e.target.value))}
-                          className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-slate-900"
-                        >
-                          {DIAMETER_OPTIONS.map(d => (
-                            <option key={d} value={d}>Ø{d} cm</option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() => setPriceGrid(prev => prev.filter(r => r.id !== row.id))}
-                          className="text-red-400 hover:text-red-600 transition-colors p-1"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div>
-                          <label className="block text-xs font-medium text-slate-500 mb-1">Brasero (€)</label>
-                          <input type="number" value={row.priceBrasero} onChange={(e) => updateRow('priceBrasero', e.target.value)} placeholder="1200" min="0" step="0.01" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900" />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-slate-500 mb-1">Plancha acier (€)</label>
-                          <input type="number" value={row.priceAcier} onChange={(e) => updateRow('priceAcier', e.target.value)} placeholder="200" min="0" step="0.01" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900" />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-slate-500 mb-1">Plancha inox (€)</label>
-                          <input type="number" value={row.priceInox} onChange={(e) => updateRow('priceInox', e.target.value)} placeholder="350" min="0" step="0.01" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900" />
-                        </div>
-                      </div>
-                      {brasero > 0 && (acier > 0 || inox > 0) && (
-                        <div className="mt-2 text-xs text-slate-400">
-                          {acier > 0 && <span>Total acier : {(brasero + acier).toFixed(0)} €</span>}
-                          {acier > 0 && inox > 0 && <span className="mx-2">·</span>}
-                          {inox > 0 && <span>Total inox : {(brasero + inox).toFixed(0)} €</span>}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Dimensions et caractéristiques */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
@@ -1908,12 +1863,6 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                       />
                     </div>
 
-                    {/* Description */}
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description</label>
-                      <textarea value={sf.description} onChange={(e) => updateSubFiche('description', e.target.value)} rows={3} className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Description spécifique à cette variante…" />
-                    </div>
-
                     {/* Diamètres */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Diamètres disponibles</label>
@@ -1991,6 +1940,14 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                                     <input type="text" value={dd.height} onChange={(e) => updateDiam('height', e.target.value)} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="50" />
                                   </div>
                                   <div>
+                                    <label className="block text-[10px] text-slate-400 mb-0.5">Longueur cm</label>
+                                    <input type="text" value={dd.length} onChange={(e) => updateDiam('length', e.target.value)} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="120" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] text-slate-400 mb-0.5">Largeur cm</label>
+                                    <input type="text" value={dd.width} onChange={(e) => updateDiam('width', e.target.value)} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="80" />
+                                  </div>
+                                  <div>
                                     <label className="block text-[10px] text-slate-400 mb-0.5">Ép. cuve mm</label>
                                     <input type="text" value={dd.bowlThickness} onChange={(e) => updateDiam('bowlThickness', e.target.value)} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="3" />
                                   </div>
@@ -1998,6 +1955,11 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                                     <label className="block text-[10px] text-slate-400 mb-0.5">Ép. socle mm</label>
                                     <input type="text" value={dd.baseThickness} onChange={(e) => updateDiam('baseThickness', e.target.value)} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="3" />
                                   </div>
+                                </div>
+                                {/* Description spécifique au diamètre */}
+                                <div>
+                                  <label className="block text-[10px] text-slate-400 mb-0.5">Description (optionnel)</label>
+                                  <textarea value={dd.description} onChange={(e) => updateDiam('description', e.target.value)} rows={2} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Description spécifique pour ce diamètre…" />
                                 </div>
                               </div>
                             );
@@ -2023,12 +1985,20 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">FAQ</label>
-                        <button type="button" onClick={() => updateSubFiche('faq', [...sf.faq, { question: '', answer: '' }])} className="px-2 py-0.5 text-[11px] font-medium bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition flex items-center gap-1">
-                          <Plus className="w-3 h-3" /> Ajouter
-                        </button>
+                        <div className="flex gap-1">
+                          <button type="button" onClick={() => {
+                            const autoFaq = generateFAQForConfigKey(openConfigKey);
+                            updateSubFiche('faq', autoFaq);
+                          }} className="px-2 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-md hover:bg-amber-100 transition flex items-center gap-1">
+                            <Sparkles className="w-3 h-3" /> Pré-remplir
+                          </button>
+                          <button type="button" onClick={() => updateSubFiche('faq', [...sf.faq, { question: '', answer: '' }])} className="px-2 py-0.5 text-[11px] font-medium bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition flex items-center gap-1">
+                            <Plus className="w-3 h-3" /> Ajouter
+                          </button>
+                        </div>
                       </div>
                       {sf.faq.length === 0 ? (
-                        <p className="text-[11px] text-slate-400 italic">FAQ par défaut du produit utilisée.</p>
+                        <p className="text-[11px] text-slate-400 italic">Cliquez sur &quot;Pré-remplir&quot; pour générer automatiquement selon la matière.</p>
                       ) : (
                         <div className="space-y-2">
                           {sf.faq.map((faqItem, fIdx) => (
