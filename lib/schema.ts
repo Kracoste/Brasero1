@@ -57,6 +57,20 @@ export type ProductVariant = z.infer<typeof productVariantSchema>;
  * à une combinaison (finition × plancha × diamètre).
  * Stocké dans le champ `configurations` du produit (JSONB en base).
  */
+/** Schema réutilisable pour le contenu SEO riche */
+const seoContentSchema = z.object({
+  sections: z.array(z.object({
+    title: z.string(),
+    blocks: z.array(z.object({
+      subtitle: z.string().optional(),
+      text: z.string().optional(),
+    })).optional(),
+    bullets: z.array(z.string()).optional(),
+  })),
+});
+
+export type SeoContent = z.infer<typeof seoContentSchema>;
+
 /**
  * Données spécifiques à un diamètre dans une sous-fiche.
  * Chaque diamètre coché a son propre prix et ses dimensions.
@@ -72,6 +86,7 @@ const diameterDataSchema = z.object({
   bowlThickness: z.number().optional(),
   baseThickness: z.number().optional(),
   description: z.string().optional(),
+  seoContent: seoContentSchema.optional(),
 });
 
 export type DiameterData = z.infer<typeof diameterDataSchema>;
@@ -82,6 +97,7 @@ const productConfigurationSchema = z.object({
   faq: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
   characteristics: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
   painting: z.string().optional(),
+  seoContent: seoContentSchema.optional(),
   /** Données par diamètre : clé = "50" | "80" | "100" */
   diameters: z.record(z.string(), diameterDataSchema).optional(),
 });
@@ -142,16 +158,7 @@ export const productSchema = z.object({
       }),
     )
     .optional(),
-  seoContent: z.object({
-    sections: z.array(z.object({
-      title: z.string(),
-      blocks: z.array(z.object({
-        subtitle: z.string().optional(),
-        text: z.string().optional(),
-      })).optional(),
-      bullets: z.array(z.string()).optional(),
-    })),
-  }).optional(),
+  seoContent: seoContentSchema.optional(),
 });
 
 export type Product = z.infer<typeof productSchema>;

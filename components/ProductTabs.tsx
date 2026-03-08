@@ -36,9 +36,11 @@ type ProductTabsProps = {
   overrideFAQ?: { question: string; answer: string }[];
   /** Caractéristiques override depuis la sous-fiche de configuration */
   overrideCharacteristics?: { label: string; value: string }[];
+  /** Contenu SEO override depuis la sous-fiche ou le diamètre */
+  overrideSeoContent?: { sections: { title: string; blocks?: { subtitle?: string; text?: string }[]; bullets?: string[] }[] };
 };
 
-export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverrides, overrideDescription, overrideFAQ, overrideCharacteristics }: ProductTabsProps) => {
+export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverrides, overrideDescription, overrideFAQ, overrideCharacteristics, overrideSeoContent }: ProductTabsProps) => {
   const [activeTab, setActiveTab] = useState("description");
   const contentRef = useRef<HTMLDivElement | null>(null);
 
@@ -349,7 +351,9 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
       </div>
 
       {/* Contenu SEO riche — toujours visible sous les onglets */}
-      {product.seoContent && <ProductSeoContent seoContent={product.seoContent} />}
+      {(overrideSeoContent || product.seoContent) && (
+        <ProductSeoContent seoContent={overrideSeoContent || product.seoContent!} />
+      )}
     </div>
   );
 };

@@ -33,6 +33,8 @@ type PriceGridRow = {
 type ConfigImageEntry = { src: string; alt: string; file?: File; preview?: string };
 type ConfigImagesMap = Record<string, ConfigImageEntry[]>;
 
+type SeoSection = { title: string; blocks?: { subtitle?: string; text?: string }[]; bullets?: string[] };
+
 type DiameterEntry = {
   price: string;
   priceBrasero: string;
@@ -44,6 +46,7 @@ type DiameterEntry = {
   bowlThickness: string;
   baseThickness: string;
   description: string;
+  seoSections: SeoSection[];
 };
 
 type SubFiche = {
@@ -54,6 +57,7 @@ type SubFiche = {
   pricePlancha: string;
   faq: { question: string; answer: string }[];
   characteristics: { label: string; value: string }[];
+  seoSections: SeoSection[];
   weight: string;
   height: string;
   bowlThickness: string;
@@ -145,7 +149,7 @@ function generateFAQForConfigKey(configKey: string): { question: string; answer:
 }
 
 const emptyDiameterEntry = (): DiameterEntry => ({
-  price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', length: '', width: '', bowlThickness: '', baseThickness: '', description: '',
+  price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', length: '', width: '', bowlThickness: '', baseThickness: '', description: '', seoSections: [],
 });
 
 const emptySubFiche = (): SubFiche => ({
@@ -156,6 +160,7 @@ const emptySubFiche = (): SubFiche => ({
   pricePlancha: '',
   faq: [],
   characteristics: [],
+  seoSections: [],
   weight: '',
   height: '',
   bowlThickness: '',
@@ -288,8 +293,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
   const [configurations, setConfigurations] = useState<Record<string, SubFiche>>({});
   const [openConfigKey, setOpenConfigKey] = useState<string | null>(null);
 
-  // SEO Content (pour les braseros uniquement)
-  type SeoSection = { title: string; blocks?: { subtitle?: string; text?: string }[]; bullets?: string[] };
+  // SEO Content (pour le produit principal)
   const [seoSections, setSeoSections] = useState<SeoSection[]>([]);
   const [variantDropdownOpen, setVariantDropdownOpen] = useState(false);
   const subFicheFileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -452,6 +456,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                     bowlThickness: dv.bowlThickness?.toString() || '',
                     baseThickness: dv.baseThickness?.toString() || '',
                     description: dv.description || '',
+                    seoSections: dv.seoContent?.sections || [],
                   };
                 }
               }
@@ -467,6 +472,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
               pricePlancha: c.pricePlancha?.toString() || '',
               faq: Array.isArray(c.faq) ? c.faq.map((f: any) => ({ question: f.question || '', answer: f.answer || '' })) : [],
               characteristics: Array.isArray(c.characteristics) ? c.characteristics.map((ch: any) => ({ label: ch.label || '', value: ch.value || '' })) : [],
+              seoSections: c.seoContent?.sections || [],
               weight: c.weight?.toString() || '',
               height: c.height?.toString() || '',
               bowlThickness: c.bowlThickness?.toString() || '',
@@ -846,6 +852,8 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                 if (dd.bowlThickness) entry.bowlThickness = parseFloat(dd.bowlThickness);
                 if (dd.baseThickness) entry.baseThickness = parseFloat(dd.baseThickness);
                 if (dd.description?.trim()) entry.description = dd.description.trim();
+                const validDiamSeo = dd.seoSections.filter(s => s.title.trim());
+                if (validDiamSeo.length > 0) entry.seoContent = { sections: validDiamSeo };
                 if (Object.keys(entry).length > 0) diametersData[String(d)] = entry;
               }
             }
@@ -863,6 +871,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
               ...(sf.bowlThickness && { bowlThickness: sf.bowlThickness }),
               ...(sf.baseThickness && { baseThickness: sf.baseThickness }),
               ...(sf.painting && { painting: sf.painting }),
+              ...(sf.seoSections.length > 0 && { seoContent: { sections: sf.seoSections.filter(s => s.title.trim()) } }),
               ...(Object.keys(diametersData).length > 0 && { diameters: diametersData }),
             };
           }
@@ -2065,7 +2074,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                         <div className="space-y-3">
                           {sf.enabledDiameters.map((d) => {
                             const dd = sf.diameterData[d] || emptyDiameterEntry();
-                            const updateDiam = (field: keyof DiameterEntry, value: string) => {
+                            const updateDiam = (field: keyof DiameterEntry, value: any) => {
                               setConfigurations(prev => {
                                 const current = prev[openConfigKey] || emptySubFiche();
                                 return {
@@ -2129,6 +2138,39 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                                 <div>
                                   <label className="block text-[10px] text-slate-400 mb-0.5">Description (optionnel)</label>
                                   <textarea value={dd.description} onChange={(e) => updateDiam('description', e.target.value)} rows={2} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Description spécifique pour ce diamètre…" />
+                                </div>
+                                {/* SEO spécifique au diamètre */}
+                                <div>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <label className="block text-[10px] text-slate-400">Contenu SEO (optionnel)</label>
+                                    <button type="button" onClick={() => {
+                                      const newSeo = [...dd.seoSections, { title: '', blocks: [{ subtitle: '', text: '' }], bullets: [] }];
+                                      updateDiam('seoSections' as any, newSeo as any);
+                                    }} className="text-[9px] text-slate-500 hover:text-slate-700 flex items-center gap-0.5">
+                                      <Plus className="w-2.5 h-2.5" /> Section
+                                    </button>
+                                  </div>
+                                  {dd.seoSections.length > 0 && (
+                                    <div className="space-y-2">
+                                      {dd.seoSections.map((sec, secIdx) => (
+                                        <div key={secIdx} className="bg-white rounded p-2 space-y-1.5 border border-slate-100">
+                                          <div className="flex items-center gap-1">
+                                            <input type="text" value={sec.title} onChange={(e) => { const u = [...dd.seoSections]; u[secIdx] = { ...u[secIdx], title: e.target.value }; updateDiam('seoSections' as any, u as any); }} className="flex-1 px-1.5 py-0.5 text-[10px] font-semibold border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900" placeholder="Titre section" />
+                                            <button type="button" onClick={() => { updateDiam('seoSections' as any, dd.seoSections.filter((_, i) => i !== secIdx) as any); }} className="p-0.5 text-slate-400 hover:text-red-500"><Trash2 className="w-2.5 h-2.5" /></button>
+                                          </div>
+                                          {(sec.blocks || []).map((blk, bIdx) => (
+                                            <div key={bIdx} className="pl-1.5 border-l border-slate-200 space-y-0.5">
+                                              <input type="text" value={blk.subtitle || ''} onChange={(e) => { const u = [...dd.seoSections]; const blocks = [...(u[secIdx].blocks || [])]; blocks[bIdx] = { ...blocks[bIdx], subtitle: e.target.value }; u[secIdx] = { ...u[secIdx], blocks }; updateDiam('seoSections' as any, u as any); }} className="w-full px-1.5 py-0.5 text-[10px] border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900" placeholder="Sous-titre" />
+                                              <textarea value={blk.text || ''} onChange={(e) => { const u = [...dd.seoSections]; const blocks = [...(u[secIdx].blocks || [])]; blocks[bIdx] = { ...blocks[bIdx], text: e.target.value }; u[secIdx] = { ...u[secIdx], blocks }; updateDiam('seoSections' as any, u as any); }} rows={2} className="w-full px-1.5 py-0.5 text-[10px] border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900 resize-y" placeholder="Texte..." />
+                                            </div>
+                                          ))}
+                                          <button type="button" onClick={() => { const u = [...dd.seoSections]; u[secIdx] = { ...u[secIdx], blocks: [...(u[secIdx].blocks || []), { subtitle: '', text: '' }] }; updateDiam('seoSections' as any, u as any); }} className="text-[9px] text-slate-500 hover:text-slate-700 flex items-center gap-0.5">
+                                            <Plus className="w-2 h-2" /> Paragraphe
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             );
@@ -2228,6 +2270,53 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                               <input type="text" value={ch.label} onChange={(e) => { const u = [...sf.characteristics]; u[cIdx] = { ...u[cIdx], label: e.target.value }; updateSubFiche('characteristics', u); }} className="px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium" placeholder="Label" />
                               <input type="text" value={ch.value} onChange={(e) => { const u = [...sf.characteristics]; u[cIdx] = { ...u[cIdx], value: e.target.value }; updateSubFiche('characteristics', u); }} className="px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Valeur" />
                               <button type="button" onClick={() => updateSubFiche('characteristics', sf.characteristics.filter((_, i) => i !== cIdx))} className="p-1 text-slate-400 hover:text-red-500 transition"><Trash2 className="w-3 h-3" /></button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Contenu SEO de la sous-fiche (par matière) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Contenu SEO</label>
+                        <button type="button" onClick={() => updateSubFiche('seoSections', [...sf.seoSections, { title: '', blocks: [{ subtitle: '', text: '' }], bullets: [] }])} className="px-2 py-0.5 text-[11px] font-medium bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition flex items-center gap-1">
+                          <Plus className="w-3 h-3" /> Section
+                        </button>
+                      </div>
+                      {sf.seoSections.length === 0 ? (
+                        <p className="text-[11px] text-slate-400 italic">SEO du produit utilisé par défaut. Ajoutez des sections pour personnaliser.</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {sf.seoSections.map((sec, secIdx) => (
+                            <div key={secIdx} className="bg-slate-50 rounded-lg p-2.5 space-y-2">
+                              <div className="flex items-center gap-1.5">
+                                <input type="text" value={sec.title} onChange={(e) => { const u = [...sf.seoSections]; u[secIdx] = { ...u[secIdx], title: e.target.value }; updateSubFiche('seoSections', u); }} className="flex-1 px-2 py-1 text-xs font-semibold border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Titre de la section SEO" />
+                                <button type="button" onClick={() => updateSubFiche('seoSections', sf.seoSections.filter((_, i) => i !== secIdx))} className="p-1 text-slate-400 hover:text-red-500 transition"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                              {(sec.blocks || []).map((blk, bIdx) => (
+                                <div key={bIdx} className="pl-2 border-l-2 border-slate-200 space-y-1">
+                                  <div className="flex items-center gap-1">
+                                    <input type="text" value={blk.subtitle || ''} onChange={(e) => { const u = [...sf.seoSections]; const blocks = [...(u[secIdx].blocks || [])]; blocks[bIdx] = { ...blocks[bIdx], subtitle: e.target.value }; u[secIdx] = { ...u[secIdx], blocks }; updateSubFiche('seoSections', u); }} className="flex-1 px-2 py-0.5 text-[11px] border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900" placeholder="Sous-titre" />
+                                    <button type="button" onClick={() => { const u = [...sf.seoSections]; u[secIdx] = { ...u[secIdx], blocks: (u[secIdx].blocks || []).filter((_, i) => i !== bIdx) }; updateSubFiche('seoSections', u); }} className="p-0.5 text-slate-400 hover:text-red-500"><X className="w-2.5 h-2.5" /></button>
+                                  </div>
+                                  <textarea value={blk.text || ''} onChange={(e) => { const u = [...sf.seoSections]; const blocks = [...(u[secIdx].blocks || [])]; blocks[bIdx] = { ...blocks[bIdx], text: e.target.value }; u[secIdx] = { ...u[secIdx], blocks }; updateSubFiche('seoSections', u); }} rows={2} className="w-full px-2 py-1 text-[11px] border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900 resize-y" placeholder="Texte..." />
+                                </div>
+                              ))}
+                              <button type="button" onClick={() => { const u = [...sf.seoSections]; u[secIdx] = { ...u[secIdx], blocks: [...(u[secIdx].blocks || []), { subtitle: '', text: '' }] }; updateSubFiche('seoSections', u); }} className="text-[10px] text-slate-500 hover:text-slate-700 flex items-center gap-0.5">
+                                <Plus className="w-2.5 h-2.5" /> Paragraphe
+                              </button>
+                              {/* Bullets */}
+                              {(sec.bullets || []).map((bullet, bulletIdx) => (
+                                <div key={bulletIdx} className="flex items-center gap-1 pl-2">
+                                  <span className="text-slate-400 text-[10px]">•</span>
+                                  <input type="text" value={bullet} onChange={(e) => { const u = [...sf.seoSections]; const bullets = [...(u[secIdx].bullets || [])]; bullets[bulletIdx] = e.target.value; u[secIdx] = { ...u[secIdx], bullets }; updateSubFiche('seoSections', u); }} className="flex-1 px-2 py-0.5 text-[11px] border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900" placeholder="Point clé" />
+                                  <button type="button" onClick={() => { const u = [...sf.seoSections]; u[secIdx] = { ...u[secIdx], bullets: (u[secIdx].bullets || []).filter((_, i) => i !== bulletIdx) }; updateSubFiche('seoSections', u); }} className="p-0.5 text-slate-400 hover:text-red-500"><X className="w-2.5 h-2.5" /></button>
+                                </div>
+                              ))}
+                              <button type="button" onClick={() => { const u = [...sf.seoSections]; u[secIdx] = { ...u[secIdx], bullets: [...(u[secIdx].bullets || []), ''] }; updateSubFiche('seoSections', u); }} className="text-[10px] text-slate-500 hover:text-slate-700 flex items-center gap-0.5 pl-2">
+                                <Plus className="w-2.5 h-2.5" /> Bullet
+                              </button>
                             </div>
                           ))}
                         </div>

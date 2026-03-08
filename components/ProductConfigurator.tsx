@@ -5,7 +5,7 @@ import { ProductGallery } from '@/components/ProductGallery';
 import { ProductPurchaseSection, type ProductSelections } from '@/components/ProductPurchaseSection';
 import { ProductTabs } from '@/components/ProductTabs';
 import { Badge } from '@/components/Badge';
-import type { Product, ProductVariant, ProductConfiguration, DiameterData } from '@/lib/schema';
+import type { Product, ProductVariant, ProductConfiguration, DiameterData, SeoContent } from '@/lib/schema';
 import type { FAQOptions, MaterialType, PlanchaType } from '@/lib/product-faq';
 
 type ProductConfiguratorProps = {
@@ -81,6 +81,13 @@ export function ProductConfigurator({
 
   // --- Caractéristiques dynamiques ---
   const activeCharacteristics = activeConfig?.characteristics;
+
+  // --- Contenu SEO dynamique (diamètre > sous-fiche > produit) ---
+  const activeSeoContent: SeoContent | undefined = useMemo(() => {
+    if (activeDiameterData?.seoContent?.sections?.length) return activeDiameterData.seoContent;
+    if (activeConfig?.seoContent?.sections?.length) return activeConfig.seoContent;
+    return undefined;
+  }, [activeDiameterData, activeConfig]);
 
   // Calculer les options FAQ dynamiques en fonction des sélections du client
   const faqOptions: FAQOptions = useMemo(() => {
@@ -169,6 +176,7 @@ export function ProductConfigurator({
           overrideDescription={activeDescription !== product.description ? activeDescription : undefined}
           overrideFAQ={activeFAQ}
           overrideCharacteristics={activeCharacteristics}
+          overrideSeoContent={activeSeoContent}
         />
       </div>
     </>
