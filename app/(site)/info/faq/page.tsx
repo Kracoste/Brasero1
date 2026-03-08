@@ -48,59 +48,28 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Schéma JSON-LD FAQPage pour le SEO
-function generateStructuredData() {
+// Schéma JSON-LD FAQPage pour le SEO — inclut TOUTES les questions
+function generateStructuredData(categories: Array<{ questions: Array<{ question: string; answer: string }> }>) {
+  const allQuestions = categories.flatMap((cat) =>
+    cat.questions.map((faq) => ({
+      "@type": "Question" as const,
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer" as const,
+        text: faq.answer,
+      },
+    }))
+  );
+
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Comment entretenir mon brasero en acier ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "L'acier corten développe naturellement une patine protectrice de rouille. Pour les braseros en acier classique, un nettoyage régulier et une protection contre l'humidité sont recommandés. Videz les cendres après chaque utilisation."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Quels sont les délais de livraison ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Les braseros en stock sont expédiés sous 24 à 48h. Comptez 3 à 7 jours ouvrés pour la France métropolitaine, 5 à 10 jours pour la Belgique et le Luxembourg, 7 à 14 jours pour la Suisse et l'Allemagne."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Proposez-vous des braseros sur mesure ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Oui, notre atelier réalise des braseros personnalisés et sur mesure. Dimensions, motifs, gravures : contactez-nous pour un devis personnalisé."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Quelle est la garantie sur vos braseros ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Tous nos braseros bénéficient d'une garantie fabricant de 2 ans couvrant les défauts de fabrication. Cette garantie ne couvre pas l'usure normale ni les dommages liés à une mauvaise utilisation."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Quels moyens de paiement acceptez-vous ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Nous acceptons les cartes bancaires (Visa, Mastercard), le paiement en 3x sans frais à partir de 500€, et le virement bancaire pour les professionnels et particuliers."
-        }
-      }
-    ]
+    mainEntity: allQuestions,
   };
 }
 
 export default async function FAQPage() {
   const settings = await getSiteSettings();
-  const structuredData = generateStructuredData();
 
   const faqCategories = [
     {
@@ -292,6 +261,8 @@ export default async function FAQPage() {
       ]
     }
   ];
+
+  const structuredData = generateStructuredData(faqCategories);
 
   return (
     <>

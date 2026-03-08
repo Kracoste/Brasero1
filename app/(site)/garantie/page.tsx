@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
-import { 
+import { JsonLd } from "@/components/JsonLd";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
+import {
   Shield,
   CheckCircle2,
   Wrench,
@@ -81,8 +83,14 @@ export default async function GarantiePage() {
     },
   ];
 
+  const breadcrumb = generateBreadcrumbSchema([
+    { name: "Accueil", url: "/" },
+    { name: "Garantie", url: "/garantie" },
+  ]);
+
   return (
     <main className="bg-white">
+      <JsonLd data={breadcrumb} />
       {/* Schema.org */}
       <script
         type="application/ld+json"

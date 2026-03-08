@@ -1,0 +1,23 @@
+{
+  "name": "Atelier LBF - Braseros artisanaux Made in France",
+  "short_name": "Atelier LBF",
+  "description": "Braseros artisanaux en acier corten et acier, fabriqués à la main en France. Fendeurs à bûches, planchas et accessoires.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f1e9",
+  "theme_color": "#8B4513",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/logo/Logo1.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/Brasero.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

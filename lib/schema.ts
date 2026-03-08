@@ -142,6 +142,16 @@ export const productSchema = z.object({
       }),
     )
     .optional(),
+  seoContent: z.object({
+    sections: z.array(z.object({
+      title: z.string(),
+      blocks: z.array(z.object({
+        subtitle: z.string().optional(),
+        text: z.string().optional(),
+      })).optional(),
+      bullets: z.array(z.string()).optional(),
+    })),
+  }).optional(),
 });
 
 export type Product = z.infer<typeof productSchema>;

@@ -125,22 +125,26 @@ export default async function CommanderPage() {
     {
       icon: Shield,
       title: "Paiement 100% sécurisé",
-      description: "Vos données bancaires sont protégées par le protocole SSL. Nous acceptons CB, Visa et Mastercard."
+      description: "Vos données bancaires sont protégées par le protocole SSL. Nous acceptons CB, Visa et Mastercard.",
+      href: "/info/paiement"
     },
     {
       icon: Truck,
       title: "Livraison soignée",
-      description: `Frais de livraison calculés selon le poids lors du paiement. Vos produits sont emballés avec soin.`
+      description: `Frais de livraison calculés selon le poids lors du paiement. Vos produits sont emballés avec soin.`,
+      href: "/livraison"
     },
     {
       icon: HeartHandshake,
       title: "Fabrication artisanale",
-      description: `Chaque brasero est fabriqué à la main dans notre atelier de ${settings.atelier.city} (${settings.atelier.department}).`
+      description: `Chaque brasero est fabriqué à la main dans notre atelier de ${settings.atelier.city} (${settings.atelier.department}).`,
+      href: "/fabrication"
     },
     {
       icon: CheckCircle2,
       title: "Satisfait ou remboursé",
-      description: "14 jours pour changer d'avis. Retour simplifié et remboursement rapide."
+      description: "14 jours pour changer d'avis. Retour simplifié et remboursement rapide.",
+      href: "/retours"
     }
   ];
 
@@ -314,16 +318,20 @@ export default async function CommanderPage() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {guarantees.map((guarantee) => (
-                <div 
+                <Link
                   key={guarantee.title}
-                  className="bg-slate-50 p-6 border border-slate-200"
+                  href={guarantee.href}
+                  className="bg-slate-50 p-6 border border-slate-200 hover:shadow-md hover:border-[#CD853F]/40 transition-all group"
                 >
-                  <guarantee.icon className="w-10 h-10 text-[#8B4513] mb-4" />
-                  <h3 className="font-semibold text-lg mb-2 text-slate-900">{guarantee.title}</h3>
+                  <guarantee.icon className="w-10 h-10 text-[#8B4513] mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-semibold text-lg mb-2 text-slate-900 group-hover:text-[#8B4513] transition-colors">{guarantee.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     {guarantee.description}
                   </p>
-                </div>
+                  <span className="inline-flex items-center gap-1 text-[#8B4513] text-sm font-medium mt-3 group-hover:gap-2 transition-all">
+                    En savoir plus <ArrowRight size={14} />
+                  </span>
+                </Link>
               ))}
             </div>
           </div>

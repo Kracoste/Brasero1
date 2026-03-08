@@ -5,6 +5,7 @@ import { Users, Flame, Box, Ruler, Weight, Paintbrush, CookingPot, Layers } from
 
 import { AccessoryGrid } from "@/components/AccessoryGrid";
 import { FAQ } from "@/components/FAQ";
+import { ProductSeoContent } from "@/components/ProductSeoContent";
 import { getProductFAQ, type FAQOptions } from "@/lib/product-faq";
 import type { Product } from "@/lib/schema";
 import { cn, formatDimensions } from "@/lib/utils";
@@ -346,6 +347,9 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
           </div>
         )}
       </div>
+
+      {/* Contenu SEO riche — toujours visible sous les onglets */}
+      {product.seoContent && <ProductSeoContent seoContent={product.seoContent} />}
     </div>
   );
 };

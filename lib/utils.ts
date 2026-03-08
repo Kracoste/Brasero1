@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import type { Product } from "@/lib/schema";
+import { generateProductImageAlt } from "@/lib/seo/schemas";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -351,13 +352,22 @@ export const mapSupabaseProduct = (p: Record<string, unknown>): Product | null =
     comparePrice: (p.comparePrice || p.compare_price) as number | undefined,
     discountPercent: (p.discountPercent || p.discount_percent) as number | undefined,
     badge: (p.badge || "") as string,
-    images: (Array.isArray(p.images) ? p.images : []).map((img: Record<string, unknown>) => ({
-      src: (img.src as string) || "",
-      alt: (img.alt as string) || (p.name as string) || "Image produit",
-      width: (img.width as number) || 800,
-      height: (img.height as number) || 600,
-      blurDataURL: (img.blurDataURL as string) || "",
-    })),
+    images: (Array.isArray(p.images) ? p.images : []).map((img: Record<string, unknown>, index: number) => {
+      const originalAlt = (img.alt as string) || (p.name as string) || "Image produit";
+      const productContext = {
+        name: (p.name as string) || "Produit",
+        material: (p.material as string) || "Acier",
+        diameter: resolveDiameter({ ...p, specs }) ?? 0,
+        category: (p.category as string) || "accessoire",
+      };
+      return {
+        src: (img.src as string) || "",
+        alt: generateProductImageAlt(productContext, index, originalAlt),
+        width: (img.width as number) || 800,
+        height: (img.height as number) || 600,
+        blurDataURL: (img.blurDataURL as string) || "",
+      };
+    }),
     material: (p.material || "Acier") as string,
     madeIn: "France" as const,
     diameter,
@@ -385,5 +395,6 @@ export const mapSupabaseProduct = (p: Record<string, unknown>): Product | null =
     faq: (p.faq || []) as Product["faq"],
     customSpecs: (p.customSpecs || p.custom_specs || []) as Product["customSpecs"],
     location: (p.location || { city: "", dept: "", lat: 0, lng: 0 }) as Product["location"],
+    seoContent: (p.seoContent || p.seo_content || undefined) as Product["seoContent"],
   };
 };

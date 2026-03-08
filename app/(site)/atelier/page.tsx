@@ -2,14 +2,38 @@ import Image from "next/image";
 import type { Metadata } from "next";
 
 import { Container } from "@/components/Container";
+import { JsonLd } from "@/components/JsonLd";
 import { LeafletMap } from "@/components/LeafletMap";
 import { Section } from "@/components/Section";
 import { getSiteSettings } from "@/lib/site-settings";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 
-export const metadata: Metadata = {
-  title: "Atelier & savoir-faire",
-  description: "Plongez dans les coulisses de notre atelier de Moncoutant et de nos procédés artisanaux.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return {
+    title: `Notre atelier à ${settings.atelier.city} | Savoir-faire artisanal ${settings.atelier.department} | ${settings.storeName}`,
+    description: `Visitez notre atelier de ferronnerie à ${settings.atelier.city} (79). Découvrez comment nous fabriquons vos braseros artisanaux à la main dans les ${settings.atelier.department}, Nouvelle-Aquitaine. Découpe laser, soudure TIG, finitions soignées.`,
+    keywords: [
+      "atelier brasero",
+      `atelier ${settings.atelier.city}`,
+      "savoir-faire artisanal",
+      "ferronnerie Deux-Sèvres",
+      "fabrication brasero",
+      "atelier Nouvelle-Aquitaine",
+      settings.storeName,
+    ],
+    openGraph: {
+      title: `Notre atelier artisanal à ${settings.atelier.city} | ${settings.storeName}`,
+      description: `Plongez dans les coulisses de notre atelier de ${settings.atelier.city}. Braseros fabriqués à la main.`,
+      type: "website",
+      locale: "fr_FR",
+    },
+    alternates: {
+      canonical: "/atelier",
+    },
+  };
+}
 
 const atelierImages = [
   {
@@ -29,8 +53,14 @@ const atelierImages = [
 export default async function AtelierPage() {
   const siteSettings = await getSiteSettings();
 
+  const breadcrumb = generateBreadcrumbSchema([
+    { name: "Accueil", url: "/" },
+    { name: "Notre atelier", url: "/atelier" },
+  ]);
+
   return (
     <div className="pb-24">
+      <JsonLd data={breadcrumb} />
       <Section className="pt-10">
         <Container className="space-y-8">
           <div className="space-y-3">

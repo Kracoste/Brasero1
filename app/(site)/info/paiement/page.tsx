@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
-import { 
-  CreditCard, 
-  Shield, 
+import {
+  CreditCard,
+  Shield,
   Lock,
-  CheckCircle2, 
+  CheckCircle2,
   ArrowRight,
   Phone,
   Mail,
@@ -16,6 +16,8 @@ import {
   FileText,
   HelpCircle
 } from "lucide-react";
+import { JsonLd } from "@/components/JsonLd";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -76,25 +78,29 @@ function generateStructuredData(settings: Awaited<ReturnType<typeof getSiteSetti
 export default async function PaiementPage() {
   const settings = await getSiteSettings();
   const structuredData = generateStructuredData(settings);
+  const breadcrumb = generateBreadcrumbSchema([
+    { name: "Accueil", url: "/" },
+    { name: "Paiement sécurisé", url: "/info/paiement" },
+  ]);
 
   const paymentMethods = [
     {
       icon: CreditCard,
       title: "Carte bancaire",
-      description: "Visa, Mastercard, CB",
-      details: "Paiement instantané et sécurisé. Vos données sont protégées par cryptage SSL 256 bits."
+      description: "CB, Visa, Mastercard",
+      details: "Paiement instantané et sécurisé. Vos données sont protégées par cryptage SSL 256 bits. Débit immédiat à la commande."
     },
     {
       icon: Banknote,
       title: "Virement bancaire",
       description: "Professionnels et particuliers",
-      details: "Contactez-nous par email pour recevoir nos coordonnées bancaires. Expédition après réception du virement."
+      details: "Contactez-nous par email pour recevoir nos coordonnées bancaires (IBAN). Expédition dès réception du virement. Idéal pour les commandes importantes."
     },
     {
       icon: CreditCard,
       title: "Paiement en 3x sans frais",
       description: "À partir de 500€ d'achat",
-      details: "Étalez votre paiement en 3 mensualités sans aucun frais supplémentaire."
+      details: "Étalez votre paiement en 3 mensualités sans aucun frais supplémentaire. 1/3 à la commande, puis à J+30 et J+60."
     }
   ];
 
@@ -146,11 +152,12 @@ export default async function PaiementPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumb} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      
+
       <main className="min-h-screen">
         {/* Hero Section */}
         <section className="relative bg-white py-16 sm:py-24 overflow-hidden">

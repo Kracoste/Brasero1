@@ -5,9 +5,20 @@ import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
 import { ProductConfigurator } from "@/components/ProductConfigurator";
 import { RelatedProducts } from "@/components/RelatedProducts";
+import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
+import {
+  generateProductSchema,
+  generateProductBreadcrumb,
+  generateFAQSchema,
+} from "@/lib/seo/schemas";
+import {
+  generateProductSEO,
+  generateProductMetaTitle,
+  generateProductMetaDescription,
+} from "@/lib/seo/product-seo";
 
 // ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
 export const revalidate = 60;
@@ -30,7 +41,7 @@ async function getProduct(slug: string) {
 }
 
 // Fonction pour récupérer les produits similaires (même catégorie, excluant le produit actuel)
-const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations';
+const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content';
 
 async function getRelatedProducts(currentSlug: string, category: string, limit: number = 8) {
   const supabase = await createClient();
@@ -64,18 +75,35 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getProduct(slug);
   if (!product) return {};
 
+  const seo = generateProductSEO(product);
+  const title = generateProductMetaTitle(product);
+  const description = generateProductMetaDescription(product);
+
   return {
-    title: product.name,
-    description: product.shortDescription,
+    title,
+    description,
+    keywords: seo.keywords,
     openGraph: {
-      title: product.name,
-      description: product.shortDescription,
-      images: product.images.slice(0, 1).map((image: any) => ({
+      title,
+      description,
+      type: "website",
+      locale: "fr_FR",
+      url: `https://www.atelier-lbf.fr/produits/${product.slug}`,
+      images: product.images.slice(0, 3).map((image: any) => ({
         url: image.src,
         width: image.width,
         height: image.height,
         alt: image.alt,
       })),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.shortDescription,
+      images: product.images.slice(0, 1).map((img: any) => img.src),
+    },
+    alternates: {
+      canonical: `/produits/${product.slug}`,
     },
   };
 }
@@ -96,8 +124,24 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // Récupérer les produits similaires (même catégorie)
   const relatedProducts = await getRelatedProducts(slug, product.category, 8);
 
+  // SEO dynamique — descriptions + FAQ générées par catégorie/variante
+  const seo = generateProductSEO(product);
+
+  // Utiliser les FAQ du produit si elles existent, sinon les FAQ SEO générées
+  const productFAQs = product.faq && product.faq.length > 0
+    ? product.faq
+    : seo.faq;
+
+  // JSON-LD schemas
+  const productSchema = generateProductSchema(product, seo.description);
+  const breadcrumbSchema = generateProductBreadcrumb(product);
+  const faqSchema = generateFAQSchema(productFAQs);
+
   return (
     <div className="bg-white pb-16 sm:pb-24">
+      <JsonLd data={productSchema} />
+      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={faqSchema} />
       <Section className="pt-4 sm:pt-6 lg:pt-10">
         <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
           <ProductConfigurator

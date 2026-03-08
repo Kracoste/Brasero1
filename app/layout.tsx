@@ -7,6 +7,7 @@ import "@/styles/globals.css";
 
 import { getSiteSettings } from "@/lib/site-settings";
 import { SiteSettingsProvider } from "@/components/SiteSettingsProvider";
+import { generateOrganizationSchema, generateWebSiteSchema } from "@/lib/seo/schemas";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,20 +31,29 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.storeName}`,
       default: titleBase,
     },
-    description: `${settings.storeName} fabrique vos braséros à ${settings.storeAddress}.`,
+    description: `${settings.storeName} : braseros artisanaux en acier corten et acier, fabriqués à la main à ${settings.atelier.city} (${settings.atelier.department}). Fendeurs à bûches, planchas et accessoires. Livraison France. Garantie 2 ans.`,
     alternates: {
       canonical: baseUrl.href,
     },
     keywords: [
+      "brasero artisanal",
       "brasero corten",
       "brasero français",
-      "atelier Moncoutant",
-      "plancha extérieure",
+      "brasero made in France",
+      "brasero acier",
+      "brasero jardin",
+      "brasero terrasse",
+      "brasero extérieur",
+      "plancha brasero",
       "fendeur à bûches",
+      "atelier Moncoutant",
+      "brasero Deux-Sèvres",
+      "brasero Nouvelle-Aquitaine",
+      settings.storeName,
     ],
     openGraph: {
-      title: `${settings.storeName} — Fabriqué à ${settings.atelier.city} (79)`,
-      description: `${settings.storeName} fabrique vos braséros à ${settings.storeAddress}.`,
+      title: `${settings.storeName} — Braseros artisanaux fabriqués en France à ${settings.atelier.city}`,
+      description: `Braseros artisanaux en acier corten, fendeurs à bûches et accessoires. Fabriqués à la main dans notre atelier de ${settings.atelier.city} (${settings.atelier.department}). Livraison France.`,
       url: baseUrl.href,
       siteName: settings.storeName,
       images: [
@@ -59,31 +69,20 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: settings.storeName,
-      description: `${settings.storeName} fabrique vos braséros à ${settings.storeAddress}.`,
+      title: `${settings.storeName} — Braseros artisanaux Made in France`,
+      description: `Braseros artisanaux en acier corten, fendeurs à bûches et accessoires. Fabriqués à la main à ${settings.atelier.city}. Livraison France.`,
       images: [
         "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
       ],
     },
+    manifest: "/manifest.json",
   };
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings();
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: settings.storeName,
-    url: baseUrl.href,
-    email: settings.storeEmail,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: settings.storeAddress,
-      addressLocality: settings.atelier.city,
-      postalCode: "79320",
-      addressCountry: "FR",
-    },
-  };
+  const organizationSchema = generateOrganizationSchema(settings);
+  const webSiteSchema = generateWebSiteSchema(settings);
 
   return (
     <html lang="fr" suppressHydrationWarning>
@@ -161,6 +160,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }}
         />
         <SiteSettingsProvider value={settings}>
           {children}

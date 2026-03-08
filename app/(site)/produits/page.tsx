@@ -3,16 +3,44 @@ import type { Metadata } from "next";
 import { CatalogueView } from "@/components/CatalogueView";
 import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
+import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { mapSupabaseProduct } from "@/lib/utils";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 
-export const metadata: Metadata = {
-  title: "Catalogue",
-  description: "Parcourez nos braséros en acier corten et notre fendeur à bûches Made in France.",
+const CATEGORY_META: Record<string, { title: string; description: string; keywords: string[] }> = {
+  brasero: {
+    title: "Braseros artisanaux en acier corten et acier | Made in France | Atelier LBF",
+    description: "Découvrez notre collection de braseros artisanaux fabriqués en France. Acier corten, acier noir, diamètres de 55 à 100cm. Livraison soignée, garantie 2 ans.",
+    keywords: ["brasero artisanal", "brasero corten", "brasero acier", "brasero français", "brasero jardin", "brasero terrasse"],
+  },
+  fendeur: {
+    title: "Fendeur à bûches professionnel | Fabriqué en France | Atelier LBF",
+    description: "Fendeur à bûches robuste et sécurisé, fabriqué artisanalement en France. Préparez votre bois de chauffage facilement. Garantie 2 ans.",
+    keywords: ["fendeur à bûches", "fendeur bois", "fendeur manuel", "fendeur français", "couper bûches"],
+  },
+  accessoire: {
+    title: "Accessoires pour brasero : plancha, grille, couvercle | Atelier LBF",
+    description: "Complétez votre brasero avec nos accessoires artisanaux : planchas amovibles, grilles de cuisson, couvercles, pare-étincelles. Fabriqués en France.",
+    keywords: ["accessoire brasero", "plancha brasero", "grille brasero", "couvercle brasero", "pare-étincelles"],
+  },
+  "range-buches": {
+    title: "Range-bûches design et pratique | Made in France | Atelier LBF",
+    description: "Range-bûches artisanaux en acier pour organiser et stocker votre bois de chauffage avec style. Fabriqués en France.",
+    keywords: ["range-bûches", "rangement bois", "range-bûches design", "range-bûches acier"],
+  },
+  promotions: {
+    title: "Promotions braseros : jusqu'à -40% | Atelier LBF",
+    description: "Profitez de nos promotions exceptionnelles sur les braseros artisanaux et accessoires. Jusqu'à -40% sur une sélection de produits Made in France.",
+    keywords: ["promotion brasero", "brasero pas cher", "soldes brasero", "réduction brasero", "brasero promo"],
+  },
 };
 
-// ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
-export const revalidate = 60;
+const DEFAULT_META = {
+  title: "Catalogue braseros, fendeurs et accessoires | Artisan Made in France | Atelier LBF",
+  description: "Parcourez notre catalogue complet de braseros artisanaux, fendeurs à bûches et accessoires. Fabriqués à la main en France. Acier corten, diamètres de 55 à 100cm. Filtres et tri disponibles.",
+  keywords: ["catalogue brasero", "brasero artisanal", "fendeur à bûches", "accessoire brasero", "made in France"],
+};
 
 type SearchParams = {
   category?: string;
@@ -22,6 +50,30 @@ type SearchParams = {
 type Props = {
   searchParams: Promise<SearchParams>;
 };
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const params = await searchParams;
+  const category = params.category;
+  const meta = (category && CATEGORY_META[category]) || DEFAULT_META;
+
+  return {
+    title: meta.title,
+    description: meta.description,
+    keywords: meta.keywords,
+    openGraph: {
+      title: meta.title,
+      description: meta.description,
+      type: "website",
+      locale: "fr_FR",
+    },
+    alternates: {
+      canonical: category ? `/produits?category=${category}` : "/produits",
+    },
+  };
+}
+
+// ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
+export const revalidate = 60;
 
 export default async function ProductsPage({ searchParams }: Props) {
   const params = await searchParams;
@@ -82,8 +134,17 @@ export default async function ProductsPage({ searchParams }: Props) {
 
   const containerClass = 'space-y-6 sm:space-y-10 w-full max-w-[1600px] px-3 sm:px-4 lg:px-0';
 
+  const breadcrumbItems = [
+    { name: "Accueil", url: "/" },
+    { name: "Nos produits", url: "/produits" },
+    ...(category && title !== "Nos créations"
+      ? [{ name: title, url: `/produits?category=${category}` }]
+      : []),
+  ];
+
   return (
     <Section className="pb-24 bg-[var(--background)]">
+      <JsonLd data={generateBreadcrumbSchema(breadcrumbItems)} />
       <Container className={containerClass}>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2d2d2d] mb-4 sm:mb-8">{title.toUpperCase()}</h1>
         <div>

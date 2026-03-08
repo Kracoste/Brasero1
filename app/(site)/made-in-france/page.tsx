@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
-import { 
+import { JsonLd } from "@/components/JsonLd";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
+import {
   Award,
   Factory,
   MapPin,
@@ -82,8 +84,14 @@ export default async function MadeInFrancePage() {
     },
   ];
 
+  const breadcrumb = generateBreadcrumbSchema([
+    { name: "Accueil", url: "/" },
+    { name: "Made in France", url: "/made-in-france" },
+  ]);
+
   return (
     <main className="bg-white">
+      <JsonLd data={breadcrumb} />
       {/* Schema.org */}
       <script
         type="application/ld+json"

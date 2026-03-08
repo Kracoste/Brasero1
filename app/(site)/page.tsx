@@ -2,10 +2,12 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { HeroMenu } from "@/components/HeroMenu";
 import { ProductCarousel } from "@/components/ProductCarousel";
+import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/site-settings";
 import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
+import { generateStoreSchema } from "@/lib/seo/schemas";
 import { Flame, Truck, Shield, Award } from "lucide-react";
 
 // ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
@@ -74,41 +76,8 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Schema.org pour la page d'accueil */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Store",
-            "name": settings.storeName,
-            "description": "Boutique en ligne de braseros artisanaux fabriqués en France",
-            "url": "https://www.atelier-lbf.fr",
-            "image": "https://www.atelier-lbf.fr/Braserobanner.jpg",
-            "telephone": settings.storePhone,
-            "email": settings.storeEmail,
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": settings.atelier.city,
-              "addressRegion": settings.atelier.department,
-              "postalCode": "79320",
-              "addressCountry": "FR"
-            },
-            "geo": {
-              "@type": "GeoCoordinates",
-              "latitude": settings.atelier.lat,
-              "longitude": settings.atelier.lng
-            },
-            "priceRange": "€€",
-            "openingHoursSpecification": {
-              "@type": "OpeningHoursSpecification",
-              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-              "opens": "09:00",
-              "closes": "18:00"
-            }
-          })
-        }}
-      />
+      {/* Schema.org Store enrichi pour la page d'accueil */}
+      <JsonLd data={generateStoreSchema(settings)} />
 
       {/* Hero avec H1 SEO */}
       <section className="bg-[#f6f1e9] py-8 sm:py-10 lg:py-12">

@@ -1,11 +1,31 @@
 import type { Metadata } from "next";
 
 import { Container } from "@/components/Container";
+import { JsonLd } from "@/components/JsonLd";
 import { Section } from "@/components/Section";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 
 export const metadata: Metadata = {
-  title: "Recettes au brasero",
-  description: "Idees gourmandes, marinades et cuissons parfaites pour votre brasero.",
+  title: "Recettes au brasero : viandes, légumes, desserts | Cuisson au feu de bois | Atelier LBF",
+  description: "Découvrez nos recettes au brasero : viandes grillées, légumes rôtis, desserts au feu doux. Astuces de cuisson au feu de bois, marinades et temps de cuisson pour réussir vos repas en extérieur.",
+  keywords: [
+    "recette brasero",
+    "cuisson brasero",
+    "recette feu de bois",
+    "grillades brasero",
+    "plancha brasero recette",
+    "barbecue brasero",
+    "cuisson extérieur",
+  ],
+  openGraph: {
+    title: "Recettes au brasero | Atelier LBF",
+    description: "Idées gourmandes et astuces de cuisson pour votre brasero artisanal.",
+    type: "website",
+    locale: "fr_FR",
+  },
+  alternates: {
+    canonical: "/recettes",
+  },
 };
 
 const recipeHighlights = [
@@ -24,8 +44,14 @@ const recipeHighlights = [
 ];
 
 export default function RecettesPage() {
+  const breadcrumb = generateBreadcrumbSchema([
+    { name: "Accueil", url: "/" },
+    { name: "Recettes au brasero", url: "/recettes" },
+  ]);
+
   return (
     <Section className="pb-24 pt-10">
+      <JsonLd data={breadcrumb} />
       <Container className="space-y-10">
         <div className="space-y-3">
           <p className="text-sm uppercase tracking-wide text-slate-500">Recettes</p>

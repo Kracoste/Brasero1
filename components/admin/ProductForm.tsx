@@ -287,6 +287,10 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
 
   const [configurations, setConfigurations] = useState<Record<string, SubFiche>>({});
   const [openConfigKey, setOpenConfigKey] = useState<string | null>(null);
+
+  // SEO Content (pour les braseros uniquement)
+  type SeoSection = { title: string; blocks?: { subtitle?: string; text?: string }[]; bullets?: string[] };
+  const [seoSections, setSeoSections] = useState<SeoSection[]>([]);
   const [variantDropdownOpen, setVariantDropdownOpen] = useState(false);
   const subFicheFileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -473,6 +477,12 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
             };
           }
           setConfigurations(loadedConfigs);
+        }
+
+        // Charger le contenu SEO existant
+        const rawSeoContent = product.seo_content || product.seoContent;
+        if (rawSeoContent && rawSeoContent.sections && Array.isArray(rawSeoContent.sections)) {
+          setSeoSections(rawSeoContent.sections);
         }
 
         setLoadingProduct(false);
@@ -858,6 +868,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
           }
           return Object.keys(result).length > 0 ? result : null;
         })(),
+        seoContent: seoSections.length > 0 ? { sections: seoSections.filter(s => s.title.trim()) } : null,
       };
 
       // API call
@@ -1709,6 +1720,164 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
             </div>
           )}
         </div>
+
+        {/* Contenu SEO (braseros uniquement) */}
+        {formData.category === 'brasero' && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Contenu SEO</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Textes riches affichés sous les onglets produit (toujours visibles)</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSeoSections([...seoSections, { title: '', blocks: [{ subtitle: '', text: '' }], bullets: [] }])}
+                className="px-3 py-1.5 text-xs font-medium bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition flex items-center gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" /> Ajouter une section
+              </button>
+            </div>
+
+            {seoSections.length === 0 ? (
+              <p className="text-sm text-slate-400 italic py-4 text-center">Aucune section SEO. Cliquez sur &quot;Ajouter une section&quot; pour commencer.</p>
+            ) : (
+              <div className="space-y-6">
+                {seoSections.map((section, sIdx) => (
+                  <div key={sIdx} className="border border-slate-200 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={section.title}
+                        onChange={(e) => {
+                          const updated = [...seoSections];
+                          updated[sIdx] = { ...updated[sIdx], title: e.target.value };
+                          setSeoSections(updated);
+                        }}
+                        className="flex-1 px-3 py-1.5 text-sm font-semibold border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                        placeholder="Titre de la section (ex: Pourquoi choisir ce brasero ?)"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSeoSections(seoSections.filter((_, i) => i !== sIdx))}
+                        className="p-1.5 text-slate-400 hover:text-red-500 transition"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Blocs texte */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-500">Paragraphes</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...seoSections];
+                            updated[sIdx] = { ...updated[sIdx], blocks: [...(updated[sIdx].blocks || []), { subtitle: '', text: '' }] };
+                            setSeoSections(updated);
+                          }}
+                          className="text-[11px] text-slate-500 hover:text-slate-700 flex items-center gap-0.5"
+                        >
+                          <Plus className="w-3 h-3" /> Ajouter
+                        </button>
+                      </div>
+                      {(section.blocks || []).map((block, bIdx) => (
+                        <div key={bIdx} className="pl-3 border-l-2 border-slate-100 space-y-1.5">
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              value={block.subtitle || ''}
+                              onChange={(e) => {
+                                const updated = [...seoSections];
+                                const blocks = [...(updated[sIdx].blocks || [])];
+                                blocks[bIdx] = { ...blocks[bIdx], subtitle: e.target.value };
+                                updated[sIdx] = { ...updated[sIdx], blocks };
+                                setSeoSections(updated);
+                              }}
+                              className="flex-1 px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900"
+                              placeholder="Sous-titre (optionnel)"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = [...seoSections];
+                                updated[sIdx] = { ...updated[sIdx], blocks: (updated[sIdx].blocks || []).filter((_, i) => i !== bIdx) };
+                                setSeoSections(updated);
+                              }}
+                              className="p-0.5 text-slate-400 hover:text-red-500"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <textarea
+                            value={block.text || ''}
+                            onChange={(e) => {
+                              const updated = [...seoSections];
+                              const blocks = [...(updated[sIdx].blocks || [])];
+                              blocks[bIdx] = { ...blocks[bIdx], text: e.target.value };
+                              updated[sIdx] = { ...updated[sIdx], blocks };
+                              setSeoSections(updated);
+                            }}
+                            rows={3}
+                            className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900 resize-y"
+                            placeholder="Texte du paragraphe..."
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Bullets */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-500">Points clés (bullets)</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...seoSections];
+                            updated[sIdx] = { ...updated[sIdx], bullets: [...(updated[sIdx].bullets || []), ''] };
+                            setSeoSections(updated);
+                          }}
+                          className="text-[11px] text-slate-500 hover:text-slate-700 flex items-center gap-0.5"
+                        >
+                          <Plus className="w-3 h-3" /> Ajouter
+                        </button>
+                      </div>
+                      {(section.bullets || []).map((bullet, bulletIdx) => (
+                        <div key={bulletIdx} className="flex items-center gap-1.5">
+                          <span className="text-slate-400 text-xs">•</span>
+                          <input
+                            type="text"
+                            value={bullet}
+                            onChange={(e) => {
+                              const updated = [...seoSections];
+                              const bullets = [...(updated[sIdx].bullets || [])];
+                              bullets[bulletIdx] = e.target.value;
+                              updated[sIdx] = { ...updated[sIdx], bullets };
+                              setSeoSections(updated);
+                            }}
+                            className="flex-1 px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900"
+                            placeholder="Point clé..."
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = [...seoSections];
+                              updated[sIdx] = { ...updated[sIdx], bullets: (updated[sIdx].bullets || []).filter((_, i) => i !== bulletIdx) };
+                              setSeoSections(updated);
+                            }}
+                            className="p-0.5 text-slate-400 hover:text-red-500"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-4">

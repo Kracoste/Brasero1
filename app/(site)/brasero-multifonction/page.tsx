@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
-import { 
+import { JsonLd } from "@/components/JsonLd";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
+import {
   Flame,
   ChefHat,
   Users,
@@ -81,8 +83,14 @@ export default async function BraseroMultifonctionPage() {
     },
   ];
 
+  const breadcrumb = generateBreadcrumbSchema([
+    { name: "Accueil", url: "/" },
+    { name: "Brasero multifonction", url: "/brasero-multifonction" },
+  ]);
+
   return (
     <main className="bg-white">
+      <JsonLd data={breadcrumb} />
       {/* Schema.org */}
       <script
         type="application/ld+json"

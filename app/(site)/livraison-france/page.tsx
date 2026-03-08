@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
-import { 
+import { JsonLd } from "@/components/JsonLd";
+import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
+import {
   Truck,
   Package,
   Shield,
@@ -90,8 +92,14 @@ export default async function LivraisonFrancePage() {
     },
   ];
 
+  const breadcrumb = generateBreadcrumbSchema([
+    { name: "Accueil", url: "/" },
+    { name: "Livraison France", url: "/livraison-france" },
+  ]);
+
   return (
     <main className="bg-white">
+      <JsonLd data={breadcrumb} />
       {/* Schema.org */}
       <script
         type="application/ld+json"

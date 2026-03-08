@@ -68,6 +68,7 @@ const CAMEL_TO_SNAKE_MAP: Record<string, string> = {
   featuredOrder: 'featured_order',
   configImages: 'config_images',
   configurations: 'configurations',
+  seoContent: 'seo_content',
 };
 
 /**
@@ -102,6 +103,7 @@ export const ALLOWED_PRODUCT_FIELDS = [
   'is_featured',
   'featured_order',
   'format',
+  'seo_content',
 ] as const;
 
 /**
