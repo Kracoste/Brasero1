@@ -86,6 +86,7 @@ const diameterDataSchema = z.object({
   bowlThickness: z.number().optional(),
   baseThickness: z.number().optional(),
   description: z.string().optional(),
+  characteristics: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
   seoContent: seoContentSchema.optional(),
 });
 

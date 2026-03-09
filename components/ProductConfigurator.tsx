@@ -79,8 +79,10 @@ export function ProductConfigurator({
   // --- FAQ dynamique ---
   const activeFAQ = activeConfig?.faq;
 
-  // --- Caractéristiques dynamiques ---
-  const activeCharacteristics = activeConfig?.characteristics;
+  // --- Caractéristiques dynamiques (diamètre > sous-fiche) ---
+  const activeCharacteristics = activeDiameterData?.characteristics?.length
+    ? activeDiameterData.characteristics
+    : activeConfig?.characteristics;
 
   // --- Contenu SEO dynamique (diamètre > sous-fiche > produit) ---
   const activeSeoContent: SeoContent | undefined = useMemo(() => {

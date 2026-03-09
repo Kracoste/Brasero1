@@ -46,6 +46,7 @@ type DiameterEntry = {
   bowlThickness: string;
   baseThickness: string;
   description: string;
+  characteristics: { label: string; value: string }[];
   seoSections: SeoSection[];
 };
 
@@ -149,7 +150,7 @@ function generateFAQForConfigKey(configKey: string): { question: string; answer:
 }
 
 const emptyDiameterEntry = (): DiameterEntry => ({
-  price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', length: '', width: '', bowlThickness: '', baseThickness: '', description: '', seoSections: [],
+  price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', length: '', width: '', bowlThickness: '', baseThickness: '', description: '', characteristics: [], seoSections: [],
 });
 
 const emptySubFiche = (): SubFiche => ({
@@ -456,6 +457,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                     bowlThickness: dv.bowlThickness?.toString() || '',
                     baseThickness: dv.baseThickness?.toString() || '',
                     description: dv.description || '',
+                    characteristics: Array.isArray(dv.characteristics) ? dv.characteristics.map((ch: any) => ({ label: ch.label || '', value: ch.value || '' })) : [],
                     seoSections: dv.seoContent?.sections || [],
                   };
                 }
@@ -852,6 +854,8 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                 if (dd.bowlThickness) entry.bowlThickness = parseFloat(dd.bowlThickness);
                 if (dd.baseThickness) entry.baseThickness = parseFloat(dd.baseThickness);
                 if (dd.description?.trim()) entry.description = dd.description.trim();
+                const validDiamChars = dd.characteristics.filter(c => c.label.trim() && c.value.trim());
+                if (validDiamChars.length > 0) entry.characteristics = validDiamChars;
                 const validDiamSeo = dd.seoSections.filter(s => s.title.trim());
                 if (validDiamSeo.length > 0) entry.seoContent = { sections: validDiamSeo };
                 if (Object.keys(entry).length > 0) diametersData[String(d)] = entry;
@@ -2138,6 +2142,66 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                                 <div>
                                   <label className="block text-[10px] text-slate-400 mb-0.5">Description (optionnel)</label>
                                   <textarea value={dd.description} onChange={(e) => updateDiam('description', e.target.value)} rows={2} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Description spécifique pour ce diamètre…" />
+                                </div>
+                                {/* Caractéristiques spécifiques au diamètre */}
+                                <div>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <label className="block text-[10px] text-slate-400">Caractéristiques</label>
+                                    <div className="flex gap-1">
+                                      <button type="button" onClick={() => {
+                                        const configKey = openConfigKey || '';
+                                        const [finish, plancha] = configKey.split('-');
+                                        const finishLabel = finish === 'corten' ? 'Acier Corten' : finish === 'peint' ? 'Acier peint thermolaqué' : formData.material;
+                                        const planchaLabel = plancha === 'inox' ? 'Inox' : plancha === 'acier' ? 'Acier carbone' : '';
+                                        const chars: { label: string; value: string }[] = [];
+                                        chars.push({ label: 'Diamètre', value: `Ø ${d} cm` });
+                                        if (dd.height) chars.push({ label: 'Hauteur', value: `${dd.height} cm` });
+                                        if (dd.length && dd.width) {
+                                          chars.push({ label: 'Dimensions', value: `L${dd.length} x l${dd.width} x H${dd.height || '–'} cm` });
+                                        }
+                                        if (dd.weight) chars.push({ label: 'Poids', value: dd.weight.includes('kg') ? dd.weight : `${dd.weight} kg` });
+                                        chars.push({ label: 'Matière brasero', value: finishLabel });
+                                        if (planchaLabel) chars.push({ label: 'Matière plancha', value: planchaLabel });
+                                        if (dd.bowlThickness) chars.push({ label: 'Épaisseur cuve', value: `${dd.bowlThickness} mm` });
+                                        if (dd.baseThickness) chars.push({ label: 'Épaisseur socle', value: `${dd.baseThickness} mm` });
+                                        if (formData.format) {
+                                          const fmtLabels: Record<string, string> = { rond: 'Ronde', hexagonal: 'Hexagonale', carre: 'Carrée' };
+                                          chars.push({ label: 'Forme plancha', value: fmtLabels[formData.format] || formData.format });
+                                        }
+                                        if (sf.painting) chars.push({ label: 'Finition', value: sf.painting });
+                                        if (formData.numberOfGuests) chars.push({ label: 'Convives', value: formData.numberOfGuests });
+                                        chars.push({ label: 'Fabrication', value: 'France — Moncoutant (79)' });
+                                        chars.push({ label: 'Type', value: 'Brasero' });
+                                        updateDiam('characteristics' as any, chars as any);
+                                      }} className="text-[9px] font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded px-1.5 py-0.5 hover:bg-amber-100 transition flex items-center gap-0.5">
+                                        <Sparkles className="w-2.5 h-2.5" /> Pré-remplir
+                                      </button>
+                                      <button type="button" onClick={() => {
+                                        updateDiam('characteristics' as any, [...dd.characteristics, { label: '', value: '' }] as any);
+                                      }} className="text-[9px] text-slate-500 hover:text-slate-700 flex items-center gap-0.5">
+                                        <Plus className="w-2.5 h-2.5" /> Ajouter
+                                      </button>
+                                    </div>
+                                  </div>
+                                  {dd.characteristics.length > 0 && (
+                                    <div className="space-y-1">
+                                      {dd.characteristics.map((ch, chIdx) => (
+                                        <div key={chIdx} className="grid grid-cols-[1fr_1fr_20px] gap-1 items-center">
+                                          <input type="text" value={ch.label} onChange={(e) => {
+                                            const u = [...dd.characteristics]; u[chIdx] = { ...u[chIdx], label: e.target.value };
+                                            updateDiam('characteristics' as any, u as any);
+                                          }} className="px-1.5 py-0.5 text-[10px] border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900 font-medium" placeholder="Label" />
+                                          <input type="text" value={ch.value} onChange={(e) => {
+                                            const u = [...dd.characteristics]; u[chIdx] = { ...u[chIdx], value: e.target.value };
+                                            updateDiam('characteristics' as any, u as any);
+                                          }} className="px-1.5 py-0.5 text-[10px] border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-900" placeholder="Valeur" />
+                                          <button type="button" onClick={() => {
+                                            updateDiam('characteristics' as any, dd.characteristics.filter((_, i) => i !== chIdx) as any);
+                                          }} className="p-0.5 text-slate-400 hover:text-red-500"><Trash2 className="w-2.5 h-2.5" /></button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                                 {/* SEO spécifique au diamètre */}
                                 <div>
