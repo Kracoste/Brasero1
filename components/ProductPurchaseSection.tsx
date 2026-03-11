@@ -32,6 +32,12 @@ type ProductPurchaseSectionProps = {
   activeConfig?: ProductConfiguration;
   /** Données spécifiques au diamètre sélectionné (prix, dimensions) */
   activeDiameterData?: DiameterData;
+  /** Sélections initiales pour les pages variantes */
+  initialSelections?: {
+    diameter: number;
+    finish: string;
+    plancha: string;
+  };
 };
 
 const FINISH_LABELS: Record<string, string> = {
@@ -78,7 +84,7 @@ function buildOptions<T extends string | number>(
   return options;
 }
 
-export function ProductPurchaseSection({ product, compatibleAccessorySlugs, preloadedAccessories, onVariantChange, onSelectionChange, activeConfig, activeDiameterData }: ProductPurchaseSectionProps) {
+export function ProductPurchaseSection({ product, compatibleAccessorySlugs, preloadedAccessories, onVariantChange, onSelectionChange, activeConfig, activeDiameterData, initialSelections }: ProductPurchaseSectionProps) {
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   const { trackProductView } = useAnalytics();
 
@@ -158,15 +164,15 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
     );
   }, [showSelectors, basePlancha, variants, configPlanchas]);
 
-  // --- État des sélections : initialisé aux valeurs du produit de base ---
+  // --- État des sélections : initialisé aux sélections initiales (variante) ou valeurs du produit de base ---
   const [selectedDiameter, setSelectedDiameter] = useState<number | null>(
-    baseDiameter ?? (diameterOptions.length > 0 ? diameterOptions[0].value as number : null)
+    initialSelections?.diameter ?? baseDiameter ?? (diameterOptions.length > 0 ? diameterOptions[0].value as number : null)
   );
   const [selectedFinish, setSelectedFinish] = useState<string | null>(
-    baseFinish ?? (finishOptions.length > 0 ? finishOptions[0].value as string : null)
+    initialSelections?.finish ?? baseFinish ?? (finishOptions.length > 0 ? finishOptions[0].value as string : null)
   );
   const [selectedPlancha, setSelectedPlancha] = useState<string | null>(
-    basePlancha ?? (planchaOptions.length > 0 ? planchaOptions[0].value as string : null)
+    initialSelections?.plancha ?? basePlancha ?? (planchaOptions.length > 0 ? planchaOptions[0].value as string : null)
   );
 
   // --- Déterminer si la sélection courante correspond au produit de base ---

@@ -13,6 +13,12 @@ type ProductConfiguratorProps = {
   reference: string;
   compatibleAccessorySlugs: string[];
   preloadedAccessories?: any[];
+  initialSelections?: {
+    diameter: number;
+    finish: string;
+    plancha: string;
+  };
+  onVariantNavigate?: (selections: ProductSelections) => void;
 };
 
 /**
@@ -27,9 +33,15 @@ export function ProductConfigurator({
   reference,
   compatibleAccessorySlugs,
   preloadedAccessories,
+  initialSelections,
+  onVariantNavigate,
 }: ProductConfiguratorProps) {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [selections, setSelections] = useState<ProductSelections>({ diameter: null, finish: null, plancha: null });
+  const [selections, setSelections] = useState<ProductSelections>({
+    diameter: initialSelections?.diameter ?? null,
+    finish: initialSelections?.finish ?? null,
+    plancha: initialSelections?.plancha ?? null,
+  });
 
   const handleVariantChange = useCallback((variant: ProductVariant | null) => {
     setSelectedVariant(variant);
@@ -37,7 +49,8 @@ export function ProductConfigurator({
 
   const handleSelectionChange = useCallback((sel: ProductSelections) => {
     setSelections(sel);
-  }, []);
+    onVariantNavigate?.(sel);
+  }, [onVariantNavigate]);
 
   // --- Résoudre la sous-fiche de configuration active ---
   // Clé de recherche : "finish-plancha" (ex: "corten-inox")
@@ -164,6 +177,7 @@ export function ProductConfigurator({
             onSelectionChange={handleSelectionChange}
             activeConfig={activeConfig}
             activeDiameterData={activeDiameterData}
+            initialSelections={initialSelections}
           />
         </div>
       </div>

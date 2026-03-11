@@ -1,5 +1,8 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { mapSupabaseProduct } from '@/lib/utils';
+import { getAllVariantSlugs } from '@/lib/variant-slugs';
+import { PRODUCT_COLUMNS } from '@/lib/data/products';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.atelier-lbf.fr';
@@ -148,5 +151,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...infoPages, ...productUrls];
+  // Pages variantes brasero-plancha (SEO individuel par config+diamètre)
+  const { data: allProducts } = await supabase
+    .from('products')
+    .select(PRODUCT_COLUMNS);
+
+  const variantUrls: MetadataRoute.Sitemap = [];
+  if (allProducts) {
+    for (const p of allProducts) {
+      const product = mapSupabaseProduct(p);
+      if (!product) continue;
+      const variants = getAllVariantSlugs(product);
+      for (const v of variants) {
+        variantUrls.push({
+          url: `${baseUrl}/brasero-plancha/${v.variantSlug}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.7,
+        });
+      }
+    }
+  }
+
+  return [...staticPages, ...infoPages, ...productUrls, ...variantUrls];
 }
