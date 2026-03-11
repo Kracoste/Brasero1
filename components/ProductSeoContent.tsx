@@ -2,6 +2,7 @@ import type { Product } from "@/lib/schema";
 
 type SeoSection = {
   title: string;
+  content?: string;
   blocks?: { subtitle?: string; text?: string }[];
   bullets?: string[];
 };
@@ -21,6 +22,19 @@ export const ProductSeoContent = ({ seoContent }: ProductSeoContentProps) => {
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               {section.title}
             </h2>
+
+            {/* Contenu texte simple */}
+            {section.content && (
+              <div className="space-y-3">
+                {section.content.split('\n').map((paragraph, pIdx) => (
+                  paragraph.trim() && (
+                    <p key={pIdx} className="text-sm leading-relaxed text-gray-600">
+                      {paragraph}
+                    </p>
+                  )
+                ))}
+              </div>
+            )}
 
             {/* Blocs texte avec sous-titres */}
             {section.blocks && section.blocks.length > 0 && (

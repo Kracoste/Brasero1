@@ -61,6 +61,7 @@ export type ProductVariant = z.infer<typeof productVariantSchema>;
 const seoContentSchema = z.object({
   sections: z.array(z.object({
     title: z.string(),
+    content: z.string().optional(),
     blocks: z.array(z.object({
       subtitle: z.string().optional(),
       text: z.string().optional(),

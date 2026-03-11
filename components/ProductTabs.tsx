@@ -37,7 +37,7 @@ type ProductTabsProps = {
   /** Caractéristiques override depuis la sous-fiche de configuration */
   overrideCharacteristics?: { label: string; value: string }[];
   /** Contenu SEO override depuis la sous-fiche ou le diamètre */
-  overrideSeoContent?: { sections: { title: string; blocks?: { subtitle?: string; text?: string }[]; bullets?: string[] }[] };
+  overrideSeoContent?: { sections: { title: string; content?: string; blocks?: { subtitle?: string; text?: string }[]; bullets?: string[] }[] };
 };
 
 export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverrides, overrideDescription, overrideFAQ, overrideCharacteristics, overrideSeoContent }: ProductTabsProps) => {
