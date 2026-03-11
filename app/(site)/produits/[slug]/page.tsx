@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
-import { ProductConfigurator } from "@/components/ProductConfigurator";
+import { VariantConfiguratorWrapper } from "@/components/VariantConfiguratorWrapper";
 import { RelatedProducts } from "@/components/RelatedProducts";
 import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
@@ -144,11 +144,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <JsonLd data={faqSchema} />
       <Section className="pt-4 sm:pt-6 lg:pt-10">
         <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
-          <ProductConfigurator
+          <VariantConfiguratorWrapper
             product={product}
             reference={reference}
             compatibleAccessorySlugs={compatibleAccessorySlugs}
             preloadedAccessories={compatibleAccessories}
+            initialSelections={{
+              diameter: product.diameter,
+              finish: product.material?.toLowerCase().includes('corten') ? 'corten' : 'peint',
+              plancha: product.specs?.planchaMaterial ?? 'acier',
+            }}
           />
         </Container>
       </Section>
