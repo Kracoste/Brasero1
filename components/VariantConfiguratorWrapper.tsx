@@ -39,6 +39,11 @@ export function VariantConfiguratorWrapper({
         selections.plancha === initialSelections.plancha
       ) return;
 
+      // Vérifier que la combinaison existe dans les configurations du produit
+      const configKey = `${selections.finish}-${selections.plancha}`;
+      const config = product.configurations?.[configKey];
+      if (!config?.diameters?.[String(selections.diameter)]) return;
+
       const newSlug = generateVariantSlug(
         product.name,
         selections.finish,
@@ -48,7 +53,7 @@ export function VariantConfiguratorWrapper({
 
       router.push(`/brasero-plancha/${newSlug}`);
     },
-    [router, product.name, initialSelections],
+    [router, product.name, product.configurations, initialSelections],
   );
 
   return (
