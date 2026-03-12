@@ -1,21 +1,29 @@
 import type { Product } from '@/lib/schema';
 
 /**
- * Génère un slug de variante à partir des paramètres produit.
- * Format: l-obelix-corten-80-inox
+ * Normalise un nom en slug : supprime accents, caractères spéciaux, etc.
  */
-export function generateVariantSlug(
-  productName: string,
-  finish: string,
-  diameter: number | string,
-  plancha: string,
-): string {
-  const base = productName
+function slugify(text: string): string {
+  return text
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // remove accents
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+}
+
+/**
+ * Génère un slug de variante à partir des paramètres produit.
+ * Utilise shortName si disponible pour des URLs plus propres.
+ * Format: l-obelix-corten-80-inox (au lieu de brasero-acier-100-l-obelix-corten-80-inox)
+ */
+export function generateVariantSlug(
+  productNameOrShortName: string,
+  finish: string,
+  diameter: number | string,
+  plancha: string,
+): string {
+  const base = slugify(productNameOrShortName);
   return `${base}-${finish}-${diameter}-${plancha}`;
 }
 
@@ -76,7 +84,8 @@ export function getAllVariantSlugs(product: Product): {
     if (!finish || !plancha || !config.diameters) continue;
 
     for (const diameter of Object.keys(config.diameters)) {
-      const variantSlug = generateVariantSlug(product.name, finish, diameter, plancha);
+      const nameForSlug = product.specs?.shortName || product.name;
+      const variantSlug = generateVariantSlug(nameForSlug, finish, diameter, plancha);
       results.push({ variantSlug, configKey, diameter, finish, plancha });
     }
   }
@@ -86,19 +95,20 @@ export function getAllVariantSlugs(product: Product): {
 
 /**
  * Trouve le produit correspondant à un slug de variante parmi une liste de produits.
- * Compare le nom normalisé du produit avec la partie productName du slug.
+ * Compare le shortName (prioritaire) puis le name normalisé avec la partie productName du slug.
  */
 export function findProductByVariantSlug(
   products: Product[],
   parsed: { productName: string },
 ): Product | undefined {
   return products.find((p) => {
-    const normalized = p.name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-    return normalized === parsed.productName;
+    // D'abord comparer avec shortName si disponible
+    if (p.specs?.shortName) {
+      const normalizedShort = slugify(p.specs.shortName);
+      if (normalizedShort === parsed.productName) return true;
+    }
+    // Fallback sur le nom complet
+    const normalizedFull = slugify(p.name);
+    return normalizedFull === parsed.productName;
   });
 }

@@ -28,6 +28,7 @@ const specSchema = z.object({
   planchaMaterial: z.enum(["acier", "inox"]).optional(),
   format: z.string().optional(),
   compatibleAccessories: z.array(z.string()).optional(),
+  shortName: z.string().optional(),
   imageScale: z.number().optional(),
   detailImageScale: z.number().optional(),
   detailImageOffsetX: z.number().optional(),
@@ -87,6 +88,8 @@ const diameterDataSchema = z.object({
   bowlThickness: z.number().optional(),
   baseThickness: z.number().optional(),
   description: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
   characteristics: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
   seoContent: seoContentSchema.optional(),
 });

@@ -56,18 +56,18 @@ export async function generateMetadata({ params }: VariantPageProps): Promise<Me
 
   const { product, parsed, diameterData, config } = resolved;
 
-  // Titre et description depuis le SEO content de la sous-fiche
-  const seoContent = diameterData.seoContent || config.seoContent;
   const finishLabel = parsed.finish === 'corten' ? 'Acier Corten' : 'Acier Peint';
   const planchaLabel = parsed.plancha === 'inox' ? 'Plancha Inox' : 'Plancha Acier';
+  const shortName = product.specs?.shortName || product.name;
 
-  // Extraire un titre depuis le premier titre de section SEO si disponible
-  const seoTitle = seoContent?.sections?.[0]?.title;
-  const title = seoTitle
-    ? `${seoTitle} | Atelier LBF`
-    : `${product.name} ${finishLabel} ${parsed.diameter}cm ${planchaLabel} | Atelier LBF`;
-  const description = diameterData.description
-    || `${product.name} en ${finishLabel.toLowerCase()} diamètre ${parsed.diameter}cm avec ${planchaLabel.toLowerCase()}. Brasero artisanal fabriqué en France par l'Atelier LBF.`;
+  // Meta title optimisé pour le clic : priorité metaTitle > génération automatique
+  const title = diameterData.metaTitle
+    || `Brasero ${shortName} ${finishLabel} Ø${parsed.diameter}cm ${planchaLabel} | Fabriqué en France - Atelier LBF`;
+
+  // Meta description optimisée pour la conversion
+  const priceStr = diameterData.price ? ` À partir de ${diameterData.price}€ HT.` : '';
+  const description = diameterData.metaDescription
+    || `Brasero artisanal ${shortName} en ${finishLabel.toLowerCase()} Ø${parsed.diameter}cm avec ${planchaLabel.toLowerCase()}. Fabriqué en France par l'Atelier LBF.${priceStr} Livraison partout en France.`;
 
   const images = config.images?.length
     ? config.images
@@ -111,7 +111,8 @@ export default async function VariantPage({ params }: VariantPageProps) {
   // JSON-LD
   const finishLabel = parsed.finish === 'corten' ? 'Acier Corten' : 'Acier Peint';
   const planchaLabel = parsed.plancha === 'inox' ? 'Plancha Inox' : 'Plancha Acier';
-  const variantName = `${product.name} ${finishLabel} ${parsed.diameter}cm ${planchaLabel}`;
+  const shortName = product.specs?.shortName || product.name;
+  const variantName = `Brasero ${shortName} ${finishLabel} Ø${parsed.diameter}cm ${planchaLabel}`;
 
   const productSchema = generateProductSchema(product, `${variantName} - Brasero artisanal fabriqué en France par l'Atelier LBF.`);
   // Override URL and name for this variant
