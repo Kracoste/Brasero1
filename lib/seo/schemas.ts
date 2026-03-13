@@ -398,6 +398,53 @@ export function generateFAQSchema(faqs: FAQItem[]) {
   };
 }
 
+// ── BlogPosting (Article) ─────────────────────────────────────────────────
+
+export function generateArticleSchema(article: {
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  author: string;
+  published_at: string | null;
+  updated_at: string;
+  featured_image?: { src: string; alt: string } | null;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: article.title,
+    description: article.excerpt || "",
+    url: `${BASE_URL}/blog/${article.slug}`,
+    datePublished: article.published_at || article.updated_at,
+    dateModified: article.updated_at,
+    author: {
+      "@type": "Organization",
+      name: article.author || "Atelier LBF",
+      url: BASE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Atelier LBF",
+      url: BASE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${BASE_URL}/Braserobanner.jpg`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/blog/${article.slug}`,
+    },
+    ...(article.featured_image ? {
+      image: {
+        "@type": "ImageObject",
+        url: article.featured_image.src,
+        caption: article.featured_image.alt,
+      },
+    } : {}),
+  };
+}
+
 // ── Image ALT SEO ──────────────────────────────────────────────────────────
 
 const VIEW_MAP: Record<string, string> = {

@@ -173,5 +173,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticPages, ...infoPages, ...productUrls, ...variantUrls];
+  // Articles de blog
+  const { data: blogPosts } = await supabase
+    .from('blog_posts')
+    .select('slug, published_at, updated_at')
+    .eq('is_published', true)
+    .order('published_at', { ascending: false });
+
+  const blogUrls: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    },
+    ...(blogPosts || []).map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: post.updated_at ? new Date(post.updated_at) : new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
+  ];
+
+  return [...staticPages, ...infoPages, ...productUrls, ...variantUrls, ...blogUrls];
 }

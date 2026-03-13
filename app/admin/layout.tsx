@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ChevronLeft, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ChevronLeft, Menu, X, FileText } from 'lucide-react';
 
 import { AdminSignOutButton } from '@/components/AdminSignOutButton';
 import { AuthProvider } from '@/lib/auth-context';
@@ -17,6 +17,7 @@ const navItems = [
   { href: '/admin/produits', icon: Package, label: 'Produits' },
   { href: '/admin/commandes', icon: ShoppingCart, label: 'Commandes' },
   { href: '/admin/clients', icon: Users, label: 'Clients' },
+  { href: '/admin/blog', icon: FileText, label: 'Blog' },
   { href: '/admin/parametres', icon: Settings, label: 'Paramètres' },
 ];
 
