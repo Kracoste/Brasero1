@@ -79,6 +79,19 @@ export async function getBlogPostsBySlug(slugs: string[]): Promise<BlogPost[]> {
   return (data as BlogPost[]) || [];
 }
 
+export async function getBlogPostsForProduct(productSlug: string, limit: number = 3): Promise<BlogPost[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('blog_posts')
+    .select(BLOG_COLUMNS)
+    .eq('is_published', true)
+    .contains('related_products', [productSlug])
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  return (data as BlogPost[]) || [];
+}
+
 // Admin functions (no is_published filter)
 export async function getAllBlogPostsAdmin(): Promise<BlogPost[]> {
   const supabase = await createClient();

@@ -284,16 +284,22 @@ export function generateProductMetaTitle(product: Product): string {
 
 export function generateProductMetaDescription(product: Product): string {
   const { materialLabel, planchaLabel } = detectFinish(product);
-  const diameterStr = product.diameter ? `${product.diameter}cm` : "";
+  const diameterStr = product.diameter ? ` Ø${product.diameter}cm` : "";
 
+  let desc: string;
   switch (product.category) {
     case "brasero":
-      return `${product.name} : brasero rond artisanal ${materialLabel} de ${diameterStr}, ${planchaLabel} amovible et grille incluse. Fabriqué à la main en France. À partir de ${product.price}€. Garantie 2 ans, livraison soignée.`;
+      desc = `${product.name} : brasero artisanal ${materialLabel}${diameterStr}, ${planchaLabel} et grille. Made in France. Dès ${product.price}€.`;
+      break;
     case "fendeur":
-      return `${product.name} : fendeur à bûches robuste et sécurisé, fabriqué artisanalement en France. ${product.price}€. Garantie 2 ans, livraison France.`;
+      desc = `${product.name} : fendeur à bûches artisanal, robuste et sécurisé. Fabriqué en France. ${product.price}€. Garantie 2 ans.`;
+      break;
     case "accessoire":
     case "range-buches":
     default:
-      return `${product.name} : accessoire artisanal pour brasero, fabriqué en France. ${product.price}€. Compatible avec tous nos braseros. Garantie 2 ans.`;
+      desc = `${product.name} : accessoire brasero artisanal, fabriqué en France. ${product.price}€. Compatible tous braseros. Garantie 2 ans.`;
+      break;
   }
+  // Tronquer à 155 caractères pour Google
+  return desc.length > 155 ? desc.slice(0, 152) + "..." : desc;
 }

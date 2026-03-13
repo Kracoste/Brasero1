@@ -131,7 +131,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const infoPages: MetadataRoute.Sitemap = [
     'a-propos-de-nous',
     'astuces-conseils',
-    'blog',
     'bulletin-information',
     'commande-affaires',
     'commander',
