@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
 import { JsonLd } from "@/components/JsonLd";
-import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
+import { generateBreadcrumbSchema, generateFAQSchema } from "@/lib/seo/schemas";
 import {
   Flame,
   ChefHat,
@@ -14,15 +14,19 @@ import {
   Mail,
   Sparkles,
   Sun,
-  Utensils
+  Utensils,
+  ShieldCheck,
+  Ruler,
+  Thermometer,
+  Wind,
 } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
-  
+
   return {
     title: `Brasero multifonction | Barbecue, plancha et chauffage | ${settings.storeName}`,
-    description: `Découvrez nos braseros multifonctions 3 en 1 : barbecue, plancha et chauffage d'extérieur. Transformez votre jardin en espace convivial toute l'année. Fabriqués en France.`,
+    description: `Brasero multifonction 3 en 1 : barbecue, plancha et chauffage extérieur. Acier corten ou peint, fabriqué en France. Dès 800€. Garantie 2 ans.`,
     keywords: [
       "brasero multifonction",
       "brasero barbecue plancha",
@@ -30,11 +34,13 @@ export async function generateMetadata(): Promise<Metadata> {
       "brasero chauffage extérieur",
       "brasero coin feu jardin",
       "brasero polyvalent",
+      "brasero plancha feu de bois",
+      "brasero cuisson extérieur",
       settings.storeName,
     ],
     openGraph: {
       title: `Brasero multifonction 3 en 1 | ${settings.storeName}`,
-      description: `Barbecue, plancha et chauffage : un seul brasero pour toutes vos envies.`,
+      description: `Barbecue, plancha et chauffage : un seul brasero pour toutes vos envies. Fabriqué en France.`,
       type: "website",
       locale: "fr_FR",
     },
@@ -83,15 +89,44 @@ export default async function BraseroMultifonctionPage() {
     },
   ];
 
+  const faqItems = [
+    {
+      question: "Qu'est-ce qu'un brasero multifonction ?",
+      answer: "Un brasero multifonction est un appareil d'extérieur qui cumule trois fonctions en un seul objet : le chauffage d'ambiance par le feu de bois, la cuisson sur grille (barbecue) et la cuisson sur plancha. Il remplace à lui seul un barbecue, une plancha à gaz et un chauffage de terrasse."
+    },
+    {
+      question: "Quelle différence entre un brasero multifonction et un barbecue classique ?",
+      answer: "Le barbecue ne fait que griller. Le brasero multifonction chauffe votre espace extérieur par rayonnement, cuisine sur plancha (surface lisse, pas de flammes directes) ET grille sur grille comme un barbecue. En plus, il continue à vivre après le repas : on ajoute une bûche et la soirée se prolonge autour du feu."
+    },
+    {
+      question: "Peut-on cuisiner pour combien de personnes sur un brasero multifonction ?",
+      answer: "Cela dépend du diamètre : 2-4 personnes sur un 50 cm, 6-8 personnes sur un 80 cm, 10-12 personnes sur un 100 cm. La plancha offre une surface de cuisson continue où rien ne tombe, contrairement à une grille de barbecue."
+    },
+    {
+      question: "Quel bois utiliser dans un brasero multifonction ?",
+      answer: "Utilisez du bois de feuillus sec (chêne, hêtre, charme) avec un taux d'humidité inférieur à 20%. Évitez les résineux (pin, sapin) qui projettent des étincelles. Les bûches compressées sont aussi une excellente option, compactes et à haut pouvoir calorifique."
+    },
+    {
+      question: "Un brasero multifonction peut-il rester dehors toute l'année ?",
+      answer: "Oui. Nos braseros en acier corten sont conçus pour vivre dehors sans aucun entretien — la patine rouille les protège. Les modèles en acier peint peuvent aussi rester dehors, mais une housse de protection est recommandée pour préserver la finition."
+    },
+    {
+      question: "Combien coûte un brasero multifonction Atelier LBF ?",
+      answer: "Nos braseros multifonctions commencent à partir de 800€ HT pour le format 50 cm et vont jusqu'à 3 200€ HT pour les grands formats 100 cm en acier corten. Le prix inclut la grille de cuisson. La plancha est disponible en option ou incluse selon le modèle."
+    },
+  ];
+
   const breadcrumb = generateBreadcrumbSchema([
     { name: "Accueil", url: "/" },
     { name: "Brasero multifonction", url: "/brasero-multifonction" },
   ]);
 
+  const faqSchema = generateFAQSchema(faqItems);
+
   return (
     <main className="bg-white">
       <JsonLd data={breadcrumb} />
-      {/* Schema.org */}
+      {faqSchema && <JsonLd data={faqSchema} />}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -99,7 +134,7 @@ export default async function BraseroMultifonctionPage() {
             "@context": "https://schema.org",
             "@type": "Product",
             "name": "Brasero multifonction 3 en 1",
-            "description": "Brasero artisanal multifonction : barbecue, plancha et chauffage d'extérieur",
+            "description": "Brasero artisanal multifonction : barbecue, plancha et chauffage d'extérieur. Fabriqué en France.",
             "brand": {
               "@type": "Brand",
               "name": settings.storeName
@@ -129,7 +164,7 @@ export default async function BraseroMultifonctionPage() {
               Brasero <span className="text-[#CD853F]">multifonction</span>
             </h1>
             <p className="mt-6 text-xl text-slate-600 leading-relaxed">
-              Un seul équipement pour trois usages : barbecue, plancha et chauffage d&apos;extérieur. 
+              Un seul équipement pour trois usages : barbecue, plancha et chauffage d&apos;extérieur.
               Créez un coin chaleureux dans votre jardin et profitez-en toute l&apos;année.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
@@ -141,7 +176,7 @@ export default async function BraseroMultifonctionPage() {
                 <ArrowRight size={18} />
               </Link>
               <Link
-                href="/contact"
+                href="/info/contact"
                 className="inline-flex items-center gap-2 bg-[#1a1a1a] hover:bg-slate-800 text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
               >
                 Demander un devis
@@ -179,6 +214,204 @@ export default async function BraseroMultifonctionPage() {
         </div>
       </section>
 
+      {/* Contenu SEO détaillé — barbecue */}
+      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 mb-8 text-center">
+            Barbecue, plancha ou chauffage : comment ça marche ?
+          </h2>
+
+          <div className="space-y-10">
+            {/* Barbecue */}
+            <div className="bg-white p-6 sm:p-8 border border-slate-200">
+              <div className="flex items-center gap-3 mb-4">
+                <ChefHat className="w-6 h-6 text-[#CD853F]" />
+                <h3 className="text-2xl font-display font-semibold text-slate-900">Mode barbecue : la grille au feu de bois</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-4">
+                Retirez la plancha et posez la grille de cuisson directement au-dessus du foyer. Les braises de bois dur (chêne, hêtre, charme) produisent une chaleur intense et régulière qui saisit viandes, poissons et légumes avec ce goût fumé unique que seul le feu de bois peut offrir.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Contrairement au charbon de barbecue classique, les braises de feuillus brûlent plus proprement et plus longtemps. La grille est amovible : vous passez du barbecue à la plancha en 10 secondes, sans outil.
+              </p>
+            </div>
+
+            {/* Plancha */}
+            <div className="bg-white p-6 sm:p-8 border border-slate-200">
+              <div className="flex items-center gap-3 mb-4">
+                <Utensils className="w-6 h-6 text-[#CD853F]" />
+                <h3 className="text-2xl font-display font-semibold text-slate-900">Mode plancha : la cuisson des chefs</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-4">
+                La plancha offre une surface de cuisson continue en acier — <Link href="/blog/plancha-inox-ou-acier-carbone" className="text-[#8B4513] hover:underline font-medium">inox (10 mm) ou acier carbone (8 mm)</Link> selon votre préférence. Rien ne tombe, rien ne brûle directement. Les graisses ne tombent pas dans le feu, ce qui rend la cuisson plus saine et sans flammes parasites.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Sur la plancha, vous pouvez cuisiner tout ce qu&apos;un barbecue ne peut pas : crevettes, œufs, légumes émincés, fromage grillé, fruits caramélisés. La réaction de Maillard (cette croûte dorée) se déclenche rapidement grâce à la chaleur intense du feu de bois transmise par l&apos;acier.
+              </p>
+            </div>
+
+            {/* Chauffage */}
+            <div className="bg-white p-6 sm:p-8 border border-slate-200">
+              <div className="flex items-center gap-3 mb-4">
+                <Flame className="w-6 h-6 text-[#CD853F]" />
+                <h3 className="text-2xl font-display font-semibold text-slate-900">Mode chauffage : la flamme vivante</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-4">
+                Retirez plancha et grille : votre brasero devient un foyer ouvert. La flamme danse, les braises rougeoient, et la chaleur rayonne dans un rayon de 3 à 5 mètres autour du foyer. Vos invités restent dehors bien après le repas, un verre à la main, face au feu.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                En automne et en hiver, le brasero transforme votre terrasse en espace de vie extérieur chauffé. Là où un chauffage de terrasse électrique ou à gaz diffuse une chaleur artificielle, le brasero offre un rayonnement naturel et une ambiance que rien ne peut remplacer.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparatif vs appareils séparés */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 mb-4 text-center">
+            Brasero multifonction vs équipements séparés
+          </h2>
+          <p className="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+            Un brasero plancha remplace trois appareils distincts. Voici le comparatif.
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border border-slate-200">
+              <thead>
+                <tr className="bg-[#f6f1e9]">
+                  <th className="p-4 font-semibold text-slate-900 border-b border-slate-200">Critère</th>
+                  <th className="p-4 font-semibold text-[#8B4513] border-b border-slate-200">Brasero multifonction</th>
+                  <th className="p-4 font-semibold text-slate-500 border-b border-slate-200">BBQ + plancha + parasol chauffant</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm text-slate-600">
+                <tr className="border-b border-slate-100">
+                  <td className="p-4 font-medium text-slate-900">Prix total</td>
+                  <td className="p-4">800 — 3 200 €</td>
+                  <td className="p-4">700 — 1 900 € (3 appareils)</td>
+                </tr>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  <td className="p-4 font-medium text-slate-900">Encombrement</td>
+                  <td className="p-4">1 appareil, socle 55×55 cm</td>
+                  <td className="p-4">3 appareils, 3 emplacements</td>
+                </tr>
+                <tr className="border-b border-slate-100">
+                  <td className="p-4 font-medium text-slate-900">Durée de vie</td>
+                  <td className="p-4 font-medium text-[#8B4513]">20+ ans (acier 3 mm)</td>
+                  <td className="p-4">2-5 ans par appareil</td>
+                </tr>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  <td className="p-4 font-medium text-slate-900">Combustible</td>
+                  <td className="p-4">Bois (gratuit ou pas cher)</td>
+                  <td className="p-4">Charbon + gaz + électricité</td>
+                </tr>
+                <tr className="border-b border-slate-100">
+                  <td className="p-4 font-medium text-slate-900">Ambiance</td>
+                  <td className="p-4 font-medium text-[#8B4513]">Flamme vivante, convivialité</td>
+                  <td className="p-4">Aucune ambiance particulière</td>
+                </tr>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  <td className="p-4 font-medium text-slate-900">Cuisson</td>
+                  <td className="p-4">Grille + plancha au feu de bois</td>
+                  <td className="p-4">Grille charbon + plancha gaz</td>
+                </tr>
+                <tr>
+                  <td className="p-4 font-medium text-slate-900">Entretien</td>
+                  <td className="p-4">Spatule + chiffon (2 min)</td>
+                  <td className="p-4">3 nettoyages distincts</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-6 text-slate-600 text-center text-sm">
+            Sur 20 ans, un brasero multifonction à 1 200 € coûte 60 €/an — contre 75 €/an pour des appareils jetables remplacés tous les 3 ans.
+          </p>
+        </div>
+      </section>
+
+      {/* Tailles */}
+      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 mb-4 text-center">
+            Quel diamètre pour votre tablée ?
+          </h2>
+          <p className="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+            Nos braseros multifonctions sont disponibles en 3 diamètres. <Link href="/blog/quel-brasero-choisir-nombre-convives" className="text-[#8B4513] hover:underline font-medium">Voir le guide complet</Link>.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white p-6 sm:p-8 border border-slate-200 text-center">
+              <Ruler className="w-8 h-8 text-[#CD853F] mx-auto mb-3" />
+              <div className="text-3xl font-bold text-slate-900 mb-1">50 cm</div>
+              <div className="text-[#CD853F] font-semibold mb-4">2 à 4 convives</div>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Le format compact. Idéal pour les repas en duo ou les apéritifs plancha à quatre. Montée en température rapide, faible consommation de bois. À partir de 67 kg.
+              </p>
+            </div>
+            <div className="bg-white p-6 sm:p-8 border-2 border-[#CD853F] text-center relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#CD853F] text-white text-xs font-bold px-3 py-1 uppercase tracking-wide">Le plus populaire</div>
+              <Ruler className="w-8 h-8 text-[#CD853F] mx-auto mb-3" />
+              <div className="text-3xl font-bold text-slate-900 mb-1">80 cm</div>
+              <div className="text-[#CD853F] font-semibold mb-4">6 à 8 convives</div>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Le format convivial. Assez grand pour cuisiner viandes et légumes en simultané, sans cuire en plusieurs fois. L&apos;équilibre parfait taille/performance.
+              </p>
+            </div>
+            <div className="bg-white p-6 sm:p-8 border border-slate-200 text-center">
+              <Ruler className="w-8 h-8 text-[#CD853F] mx-auto mb-3" />
+              <div className="text-3xl font-bold text-slate-900 mb-1">100 cm</div>
+              <div className="text-[#CD853F] font-semibold mb-4">10 à 12 convives</div>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Le grand format. Surface immense pour les grandes tablées et les événements. Zones de chaleur distinctes pour cuire plusieurs plats en parallèle.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Matériaux */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 mb-8 text-center">
+            Acier corten ou acier peint ?
+          </h2>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+              <div className="flex items-center gap-2 mb-4">
+                <Wind className="w-5 h-5 text-[#CD853F]" />
+                <h3 className="text-xl font-semibold text-slate-900">Acier corten</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-4">
+                L&apos;acier corten développe naturellement une patine rouille protectrice. <Link href="/blog/brasero-corten-avantages-inconvenients" className="text-[#8B4513] hover:underline font-medium">Zéro entretien</Link>, résistance totale aux intempéries, esthétique vivante qui évolue avec le temps.
+              </p>
+              <ul className="space-y-2 text-sm text-slate-600">
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-[#CD853F] flex-shrink-0 mt-0.5" /> Aucun entretien nécessaire</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-[#CD853F] flex-shrink-0 mt-0.5" /> Patine unique à chaque brasero</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-[#CD853F] flex-shrink-0 mt-0.5" /> Durée de vie 50+ ans</li>
+              </ul>
+            </div>
+            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheck className="w-5 h-5 text-[#CD853F]" />
+                <h3 className="text-xl font-semibold text-slate-900">Acier peint noir</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-4">
+                Finition thermolaquée haute température. Aspect noir mat élégant et constant, protection durable contre la corrosion. Housse recommandée pour un entretien optimal.
+              </p>
+              <ul className="space-y-2 text-sm text-slate-600">
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-[#CD853F] flex-shrink-0 mt-0.5" /> Aspect noir mat uniforme</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-[#CD853F] flex-shrink-0 mt-0.5" /> Pas de coulures de rouille</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-4 h-4 text-[#CD853F] flex-shrink-0 mt-0.5" /> Prix légèrement inférieur</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Usages */}
       <section className="py-16 sm:py-24 bg-[#f6f1e9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -187,7 +420,7 @@ export default async function BraseroMultifonctionPage() {
               Pour toutes vos occasions
             </h2>
             <p className="mt-4 text-lg text-slate-600">
-              Un brasero qui s&apos;adapte à vos besoins
+              Un brasero qui s&apos;adapte à vos besoins, toute l&apos;année
             </p>
           </div>
 
@@ -223,6 +456,8 @@ export default async function BraseroMultifonctionPage() {
                 "Grille et plancha incluses ou en option selon les modèles",
                 "Acier corten ou acier peint haute température",
                 "Fabrication artisanale française à Moncoutant",
+                "Range-bûches intégré : le bois est toujours à portée de main",
+                "Hauteur de travail ergonomique (93 cm) pour cuisiner debout",
               ].map((item, index) => (
                 <li key={index} className="flex items-start gap-4">
                   <CheckCircle2 className="w-6 h-6 text-[#CD853F] flex-shrink-0 mt-0.5" />
@@ -230,6 +465,51 @@ export default async function BraseroMultifonctionPage() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Articles liés */}
+      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-8 text-center">
+            Guides pour bien choisir et utiliser votre brasero
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <Link href="/blog/brasero-plancha-vs-barbecue" className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
+              <span className="text-xs text-[#8B4513] font-medium">Guide</span>
+              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Brasero plancha vs barbecue : le comparatif</h3>
+            </Link>
+            <Link href="/blog/quel-brasero-choisir-nombre-convives" className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
+              <span className="text-xs text-[#8B4513] font-medium">Guide</span>
+              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Quel brasero choisir selon vos convives</h3>
+            </Link>
+            <Link href="/blog/temperature-cuisson-brasero-plancha" className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
+              <span className="text-xs text-[#8B4513] font-medium">Cuisson</span>
+              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Maîtriser la température de cuisson</h3>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 mb-10 text-center">
+            Questions fréquentes sur le brasero multifonction
+          </h2>
+          <div className="space-y-4">
+            {faqItems.map((faq, index) => (
+              <details key={index} className="bg-[#f6f1e9] border border-slate-200 group">
+                <summary className="p-5 sm:p-6 cursor-pointer font-semibold text-slate-900 hover:text-[#8B4513] transition-colors list-none flex items-center justify-between">
+                  {faq.question}
+                  <span className="text-[#CD853F] text-xl ml-4 group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-slate-600 leading-relaxed">
+                  {faq.answer}
+                </div>
+              </details>
+            ))}
           </div>
         </div>
       </section>
@@ -265,14 +545,14 @@ export default async function BraseroMultifonctionPage() {
       <section className="py-12 bg-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
-            <a 
+            <a
               href={`mailto:${settings.storeEmail}`}
               className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
             >
               <Mail className="w-4 h-4 text-[#8B4513]" />
               <span>{settings.storeEmail}</span>
             </a>
-            <a 
+            <a
               href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
               className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
             >
