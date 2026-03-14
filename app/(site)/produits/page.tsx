@@ -142,11 +142,31 @@ export default async function ProductsPage({ searchParams }: Props) {
       : []),
   ];
 
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: title,
+    description: description,
+    url: category
+      ? `https://www.atelier-lbf.fr/produits?category=${category}`
+      : "https://www.atelier-lbf.fr/produits",
+    numberOfItems: filteredProducts.length,
+    provider: {
+      "@type": "Organization",
+      name: "Atelier LBF",
+      url: "https://www.atelier-lbf.fr",
+    },
+  };
+
   return (
     <Section className="pb-24 bg-[var(--background)]">
       <JsonLd data={generateBreadcrumbSchema(breadcrumbItems)} />
+      <JsonLd data={collectionSchema} />
       <Container className={containerClass}>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2d2d2d] mb-4 sm:mb-8">{title.toUpperCase()}</h1>
+        <p className="text-slate-600 leading-relaxed max-w-3xl mb-8">
+          {description}
+        </p>
         <div>
           <CatalogueView
             products={filteredProducts}

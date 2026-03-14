@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     const missingSlugs = productSlugs.filter((slug) => !productsBySlug.has(slug));
     if (missingSlugs.length > 0) {
       return NextResponse.json(
-        { error: 'Produit introuvable', details: missingSlugs },
+        { error: 'Un ou plusieurs produits sont introuvables' },
         { status: 400 }
       );
     }

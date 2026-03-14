@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const { data: _data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [ADMIN_EMAIL],
-      replyTo: email.trim(),
+      replyTo: email.trim().replace(/[\r\n]/g, ''),
       subject: safeSubject || `Nouveau message de ${safeName} via le site`,
       html: `
         <!DOCTYPE html>

@@ -408,7 +408,13 @@ export function generateArticleSchema(article: {
   published_at: string | null;
   updated_at: string;
   featured_image?: { src: string; alt: string } | null;
+  content?: string | null;
+  read_time?: number | null;
 }) {
+  const wordCount = article.content
+    ? article.content.split(/\s+/).filter(Boolean).length
+    : undefined;
+
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -417,6 +423,8 @@ export function generateArticleSchema(article: {
     url: `${BASE_URL}/blog/${article.slug}`,
     datePublished: article.published_at || article.updated_at,
     dateModified: article.updated_at,
+    ...(wordCount ? { wordCount } : {}),
+    ...(article.read_time ? { timeRequired: `PT${article.read_time}M` } : {}),
     author: {
       "@type": "Organization",
       name: article.author || "Atelier LBF",

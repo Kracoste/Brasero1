@@ -98,6 +98,8 @@ export async function POST(request: Request) {
     const { error } = await adminClient.from("conversion_events").insert({
       session_id: body.sessionId,
       visitor_id: body.visitorId,
+      // userId non vérifié côté auth (analytics anonyme) — on le garde pour corrélation
+      // mais il ne donne accès à rien de sensible
       user_id: body.userId && isValidUUID(body.userId) ? body.userId : null,
       event_type: body.eventType,
       product_slug: sanitizeString(body.productSlug, 100),

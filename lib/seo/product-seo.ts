@@ -79,19 +79,39 @@ function generateAccessoireDescription(product: Product): string {
   const name = product.name.toLowerCase();
 
   if (name.includes("pique")) {
-    return `La ${product.name} est un accessoire indispensable pour votre brasero artisanal. Fabriquée en France dans notre atelier de Moncoutant, cette pique de qualité professionnelle vous permet de manipuler vos braises et aliments avec précision au-dessus du feu. Robuste et ergonomique, elle complète parfaitement votre équipement de cuisson au brasero. Garantie 2 ans.`;
+    return `La ${product.name} est un accessoire indispensable pour votre brasero artisanal. Fabriquée en France dans notre atelier de Moncoutant (Deux-Sèvres), cette pique de qualité professionnelle vous permet de manipuler vos braises et aliments avec précision au-dessus du feu.
+
+Son manche ergonomique offre une prise en main confortable et sécurisée, même avec des gants de protection. La longueur est calculée pour maintenir vos mains à distance des flammes tout en gardant un contrôle total sur vos braises. L'acier utilisé résiste aux températures extrêmes du foyer sans se déformer.
+
+Que vous repositionniez des bûches pour optimiser la combustion, que vous écartiez des braises pour créer des zones de chaleur, ou que vous retourniez un aliment directement sur la grille, la ${product.name} est l'outil qui manque à votre arsenal de cuisson au feu de bois. Compatible avec tous les braseros Atelier LBF (Le Morris, Le Fermier, L'Obélix) dans toutes les tailles. Fabriquée en France, garantie 2 ans, livraison soignée.`;
   }
   if (name.includes("spatule")) {
-    return `La ${product.name} est l'accessoire de cuisson idéal pour votre brasero et plancha. Fabriquée artisanalement en France, cette spatule professionnelle vous offre un contrôle parfait pour retourner viandes, légumes et poissons sur votre plancha ou grille de brasero. Manche ergonomique, acier de qualité, conçue pour durer. Garantie 2 ans.`;
+    return `La ${product.name} est l'accessoire de cuisson essentiel pour votre brasero plancha. Fabriquée artisanalement en France dans notre atelier de Moncoutant, cette spatule professionnelle vous offre un contrôle parfait pour retourner viandes, légumes et poissons sur votre plancha ou grille de brasero.
+
+Sa lame en acier est suffisamment fine pour glisser sous les aliments sans les abîmer, et suffisamment rigide pour retourner une entrecôte ou un pavé de saumon sans risque. Le manche ergonomique assure une prise en main naturelle, même pendant les longues sessions de cuisson.
+
+La spatule est l'outil le plus utilisé en cuisson plancha : elle sert à retourner, à déplacer les aliments entre les zones chaudes et tièdes de la plancha, et à racler les résidus après cuisson pour entretenir le culottage (sur plancha acier carbone) ou nettoyer la surface (sur plancha inox). Compatible avec tous les braseros plancha Atelier LBF. Fabriquée en France, garantie 2 ans.`;
   }
   if (name.includes("plancha") || name.includes("découper") || name.includes("acajou")) {
-    return `La ${product.name} en bois d'acajou est un accessoire haut de gamme pour compléter votre expérience de cuisson au brasero. Ce bois noble offre une surface de découpe élégante et durable, résistante aux entailles. Parfaite pour préparer et présenter vos viandes, fromages et accompagnements lors de vos soirées barbecue au brasero. Un objet artisanal qui allie fonctionnalité et esthétique.`;
+    return `La ${product.name} en bois d'acajou est un accessoire haut de gamme pour compléter votre expérience de cuisson au brasero. Ce bois noble, reconnu pour sa densité et sa résistance naturelle, offre une surface de découpe élégante et durable qui ne marque pas les lames de vos couteaux.
+
+L'acajou est un bois tropical aux propriétés antibactériennes naturelles, ce qui en fait un choix idéal pour la découpe et la présentation alimentaire. Sa texture serrée empêche les jus de viande de pénétrer en profondeur, facilitant le nettoyage après chaque utilisation.
+
+Utilisez cette planche pour découper vos viandes grillées directement à table, présenter vos plateaux de fromages et charcuteries en apéritif, ou préparer vos légumes avant de les poser sur la plancha. Son format est pensé pour s'intégrer naturellement à vos repas autour du brasero — à la fois outil de cuisine et objet de présentation. Compatible avec tous les braseros Atelier LBF. Garantie 2 ans.`;
   }
   if (name.includes("kit") || name.includes("ustensile")) {
-    return `Le ${product.name} regroupe tous les accessoires essentiels pour cuisiner sur votre brasero artisanal. Ce kit complet vous équipe pour griller, retourner et servir vos préparations avec aisance. Chaque ustensile est fabriqué avec des matériaux de qualité pour résister à la chaleur intense du feu de bois. L'ensemble idéal pour profiter pleinement de votre brasero. Fabriqué en France, garanti 2 ans.`;
+    return `Le ${product.name} regroupe tous les accessoires essentiels pour cuisiner sur votre brasero artisanal. Ce kit complet vous équipe pour griller, retourner et servir vos préparations avec aisance, du premier feu à la dernière assiette.
+
+Chaque ustensile est fabriqué avec des matériaux de qualité pour résister à la chaleur intense du feu de bois. Les manches sont conçus pour rester confortables même pendant les longues sessions de cuisson, et les parties métalliques supportent les températures extrêmes sans se déformer.
+
+Avec ce kit, vous avez tout ce qu'il faut pour gérer votre brasero comme un professionnel : préparer le feu, gérer les braises, saisir vos aliments sur la plancha ou la grille, et nettoyer la surface après cuisson. L'ensemble idéal pour profiter pleinement de votre brasero. Compatible avec tous les braseros Atelier LBF. Fabriqué en France, garanti 2 ans.`;
   }
 
-  return `${product.name} — accessoire artisanal pour brasero, fabriqué en France dans notre atelier de Moncoutant (Deux-Sèvres). Conçu pour compléter votre brasero et améliorer votre expérience de cuisson en extérieur. Matériaux de qualité, garanti 2 ans, livraison soignée partout en France.`;
+  return `${product.name} — accessoire artisanal pour brasero, fabriqué en France dans notre atelier de Moncoutant (Deux-Sèvres). Conçu pour compléter votre brasero et améliorer votre expérience de cuisson en extérieur.
+
+Chaque accessoire de notre gamme est pensé pour fonctionner en parfaite harmonie avec nos braseros. Les matériaux sont sélectionnés pour leur résistance à la chaleur et leur durabilité : vous investissez dans un outil qui vous accompagnera pendant des années de cuissons au feu de bois.
+
+Compatible avec l'ensemble de la gamme Atelier LBF (Le Morris, Le Fermier, L'Obélix) dans toutes les tailles (50, 80 et 100 cm). Matériaux de qualité, garanti 2 ans, livraison soignée partout en France.`;
 }
 
 // ── FAQ SEO par catégorie ──────────────────────────────────────────────────
@@ -158,11 +178,27 @@ function generateAccessoireFAQ(product: Product): Array<{ question: string; answ
   return [
     {
       question: `${product.name} est-il compatible avec tous les braseros Atelier LBF ?`,
-      answer: `Oui, ${product.name} est conçu pour être compatible avec l'ensemble de notre gamme de braseros (Le Morris, Le Fermier, L'Obélix) dans toutes les tailles (50 cm, 80 cm, 100 cm).`,
+      answer: `Oui, ${product.name} est conçu pour être compatible avec l'ensemble de notre gamme de braseros (Le Morris, Le Fermier, L'Obélix) dans toutes les tailles (50 cm, 80 cm, 100 cm). Aucun adaptateur nécessaire.`,
     },
     {
       question: `Quelle est la garantie sur ${product.name} ?`,
-      answer: `${product.name} bénéficie de la même garantie fabricant de 2 ans que tous nos produits. Fabriqué en France dans notre atelier de Moncoutant.`,
+      answer: `${product.name} bénéficie de la même garantie fabricant de 2 ans que tous nos produits. Fabriqué en France dans notre atelier de Moncoutant (Deux-Sèvres). Notre SAV est joignable par téléphone et email.`,
+    },
+    {
+      question: `Comment entretenir ${product.name} ?`,
+      answer: `Après chaque utilisation, nettoyez ${product.name} avec un chiffon humide et séchez-le. Pour les pièces en acier, un léger huilage après nettoyage prolonge la durée de vie. Évitez de laisser les accessoires mouillés à l'extérieur pour prévenir la rouille.`,
+    },
+    {
+      question: `${product.name} est-il livré avec le brasero ?`,
+      answer: `${product.name} est vendu séparément. Nos braseros sont livrés avec une grille de cuisson incluse. La plancha et les accessoires complémentaires sont disponibles en option pour personnaliser votre expérience de cuisson.`,
+    },
+    {
+      question: `Quel est le délai de livraison pour ${product.name} ?`,
+      answer: `${product.name} est expédié sous 5 à 10 jours ouvrés partout en France métropolitaine. L'emballage est soigné pour garantir une réception en parfait état. La livraison peut être combinée avec une commande de brasero.`,
+    },
+    {
+      question: `${product.name} résiste-t-il à la chaleur du brasero ?`,
+      answer: `Oui, tous nos accessoires sont conçus pour résister aux températures élevées du feu de bois (jusqu'à 500°C et plus). Les matériaux sont sélectionnés pour leur tenue thermique et leur durabilité dans des conditions d'utilisation intensives.`,
     },
   ];
 }

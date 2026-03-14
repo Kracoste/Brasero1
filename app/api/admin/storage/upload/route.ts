@@ -40,6 +40,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Fichier et nom requis' }, { status: 400 });
     }
 
+    // Valider le type MIME (images uniquement)
+    const ALLOWED_MIME_TYPES = [
+      'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/avif',
+    ];
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: 'Type de fichier non autorisé. Images uniquement (JPEG, PNG, WebP, GIF, SVG, AVIF).' }, { status: 400 });
+    }
+
+    // Limiter la taille (10 Mo max)
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Fichier trop volumineux (max 10 Mo)' }, { status: 400 });
+    }
+
     // Valider le bucket
     if (!ALLOWED_STORAGE_BUCKETS.includes(bucket as any)) {
       return NextResponse.json({ error: 'Bucket non autorisé' }, { status: 400 });
@@ -80,6 +93,12 @@ export async function POST(request: NextRequest) {
 // DELETE: Supprimer une image de Storage
 export async function DELETE(request: NextRequest) {
   try {
+    // Rate limiting pour éviter les suppressions massives (20/minute)
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`storage-delete-${clientIP}`, 20, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }, { status: 429 });
+    }
+
     // Vérifier l'authentification admin
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();

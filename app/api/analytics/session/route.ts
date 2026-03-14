@@ -42,9 +42,8 @@ const hashIP = (ip: string): string => {
   // En production, ANALYTICS_SECRET doit être défini.
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-  const secret = process.env.ANALYTICS_SECRET || 
-    (serviceKey.slice(0, 32) + supabaseUrl) || 
-    'dev-only-static-fallback-key';
+  const derived = serviceKey.slice(0, 32) + supabaseUrl;
+  const secret = process.env.ANALYTICS_SECRET || (derived.length > 0 ? derived : 'dev-' + Date.now());
   return createHash('sha256').update(ip + secret).digest('hex').slice(0, 32);
 };
 

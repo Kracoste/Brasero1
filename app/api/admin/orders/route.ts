@@ -124,10 +124,8 @@ export async function PUT(request: NextRequest) {
     if (updateError) {
       devError('Erreur mise à jour commande:', JSON.stringify(updateError));
       devError('updateData était:', JSON.stringify(updateData));
-      return NextResponse.json({ 
-        error: `Erreur: ${updateError.message || 'inconnue'}`,
-        details: updateError,
-        update_data: updateData,
+      return NextResponse.json({
+        error: 'Erreur lors de la mise à jour de la commande',
       }, { status: 500 });
     }
 
@@ -178,8 +176,8 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     devError('Erreur PUT order:', error);
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : 'Erreur serveur',
+    return NextResponse.json({
+      error: 'Erreur serveur',
     }, { status: 500 });
   }
 }
