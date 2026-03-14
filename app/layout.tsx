@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -20,6 +20,13 @@ const displayFont = Space_Grotesk({
 });
 
 const baseUrl = new URL("https://www.atelier-lbf.fr");
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#1a1a1a",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -58,10 +65,10 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: settings.storeName,
       images: [
         {
-          url: `${baseUrl.href}Braserobanner.jpg`,
+          url: `${baseUrl.href}Produits/og-brasero.webp`,
           width: 1200,
           height: 630,
-          alt: `Brasero artisanal en acier corten fabriqué en France — ${settings.storeName}`,
+          alt: `Brasero plancha artisanal en acier corten avec range-bûches — ${settings.storeName}`,
         },
       ],
       locale: "fr_FR",
@@ -72,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `${settings.storeName} — Braseros artisanaux Made in France`,
       description: `Braseros artisanaux en acier corten, fendeurs à bûches et accessoires. Fabriqués à la main à ${settings.atelier.city}. Livraison France.`,
       images: [
-        `${baseUrl.href}Braserobanner.jpg`,
+        `${baseUrl.href}Produits/og-brasero.webp`,
       ],
     },
     manifest: "/manifest.json",
