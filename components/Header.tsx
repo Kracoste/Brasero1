@@ -128,6 +128,18 @@ export const Header = () => {
           
           {/* Icônes à droite - toujours visibles */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-shrink-0">
+            {/* Badge Klarna */}
+            <div className="hidden sm:flex flex-col items-center gap-0.5">
+              <Image
+                src="/logos/klarna.svg"
+                alt="Klarna"
+                width={52}
+                height={20}
+                className="h-5 w-auto"
+              />
+              <span className="text-[7px] uppercase tracking-wide text-slate-500 leading-none whitespace-nowrap">Payer en plusieurs fois</span>
+            </div>
+
             {/* Sélecteur de langue */}
             <LanguageSelector />
             
