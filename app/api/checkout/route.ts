@@ -30,6 +30,7 @@ type CheckoutBody = {
     country: string;
   };
   deliveryMessage?: string;
+  paymentMethod?: 'card' | 'klarna';
 };
 
 const parseQuantity = (value: unknown) => {
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CheckoutBody = await request.json();
-    const { items, customerInfo, deliveryMessage } = body;
+    const { items, customerInfo, deliveryMessage, paymentMethod } = body;
 
     // ============================================
     // SÉCURITÉ : Validation des entrées
@@ -193,7 +194,7 @@ export async function POST(request: NextRequest) {
 
     // Créer la session de checkout Stripe
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'klarna'],
+      payment_method_types: paymentMethod === 'klarna' ? ['klarna'] : ['card', 'link'],
       line_items: lineItems,
       mode: 'payment',
       success_url: `${origin}/commande/succes?session_id={CHECKOUT_SESSION_ID}`,

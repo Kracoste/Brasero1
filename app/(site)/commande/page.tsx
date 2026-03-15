@@ -41,7 +41,7 @@ const emptyCheckoutForm: CheckoutForm = {
 
 type CheckoutSection = 'infos' | 'address' | 'delivery' | 'payment';
 type DeliveryOption = 'db-schenker';
-type PaymentOption = 'card' | 'bank';
+type PaymentOption = 'card' | 'klarna' | 'bank';
 
 // Composant SectionHeader extrait pour éviter la recréation pendant le render
 function SectionHeader({ 
@@ -237,8 +237,8 @@ export default function CheckoutPage() {
 
     setPaymentError(null);
 
-    if (paymentMethod === 'card') {
-      // Paiement par carte via Stripe
+    if (paymentMethod === 'card' || paymentMethod === 'klarna') {
+      // Paiement via Stripe (carte ou Klarna)
       setIsProcessingPayment(true);
 
       try {
@@ -268,6 +268,7 @@ export default function CheckoutPage() {
               country: checkoutForm.country,
             },
             deliveryMessage,
+            paymentMethod,
           }),
         });
 
@@ -733,6 +734,11 @@ export default function CheckoutPage() {
                         id: 'card',
                         label: 'Carte de crédit',
                         description: 'Visa, Mastercard et Amex. Paiement sécurisé par Stripe.',
+                      },
+                      {
+                        id: 'klarna',
+                        label: 'Payer en plusieurs fois avec Klarna',
+                        description: 'Payez en 3 fois sans frais. Paiement sécurisé par Klarna.',
                       },
                       {
                         id: 'bank',
