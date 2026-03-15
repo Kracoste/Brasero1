@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
 
     // Créer la session de checkout Stripe
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'klarna'],
       line_items: lineItems,
       mode: 'payment',
       success_url: `${origin}/commande/succes?session_id={CHECKOUT_SESSION_ID}`,
