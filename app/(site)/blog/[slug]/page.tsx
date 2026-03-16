@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock, Calendar } from "lucide-react";
+import { ShareButtons } from "@/components/ShareButtons";
 
 import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
@@ -254,6 +255,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {renderMarkdown(post.content)}
           </article>
 
+          {/* Boutons de partage */}
+          <div className="mt-10 pt-6 border-t border-slate-200">
+            <p className="text-sm font-semibold text-slate-700 mb-3">Partager cet article</p>
+            <ShareButtons slug={slug} title={post.title} />
+          </div>
+
           {/* CTA Product */}
           {post.cta_product_slug && (
             <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200">
@@ -269,6 +276,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </Link>
             </div>
           )}
+
+          {/* Newsletter CTA */}
+          <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+              Recevez nos conseils brasero & plancha
+            </h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Guides, recettes et offres exclusives directement dans votre boîte mail.
+            </p>
+            <Link
+              href="/info/bulletin-information"
+              className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-medium tracking-wide uppercase px-6 py-3 transition-all text-sm"
+            >
+              S&apos;inscrire à la newsletter
+            </Link>
+          </div>
 
           {/* Related articles */}
           {relatedPosts.length > 0 && (

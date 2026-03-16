@@ -372,6 +372,38 @@ export default function CheckoutPage() {
           </Link>
         </div>
 
+        {/* Barre de progression */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            {[
+              { label: 'Panier', section: null as CheckoutSection | null, done: true },
+              { label: 'Informations', section: 'infos' as CheckoutSection, done: completedSections.infos },
+              { label: 'Livraison', section: 'delivery' as CheckoutSection, done: completedSections.delivery },
+              { label: 'Paiement', section: 'payment' as CheckoutSection, done: completedSections.payment },
+            ].map((step, i, arr) => (
+              <div key={step.label} className="flex items-center flex-1">
+                <div className="flex flex-col items-center">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                    step.done
+                      ? 'bg-emerald-500 text-white'
+                      : step.section === activeSection
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-200 text-slate-400'
+                  }`}>
+                    {step.done ? <Check className="w-4 h-4" /> : i + 1}
+                  </div>
+                  <span className={`mt-1 text-[10px] font-medium ${
+                    step.done ? 'text-emerald-600' : step.section === activeSection ? 'text-slate-900' : 'text-slate-400'
+                  }`}>{step.label}</span>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className={`flex-1 h-0.5 mx-2 ${step.done ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(320px,1fr)]">
           <div className="space-y-5">
             {/* Informations personnelles */}

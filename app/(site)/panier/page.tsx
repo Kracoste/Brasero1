@@ -6,7 +6,7 @@ import { Section } from '@/components/Section';
 import { Price } from '@/components/Price';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, Shield, Truck, Lock, RotateCcw } from 'lucide-react';
 
 export default function PanierPage() {
   const { items, itemCount, totalPrice, loading, updateQuantity, removeItem, clearCart } = useCart();
@@ -185,7 +185,53 @@ export default function PanierPage() {
                 >
                   ← Continuer mes achats
                 </Link>
+
+                {/* Reassurance */}
+                <div className="mt-4 space-y-2 pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <Lock size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <span>Paiement 100% sécurisé (SSL)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <Truck size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <span>Livraison incluse — 5 à 7 jours ouvrés</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <Shield size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <span>Garantie 2 ans — SAV sous 48h</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <RotateCcw size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <span>Retour sous 14 jours</span>
+                  </div>
+                </div>
               </div>
+            </div>
+          </div>
+
+          {/* Cross-sell */}
+          <div className="mt-10 pt-8 border-t border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Complétez votre commande</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { name: "Plancha acier", href: "/produits?category=accessoire", image: "/accesoiresbrasero.jpg" },
+                { name: "Fendeur à bûches", href: "/produits?category=fendeur", image: "/acceuil/Fendeur-Buches.png" },
+                { name: "Range-bûches", href: "/produits?category=range-buches", image: "/acceuil/acceuil1.jpg" },
+                { name: "Tous nos accessoires", href: "/produits?category=accessoire", image: "/accesoiresbrasero.jpg" },
+              ].map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="group block border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="relative h-24 bg-slate-50">
+                    <Image src={item.image} alt={item.name} fill className="object-cover group-hover:scale-105 transition-transform" />
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-xs font-semibold text-slate-900 group-hover:text-[#8B4513] transition-colors">{item.name}</p>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
