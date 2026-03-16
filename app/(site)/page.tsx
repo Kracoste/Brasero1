@@ -109,6 +109,7 @@ export default async function HomePage() {
                 cta="Découvrir nos braséro"
                 image="/Produits/og-brasero.webp"
                 href="/produits?category=brasero"
+                contain
               />
               {/* Fendeur et Accessoires côte à côte */}
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -293,20 +294,21 @@ type CategoryTileProps = {
   image: string;
   href: string;
   compact?: boolean;
+  contain?: boolean;
 };
 
-const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTileProps) => (
+const CategoryTile = ({ title, cta, image, href, compact = false, contain = false }: CategoryTileProps) => (
   <Link
     href={href}
     className={`relative block overflow-hidden rounded-xl sm:rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${
       compact ? 'h-[120px] sm:h-[140px] lg:h-[160px]' : 'h-[180px] sm:h-[200px] lg:h-[240px]'
     }`}
   >
-    <div className="absolute inset-0">
+    <div className={`absolute inset-0 ${contain ? 'bg-[#2a2018]' : ''}`}>
       <img
         src={image}
         alt={title}
-        className="h-full w-full object-cover"
+        className={`h-full w-full ${contain ? 'object-contain' : 'object-cover'}`}
       />
     </div>
     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
