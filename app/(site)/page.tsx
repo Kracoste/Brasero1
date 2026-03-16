@@ -8,7 +8,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 import { generateStoreSchema } from "@/lib/seo/schemas";
-import { Flame, Truck, Shield, Award, Users, Star, Factory, ChevronDown } from "lucide-react";
+import { Flame, Truck, Shield, Award } from "lucide-react";
 
 // ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
 export const revalidate = 60;
@@ -94,34 +94,6 @@ export default async function HomePage() {
             Braseros, planchas et accessoires fabriqués à la main en France. 
             Transformez votre jardin en véritable espace de convivialité.
           </p>
-        </div>
-      </section>
-
-      {/* Social proof chiffrée */}
-      <section className="py-4 sm:py-6 bg-white border-y border-slate-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8">
-            <div className="flex flex-col items-center text-center">
-              <Users className="w-6 h-6 text-[#CD853F] mb-1" />
-              <span className="text-xl sm:text-2xl font-bold text-slate-900">2 000+</span>
-              <span className="text-[10px] sm:text-xs text-slate-500">Clients satisfaits</span>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <Star className="w-6 h-6 text-[#CD853F] mb-1" />
-              <span className="text-xl sm:text-2xl font-bold text-slate-900">4.8/5</span>
-              <span className="text-[10px] sm:text-xs text-slate-500">Satisfaction client</span>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <Factory className="w-6 h-6 text-[#CD853F] mb-1" />
-              <span className="text-xl sm:text-2xl font-bold text-slate-900">100%</span>
-              <span className="text-[10px] sm:text-xs text-slate-500">Fabrication française</span>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <Shield className="w-6 h-6 text-[#CD853F] mb-1" />
-              <span className="text-xl sm:text-2xl font-bold text-slate-900">2 ans</span>
-              <span className="text-[10px] sm:text-xs text-slate-500">Garantie incluse</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -267,9 +239,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FAQ Homepage — featured snippets Google */}
-      <HomeFAQ />
-
       {/* Section SEO - Texte descriptif */}
       <section className="py-12 sm:py-16 bg-[#f6f1e9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -349,85 +318,6 @@ const CategoryTile = ({ title, cta, image, href, compact = false }: CategoryTile
     </div>
   </Link>
 );
-
-const FAQ_ITEMS = [
-  {
-    question: "Quel brasero choisir pour mon jardin ?",
-    answer: "Le choix dépend de votre espace et usage. Pour 4-6 personnes, un brasero de 60cm suffit. Pour 8-10 convives, optez pour un 80cm. Si vous souhaitez cuisiner (plancha, grill), choisissez un brasero multifonction. L'acier corten offre un aspect rouillé naturel, tandis que l'acier thermolaqué reste noir mat.",
-  },
-  {
-    question: "Quelle est la différence entre acier corten et acier classique ?",
-    answer: "L'acier corten développe une patine de rouille protectrice naturelle qui le rend auto-protégé contre la corrosion. Il ne nécessite aucun entretien et sa couleur évolue avec le temps. L'acier classique thermolaqué offre un look noir mat élégant mais peut nécessiter un entretien périodique.",
-  },
-  {
-    question: "Peut-on cuisiner sur un brasero ?",
-    answer: "Oui, nos braseros multifonctions sont conçus pour la cuisson. Vous pouvez y ajouter une plancha amovible en acier ou inox, une grille de cuisson, ou un support wok. La chaleur du feu de bois apporte une saveur unique à vos plats. Consultez nos recettes pour des idées de cuisson au brasero.",
-  },
-  {
-    question: "Comment entretenir mon brasero ?",
-    answer: "Pour un brasero en acier corten : aucun entretien particulier, la rouille est protectrice. Pour un brasero thermolaqué : nettoyez les cendres après chaque utilisation, protégez-le avec une housse en hiver. Pour la plancha : culottez-la avant la première utilisation et huilez-la après chaque cuisson.",
-  },
-  {
-    question: "Quelle est la durée de vie d'un brasero artisanal ?",
-    answer: "Un brasero artisanal Atelier LBF est conçu pour durer 15 à 20 ans minimum. L'épaisseur de l'acier (3mm pour la cuve, 5mm pour la base) garantit une résistance exceptionnelle. Tous nos braseros sont garantis 2 ans pièces et main d'œuvre.",
-  },
-  {
-    question: "Peut-on installer un brasero sur une terrasse en bois ?",
-    answer: "Oui, à condition de respecter quelques précautions : utilisez une plaque de protection sous le brasero, maintenez une distance de sécurité de 1,5m avec les matériaux combustibles, et ne posez jamais le brasero directement sur le bois. Notre guide dédié détaille toutes les mesures de sécurité.",
-  },
-  {
-    question: "Livrez-vous dans toute la France ?",
-    answer: "Oui, nous livrons partout en France métropolitaine. La livraison est incluse dans le prix et effectuée par DB Schenker avec prise de rendez-vous. Délai : 5 à 7 jours ouvrés. Le brasero est livré au pied de votre domicile dans un emballage renforcé.",
-  },
-  {
-    question: "Quel bois utiliser dans un brasero ?",
-    answer: "Privilégiez les bois durs et secs : chêne, hêtre, charme ou frêne. Ils produisent plus de chaleur et moins de fumée. Évitez les bois résineux (pin, sapin) qui projettent des étincelles et les bois traités. Le bois doit être séché (moins de 20% d'humidité) pour une combustion optimale.",
-  },
-];
-
-const HomeFAQ = () => {
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
-
-  return (
-    <section className="py-12 sm:py-16">
-      <JsonLd data={faqSchema} />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
-            Questions fréquentes sur les braseros
-          </h2>
-          <p className="mt-3 text-slate-600">
-            Tout ce que vous devez savoir avant d&apos;acheter votre brasero artisanal
-          </p>
-        </div>
-        <div className="space-y-3">
-          {FAQ_ITEMS.map((item, i) => (
-            <details key={i} className="group border border-slate-200 bg-white">
-              <summary className="flex items-center justify-between cursor-pointer px-5 py-4 text-sm sm:text-base font-semibold text-slate-900 hover:bg-slate-50 transition-colors">
-                {item.question}
-                <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0 ml-4" />
-              </summary>
-              <div className="px-5 pb-4 text-sm text-slate-600 leading-relaxed">
-                {item.answer}
-              </div>
-            </details>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
 
 const PromoTile = () => (
   <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-black text-white shadow-lg h-[320px] sm:h-[360px] lg:h-full lg:min-h-[420px]">
