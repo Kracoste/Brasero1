@@ -107,7 +107,7 @@ export default async function HomePage() {
               <CategoryTile
                 title="Nos braséros"
                 cta="Découvrir nos braséro"
-                image="/acceuil/acceuil1.jpg"
+                image="/Produits/og-brasero.webp"
                 href="/produits?category=brasero"
               />
               {/* Fendeur et Accessoires côte à côte */}
