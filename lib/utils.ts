@@ -396,5 +396,6 @@ export const mapSupabaseProduct = (p: Record<string, unknown>): Product | null =
     customSpecs: (p.customSpecs || p.custom_specs || []) as Product["customSpecs"],
     location: (p.location || { city: "", dept: "", lat: 0, lng: 0 }) as Product["location"],
     seoContent: (p.seoContent || p.seo_content || undefined) as Product["seoContent"],
+    customization: (p.customization || undefined) as Product["customization"],
   };
 };

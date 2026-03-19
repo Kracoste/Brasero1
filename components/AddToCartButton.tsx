@@ -5,6 +5,7 @@ import { useCart } from '@/lib/cart-context';
 import { useAnalytics } from '@/lib/analytics-context';
 import { ShoppingCart, Check, Minus, Plus } from 'lucide-react';
 import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
+import type { FacesCustomization } from '@/components/CustomizationSelector';
 
 type SelectedAccessory = {
   slug: string;
@@ -23,11 +24,12 @@ type AddToCartButtonProps = {
   };
   selectedAccessories?: SelectedAccessory[];
   selectedVariantLabel?: string;
+  customizationData?: FacesCustomization | null;
   disabled?: boolean;
   className?: string;
 };
 
-export function AddToCartButton({ product, selectedAccessories = [], selectedVariantLabel, disabled = false, className = '' }: AddToCartButtonProps) {
+export function AddToCartButton({ product, selectedAccessories = [], selectedVariantLabel, customizationData, disabled = false, className = '' }: AddToCartButtonProps) {
   const { addItem, totalPrice: cartTotal, itemCount: cartItemsCount } = useCart();
   const { trackAddToCart } = useAnalytics();
   const [quantity, setQuantity] = useState(1);
@@ -66,6 +68,7 @@ export function AddToCartButton({ product, selectedAccessories = [], selectedVar
           price: product.price,
           image: product.images[0]?.src,
           variantLabel: selectedVariantLabel,
+          customization: customizationData || undefined,
         },
         quantity
       );

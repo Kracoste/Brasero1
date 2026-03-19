@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { mapSupabaseProduct } from '@/lib/utils';
 import type { Product } from '@/lib/schema';
 
-export const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content';
+export const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content, customization';
 
 export async function getProduct(slug: string): Promise<Product | null> {
   const supabase = await createClient();

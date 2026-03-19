@@ -44,7 +44,7 @@ async function getProduct(slug: string) {
 }
 
 // Fonction pour récupérer les produits similaires (même catégorie, excluant le produit actuel)
-const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content';
+const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content, customization';
 
 async function getRelatedProducts(currentSlug: string, category: string, limit: number = 8) {
   const supabase = await createClient();

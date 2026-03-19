@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { CompatibleAccessories } from '@/components/CompatibleAccessories';
+import { CustomizationSelector, type FacesCustomization } from '@/components/CustomizationSelector';
 import { AddToCartButton } from '@/components/AddToCartButton';
 import { Price } from '@/components/Price';
 import { useAnalytics } from '@/lib/analytics-context';
@@ -232,23 +233,31 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
     });
   }, [product.slug, product.name, activePrice, trackProductView]);
 
+  // --- Personnalisation découpe laser ---
+  const [customizationFaces, setCustomizationFaces] = useState<FacesCustomization | null>(null);
+  const customizationSupplement = customizationFaces !== null && product.customization?.priceSupplement
+    ? product.customization.priceSupplement
+    : 0;
+
   const handleSelectionChange = useCallback((accessories: Accessory[]) => {
     setSelectedAccessories(accessories);
   }, []);
 
   const totalAccessoriesPrice = selectedAccessories.reduce((sum, a) => sum + a.price, 0);
-  const totalPrice = activePrice + totalAccessoriesPrice;
+  const totalPrice = activePrice + totalAccessoriesPrice + customizationSupplement;
 
   const productWithVariantPrice = useMemo(() => ({
     ...product,
-    price: activePrice,
-  }), [product, activePrice]);
+    price: activePrice + customizationSupplement,
+  }), [product, activePrice, customizationSupplement]);
 
-  // Construire le label de la variante pour le panier
+  // Construire le label de la variante pour le panier (inclut la personnalisation)
   const variantLabel = useMemo(() => {
-    if (!matchedVariant) return undefined;
-    return matchedVariant.label;
-  }, [matchedVariant]);
+    const parts: string[] = [];
+    if (matchedVariant) parts.push(matchedVariant.label);
+    if (customizationFaces) parts.push('Découpe laser personnalisée');
+    return parts.length > 0 ? parts.join(' — ') : undefined;
+  }, [matchedVariant, customizationFaces]);
 
   const selectClass =
     'w-full appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-medium text-slate-800 shadow-sm transition-all focus:border-slate-900 focus:ring-2 focus:ring-slate-900/20 focus:outline-none cursor-pointer';
@@ -340,6 +349,16 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
         </div>
       )}
 
+      {/* Personnalisation découpe laser */}
+      {product.customization?.enabled && (
+        <CustomizationSelector
+          priceSupplement={product.customization.priceSupplement}
+          numberOfFaces={product.customization.numberOfFaces}
+          schemaImage={product.customization.schemaImage}
+          onChange={setCustomizationFaces}
+        />
+      )}
+
       {compatibleAccessorySlugs.length > 0 && (
         <CompatibleAccessories 
           compatibleSlugs={compatibleAccessorySlugs}
@@ -352,10 +371,16 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
       <div className="space-y-3 sm:space-y-4">
         {!product.onDemand && (
           <div className="space-y-1">
-            <Price amount={activePrice} className="text-2xl sm:text-3xl lg:text-4xl font-bold" showHT />
+            <Price amount={activePrice + customizationSupplement} className="text-2xl sm:text-3xl lg:text-4xl font-bold" showHT />
             {showPriceBreakdown && (
               <p className="text-sm text-slate-500">
                 Brasero {activePriceBrasero.toFixed(2).replace('.', ',')} € + Plancha {activePricePlancha.toFixed(2).replace('.', ',')} €
+                {customizationSupplement > 0 && ` + Personnalisation ${customizationSupplement.toFixed(2).replace('.', ',')} €`}
+              </p>
+            )}
+            {customizationSupplement > 0 && !showPriceBreakdown && (
+              <p className="text-sm text-slate-500">
+                Dont personnalisation : +{customizationSupplement.toFixed(2).replace('.', ',')} € HT
               </p>
             )}
             {selectedAccessories.length > 0 && (
@@ -371,10 +396,11 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
             )}
           </div>
         )}
-        <AddToCartButton 
-          product={productWithVariantPrice} 
+        <AddToCartButton
+          product={productWithVariantPrice}
           selectedAccessories={selectedAccessories}
           selectedVariantLabel={variantLabel}
+          customizationData={customizationFaces}
           disabled={showSelectors && !isSelectionValid}
         />
       </div>

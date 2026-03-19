@@ -88,6 +88,10 @@ export type ProductFormData = {
   weight: string;
   inStock: boolean;
   onDemand: boolean;
+  customizationEnabled: boolean;
+  customizationPrice: string;
+  customizationFaces: string;
+  customizationSchemaImage: string;
   isFeatured: boolean;
   featuredOrder: string;
   format: string;
@@ -191,6 +195,10 @@ const defaultFormData = (): ProductFormData => ({
   weight: '',
   inStock: true,
   onDemand: false,
+  customizationEnabled: false,
+  customizationPrice: '300',
+  customizationFaces: '3',
+  customizationSchemaImage: '',
   isFeatured: false,
   featuredOrder: '999',
   format: '',
@@ -364,6 +372,10 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
           weight: product.weight?.toString() || '',
           inStock: product.inStock ?? product.in_stock ?? true,
           onDemand: product.onDemand ?? product.on_demand ?? false,
+          customizationEnabled: product.customization?.enabled ?? false,
+          customizationPrice: product.customization?.priceSupplement?.toString() || '300',
+          customizationFaces: product.customization?.numberOfFaces?.toString() || '3',
+          customizationSchemaImage: product.customization?.schemaImage || '',
           isFeatured: product.isFeatured ?? product.is_featured ?? false,
           featuredOrder: (product.featuredOrder ?? product.featured_order ?? 999).toString(),
           format: parsedSpecs?.format || product.format || '',
@@ -777,6 +789,12 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
         specs: Object.keys(specsPayload).length ? specsPayload : null,
         inStock: formData.inStock,
         on_demand: formData.onDemand,
+        customization: formData.customizationEnabled ? {
+          enabled: true,
+          priceSupplement: parseFloat(formData.customizationPrice) || 300,
+          numberOfFaces: parseInt(formData.customizationFaces) || 3,
+          schemaImage: formData.customizationSchemaImage || undefined,
+        } : { enabled: false, priceSupplement: 0 },
         is_featured: formData.isFeatured,
         featured_order: parseInt(formData.featuredOrder),
         images: uploadedImages,
@@ -1275,6 +1293,84 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                 />
                 <span className="text-sm font-medium text-slate-700">Ce produit est sur demande</span>
               </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="customizationEnabled"
+                  checked={formData.customizationEnabled}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                />
+                <span className="text-sm font-medium text-slate-700">Personnalisation découpe laser</span>
+              </label>
+              {formData.customizationEnabled && (
+                <div className="ml-8 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-slate-600">Prix supplément :</label>
+                    <input
+                      type="number"
+                      name="customizationPrice"
+                      value={formData.customizationPrice}
+                      onChange={handleInputChange}
+                      className="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+                      min="0"
+                      step="10"
+                    />
+                    <span className="text-sm text-slate-500">€ HT</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-slate-600">Nombre de faces :</label>
+                    <select
+                      name="customizationFaces"
+                      value={formData.customizationFaces}
+                      onChange={handleInputChange}
+                      className="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+                    >
+                      {[1, 2, 3, 4, 5, 6].map(n => (
+                        <option key={n} value={n}>{n}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-sm text-slate-600">Image schéma des faces :</label>
+                    {formData.customizationSchemaImage && (
+                      <div className="flex items-center gap-2">
+                        <img src={formData.customizationSchemaImage} alt="Schéma faces" className="h-20 rounded border border-slate-200" />
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, customizationSchemaImage: '' }))}
+                          className="text-xs text-red-500 hover:text-red-700"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.webp"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        fd.append('fileName', `schema-${formData.slug || 'produit'}.${file.name.split('.').pop()}`);
+                        fd.append('bucket', 'customizations');
+                        try {
+                          const res = await fetch('/api/admin/storage/upload', { method: 'POST', body: fd });
+                          const data = await res.json();
+                          if (data.publicUrl) {
+                            setFormData(prev => ({ ...prev, customizationSchemaImage: data.publicUrl }));
+                          }
+                        } catch {
+                          alert("Erreur lors de l'upload de l'image schéma");
+                        }
+                        e.target.value = '';
+                      }}
+                      className="block w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
+                    />
+                  </div>
+                </div>
+              )}
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"

@@ -35,7 +35,7 @@ export const VALID_USER_ROLES = ['user', 'admin'] as const;
 export type UserRole = typeof VALID_USER_ROLES[number];
 
 // Buckets de stockage autorisés
-export const ALLOWED_STORAGE_BUCKETS = ['products', 'accessories', 'avatars'] as const;
+export const ALLOWED_STORAGE_BUCKETS = ['products', 'accessories', 'avatars', 'customizations'] as const;
 export type StorageBucket = typeof ALLOWED_STORAGE_BUCKETS[number];
 
 /**
@@ -69,6 +69,7 @@ const CAMEL_TO_SNAKE_MAP: Record<string, string> = {
   configImages: 'config_images',
   configurations: 'configurations',
   seoContent: 'seo_content',
+  customization: 'customization',
 };
 
 /**
@@ -104,6 +105,7 @@ export const ALLOWED_PRODUCT_FIELDS = [
   'featured_order',
   'format',
   'seo_content',
+  'customization',
 ] as const;
 
 /**

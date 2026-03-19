@@ -224,19 +224,30 @@ export async function sendOrderDeliveredEmail(
 export async function sendAdminOrderNotification(
   orderData: OrderEmailData,
   supabase: SupabaseClientLike,
-  orderId?: string
+  orderId?: string,
+  attachments?: { filename: string; content: Buffer }[]
 ): Promise<{ success: boolean; error?: string }> {
   if (!hasResendCredentials() || !resend) {
     return { success: false, error: 'Email service not configured' };
   }
 
   try {
-    const { data, error } = await resend.emails.send({
+    const emailPayload: any = {
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
       subject: `🛒 Nouvelle commande #${orderData.orderNumber}`,
       html: generateAdminOrderNotificationHTML(orderData),
-    });
+    };
+
+    if (attachments && attachments.length > 0) {
+      emailPayload.attachments = attachments.map(a => ({
+        filename: a.filename,
+        content: a.content.toString('base64'),
+        type: 'application/pdf',
+      }));
+    }
+
+    const { data, error } = await resend.emails.send(emailPayload);
 
     if (error) {
       return { success: false, error: error.message };

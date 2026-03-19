@@ -14,6 +14,7 @@ export type CartItem = {
   product_price: number;
   product_image: string | null;
   variant_label?: string;
+  customization?: Record<number, { type: 'image' | 'text'; imageUrl?: string; fileName?: string; text?: string; font?: string }>;
   quantity: number;
 };
 
@@ -28,6 +29,7 @@ type CartContextType = {
     price: number;
     image?: string;
     variantLabel?: string;
+    customization?: Record<number, { type: 'image' | 'text'; imageUrl?: string; fileName?: string; text?: string; font?: string }>;
   }, quantity?: number) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
@@ -90,7 +92,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const addGuestItem = (
-    product: { slug: string; name: string; price: number; image?: string; variantLabel?: string },
+    product: { slug: string; name: string; price: number; image?: string; variantLabel?: string; customization?: CartItem['customization'] },
     quantity: number,
   ) => {
     syncGuestCart(prev => {
@@ -121,6 +123,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         product_price: product.price,
         product_image: product.image || null,
         variant_label: product.variantLabel || undefined,
+        customization: product.customization,
         quantity: Math.min(quantity, MAX_QUANTITY_PER_ITEM),
       };
       return [...prev, newItem];
@@ -249,7 +252,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Ajouter un article au panier
   const addItem = async (
-    product: { slug: string; name: string; price: number; image?: string; variantLabel?: string },
+    product: { slug: string; name: string; price: number; image?: string; variantLabel?: string; customization?: CartItem['customization'] },
     quantity: number = 1,
   ) => {
     // Toujours ajouter d'abord localement pour une réponse instantanée

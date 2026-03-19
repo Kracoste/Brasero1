@@ -254,6 +254,7 @@ export default function CheckoutPage() {
               product_price: item.product_price,
               product_image: item.product_image,
               variant_label: item.variant_label,
+              customization: item.customization,
               quantity: item.quantity,
             })),
             customerInfo: {
@@ -832,11 +833,18 @@ export default function CheckoutPage() {
             <h2 className="text-lg font-semibold text-slate-900">Résumé de la commande</h2>
             <div className="space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm text-slate-700">
-                  <div className="w-2/3">
-                    <p className="font-semibold text-slate-900">{item.product_name}</p>
+                <div key={item.id} className="flex items-center gap-3 text-sm text-slate-700">
+                  {item.product_image && (
+                    <img
+                      src={item.product_image}
+                      alt={item.product_name}
+                      className="w-14 h-14 object-cover rounded-md border border-slate-200 flex-shrink-0"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-900 truncate">{item.product_name}</p>
                   </div>
-                  <p className="w-1/3 text-right">
+                  <p className="text-right whitespace-nowrap">
                     {item.quantity} × <Price amount={item.product_price} />
                   </p>
                 </div>

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe, hasStripeCredentials } from "@/lib/stripe";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendOrderConfirmationEmail, sendAdminOrderNotification } from "@/lib/email";
+import { sendOrderConfirmationEmail, sendAdminOrderNotification, resend, FROM_EMAIL, ADMIN_EMAIL } from "@/lib/email";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/auth";
+import { generateCustomizationPDF, convertImageToPDF } from "@/lib/pdf-customization";
 
 export const runtime = "nodejs";
 
@@ -157,7 +158,36 @@ async function handleCheckoutCompleted(
   }
   steps.push("line_items_ok");
 
-  // Préparer les articles
+  // Préparer les articles + collecter les personnalisations
+  type CustomizationEntry = {
+    productName: string;
+    productSlug: string;
+    faces: Record<string, { type: 'image' | 'text'; imageUrl?: string; fileName?: string; text?: string; font?: string }>;
+  };
+  const customizations: CustomizationEntry[] = [];
+
+  // Récupérer les données de personnalisation depuis la DB
+  const { data: pendingCust } = await supabase
+    .from("pending_customizations")
+    .select("data")
+    .eq("stripe_session_id", session.id)
+    .maybeSingle();
+
+  if (pendingCust?.data && Array.isArray(pendingCust.data)) {
+    for (const entry of pendingCust.data as any[]) {
+      if (entry.slug && entry.faces) {
+        customizations.push({
+          productName: "",  // sera rempli depuis line items
+          productSlug: entry.slug,
+          faces: entry.faces,
+        });
+      }
+    }
+    log("Customizations récupérées depuis DB:", customizations.length);
+    // Nettoyer la table pending
+    await supabase.from("pending_customizations").delete().eq("stripe_session_id", session.id);
+  }
+
   const orderItems = lineItems.data.map((item) => {
     const product = item.price?.product as Stripe.Product | string | null;
     const productMeta = product && typeof product !== "string" ? product.metadata : {};
@@ -165,12 +195,18 @@ async function handleCheckoutCompleted(
     const qty = item.quantity || 1;
     const amountTotal = item.amount_total || 0;
 
+    // Récupérer la customization depuis le tableau collecté
+    const matchingCust = customizations.find(c => c.productSlug === slug);
+    if (matchingCust) {
+      matchingCust.productName = item.description || "Produit";
+    }
     const orderItem: Record<string, unknown> = {
       product_name: item.description || "Produit",
       product_slug: slug,
       quantity: qty,
       unit_price: qty ? amountTotal / qty / 100 : amountTotal / 100,
       total_price: amountTotal / 100,
+      customization: matchingCust?.faces || undefined,
     };
 
     return orderItem;
@@ -286,9 +322,69 @@ async function handleCheckoutCompleted(
       result.email_client_error = msg;
     }
 
+    // Générer les PDF de personnalisation à joindre au mail admin
+    const pdfAttachments: { filename: string; content: Buffer }[] = [];
+    if (customizations.length > 0) {
+      try {
+        log("Génération PDF personnalisation pour", customizations.length, "produit(s)");
+        const orderNumber = order.id.slice(0, 8).toUpperCase();
+        const custName = order.customer_name || session.customer_details?.name || "Client";
+        const custEmail = order.customer_email || session.customer_details?.email || "";
+
+        // Récupérer les schemaImage depuis la DB
+        const custSlugs = customizations.map(c => c.productSlug).filter(Boolean);
+        const { data: custProducts } = custSlugs.length > 0
+          ? await supabase.from("products").select("slug, customization").in("slug", custSlugs)
+          : { data: [] };
+        const schemaImages: Record<string, string> = {};
+        for (const cp of custProducts || []) {
+          if (cp.customization?.schemaImage) {
+            schemaImages[cp.slug] = cp.customization.schemaImage;
+          }
+        }
+
+        for (const cust of customizations) {
+          const pdfBuffer = await generateCustomizationPDF({
+            orderNumber,
+            customerName: custName,
+            customerEmail: custEmail,
+            productName: cust.productName,
+            productSlug: cust.productSlug,
+            faces: cust.faces,
+            schemaImage: schemaImages[cust.productSlug],
+          });
+          pdfAttachments.push({
+            filename: `personnalisation-${orderNumber}-${cust.productSlug}.pdf`,
+            content: pdfBuffer,
+          });
+          log("✅ PDF récap généré pour:", cust.productSlug);
+
+          // Convertir chaque image client en PDF séparé (pour le fournisseur)
+          for (const [faceNum, face] of Object.entries(cust.faces)) {
+            if (face.type === 'image' && face.imageUrl) {
+              const imagePdf = await convertImageToPDF(face.imageUrl);
+              if (imagePdf) {
+                pdfAttachments.push({
+                  filename: `face-${faceNum}-${orderNumber}.pdf`,
+                  content: imagePdf,
+                });
+                log(`✅ Image face ${faceNum} convertie en PDF`);
+              }
+            }
+          }
+        }
+        result.customization_pdf_sent = true;
+        steps.push("customization_pdf_generated");
+      } catch (pdfErr) {
+        const msg = pdfErr instanceof Error ? pdfErr.message : String(pdfErr);
+        logError("Erreur PDF personnalisation (non bloquant):", msg);
+        result.customization_pdf_error = msg;
+      }
+    }
+
     try {
-      log("Envoi notification admin");
-      const adminResult = await sendAdminOrderNotification(emailData, supabase, order.id);
+      log("Envoi notification admin" + (pdfAttachments.length > 0 ? ` avec ${pdfAttachments.length} PDF` : ""));
+      const adminResult = await sendAdminOrderNotification(emailData, supabase, order.id, pdfAttachments.length > 0 ? pdfAttachments : undefined);
       log("Résultat email admin:", JSON.stringify(adminResult));
       result.email_admin = adminResult;
     } catch (adminErr) {

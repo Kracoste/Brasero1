@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 import { isValidEmail } from '@/lib/validation';
-import { devError } from '@/lib/supabase/utils';
+
 
 type CartItem = {
   product_slug: string;
@@ -13,6 +13,7 @@ type CartItem = {
   product_price: number;
   product_image: string | null;
   variant_label?: string;
+  customization?: Record<number, { type: 'image' | 'text'; imageUrl?: string; fileName?: string; text?: string; font?: string }>;
   quantity: number;
 };
 
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest) {
       .map((item) => ({
         slug: typeof item.product_slug === 'string' ? item.product_slug.trim() : '',
         variantLabel: typeof item.variant_label === 'string' ? item.variant_label.trim() : undefined,
+        customization: item.customization || undefined,
         quantity: parseQuantity(item.quantity),
       }))
       .filter((item) => item.slug && item.quantity);
@@ -110,7 +112,7 @@ export async function POST(request: NextRequest) {
     const productClient = getSupabaseAdminClient() ?? supabase;
     const { data: products, error: productsError } = await productClient
       .from('products')
-      .select('slug, name, price, images, variants')
+      .select('slug, name, price, images, variants, customization')
       .in('slug', productSlugs);
 
     if (productsError) {
@@ -152,12 +154,25 @@ export async function POST(request: NextRequest) {
       let price = Number(product?.price ?? 0);
       let itemName = product?.name || 'Produit';
 
-      if (item.variantLabel && Array.isArray(product?.variants)) {
-        const variant = product.variants.find((v: any) => v.label === item.variantLabel);
+      // Déterminer si le produit a une personnalisation
+      const hasCustomization = !!item.customization && Object.keys(item.customization).length > 0;
+      // Label variant pur (sans "Découpe laser personnalisée")
+      const pureVariantLabel = item.variantLabel?.replace(/\s*—?\s*Découpe laser personnalisée/, '').trim() || undefined;
+
+      if (pureVariantLabel && Array.isArray(product?.variants)) {
+        const variant = product.variants.find((v: any) => v.label === pureVariantLabel);
         if (variant && typeof variant.price === 'number' && variant.price > 0) {
           price = variant.price;
-          itemName = `${itemName} — ${item.variantLabel}`;
         }
+      }
+
+      // Ajouter le supplément de personnalisation (vérifié côté serveur)
+      if (hasCustomization && product?.customization?.enabled && typeof product.customization.priceSupplement === 'number') {
+        price += product.customization.priceSupplement;
+      }
+
+      if (item.variantLabel) {
+        itemName = `${itemName} — ${item.variantLabel}`;
       }
 
       if (!Number.isFinite(price) || price <= 0) {
@@ -176,6 +191,16 @@ export async function POST(request: NextRequest) {
       const productMetadata: Record<string, string> = { slug: item.slug };
       if (item.variantLabel) {
         productMetadata.variant = item.variantLabel;
+      }
+      if (hasCustomization && item.customization) {
+        // Les metadata Stripe sont limitées à 500 chars par valeur
+        // On stocke la customization dans les metadata de la session plutôt que du produit
+        const customizationStr = JSON.stringify(item.customization);
+        if (customizationStr.length <= 500) {
+          productMetadata.customization = customizationStr;
+        } else {
+          productMetadata.has_customization = 'true';
+        }
       }
 
       lineItems.push({
@@ -218,9 +243,24 @@ export async function POST(request: NextRequest) {
       locale: 'fr',
     });
 
+    // Sauvegarder les customizations en DB (les metadata Stripe sont trop petites)
+    const customizationItems = normalizedItems
+      .filter(item => item.customization && Object.keys(item.customization).length > 0)
+      .map(item => ({ slug: item.slug, faces: item.customization }));
+
+    if (customizationItems.length > 0) {
+      const adminClient = getSupabaseAdminClient();
+      if (adminClient) {
+        await adminClient.from('pending_customizations').insert({
+          stripe_session_id: session.id,
+          data: customizationItems,
+        });
+      }
+    }
+
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
-    devError('Erreur checkout Stripe:', error);
+    console.error('Erreur checkout Stripe:', error);
     return NextResponse.json(
       { error: 'Erreur lors de la création du paiement' },
       { status: 500 }
