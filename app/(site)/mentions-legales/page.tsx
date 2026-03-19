@@ -12,17 +12,14 @@ export default function MentionsLegalesPage() {
     <Section className="pb-24">
       <Container className="space-y-6">
         <h1 className="font-display text-4xl font-semibold text-clay-900">Mentions légales</h1>
-        <p className="text-sm text-slate-600">
-          Ces informations sont fournies à titre indicatif. Remplacez-les par vos données officielles.
-        </p>
         <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-700">
           <p>
-            Éditeur : Atelier LBF — SAS au capital de 50 000 €, RCS Niort 000 000 000,
-            siège social Rue du Moulin, 79320 Moncoutant-sur-Sèvre.
+            Éditeur : Atelier LBF — SARL au capital de 10 000 €, RCS Niort 948 471 578,
+            SIRET 948 471 578 00013, TVA intracommunautaire FR62948471578,
+            siège social 10 Route du Deffend, 79350 Chiché.
           </p>
           <p>Directeur de la publication : Hugo Allou.</p>
-          <p>Hébergement : Vercel Inc, 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.</p>
-          <p>Crédits photos : Unsplash — mise à jour prochaine avec vos visuels propriétaires.</p>
+          <p>Hébergement : Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis.</p>
         </div>
       </Container>
     </Section>

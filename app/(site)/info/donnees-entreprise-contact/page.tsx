@@ -99,7 +99,7 @@ export default async function DonneesEntreprisePage() {
     },
     {
       label: "Forme juridique",
-      value: "SARL (Société à Responsabilité Limitée)"
+      value: "Entreprise individuelle"
     },
     {
       label: "Capital social",
@@ -107,11 +107,11 @@ export default async function DonneesEntreprisePage() {
     },
     {
       label: "SIRET",
-      value: "XXX XXX XXX XXXXX"
+      value: "948 471 578 00013"
     },
     {
       label: "Numéro TVA",
-      value: "FR XX XXX XXX XXX"
+      value: "FR62948471578"
     },
     {
       label: "RCS",
@@ -119,7 +119,7 @@ export default async function DonneesEntreprisePage() {
     },
     {
       label: "Code APE/NAF",
-      value: "2562B - Mécanique industrielle"
+      value: "2562B"
     }
   ];
 
