@@ -82,9 +82,9 @@ export default async function QualitePage() {
     },
     {
       icon: ThumbsUp,
-      value: "98%",
+      value: "",
       title: "Satisfaction client",
-      description: "98% de nos clients se déclarent satisfaits de leur achat. Notre engagement qualité se reflète dans les avis et témoignages de notre communauté."
+      description: "Notre engagement qualité se reflète dans chaque brasero que nous fabriquons. Chaque détail est pensé pour garantir votre satisfaction."
     },
   ];
 

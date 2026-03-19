@@ -8,7 +8,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 import { generateStoreSchema } from "@/lib/seo/schemas";
-import { Flame, Truck, Shield, Award } from "lucide-react";
+import { Flame, Truck, Shield, Award, Scissors, Send, CheckCircle, Sparkles } from "lucide-react";
 
 // ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
 export const revalidate = 60;
@@ -152,6 +152,103 @@ export default async function HomePage() {
             >
               Voir notre catalogue
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Découpe Laser Personnalisée */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Vidéo */}
+            <div className="relative overflow-hidden rounded-lg shadow-xl">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto"
+                poster="/acceuil/VideoDecoupeLaser-poster.jpg"
+              >
+                <source src="/acceuil/VideoDecoupeLaser.mp4" type="video/mp4" />
+              </video>
+              <div className="absolute bottom-4 left-4 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm">
+                Découpe laser en action
+              </div>
+            </div>
+
+            {/* Contenu SEO */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                  Personnalisation sur mesure
+                </span>
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+                Découpe laser sur brasero : rendez votre brasero unique
+              </h2>
+              <p className="text-lg text-slate-600 leading-relaxed">
+                Grâce à notre service de <strong>découpe laser sur brasero</strong>, personnalisez chaque face de votre brasero avec le motif de votre choix. Logo, prénom, dessin, blason — chaque création est taillée dans l&apos;acier avec une précision millimétrique.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Nos braseros personnalisés sont disponibles en <strong>acier corten</strong>, <strong>acier brut</strong> et <strong>inox</strong>. La découpe laser permet de réaliser des motifs d&apos;une finesse exceptionnelle, directement dans la structure du socle, pour un rendu visuel saisissant de jour comme de nuit lorsque les flammes illuminent votre création.
+              </p>
+
+              {/* Étapes du procédé */}
+              <div className="space-y-4 pt-4">
+                <h3 className="font-semibold text-slate-900 text-lg">Comment ça marche ?</h3>
+                <div className="grid gap-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0 rounded-full">
+                      <Sparkles className="w-5 h-5 text-[#8B4513]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">1. Choisissez vos motifs</p>
+                      <p className="text-sm text-slate-600">Sélectionnez l&apos;option personnalisation sur la fiche produit et envoyez vos images ou textes pour chaque face.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0 rounded-full">
+                      <Send className="w-5 h-5 text-[#8B4513]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">2. Validation du plan</p>
+                      <p className="text-sm text-slate-600">Notre équipe réalise le plan de votre brasero et vous l&apos;envoie pour confirmation avant le lancement de la production.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0 rounded-full">
+                      <Scissors className="w-5 h-5 text-[#8B4513]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">3. Fabrication et découpe</p>
+                      <p className="text-sm text-slate-600">Votre brasero est fabriqué sur mesure avec la découpe laser de vos motifs. Comptez environ 1 semaine supplémentaire.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0 rounded-full">
+                      <CheckCircle className="w-5 h-5 text-[#8B4513]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">4. Livraison chez vous</p>
+                      <p className="text-sm text-slate-600">Votre brasero personnalisé est livré directement à votre domicile, prêt à être installé.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 pt-4">
+                <Link
+                  href="/produits?category=braseros"
+                  className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                >
+                  Personnaliser mon brasero
+                </Link>
+                <span className="text-sm text-slate-500">
+                  À partir de 300 € HT le forfait personnalisation
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

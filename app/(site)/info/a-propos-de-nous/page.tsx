@@ -15,7 +15,6 @@ import {
   Leaf,
   Target,
   History,
-  Star,
   Shield
 } from "lucide-react";
 
@@ -353,55 +352,6 @@ export default async function AProposPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Témoignages */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
-                Ce que disent nos clients
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  quote: "Un travail d'une qualité exceptionnelle. Le brasero est devenu la pièce maîtresse de notre jardin.",
-                  author: "Marie-Claire P.",
-                  location: "Nantes"
-                },
-                {
-                  quote: "L'équipe est à l'écoute et de bon conseil. Notre brasero personnalisé est exactement ce qu'on imaginait.",
-                  author: "Jean-Michel R.",
-                  location: "Bordeaux"
-                },
-                {
-                  quote: "Livraison soignée, produit magnifique. On sent la passion et le savoir-faire derrière chaque détail.",
-                  author: "Sophie L.",
-                  location: "Lyon"
-                }
-              ].map((testimonial, index) => (
-                <div 
-                  key={index}
-                  className="bg-white p-6 border border-slate-200"
-                >
-                  <div className="flex gap-1 mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="w-5 h-5 text-[#CD853F] fill-current" />
-                    ))}
-                  </div>
-                  <blockquote className="text-slate-700 leading-relaxed mb-4">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div className="border-t border-slate-200 pt-4">
-                    <p className="font-semibold text-slate-900">{testimonial.author}</p>
-                    <p className="text-sm text-slate-500">{testimonial.location}</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>

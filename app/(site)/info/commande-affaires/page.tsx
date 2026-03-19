@@ -171,23 +171,6 @@ export default async function CommandeAffairesPage() {
     }
   ];
 
-  const testimonials = [
-    {
-      quote: "Les braseros ont transformé notre terrasse. Nos clients adorent l'ambiance et restent plus longtemps le soir.",
-      author: "Marc D.",
-      role: "Gérant de restaurant, Bordeaux"
-    },
-    {
-      quote: "Excellent rapport qualité-prix et personnalisation impeccable. Le logo de notre hôtel est parfaitement intégré.",
-      author: "Sophie L.",
-      role: "Directrice d'hôtel, Biarritz"
-    },
-    {
-      quote: "Collaboration fluide et produits de qualité. Je recommande systématiquement ces braseros à mes clients.",
-      author: "Thomas R.",
-      role: "Paysagiste, Lyon"
-    }
-  ];
 
   return (
     <>
@@ -377,43 +360,6 @@ export default async function CommandeAffairesPage() {
         </section>
 
         {/* Témoignages */}
-        <section className="py-16 sm:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
-                Ils nous font confiance
-              </h2>
-              <p className="mt-4 text-lg text-slate-600">
-                Découvrez les retours de nos clients professionnels
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {testimonials.map((testimonial, index) => (
-                <div 
-                  key={index}
-                  className="bg-[#f6f1e9] p-6 border border-slate-200"
-                >
-                  <div className="flex gap-1 mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <svg key={star} className="w-5 h-5 text-[#CD853F] fill-current" viewBox="0 0 20 20">
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                      </svg>
-                    ))}
-                  </div>
-                  <blockquote className="text-slate-700 leading-relaxed mb-4">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div className="border-t border-slate-200 pt-4">
-                    <p className="font-semibold text-slate-900">{testimonial.author}</p>
-                    <p className="text-sm text-slate-500">{testimonial.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* FAQ */}
         <section className="py-16 sm:py-24 bg-[#f6f1e9]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
