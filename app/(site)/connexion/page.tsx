@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { isAdminEmail, AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
+import { AUTH_ROUTES, REDIRECT_PARAM } from '@/lib/auth';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
@@ -33,13 +33,12 @@ function ConnexionPageContent() {
   }, [searchParams]);
 
   // Fonction de redirection centralisée
-  const performRedirect = useCallback((userEmail?: string | null) => {
+  const performRedirect = useCallback(() => {
     if (hasRedirected.current) return;
     hasRedirected.current = true;
     setIsRedirecting(true);
 
-    const emailToCheck = userEmail || email.trim();
-    const isAdminUser = isAdmin || isAdminEmail(emailToCheck);
+    const isAdminUser = isAdmin;
     const target = isAdminUser ? AUTH_ROUTES.admin : AUTH_ROUTES.home;
     const finalTarget = getRedirectTarget(target);
 
@@ -74,7 +73,7 @@ function ConnexionPageContent() {
     if (loading) return; // Ne pas interférer pendant un login en cours
     
     // Si l'utilisateur est déjà connecté et visite /connexion, le rediriger
-    performRedirect(user.email);
+    performRedirect();
   }, [authLoading, user, loading, performRedirect]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -138,7 +137,7 @@ function ConnexionPageContent() {
       await new Promise(resolve => setTimeout(resolve, 200));
 
       // Connexion réussie → rediriger
-      performRedirect(body.user?.email);
+      performRedirect();
       
     } catch (err: any) {
       const message = err?.message || err?.name || 'Une erreur est survenue';

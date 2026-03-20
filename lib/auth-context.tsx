@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { isAdminEmail, AUTH_ROUTES } from '@/lib/auth';
+import { AUTH_ROUTES } from '@/lib/auth';
 import { devLog, devError } from '@/lib/supabase/utils';
 import type { User, AuthChangeEvent, Session, UserResponse } from '@supabase/supabase-js';
 
@@ -31,24 +31,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(cachedIsAdmin);
   const initInProgress = useRef(false);
 
-  const checkIsAdmin = useCallback((currentUser: User | null) => {
+  const checkIsAdmin = useCallback(async (currentUser: User | null) => {
     if (!currentUser) {
       setIsAdmin(false);
       cachedIsAdmin = false;
       return;
     }
 
-    // Vérifier par email uniquement (config centralisée)
-    // Évite les problèmes de RLS recursion sur la table profiles
-    if (isAdminEmail(currentUser.email)) {
-      setIsAdmin(true);
-      cachedIsAdmin = true;
-      return;
+    // Vérifier côté serveur (les emails admin ne sont pas exposés côté client)
+    try {
+      const res = await fetch('/api/auth/check-admin');
+      const data = await res.json();
+      setIsAdmin(!!data.isAdmin);
+      cachedIsAdmin = !!data.isAdmin;
+    } catch {
+      setIsAdmin(false);
+      cachedIsAdmin = false;
     }
-
-    // Par défaut, non admin
-    setIsAdmin(false);
-    cachedIsAdmin = false;
   }, []);
 
   const updateUser = useCallback((newUser: User | null) => {
