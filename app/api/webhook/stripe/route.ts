@@ -105,6 +105,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
   }
 
+  // Nettoyage des pending_customizations de plus de 7 jours
+  try {
+    const supabaseCleanup = getSupabaseAdminClient();
+    if (supabaseCleanup) {
+      await supabaseCleanup.from("pending_customizations")
+        .delete()
+        .lt("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+    }
+  } catch { /* non bloquant */ }
+
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     log("🛒 checkout.session.completed - Session:", session.id);

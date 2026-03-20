@@ -3,9 +3,8 @@
  * Toutes les constantes et fonctions utilitaires d'auth sont ici
  */
 
-// Liste des emails administrateurs
-// ADMIN_EMAILS côté serveur, NEXT_PUBLIC_ADMIN_EMAILS côté client
-const rawEmails = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || '';
+// Liste des emails administrateurs (serveur uniquement)
+const rawEmails = process.env.ADMIN_EMAILS || '';
 const envAdminEmails = rawEmails
   .split(',')
   .map(e => e.trim().toLowerCase())

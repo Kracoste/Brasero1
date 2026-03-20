@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting
     const clientIP = getClientIP(request.headers);
-    if (!checkRateLimit(`coupon-validate-${clientIP}`, 10, 60000)) {
+    if (!checkRateLimit(`coupon-validate-${clientIP}`, 3, 60000)) {
       return NextResponse.json(
         { error: 'Trop de tentatives' },
         { status: 429 }

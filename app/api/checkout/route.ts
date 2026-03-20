@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
     const normalizedItems = items
       .map((item) => ({
         slug: typeof item.product_slug === 'string' ? item.product_slug.trim() : '',
+        clientPrice: typeof item.product_price === 'number' ? item.product_price : 0,
         variantLabel: typeof item.variant_label === 'string' ? item.variant_label.trim() : undefined,
         customization: item.customization || undefined,
         quantity: parseQuantity(item.quantity),
@@ -175,6 +176,11 @@ export async function POST(request: NextRequest) {
         itemName = `${itemName} — ${item.variantLabel}`;
       }
 
+      // Détecter les tentatives de manipulation de prix
+      if (item.clientPrice > 0 && Math.abs(price - item.clientPrice) > 1) {
+        console.warn(`[CHECKOUT SECURITY] Prix divergent pour ${item.slug}: serveur=${price}, client=${item.clientPrice}`);
+      }
+
       if (!Number.isFinite(price) || price <= 0) {
         return NextResponse.json(
           { error: `Prix invalide pour ${item.slug}` },
@@ -230,7 +236,7 @@ export async function POST(request: NextRequest) {
         allowed_countries: ['FR', 'BE', 'DE', 'LU', 'CH'],
       },
       metadata: {
-        user_id: user?.id || 'guest',
+        user_id: user?.id || `guest_${crypto.randomUUID()}`,
         customer_name: `${customerInfo.first_name} ${customerInfo.last_name}`,
         customer_phone: customerInfo.phone || '',
         shipping_address: customerInfo.address,
