@@ -18,7 +18,10 @@ export const ADMIN_EMAILS: string[] = envAdminEmails;
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
   if (ADMIN_EMAILS.length === 0) {
-    console.error('CRITICAL: ADMIN_EMAILS environment variable is not set. No admin access allowed.');
+    // Ne pas logger côté client (variable serveur uniquement)
+    if (typeof window === 'undefined') {
+      console.warn('[AUTH] ADMIN_EMAILS not set — no admin access allowed.');
+    }
     return false;
   }
   return ADMIN_EMAILS.includes(email.toLowerCase());

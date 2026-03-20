@@ -168,7 +168,6 @@ export default async function HomePage() {
                 muted
                 playsInline
                 className="w-full h-auto"
-                poster="/acceuil/VideoDecoupeLaser-poster.jpg"
               >
                 <source src="/acceuil/VideoDecoupeLaser.mp4" type="video/mp4" />
               </video>
