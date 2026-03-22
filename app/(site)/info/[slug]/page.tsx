@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
@@ -6,6 +7,148 @@ type PageConfig = {
   title: string;
   content: React.ReactNode;
 };
+
+const PAGE_META: Record<string, { title: string; description: string }> = {
+  "service-clientele": {
+    title: "Service client — Aide et accompagnement",
+    description: "Contactez le service client Atelier LBF : conseils personnalisés, suivi de commande, SAV réactif. Réponse sous 24h par email ou téléphone.",
+  },
+  commander: {
+    title: "Comment commander — Guide d'achat",
+    description: "Commandez votre brasero artisanal en 4 étapes simples. Paiement sécurisé, livraison soignée partout en France.",
+  },
+  paiement: {
+    title: "Moyens de paiement — CB, virement, 3x sans frais",
+    description: "Payez en toute sécurité : carte bancaire, virement, paiement en 3x sans frais avec Klarna. Transactions SSL sécurisées.",
+  },
+  expedition: {
+    title: "Livraison et expédition — Délais et tarifs",
+    description: "Livraison de votre brasero en 3 à 7 jours ouvrés en France. Livraison sur palette avec prise de rendez-vous pour les braseros.",
+  },
+  retourner: {
+    title: "Retours et échanges — Politique de retour 14 jours",
+    description: "Retournez votre produit sous 14 jours. Procédure simple, remboursement sous 14 jours après réception. Satisfait ou remboursé.",
+  },
+  "confidentialite-politique": {
+    title: "Politique de confidentialité — Protection des données",
+    description: "Découvrez comment Atelier LBF protège vos données personnelles. Conforme au RGPD. Droit d'accès, modification et suppression.",
+  },
+  contact: {
+    title: "Contact — Coordonnées et horaires",
+    description: "Contactez Atelier LBF : email, téléphone, adresse. Du lundi au vendredi 9h-18h. Réponse sous 24-48h.",
+  },
+  faq: {
+    title: "FAQ — Questions fréquentes sur nos braseros",
+    description: "Trouvez les réponses à vos questions : commande, paiement, livraison, entretien brasero, garantie. FAQ complète Atelier LBF.",
+  },
+  "commande-affaires": {
+    title: "Commandes professionnelles — Devis gratuit",
+    description: "Tarifs préférentiels pour les professionnels : hôtels, restaurants, collectivités. Devis gratuit sous 48h. Livraison sur chantier.",
+  },
+  "produits-sur-mesure": {
+    title: "Brasero sur mesure — Personnalisation et découpe laser",
+    description: "Créez votre brasero unique : dimensions personnalisées, gravure, découpe laser, finitions spéciales. Fabrication artisanale sur mesure.",
+  },
+  "a-propos-de-nous": {
+    title: "À propos — Notre histoire et nos valeurs",
+    description: "Découvrez l'histoire d'Atelier LBF : passion du feu, savoir-faire artisanal français, fabrication dans les Deux-Sèvres depuis notre atelier.",
+  },
+  "donnees-entreprise-contact": {
+    title: "Mentions légales — Informations entreprise",
+    description: "Informations légales d'Atelier LBF : raison sociale, SIRET, TVA, siège social, hébergeur. Coordonnées complètes.",
+  },
+  "bulletin-information": {
+    title: "Newsletter — Recevez nos offres et conseils brasero",
+    description: "Inscrivez-vous à la newsletter Atelier LBF : nouveautés, promotions exclusives, recettes et conseils brasero. -10% sur votre 1ère commande.",
+  },
+  "astuces-conseils": {
+    title: "Astuces et conseils — Allumer, entretenir, cuisiner au brasero",
+    description: "Guides pratiques : comment allumer un brasero, entretenir l'acier corten, cuisiner à la plancha. Conseils d'experts Atelier LBF.",
+  },
+  blog: {
+    title: "Blog — Guides et articles brasero",
+    description: "Articles, guides et conseils autour du brasero : comparatifs, recettes, entretien, aménagement extérieur. Blog Atelier LBF.",
+  },
+  "braseros-exterieurs": {
+    title: "Braseros extérieurs — Collection complète",
+    description: "Braseros extérieurs artisanaux en acier corten et acier peint. Chauffage, cuisson et design pour votre jardin. Fabriqués en France.",
+  },
+  accessoires: {
+    title: "Accessoires brasero — Plancha, grille, outils",
+    description: "Accessoires pour brasero : planchas, grilles, pinces, housses, porte-bûches. Complétez votre équipement. Made in France.",
+  },
+  "black-friday": {
+    title: "Black Friday — Promotions braseros et accessoires",
+    description: "Offres Black Friday Atelier LBF : promotions exceptionnelles sur nos braseros artisanaux et accessoires. Prochaines offres en novembre.",
+  },
+  "braseros-bols-feu": {
+    title: "Braseros bols de feu — Sélection",
+    description: "Braseros bols de feu artisanaux pour vos soirées en extérieur. Design épuré, fabrication française. Découvrez notre sélection.",
+  },
+  "chauffages-terrasse": {
+    title: "Chauffage de terrasse — Solutions extérieures",
+    description: "Solutions de chauffage pour terrasse : braseros, chauffages d'appoint. Prolongez vos soirées en extérieur toute l'année.",
+  },
+  "tables-brasero": {
+    title: "Tables brasero — Cuisson et convivialité",
+    description: "Tables brasero intégrées pour partager et cuisiner. Design moderne, fabrication artisanale française.",
+  },
+  "cheminees-jardin": {
+    title: "Cheminées de jardin — Ambiance extérieure",
+    description: "Cheminées extérieures pour jardin et terrasse. Créez une ambiance chaleureuse. Sélection Atelier LBF.",
+  },
+  "cheminees-electriques": {
+    title: "Cheminées électriques — Décoration et chaleur",
+    description: "Cheminées électriques décoratives et pratiques pour intérieur et extérieur. Sélection Atelier LBF.",
+  },
+  barbecues: {
+    title: "Barbecues — Sélection cuisson extérieure",
+    description: "Barbecues sélectionnés pour compléter votre brasero. Cuisson au charbon et au bois. Qualité artisanale.",
+  },
+  "heures-douverture": {
+    title: "Horaires d'ouverture — Atelier et showroom",
+    description: "Horaires d'ouverture de l'Atelier LBF : lundi-vendredi 9h-18h, samedi sur rendez-vous. Visitez notre atelier dans les Deux-Sèvres.",
+  },
+  "cheque-cadeau": {
+    title: "Chèque-cadeau — Offrez un brasero",
+    description: "Offrez un chèque-cadeau Atelier LBF : braseros, accessoires, personnalisation. Le cadeau idéal pour les amoureux du feu.",
+  },
+  ofyr: {
+    title: "OFYR — Marque et produits",
+    description: "Découvrez la marque OFYR et ses braseros plancha design. Sélection disponible chez Atelier LBF.",
+  },
+  bonfeu: {
+    title: "BonFeu — Marque et produits",
+    description: "Découvrez la marque BonFeu : braseros et foyers extérieurs. Sélection disponible chez Atelier LBF.",
+  },
+  dimplex: {
+    title: "Dimplex — Solutions chauffantes",
+    description: "Solutions chauffantes Dimplex pour l'extérieur. Sélection disponible chez Atelier LBF.",
+  },
+  moodz: {
+    title: "MOODZ — Braseros design",
+    description: "Gamme MOODZ : braseros design et contemporains. Sélection disponible chez Atelier LBF.",
+  },
+  "toutes-les-marques": {
+    title: "Toutes les marques — Notre sélection",
+    description: "Vue d'ensemble des marques proposées sur Atelier LBF. Braseros, accessoires et chauffage extérieur.",
+  },
+};
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const meta = PAGE_META[slug];
+
+  if (!meta) return {};
+
+  return {
+    title: meta.title,
+    description: meta.description,
+    alternates: {
+      canonical: `/info/${slug}`,
+    },
+  };
+}
 
 const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
   // ============ SERVICE À LA CLIENTÈLE ============

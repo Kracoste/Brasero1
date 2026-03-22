@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Metadata } from "next";
 import { HeroMenu } from "@/components/HeroMenu";
 import { ProductCarousel } from "@/components/ProductCarousel";
@@ -106,6 +107,7 @@ export default async function HomePage() {
               {/* Braséros */}
               <CategoryTile
                 title="Nos braséros"
+                alt="Braseros artisanaux en acier corten et acier peint — collection Atelier LBF"
                 cta="Découvrir nos braséro"
                 image="/Produits/og-brasero.webp"
                 href="/produits?category=brasero"
@@ -115,6 +117,7 @@ export default async function HomePage() {
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <CategoryTile
                   title="Fendeur A Bûches"
+                  alt="Fendeur à bûches artisanal en acier pour couper le bois de chauffage brasero"
                   cta="Voir tous"
                   image="/acceuil/Fendeur-Buches.png"
                   href="/produits?category=fendeur"
@@ -122,6 +125,7 @@ export default async function HomePage() {
                 />
                 <CategoryTile
                   title="Accessoires"
+                  alt="Accessoires brasero : plancha acier carbone, grille, spatule, pique — Atelier LBF"
                   cta="Voir tous"
                   image="/accesoiresbrasero.jpg"
                   href="/produits?category=accessoire"
@@ -386,6 +390,7 @@ export default async function HomePage() {
 
 type CategoryTileProps = {
   title: string;
+  alt?: string;
   cta: string;
   image: string;
   href: string;
@@ -393,7 +398,7 @@ type CategoryTileProps = {
   contain?: boolean;
 };
 
-const CategoryTile = ({ title, cta, image, href, compact = false, contain = false }: CategoryTileProps) => (
+const CategoryTile = ({ title, alt, cta, image, href, compact = false, contain = false }: CategoryTileProps) => (
   <Link
     href={href}
     className={`relative block overflow-hidden rounded-xl sm:rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${
@@ -401,10 +406,13 @@ const CategoryTile = ({ title, cta, image, href, compact = false, contain = fals
     }`}
   >
     <div className={`absolute inset-0 ${contain ? 'bg-[#2a2018]' : ''}`}>
-      <img
+      <Image
         src={image}
-        alt={title}
-        className={`h-full w-full ${contain ? 'object-contain' : 'object-cover'}`}
+        alt={alt || title}
+        fill
+        sizes="(max-width: 768px) 100vw, 33vw"
+        className={`${contain ? 'object-contain' : 'object-cover'}`}
+        loading="lazy"
       />
     </div>
     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
@@ -419,10 +427,13 @@ const CategoryTile = ({ title, cta, image, href, compact = false, contain = fals
 
 const PromoTile = () => (
   <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-black text-white shadow-lg h-[320px] sm:h-[360px] lg:h-full lg:min-h-[420px]">
-    <img
+    <Image
       src="/Braserobanner.jpg"
-      alt="Promotion brasero"
-      className="absolute inset-0 h-full w-full object-cover brightness-125"
+      alt="Promotion braseros artisanaux Atelier LBF — jusqu'à 40% de réduction sur braseros et accessoires"
+      fill
+      sizes="(max-width: 768px) 100vw, 66vw"
+      className="object-cover brightness-125"
+      loading="lazy"
     />
     <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
     <div className="relative flex h-full flex-col items-start justify-center gap-2 sm:gap-3 lg:gap-4 px-4 py-6 sm:px-6 sm:py-8 lg:px-12 lg:py-12">
