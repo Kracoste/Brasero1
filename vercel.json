@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "atelier-lbf.fr"
+        }
+      ],
+      "destination": "https://www.atelier-lbf.fr/:path",
+      "permanent": true
+    }
+  ]
+}
