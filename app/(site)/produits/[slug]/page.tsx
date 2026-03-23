@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import Link from "next/link";
-import { ArrowRight, Clock } from "lucide-react";
 import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
 import { VariantConfiguratorWrapper } from "@/components/VariantConfiguratorWrapper";
@@ -16,7 +14,6 @@ import {
   generateProductBreadcrumb,
   generateFAQSchema,
 } from "@/lib/seo/schemas";
-import { getBlogPostsForProduct } from "@/lib/data/blog";
 import {
   generateProductSEO,
   generateProductMetaTitle,
@@ -44,7 +41,7 @@ async function getProduct(slug: string) {
 }
 
 // Fonction pour récupérer les produits similaires (même catégorie, excluant le produit actuel)
-const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content, customization';
+const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content';
 
 async function getRelatedProducts(currentSlug: string, category: string, limit: number = 8) {
   const supabase = await createClient();
@@ -127,9 +124,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // Récupérer les produits similaires (même catégorie)
   const relatedProducts = await getRelatedProducts(slug, product.category, 8);
 
-  // Récupérer les articles de blog liés à ce produit (maillage interne SEO)
-  const relatedBlogPosts = await getBlogPostsForProduct(slug, 3);
-
   // SEO dynamique — descriptions + FAQ générées par catégorie/variante
   const seo = generateProductSEO(product);
 
@@ -163,43 +157,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
           />
         </Container>
       </Section>
-
-      {/* Articles de blog liés (maillage interne SEO) */}
-      {relatedBlogPosts.length > 0 && (
-        <Section className="py-8 sm:py-12">
-          <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
-            <h2 className="font-display text-xl sm:text-2xl font-semibold text-slate-900 mb-6">
-              Guides et conseils pour votre brasero
-            </h2>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {relatedBlogPosts.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group"
-                >
-                  <span className="text-xs text-[#8B4513] font-medium uppercase tracking-wide">
-                    {post.category}
-                  </span>
-                  <h3 className="font-semibold text-slate-900 mt-1 mb-2 group-hover:text-[#8B4513] transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-slate-600 line-clamp-2 mb-3">{post.excerpt}</p>
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{post.read_time} min</span>
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-[#8B4513] font-medium group-hover:gap-2 transition-all">
-                      Lire <ArrowRight size={12} />
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </Container>
-        </Section>
-      )}
 
       {/* Section produits similaires - pleine largeur */}
       {relatedProducts.length > 0 && (

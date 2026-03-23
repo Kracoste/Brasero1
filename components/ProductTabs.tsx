@@ -57,6 +57,9 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
   const effectiveWidth = specsOverrides?.width;
   const effectiveWeight = specsOverrides?.weight ?? (product.specs?.poids || (product.weight ? `${product.weight} kg` : undefined));
   const effectivePlanchaMaterial = specsOverrides?.planchaMaterial ?? product.specs?.planchaMaterial;
+  const effectiveBowlThickness = specsOverrides?.bowlThickness ?? product.bowlThickness;
+  const effectiveBaseThickness = specsOverrides?.baseThickness ?? product.baseThickness;
+  const effectiveFuel = product.specs?.fuelType?.length ? product.specs.fuelType.join(' / ') : (product.specs?.fuel || 'Bois');
   const effectivePainting = specsOverrides?.finish === 'peint'
     ? (specsOverrides?.paintType || product.specs?.painting || 'Thermolaqué')
     : (specsOverrides?.finish === 'corten' ? undefined : product.specs?.painting);
@@ -163,7 +166,7 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Combustible</p>
-                        <p className="font-semibold text-gray-900">{product.specs?.fuel || "Bois"}</p>
+                        <p className="font-semibold text-gray-900">{effectiveFuel}</p>
                       </div>
                     </div>
                   )}
@@ -200,25 +203,25 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
                       </div>
                     </div>
                   )}
-                  {product.bowlThickness && (
+                  {effectiveBowlThickness && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
                         <Layers className="h-6 w-6 text-red-600" />
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Épaisseur bol</p>
-                        <p className="font-semibold text-gray-900">{product.bowlThickness} mm</p>
+                        <p className="font-semibold text-gray-900">{effectiveBowlThickness} mm</p>
                       </div>
                     </div>
                   )}
-                  {product.baseThickness && (
+                  {effectiveBaseThickness && (
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
                         <Layers className="h-6 w-6 text-red-600" />
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Épaisseur socle</p>
-                        <p className="font-semibold text-gray-900">{product.baseThickness} mm</p>
+                        <p className="font-semibold text-gray-900">{effectiveBaseThickness} mm</p>
                       </div>
                     </div>
                   )}
@@ -250,20 +253,21 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
               <dl className="text-sm text-gray-700">
                 {(product.customSpecs ??
                   [
-                    { label: "Marque", value: "France Braseros" },
-                    { label: "Fabrication", value: product.madeIn },
-                    { label: "Matière", value: effectiveMaterial },
-                    { label: "Diamètre", value: `${effectiveDiameter} cm` },
-                    { label: "Hauteur", value: `${effectiveHeight} cm` },
-                    { label: "Épaisseur", value: `${product.thickness} mm` },
-                    effectiveWeight ? { label: "Poids", value: effectiveWeight } : { label: "Poids", value: `${product.weight} kg` },
-                    product.bowlThickness ? { label: "Épaisseur bol", value: `${product.bowlThickness} mm` } : (product.specs?.epaisseur ? { label: "Épaisseur bol", value: product.specs.epaisseur } : null),
-                    product.baseThickness ? { label: "Épaisseur socle", value: `${product.baseThickness} mm` } : null,
-                    product.specs?.acier ? { label: "Acier", value: product.specs.acier } : null,
-                    product.specs?.dimensions ? { label: "Dimensions", value: product.specs.dimensions } : null,
-                    product.specs?.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
-                    effectivePlanchaMaterial ? { label: "Matière plancha", value: effectivePlanchaMaterial === 'inox' ? 'Inox' : 'Acier' } : null,
+                    { label: "Marque", value: "Atelier LBF" },
+                    { label: "Fabrication", value: product.madeIn || "France" },
+                    { label: "Matière du socle", value: effectiveMaterial },
+                    effectiveDiameter ? { label: "Diamètre", value: `${effectiveDiameter} cm` } : null,
+                    effectiveHeight ? { label: "Hauteur", value: `${effectiveHeight} cm` } : null,
+                    (effectiveLength || effectiveWidth) ? { label: "Dimensions socle", value: `${effectiveLength ?? product.length} × ${effectiveWidth ?? product.width} cm` } : null,
+                    effectiveWeight ? { label: "Poids", value: typeof effectiveWeight === 'number' ? `${effectiveWeight} kg` : (String(effectiveWeight).includes('kg') ? effectiveWeight : `${effectiveWeight} kg`) } : (product.weight ? { label: "Poids", value: `${product.weight} kg` } : null),
+                    effectiveBowlThickness ? { label: "Épaisseur cuve/bol", value: `${effectiveBowlThickness} mm` } : (product.specs?.epaisseur ? { label: "Épaisseur cuve/bol", value: product.specs.epaisseur } : null),
+                    effectiveBaseThickness ? { label: "Épaisseur socle", value: `${effectiveBaseThickness} mm` } : null,
+                    { label: "Combustible", value: effectiveFuel },
+                    effectivePlanchaMaterial ? { label: "Matière plancha", value: effectivePlanchaMaterial === 'inox' ? 'Inox' : 'Acier carbone' } : null,
                     effectivePainting ? { label: "Peinture", value: effectivePainting } : null,
+                    product.specs?.numberOfGuests ? { label: "Convives", value: product.specs.numberOfGuests } : null,
+                    product.specs?.acier ? { label: "Acier", value: product.specs.acier } : null,
+                    product.specs?.compatibilite ? { label: "Compatibilité", value: product.specs.compatibilite } : null,
                   ])!
                   .filter(Boolean)
                   .map((item, idx) => (

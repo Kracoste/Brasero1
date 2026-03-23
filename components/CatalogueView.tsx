@@ -6,7 +6,7 @@ import { ArrowUpDown } from "lucide-react";
 import { FilterPanel } from "@/components/FilterPanel";
 import { ProductCard } from "@/components/ProductCard";
 import type { Product } from "@/lib/schema";
-import { applyFilters, type FilterState } from "@/lib/utils";
+import { applyFilters, resolveCardOverrides, type FilterState, type CardOverrides } from "@/lib/utils";
 
 type CatalogueViewProps = {
   products: Product[];
@@ -28,7 +28,31 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category, 
   
   const filteredProducts = useMemo(() => applyFilters(products, filters), [products, filters]);
 
-  const priceValues = useMemo(() => products.map((product) => product.price), [products]);
+  // Calculer les overrides visuels (image/prix de sous-fiche) pour chaque produit filtré
+  const overridesMap = useMemo(() => {
+    const map = new Map<string, CardOverrides>();
+    // Seulement si des filtres matière, plancha ou diamètre sont actifs
+    const hasMaterialOrDiameterFilter = filters.material?.length || filters.diameter?.length || filters.planchaMaterial?.length;
+    if (!hasMaterialOrDiameterFilter) return map;
+    for (const product of filteredProducts) {
+      const ov = resolveCardOverrides(product, filters);
+      if (ov) map.set(product.slug, ov);
+    }
+    return map;
+  }, [filteredProducts, filters]);
+
+  const priceValues = useMemo(() => {
+    const prices: number[] = [];
+    for (const product of products) {
+      prices.push(product.price);
+      if (product.variants) {
+        for (const v of product.variants) {
+          if (v.price) prices.push(v.price);
+        }
+      }
+    }
+    return prices;
+  }, [products]);
   const minPrice = priceValues.length ? Math.min(...priceValues) : 0;
   const maxPrice = priceValues.length ? Math.max(...priceValues) : 0;
 
@@ -84,12 +108,12 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category, 
           }`}>
           {((category === "brasero" || !category)
             ? sortOrder === "asc"
-              ? [...filteredProducts].sort((a, b) => a.price - b.price)
-              : [...filteredProducts].sort((a, b) => b.price - a.price)
+              ? [...filteredProducts].sort((a, b) => (overridesMap.get(a.slug)?.price ?? a.price) - (overridesMap.get(b.slug)?.price ?? b.price))
+              : [...filteredProducts].sort((a, b) => (overridesMap.get(b.slug)?.price ?? b.price) - (overridesMap.get(a.slug)?.price ?? a.price))
             : filteredProducts
           ).map((product) => (
             <div key={product.slug} className="h-full">
-              <ProductCard product={product} className="catalog-card h-full" />
+              <ProductCard product={product} className="catalog-card h-full" cardOverrides={overridesMap.get(product.slug)} />
             </div>
           ))}
           </div>

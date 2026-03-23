@@ -9,20 +9,24 @@ import { Price } from "@/components/Price";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
 import type { Product } from "@/lib/schema";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, type CardOverrides } from "@/lib/utils";
 import "@/styles/product-card.css";
 
 type ProductCardProps = {
   product: Product;
   className?: string;
+  /** Overrides visuels calculés par les filtres (image/prix de la sous-fiche) */
+  cardOverrides?: CardOverrides;
 };
 
-export const ProductCard = ({ product, className }: ProductCardProps) => {
-  const image = product.images[0];
+export const ProductCard = ({ product, className, cardOverrides }: ProductCardProps) => {
+  const image = cardOverrides?.image ?? product.images[0];
   const { addItem } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
   const [adding, setAdding] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const displayPrice = cardOverrides?.price ?? product.price;
+  const displayDescription = cardOverrides?.shortDescription ?? product.shortDescription;
   const isPromo = typeof product.discountPercent === "number" && product.discountPercent > 0 && !!product.comparePrice;
 
   const handleToggleFavorite = async () => {
@@ -103,17 +107,17 @@ export const ProductCard = ({ product, className }: ProductCardProps) => {
               />
             </button>
           </div>
-          <p className="product-card__description">{product.shortDescription}</p>
+          <p className="product-card__description">{displayDescription}</p>
           {isPromo ? (
             <div className="product-card__promo-pricing">
               <div className="product-card__promo-current">
-                <span>{formatCurrency(product.price)}</span>
+                <span>{formatCurrency(displayPrice)}</span>
                 <span className="product-card__promo-note">après remise</span>
               </div>
               <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} TTC</span>
             </div>
           ) : !product.onDemand ? (
-            <Price amount={product.price} className="product-card__price" tone="light" showHT />
+            <Price amount={displayPrice} className="product-card__price" tone="light" showHT />
           ) : (
             <div className="product-card__price-placeholder" style={{ height: '2.5rem' }} />
           )}

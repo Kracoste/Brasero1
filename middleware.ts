@@ -26,11 +26,6 @@ export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
   const pathname = request.nextUrl.pathname;
   
-  // Rediriger /info/blog vers /blog (anti-duplication SEO)
-  if (pathname === '/info/blog') {
-    return NextResponse.redirect(new URL('/blog', request.url), 301);
-  }
-
   // Rediriger non-www vers www pour éviter les problèmes de cookies
   if (hostname === 'atelier-lbf.fr') {
     const newUrl = new URL(request.url);
@@ -75,12 +70,6 @@ export async function middleware(request: NextRequest) {
       });
       return redirectResponse;
     }
-  }
-
-  // noindex sur les pages transactionnelles (SEO: éviter l'indexation)
-  const noindexPaths = ['/panier', '/favoris', '/mon-compte', '/commande', '/connexion', '/inscription'];
-  if (noindexPaths.some(p => pathname === p || pathname.startsWith(p + '/'))) {
-    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }
 
   // Désactiver le cache CDN pour les pages produits (données dynamiques)

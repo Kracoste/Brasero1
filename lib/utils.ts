@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import type { Product } from "@/lib/schema";
+import type { Product, ProductConfiguration } from "@/lib/schema";
 import { generateProductImageAlt } from "@/lib/seo/schemas";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
@@ -129,11 +129,14 @@ export const ensureArray = <T>(value?: MaybeArray<T>): T[] => {
   return value !== undefined ? [value] : [];
 };
 
+export type PlanchaFilterOption = "acier" | "inox";
+
 export type FilterState = {
   diameter?: MaybeArray<string>;
   material?: MaybeArray<"corten" | "acier" | "inox" | "brut" | "fendeur" | "accessoire" | "gant" | "grille" | "housse">;
   format?: MaybeArray<FormatOption>;
   accessoryType?: MaybeArray<AccessoryType>;
+  planchaMaterial?: MaybeArray<PlanchaFilterOption>;
   price?: string;
   sort?: "price-asc" | "price-desc" | "popular";
   priceMin?: number;
@@ -242,6 +245,7 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
   const formatSelections = ensureArray(filters.format);
   const accessorySelections = ensureArray(filters.accessoryType);
   const fendeurSelections = ensureArray(filters.fendeurType);
+  const planchaSelections = ensureArray(filters.planchaMaterial);
 
   const filtered = products.filter((product) => {
     const productDiameter = resolveDiameter(product as Record<string, unknown>);
@@ -250,22 +254,73 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
       return typeof product.discountPercent === "number" && product.discountPercent > 0;
     }
 
-    if (hasDiameterFilter) {
-      if (!productDiameter) {
-        return false;
+    // Collecter tous les diamètres disponibles (base + variantes + configurations)
+    const allDiameters = new Set<number>();
+    if (productDiameter) allDiameters.add(Math.round(productDiameter));
+    if (product.variants) {
+      for (const v of product.variants) {
+        if (v.diameter) allDiameters.add(Math.round(v.diameter));
       }
-      const roundedProductDiameter = Math.round(productDiameter);
-      const matchesDiameter = diameterSelections.some(
-        (selection) => Math.round(selection) === roundedProductDiameter,
-      );
+    }
+    if (product.configurations) {
+      for (const config of Object.values(product.configurations)) {
+        if (config.diameters) {
+          for (const d of Object.keys(config.diameters)) {
+            const n = Number(d);
+            if (Number.isFinite(n)) allDiameters.add(Math.round(n));
+          }
+        }
+      }
+    }
+
+    if (hasDiameterFilter) {
+      const matchesDiameter = diameterSelections.some((sel) => allDiameters.has(Math.round(sel)));
       if (!matchesDiameter) {
         return false;
       }
     }
 
+    // Collecter tous les matériaux disponibles (base + variantes)
     if (materialSelections.length) {
-      const materialType = inferMaterial(product);
-      if (!materialType || !materialSelections.includes(materialType)) {
+      const baseMaterial = inferMaterial(product);
+      const allMaterials = new Set<string>();
+      if (baseMaterial) allMaterials.add(baseMaterial);
+      if (product.variants) {
+        for (const v of product.variants) {
+          if (v.finish === 'corten') allMaterials.add('corten');
+          if (v.finish === 'peint') allMaterials.add('acier');
+          if (v.planchaMaterial === 'inox') allMaterials.add('inox');
+        }
+      }
+      if (product.configurations) {
+        for (const key of Object.keys(product.configurations)) {
+          if (key.includes('corten')) allMaterials.add('corten');
+          if (key.includes('peint')) allMaterials.add('acier');
+        }
+      }
+      const matchesMaterial = materialSelections.some((m) => allMaterials.has(m));
+      if (!matchesMaterial) {
+        return false;
+      }
+    }
+
+    // Filtre matière plancha (acier / inox)
+    if (planchaSelections.length) {
+      const allPlanchas = new Set<string>();
+      if (product.specs?.planchaMaterial) allPlanchas.add(product.specs.planchaMaterial);
+      if (product.variants) {
+        for (const v of product.variants) {
+          if (v.planchaMaterial) allPlanchas.add(v.planchaMaterial);
+        }
+      }
+      if (product.configurations) {
+        for (const key of Object.keys(product.configurations)) {
+          const plancha = key.split('-')[1];
+          if (plancha) allPlanchas.add(plancha);
+        }
+      }
+      const matchesPlancha = planchaSelections.some((p) => allPlanchas.has(p));
+      if (!matchesPlancha) {
         return false;
       }
     }
@@ -301,11 +356,22 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
       const predicate = pricePredicates[filters.price];
       if (predicate && !predicate(product)) return false;
     }
-    if (typeof filters.priceMin === "number" && product.price < filters.priceMin) {
-      return false;
-    }
-    if (typeof filters.priceMax === "number" && product.price > filters.priceMax) {
-      return false;
+    // Prix : vérifier le prix de base ET les prix des variantes
+    if (typeof filters.priceMin === "number" || typeof filters.priceMax === "number") {
+      const allPrices = [product.price];
+      if (product.variants) {
+        for (const v of product.variants) {
+          if (v.price) allPrices.push(v.price);
+        }
+      }
+      const minProductPrice = Math.min(...allPrices);
+      const maxProductPrice = Math.max(...allPrices);
+      if (typeof filters.priceMin === "number" && maxProductPrice < filters.priceMin) {
+        return false;
+      }
+      if (typeof filters.priceMax === "number" && minProductPrice > filters.priceMax) {
+        return false;
+      }
     }
 
     return true;
@@ -327,6 +393,108 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
       return [...filtered].sort((a, b) => b.popularScore - a.popularScore);
     }
   }
+};
+
+/**
+ * Overrides visuels calculés pour l'affichage catalogue quand des filtres sont actifs.
+ * Permet d'afficher l'image/prix/description de la sous-fiche correspondante.
+ */
+export type CardOverrides = {
+  image?: { src: string; alt: string; blurDataURL?: string };
+  price?: number;
+  name?: string;
+  shortDescription?: string;
+  configKey?: string;
+  diameter?: number;
+};
+
+/**
+ * Pour chaque produit filtré, résout la meilleure sous-fiche correspondant aux filtres actifs
+ * et retourne les overrides visuels (image, prix, description) pour la carte produit.
+ */
+export const resolveCardOverrides = (product: Product, filters: FilterState): CardOverrides | undefined => {
+  if (!product.configurations && !product.variants) return undefined;
+
+  const diameterSelections = ensureArray(filters.diameter)
+    .map((v) => Number.parseFloat(v))
+    .filter((v) => Number.isFinite(v));
+  const materialSelections = ensureArray(filters.material);
+  const planchaSelections = ensureArray(filters.planchaMaterial);
+
+  // Déduire la finition demandée par les filtres matériau
+  let filterFinish: string | undefined;
+  if (materialSelections.includes('corten')) filterFinish = 'corten';
+  else if (materialSelections.includes('acier')) filterFinish = 'peint';
+
+  // Déduire la plancha demandée par les filtres
+  const filterPlancha: string | undefined = planchaSelections[0];
+
+  // Chercher la meilleure sous-fiche (configuration) correspondant aux filtres
+  if (product.configurations) {
+    let bestKey: string | undefined;
+    let bestConfig: ProductConfiguration | undefined;
+
+    for (const [key, config] of Object.entries(product.configurations)) {
+      const [keyFinish, keyPlancha] = key.split('-');
+      // Si un filtre matériau est actif, la clé doit matcher
+      if (filterFinish && keyFinish !== filterFinish) continue;
+      // Si un filtre plancha est actif, la clé doit matcher
+      if (filterPlancha && keyPlancha !== filterPlancha) continue;
+      // Si un filtre diamètre est actif, la config doit avoir ce diamètre
+      if (diameterSelections.length && config.diameters) {
+        const hasMatchingDiameter = diameterSelections.some(d => config.diameters?.[String(Math.round(d))]);
+        if (!hasMatchingDiameter) continue;
+      }
+      bestKey = key;
+      bestConfig = config;
+      break; // On prend la première correspondance
+    }
+
+    if (bestConfig && bestKey) {
+      const overrides: CardOverrides = { configKey: bestKey };
+
+      // Image de la sous-fiche
+      if (bestConfig.images && bestConfig.images.length > 0) {
+        overrides.image = bestConfig.images[0];
+      } else if (product.configImages?.[bestKey]?.length) {
+        overrides.image = product.configImages[bestKey][0];
+      }
+
+      // Diamètre et prix : prendre le premier diamètre qui matche les filtres
+      if (bestConfig.diameters) {
+        const matchedDiam = diameterSelections.length
+          ? diameterSelections.find(d => bestConfig!.diameters?.[String(Math.round(d))])
+          : undefined;
+        const diamKey = matchedDiam ? String(Math.round(matchedDiam)) : Object.keys(bestConfig.diameters)[0];
+        const diamData = bestConfig.diameters[diamKey];
+        if (diamData) {
+          overrides.diameter = Number(diamKey);
+          if (diamData.price) overrides.price = diamData.price;
+          if (diamData.description) overrides.shortDescription = diamData.description;
+        }
+      }
+
+      // Description de la sous-fiche
+      if (!overrides.shortDescription && bestConfig.description) {
+        overrides.shortDescription = bestConfig.description;
+      }
+
+      return overrides;
+    }
+  }
+
+  // Fallback : si pas de configurations mais des variantes avec configImages
+  if (product.configImages && (filterFinish || filterPlancha)) {
+    for (const [key, imgs] of Object.entries(product.configImages)) {
+      if (imgs.length === 0) continue;
+      const [kFinish, kPlancha] = key.split('-');
+      if (filterFinish && kFinish !== filterFinish) continue;
+      if (filterPlancha && kPlancha !== filterPlancha) continue;
+      return { image: imgs[0], configKey: key };
+    }
+  }
+
+  return undefined;
 };
 
 export const getProductBySlug = (products: Product[], slug: string) =>

@@ -69,7 +69,7 @@ export function CustomizationSelector({
       if (face.mode === 'image' && face.imageUrl) {
         output[num] = { type: 'image', imageUrl: face.imageUrl, fileName: face.fileName };
       } else if (face.mode === 'text' && face.text?.trim()) {
-        output[num] = { type: 'text', text: face.text.trim(), font: face.font || 'serif' };
+        output[num] = { type: 'text', text: face.text.trim(), font: (face.font as FaceCustomization['font']) || 'serif' };
       }
     }
     onChange(output);

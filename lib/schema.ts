@@ -109,33 +109,22 @@ const productConfigurationSchema = z.object({
 
 export type ProductConfiguration = z.infer<typeof productConfigurationSchema>;
 
-/** Schema pour la personnalisation d'une face du brasero */
 const faceCustomizationSchema = z.object({
-  /** Type de personnalisation : image uploadée ou texte */
-  type: z.enum(["image", "text"]),
-  /** URL de l'image uploadée (si type = image) */
+  type: z.enum(['image', 'text']),
   imageUrl: z.string().optional(),
-  /** Nom du fichier original (si type = image) */
   fileName: z.string().optional(),
-  /** Texte saisi par le client (si type = text) */
   text: z.string().optional(),
-  /** Police choisie (si type = text) */
-  font: z.string().optional(),
+  font: z.enum(['serif', 'sans', 'script', 'mono', 'display']).optional(),
 });
 
 export type FaceCustomization = z.infer<typeof faceCustomizationSchema>;
 
-/** Schema pour les options de personnalisation d'un produit (stocké en DB) */
-const customizationOptionsSchema = z.object({
+const customizationSchema = z.object({
   enabled: z.boolean(),
-  priceSupplement: z.number(),
-  /** Nombre de faces personnalisables (ex: 3, 4) */
-  numberOfFaces: z.number().optional(),
-  /** Image du schéma du socle avec faces numérotées */
   schemaImage: z.string().optional(),
+  numberOfFaces: z.number().optional(),
+  priceSupplement: z.number().optional(),
 });
-
-export type CustomizationOptions = z.infer<typeof customizationOptionsSchema>;
 
 export const productSchema = z.object({
   slug: z.string(),
@@ -192,8 +181,7 @@ export const productSchema = z.object({
     )
     .optional(),
   seoContent: seoContentSchema.optional(),
-  /** Options de personnalisation par découpe laser */
-  customization: customizationOptionsSchema.optional(),
+  customization: customizationSchema.optional(),
 });
 
 export type Product = z.infer<typeof productSchema>;

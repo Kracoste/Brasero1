@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Geist, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -20,13 +20,6 @@ const displayFont = Space_Grotesk({
 });
 
 const baseUrl = new URL("https://www.atelier-lbf.fr");
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: "#1a1a1a",
-};
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -65,10 +58,10 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: settings.storeName,
       images: [
         {
-          url: `${baseUrl.href}Produits/og-brasero.webp`,
+          url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
           width: 1200,
           height: 630,
-          alt: `Brasero plancha artisanal en acier corten avec range-bûches — ${settings.storeName}`,
+          alt: settings.storeName,
         },
       ],
       locale: "fr_FR",
@@ -79,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `${settings.storeName} — Braseros artisanaux Made in France`,
       description: `Braseros artisanaux en acier corten, fendeurs à bûches et accessoires. Fabriqués à la main à ${settings.atelier.city}. Livraison France.`,
       images: [
-        `${baseUrl.href}Produits/og-brasero.webp`,
+        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     manifest: "/manifest.json",
@@ -112,12 +105,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           html.translated-ltr, html.translated-rtl { margin-top:0!important; overflow:visible!important; }
           html.translated-ltr body, html.translated-rtl body { top:0!important; position:static!important; }
         `}} />
-        {/* Google Tag Manager - must load immediately on every page */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        {/* Google Translate — loaded via next/script for proper hydration */}
+        {/* Google Tag Manager - Script tag in head */}
+        <Script id="gtm-head" strategy="afterInteractive">{`
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-W8ZKW7WD');` }} />
+})(window,document,'script','dataLayer','GTM-W8ZKW7WD');
+        `}</Script>
       </head>
       <body suppressHydrationWarning className={`${geistSans.variable} ${displayFont.variable} antialiased`}>
         {/* GT container — hidden off-screen */}

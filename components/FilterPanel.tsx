@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { ensureArray, type FilterState } from "@/lib/utils";
+import { ensureArray, type FilterState, type PlanchaFilterOption } from "@/lib/utils";
 import { CustomDualRange } from "./CustomDualRange";
 
 interface FilterPanelProps {
@@ -78,6 +78,8 @@ export const FilterPanel = ({
         onMaterialChange={(material) => onChange({ ...value, material })}
         format={value.format}
         onFormatChange={(format) => onChange({ ...value, format })}
+        planchaMaterial={value.planchaMaterial}
+        onPlanchaMaterialChange={(planchaMaterial) => onChange({ ...value, planchaMaterial })}
         accessoryType={value.accessoryType}
         onAccessoryTypeChange={(type) => onChange({ ...value, accessoryType: type })}
         diameter={value.diameter}
@@ -131,6 +133,8 @@ interface FiltersContentProps {
   onMaterialChange: (value?: FilterState["material"]) => void;
   format?: FilterState["format"];
   onFormatChange: (value?: FilterState["format"]) => void;
+  planchaMaterial?: FilterState["planchaMaterial"];
+  onPlanchaMaterialChange: (value?: FilterState["planchaMaterial"]) => void;
   accessoryType?: FilterState["accessoryType"];
   onAccessoryTypeChange: (value?: FilterState["accessoryType"]) => void;
   diameter?: FilterState["diameter"];
@@ -157,6 +161,8 @@ const FiltersContent = ({
   onMaterialChange,
   format,
   onFormatChange,
+  planchaMaterial,
+  onPlanchaMaterialChange,
   accessoryType,
   onAccessoryTypeChange,
   diameter,
@@ -171,6 +177,7 @@ const FiltersContent = ({
 }: FiltersContentProps) => {
   const materialValues = ensureArray(material);
   const formatValues = ensureArray(format);
+  const planchaValues = ensureArray(planchaMaterial);
   const accessoryValues = ensureArray(accessoryType);
   const diameterValues = ensureArray(diameter);
 
@@ -194,6 +201,10 @@ const FiltersContent = ({
           <FormatSection
             values={formatValues}
             onChange={(next) => onFormatChange(next && next.length ? next : undefined)}
+          />
+          <PlanchaMaterialSection
+            values={planchaValues}
+            onChange={(next) => onPlanchaMaterialChange(next && next.length ? next : undefined)}
           />
           <DimensionSection
             values={diameterValues}
@@ -431,6 +442,50 @@ const FormatSection = ({
               <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
             </div>
             <span>{formatOption.label}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const PlanchaMaterialSection = ({
+  values,
+  onChange,
+}: {
+  values: PlanchaFilterOption[];
+  onChange: (val?: PlanchaFilterOption[]) => void;
+}) => {
+  const options: { label: string; value: PlanchaFilterOption }[] = [
+    { label: "Plancha Acier", value: "acier" },
+    { label: "Plancha Inox", value: "inox" },
+  ];
+  const toggleValue = (target: PlanchaFilterOption) => {
+    const next = values.includes(target)
+      ? values.filter((entry) => entry !== target)
+      : [...values, target];
+    onChange(next.length ? next : undefined);
+  };
+
+  return (
+    <div className="border-t border-slate-200 pt-6">
+      <h3 className="text-base font-bold text-slate-900 mb-4">Matière Plancha</h3>
+      <div className="space-y-3">
+        {options.map((option) => (
+          <label
+            key={option.value}
+            className="flex items-center gap-3 cursor-pointer text-base text-slate-700 hover:text-slate-900"
+          >
+            <div className="relative w-5 h-5 border-2 border-slate-900 flex items-center justify-center transition-all hover:border-black">
+              <input
+                type="checkbox"
+                checked={values.includes(option.value)}
+                onChange={() => toggleValue(option.value)}
+                className="peer sr-only"
+              />
+              <div className="w-2.5 h-2.5 bg-slate-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+            </div>
+            <span>{option.label}</span>
           </label>
         ))}
       </div>

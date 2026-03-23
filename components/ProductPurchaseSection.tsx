@@ -352,8 +352,8 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
       {/* Personnalisation découpe laser */}
       {product.customization?.enabled && (
         <CustomizationSelector
-          priceSupplement={product.customization.priceSupplement}
-          numberOfFaces={product.customization.numberOfFaces}
+          priceSupplement={product.customization.priceSupplement ?? 0}
+          numberOfFaces={product.customization.numberOfFaces ?? 3}
           schemaImage={product.customization.schemaImage}
           onChange={setCustomizationFaces}
         />
