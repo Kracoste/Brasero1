@@ -135,15 +135,19 @@ export default async function BraseroMultifonctionPage() {
             "@type": "Product",
             "name": "Brasero multifonction 3 en 1",
             "description": "Brasero artisanal multifonction : barbecue, plancha et chauffage d'extérieur. Fabriqué en France.",
+            "image": "https://www.atelier-lbf.fr/Braserobanner.jpg",
             "brand": {
               "@type": "Brand",
               "name": settings.storeName
             },
             "offers": {
               "@type": "AggregateOffer",
+              "lowPrice": 800,
+              "highPrice": 2500,
               "priceCurrency": "EUR",
+              "offerCount": 12,
               "availability": "https://schema.org/InStock"
-            }
+            },
           })
         }}
       />
