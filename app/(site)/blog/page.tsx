@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Clock, ArrowRight, BookOpen } from "lucide-react";
 import { getAllBlogPosts } from "@/lib/data/blog";
 import { JsonLd } from "@/components/JsonLd";
@@ -116,9 +117,23 @@ export default async function BlogPage() {
               className="block bg-white border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="grid lg:grid-cols-2">
-                <div className="bg-gradient-to-br from-[#8B4513] to-[#CD853F] p-8 sm:p-12 flex items-center justify-center min-h-[250px]">
-                  <BookOpen className="w-32 h-32 text-white/30" />
-                </div>
+                {featured.featured_image ? (
+                  <div className="relative min-h-[250px]">
+                    <Image
+                      src={featured.featured_image.src}
+                      alt={featured.featured_image.alt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      priority
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-gradient-to-br from-[#8B4513] to-[#CD853F] p-8 sm:p-12 flex items-center justify-center min-h-[250px]">
+                    <BookOpen className="w-32 h-32 text-white/30" />
+                  </div>
+                )}
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-4 mb-4">
                     <span className="bg-[#f6f1e9] text-[#8B4513] text-xs font-medium px-3 py-1">
@@ -170,9 +185,22 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="block bg-white border border-slate-200 hover:shadow-md transition-shadow group"
                 >
-                  <div className="bg-[#f6f1e9] p-8 flex items-center justify-center">
-                    <BookOpen className="w-16 h-16 text-[#8B4513]/30" />
-                  </div>
+                  {post.featured_image ? (
+                    <div className="relative h-48">
+                      <Image
+                        src={post.featured_image.src}
+                        alt={post.featured_image.alt}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-[#f6f1e9] p-8 flex items-center justify-center">
+                      <BookOpen className="w-16 h-16 text-[#8B4513]/30" />
+                    </div>
+                  )}
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
                       <span className="bg-[#f6f1e9] text-[#8B4513] text-xs font-medium px-2 py-1">
