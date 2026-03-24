@@ -288,14 +288,14 @@ export const applyFilters = (products: Product[], filters: FilterState) => {
       if (product.variants) {
         for (const v of product.variants) {
           if (v.finish === 'corten') allMaterials.add('corten');
-          if (v.finish === 'peint') allMaterials.add('acier');
+          if (v.finish === 'peint' && baseMaterial !== 'inox') allMaterials.add('acier');
           if (v.planchaMaterial === 'inox') allMaterials.add('inox');
         }
       }
       if (product.configurations) {
         for (const key of Object.keys(product.configurations)) {
           if (key.includes('corten')) allMaterials.add('corten');
-          if (key.includes('peint')) allMaterials.add('acier');
+          if (key.includes('peint') && baseMaterial !== 'inox') allMaterials.add('acier');
         }
       }
       const matchesMaterial = materialSelections.some((m) => allMaterials.has(m));
@@ -434,20 +434,40 @@ export const resolveCardOverrides = (product: Product, filters: FilterState): Ca
     let bestKey: string | undefined;
     let bestConfig: ProductConfiguration | undefined;
 
+    // Quand le filtre matériau est "acier" (finish=peint), préférer la plancha "acier"
+    // pour éviter d'afficher la sous-fiche inox sur un brasero filtré en acier.
+    const preferredPlancha = (!filterPlancha && filterFinish === 'peint') ? 'acier' : undefined;
+
+    // Premier passage : chercher une correspondance exacte (avec plancha préférée)
     for (const [key, config] of Object.entries(product.configurations)) {
       const [keyFinish, keyPlancha] = key.split('-');
-      // Si un filtre matériau est actif, la clé doit matcher
       if (filterFinish && keyFinish !== filterFinish) continue;
-      // Si un filtre plancha est actif, la clé doit matcher
       if (filterPlancha && keyPlancha !== filterPlancha) continue;
-      // Si un filtre diamètre est actif, la config doit avoir ce diamètre
+      if (preferredPlancha && keyPlancha !== preferredPlancha) continue;
       if (diameterSelections.length && config.diameters) {
         const hasMatchingDiameter = diameterSelections.some(d => config.diameters?.[String(Math.round(d))]);
         if (!hasMatchingDiameter) continue;
       }
       bestKey = key;
       bestConfig = config;
-      break; // On prend la première correspondance
+      break;
+    }
+
+    // Deuxième passage (fallback) : si pas de correspondance exacte avec plancha préférée,
+    // accepter n'importe quelle plancha
+    if (!bestConfig && preferredPlancha) {
+      for (const [key, config] of Object.entries(product.configurations)) {
+        const [keyFinish, keyPlancha] = key.split('-');
+        if (filterFinish && keyFinish !== filterFinish) continue;
+        if (filterPlancha && keyPlancha !== filterPlancha) continue;
+        if (diameterSelections.length && config.diameters) {
+          const hasMatchingDiameter = diameterSelections.some(d => config.diameters?.[String(Math.round(d))]);
+          if (!hasMatchingDiameter) continue;
+        }
+        bestKey = key;
+        bestConfig = config;
+        break;
+      }
     }
 
     if (bestConfig && bestKey) {
@@ -469,6 +489,7 @@ export const resolveCardOverrides = (product: Product, filters: FilterState): Ca
         const diamData = bestConfig.diameters[diamKey];
         if (diamData) {
           overrides.diameter = Number(diamKey);
+          overrides.name = diamData.name || `${product.name} Ø ${diamKey} cm`;
           if (diamData.price) overrides.price = diamData.price;
           if (diamData.description) overrides.shortDescription = diamData.description;
         }

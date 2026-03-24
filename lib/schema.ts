@@ -78,6 +78,7 @@ export type SeoContent = z.infer<typeof seoContentSchema>;
  * Chaque diamètre coché a son propre prix et ses dimensions.
  */
 const diameterDataSchema = z.object({
+  name: z.string().optional(),
   price: z.number().optional(),
   priceBrasero: z.number().optional(),
   pricePlancha: z.number().optional(),

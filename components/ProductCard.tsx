@@ -26,6 +26,7 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
   const [adding, setAdding] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const displayPrice = cardOverrides?.price ?? product.price;
+  const displayName = cardOverrides?.name ?? product.name;
   const displayDescription = cardOverrides?.shortDescription ?? product.shortDescription;
   const isPromo = typeof product.discountPercent === "number" && product.discountPercent > 0 && !!product.comparePrice;
 
@@ -92,7 +93,7 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
         <div className="product-card__content">
           <span className="product-card__status">EN STOCK</span>
           <div className="product-card__name-wrapper">
-            <h3 className="product-card__name">{product.name}</h3>
+            <h3 className="product-card__name">{displayName}</h3>
             <button
               type="button"
               onClick={handleToggleFavorite}

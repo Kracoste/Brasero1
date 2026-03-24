@@ -36,6 +36,7 @@ type ConfigImagesMap = Record<string, ConfigImageEntry[]>;
 type SeoSection = { title: string; blocks?: { subtitle?: string; text?: string }[]; bullets?: string[] };
 
 type DiameterEntry = {
+  name: string;
   price: string;
   priceBrasero: string;
   pricePlancha: string;
@@ -150,7 +151,7 @@ function generateFAQForConfigKey(configKey: string): { question: string; answer:
 }
 
 const emptyDiameterEntry = (): DiameterEntry => ({
-  price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', length: '', width: '', bowlThickness: '', baseThickness: '', description: '', characteristics: [], seoSections: [],
+  name: '', price: '', priceBrasero: '', pricePlancha: '', weight: '', height: '', length: '', width: '', bowlThickness: '', baseThickness: '', description: '', characteristics: [], seoSections: [],
 });
 
 const emptySubFiche = (): SubFiche => ({
@@ -447,6 +448,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                   enabledDiameters.push(d);
                   const dv = dVal as any;
                   diameterData[d] = {
+                    name: dv.name || '',
                     price: dv.price?.toString() || '',
                     priceBrasero: dv.priceBrasero?.toString() || '',
                     pricePlancha: dv.pricePlancha?.toString() || '',
@@ -844,6 +846,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
               const dd = sf.diameterData[d];
               if (dd) {
                 const entry: Record<string, any> = {};
+                if (dd.name?.trim()) entry.name = dd.name.trim();
                 if (dd.price) entry.price = parseFloat(dd.price);
                 if (dd.priceBrasero) entry.priceBrasero = parseFloat(dd.priceBrasero);
                 if (dd.pricePlancha) entry.pricePlancha = parseFloat(dd.pricePlancha);
@@ -2097,6 +2100,10 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                               <div key={d} className="bg-slate-50 rounded-xl p-3 space-y-2">
                                 <div className="flex items-center justify-between">
                                   <span className="text-xs font-bold text-slate-700">⌀ {d} cm</span>
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] text-slate-400 mb-0.5">Nom affiché (optionnel)</label>
+                                  <input type="text" value={dd.name} onChange={(e) => updateDiam('name', e.target.value)} className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder={`${formData.name} Ø ${d}`} />
                                 </div>
                                 <div className="grid grid-cols-3 gap-1.5">
                                   <div>

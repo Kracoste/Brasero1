@@ -256,8 +256,6 @@ const CategorySection = ({
   const allCategories: { label: string; value: MaterialOption }[] = [
     { label: "Braséro Corten", value: "corten" },
     { label: "Braséro Acier", value: "acier" },
-    { label: "Braséro Inox", value: "inox" },
-    { label: "Braséro Acier Brut", value: "brut" },
     { label: "Fendeur à Bûches", value: "fendeur" },
     { label: "Accessoires", value: "accessoire" },
     { label: "Gants", value: "gant" },
@@ -267,7 +265,7 @@ const CategorySection = ({
   
   // Si on est dans l'onglet braséro, filtrer les catégories non-braséro
   const categories = currentCategory === "brasero"
-    ? allCategories.filter(cat => ["corten", "acier", "inox", "brut"].includes(cat.value))
+    ? allCategories.filter(cat => ["corten", "acier"].includes(cat.value))
     : allCategories;
   const handleToggle = (nextValue: MaterialOption) => {
     const next = values.includes(nextValue)
