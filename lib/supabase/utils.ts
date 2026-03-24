@@ -35,7 +35,7 @@ export const VALID_USER_ROLES = ['user', 'admin'] as const;
 export type UserRole = typeof VALID_USER_ROLES[number];
 
 // Buckets de stockage autorisés
-export const ALLOWED_STORAGE_BUCKETS = ['products', 'accessories', 'avatars', 'customizations'] as const;
+export const ALLOWED_STORAGE_BUCKETS = ['products', 'accessories', 'avatars', 'customizations', 'blog'] as const;
 export type StorageBucket = typeof ALLOWED_STORAGE_BUCKETS[number];
 
 /**

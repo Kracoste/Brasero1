@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
+import { BlogFeaturedImageUpload, BlogContentImageInsert } from '@/components/admin/BlogImageUpload';
 
 export default function NewBlogPostPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [featuredImage, setFeaturedImage] = useState<{ src: string; alt: string } | null>(null);
   const [form, setForm] = useState({
     title: '',
     slug: '',
@@ -48,6 +51,7 @@ export default function NewBlogPostPage() {
 
     const payload = {
       ...form,
+      featured_image: featuredImage,
       tags: form.tags
         ? form.tags.split(',').map((t) => t.trim())
         : [],
@@ -200,22 +204,48 @@ export default function NewBlogPostPage() {
           />
         </div>
 
+        {/* Featured image */}
+        <BlogFeaturedImageUpload value={featuredImage} onChange={setFeaturedImage} />
+
         {/* Content */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Contenu (Markdown) *
-          </label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-sm font-medium text-slate-700">
+              Contenu (Markdown) *
+            </label>
+            <BlogContentImageInsert
+              onInsert={(md) => {
+                const ta = contentRef.current;
+                if (ta) {
+                  const start = ta.selectionStart;
+                  const end = ta.selectionEnd;
+                  const before = form.content.slice(0, start);
+                  const after = form.content.slice(end);
+                  const newContent = before + '\n' + md + '\n' + after;
+                  setForm({ ...form, content: newContent });
+                  setTimeout(() => {
+                    ta.focus();
+                    const pos = start + md.length + 2;
+                    ta.setSelectionRange(pos, pos);
+                  }, 0);
+                } else {
+                  setForm({ ...form, content: form.content + '\n' + md + '\n' });
+                }
+              }}
+            />
+          </div>
           <textarea
+            ref={contentRef}
             rows={20}
             required
             value={form.content}
             onChange={(e) => setForm({ ...form, content: e.target.value })}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#8B4513] focus:border-transparent outline-none font-mono text-sm"
-            placeholder="## Titre de section&#10;&#10;Paragraphe de texte avec **gras** et [lien](/url).&#10;&#10;- Point 1&#10;- Point 2"
+            placeholder="## Titre de section&#10;&#10;Paragraphe de texte avec **gras** et [lien](/url).&#10;&#10;![description](url-image)&#10;&#10;- Point 1&#10;- Point 2"
           />
           <p className="text-xs text-slate-400 mt-1">
             Markdown supporté : ## H2, ### H3, **gras**, - listes,
-            [texte](/lien)
+            [texte](/lien), ![description](image)
           </p>
         </div>
 

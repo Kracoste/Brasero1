@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowRight, Clock, Calendar } from "lucide-react";
 import { ShareButtons } from "@/components/ShareButtons";
 
@@ -74,6 +75,32 @@ function renderMarkdown(content: string) {
 
   while (i < lines.length) {
     const line = lines[i];
+
+    // Image: ![alt](url)
+    const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imgMatch) {
+      elements.push(
+        <figure key={i} className="my-8">
+          <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden">
+            <Image
+              src={imgMatch[2]}
+              alt={imgMatch[1]}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 720px"
+              unoptimized
+            />
+          </div>
+          {imgMatch[1] && (
+            <figcaption className="text-center text-sm text-slate-500 mt-2">
+              {imgMatch[1]}
+            </figcaption>
+          )}
+        </figure>
+      );
+      i++;
+      continue;
+    }
 
     // H2
     if (line.startsWith("## ")) {
@@ -229,6 +256,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-6">
                 {post.excerpt}
               </p>
+            )}
+            {post.featured_image && (
+              <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden mb-6">
+                <Image
+                  src={post.featured_image.src}
+                  alt={post.featured_image.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 720px"
+                  priority
+                  unoptimized
+                />
+              </div>
             )}
             <div className="flex items-center gap-6 text-sm text-slate-500 border-b border-slate-200 pb-6">
               {post.published_at && (

@@ -68,6 +68,13 @@ function sanitizeBlogData(data: unknown): Record<string, unknown> | null {
         sanitized[field] = date.toISOString();
       }
     }
+    // featured_image : objet { src, alt }
+    else if (field === 'featured_image' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      const img = value as Record<string, unknown>;
+      if (typeof img.src === 'string' && typeof img.alt === 'string') {
+        sanitized[field] = { src: img.src.trim().slice(0, 500), alt: img.alt.trim().slice(0, 300) };
+      }
+    }
     // null explicite
     else if (value === null) {
       sanitized[field] = null;
