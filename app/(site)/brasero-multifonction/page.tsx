@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
 import { JsonLd } from "@/components/JsonLd";
 import { generateBreadcrumbSchema, generateFAQSchema } from "@/lib/seo/schemas";
+import { getAllProducts } from "@/lib/data/products";
 import {
   Flame,
   ChefHat,
@@ -51,7 +52,30 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BraseroMultifonctionPage() {
-  const settings = await getSiteSettings();
+  const [settings, allProducts] = await Promise.all([
+    getSiteSettings(),
+    getAllProducts(),
+  ]);
+
+  // Calculer les prix dynamiquement depuis les vrais braseros
+  const braseros = allProducts.filter((p) => p.category === "brasero");
+  const allPrices: number[] = [];
+  for (const product of braseros) {
+    if (product.price) allPrices.push(product.price);
+    if (product.variants) {
+      product.variants.forEach((v) => { if (v.price) allPrices.push(v.price); });
+    }
+    if (product.configurations) {
+      Object.values(product.configurations).forEach((config) => {
+        if (config.diameters) {
+          Object.values(config.diameters).forEach((d) => { if (d.price) allPrices.push(d.price); });
+        }
+      });
+    }
+  }
+  const lowPrice = allPrices.length > 0 ? Math.min(...allPrices) : 800;
+  const highPrice = allPrices.length > 0 ? Math.max(...allPrices) : 3200;
+  const offerCount = allPrices.length || 1;
 
   const functions = [
     {
@@ -127,30 +151,22 @@ export default async function BraseroMultifonctionPage() {
     <main className="bg-white">
       <JsonLd data={breadcrumb} />
       {faqSchema && <JsonLd data={faqSchema} />}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "Brasero multifonction 3 en 1",
-            "description": "Brasero artisanal multifonction : barbecue, plancha et chauffage d'extérieur. Fabriqué en France.",
-            "image": "https://www.atelier-lbf.fr/Braserobanner.jpg",
-            "brand": {
-              "@type": "Brand",
-              "name": settings.storeName
-            },
-            "offers": {
-              "@type": "AggregateOffer",
-              "lowPrice": 800,
-              "highPrice": 2500,
-              "priceCurrency": "EUR",
-              "offerCount": 12,
-              "availability": "https://schema.org/InStock"
-            },
-          })
-        }}
-      />
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: "Brasero multifonction 3 en 1",
+        description: "Brasero artisanal multifonction : barbecue, plancha et chauffage d'extérieur. Fabriqué en France.",
+        image: braseros[0]?.images?.[0]?.src || "https://www.atelier-lbf.fr/Braserobanner.jpg",
+        brand: { "@type": "Brand", name: settings.storeName },
+        offers: {
+          "@type": "AggregateOffer",
+          lowPrice,
+          highPrice,
+          priceCurrency: "EUR",
+          offerCount,
+          availability: "https://schema.org/InStock",
+        },
+      }} />
 
       {/* Hero */}
       <section className="bg-[#f6f1e9] py-16 sm:py-24">
