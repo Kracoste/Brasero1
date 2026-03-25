@@ -138,14 +138,8 @@ export default async function FabricationPage() {
               "latitude": settings.atelier.lat,
               "longitude": settings.atelier.lng
             },
-            "makesOffer": {
-              "@type": "Offer",
-              "itemOffered": {
-                "@type": "Product",
-                "name": "Brasero artisanal",
-                "description": "Brasero fabriqué à la main en France"
-              }
-            }
+            "url": "https://www.atelier-lbf.fr",
+            "sameAs": "https://www.atelier-lbf.fr/produits"
           })
         }}
       />
