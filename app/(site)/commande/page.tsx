@@ -11,6 +11,7 @@ import { useAnalytics } from '@/lib/analytics-context';
 import { Section } from '@/components/Section';
 import { Container } from '@/components/Container';
 import { Price } from '@/components/Price';
+import { PromoCodeInput, type CouponData } from '@/components/PromoCodeInput';
 import { createClient } from '@/lib/supabase/client';
 
 type CheckoutForm = {
@@ -105,6 +106,7 @@ export default function CheckoutPage() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
   const supabase = createClient();
 
   // Tracker le début du checkout
@@ -270,6 +272,7 @@ export default function CheckoutPage() {
             },
             deliveryMessage,
             paymentMethod,
+            couponCode: appliedCoupon?.code || null,
           }),
         });
 
@@ -850,11 +853,24 @@ export default function CheckoutPage() {
                 </div>
               ))}
             </div>
+            <div className="border-t border-slate-200 pt-4">
+              <PromoCodeInput
+                cartTotal={totalPrice}
+                onApply={(couponData) => setAppliedCoupon(couponData)}
+                onRemove={() => setAppliedCoupon(null)}
+              />
+            </div>
             <div className="space-y-2 border-t border-slate-200 pt-4 text-sm">
               <div className="flex justify-between text-slate-600">
                 <span>Sous-total</span>
                 <Price amount={totalPrice} />
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between text-green-600">
+                  <span>Réduction ({appliedCoupon.code})</span>
+                  <span>-{appliedCoupon.discount.toFixed(2).replace('.', ',')} €</span>
+                </div>
+              )}
               <div className="flex justify-between text-slate-600">
                 <span>Livraison</span>
                 <span>Incluse</span>
@@ -862,7 +878,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold text-slate-900">
               <span>Total</span>
-              <Price amount={totalPrice} />
+              <Price amount={appliedCoupon ? totalPrice - appliedCoupon.discount : totalPrice} />
             </div>
             <p className="text-xs text-slate-500">Tous les paiements sont sécurisés et chiffrés.</p>
           </div>

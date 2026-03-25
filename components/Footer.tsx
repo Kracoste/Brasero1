@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Shield, Truck, RotateCcw, Lock } from "lucide-react";
 
 import { Container } from "@/components/Container";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 const serviceLinks = [
   { href: "/info/service-clientele", label: "Service à la clientèle" },
@@ -95,6 +96,10 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
               ))}
             </ul>
           </div>
+        </div>
+        {/* Newsletter signup */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <NewsletterSignup />
         </div>
       </Container>
       {/* Trust badges */}

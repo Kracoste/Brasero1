@@ -32,6 +32,7 @@ type CheckoutBody = {
   };
   deliveryMessage?: string;
   paymentMethod?: 'card' | 'klarna';
+  couponCode?: string | null;
 };
 
 const parseQuantity = (value: unknown) => {
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CheckoutBody = await request.json();
-    const { items, customerInfo, deliveryMessage, paymentMethod } = body;
+    const { items, customerInfo, deliveryMessage, paymentMethod, couponCode } = body;
 
     // ============================================
     // SÉCURITÉ : Validation des entrées
@@ -223,6 +224,39 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Valider et appliquer le code promo côté serveur
+    let stripeCouponId: string | undefined;
+    let couponCodeUsed: string | undefined;
+    if (couponCode && typeof couponCode === 'string') {
+      const supabaseAdmin = getSupabaseAdminClient();
+      if (supabaseAdmin) {
+        const { data: coupon } = await supabaseAdmin
+          .from('coupons')
+          .select('id, code, discount_type, discount_value, min_purchase_amount, max_uses, current_uses, expires_at, is_active')
+          .eq('code', couponCode.toUpperCase())
+          .eq('is_active', true)
+          .single();
+
+        if (coupon) {
+          const isExpired = coupon.expires_at && new Date(coupon.expires_at) < new Date();
+          const isExhausted = coupon.max_uses && coupon.current_uses >= coupon.max_uses;
+          const cartTotal = lineItems.reduce((sum, li) => sum + (li.price_data.unit_amount * li.quantity), 0) / 100;
+          const belowMin = coupon.min_purchase_amount && cartTotal < coupon.min_purchase_amount;
+
+          if (!isExpired && !isExhausted && !belowMin) {
+            // Créer un coupon Stripe à usage unique
+            const stripeCoupon = await stripe.coupons.create(
+              coupon.discount_type === 'percentage'
+                ? { percent_off: coupon.discount_value, duration: 'once' }
+                : { amount_off: Math.round(coupon.discount_value * 100), currency: 'eur', duration: 'once' }
+            );
+            stripeCouponId = stripeCoupon.id;
+            couponCodeUsed = coupon.code;
+          }
+        }
+      }
+    }
+
     // Créer la session de checkout Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: paymentMethod === 'klarna' ? ['klarna'] : ['card', 'link'],
@@ -235,6 +269,7 @@ export async function POST(request: NextRequest) {
       shipping_address_collection: {
         allowed_countries: ['FR', 'BE', 'DE', 'LU', 'CH'],
       },
+      ...(stripeCouponId ? { discounts: [{ coupon: stripeCouponId }] } : {}),
       metadata: {
         user_id: user?.id || `guest_${crypto.randomUUID()}`,
         customer_name: `${customerInfo.first_name} ${customerInfo.last_name}`,
@@ -245,9 +280,28 @@ export async function POST(request: NextRequest) {
         shipping_city: customerInfo.city,
         shipping_country: customerInfo.country,
         delivery_message: deliveryMessage || '',
+        coupon_code: couponCodeUsed || '',
       },
       locale: 'fr',
     });
+
+    // Incrémenter l'utilisation du coupon
+    if (couponCodeUsed) {
+      const adminClient = getSupabaseAdminClient();
+      if (adminClient) {
+        const { data: couponRow } = await adminClient
+          .from('coupons')
+          .select('current_uses')
+          .eq('code', couponCodeUsed)
+          .single();
+        if (couponRow) {
+          await adminClient
+            .from('coupons')
+            .update({ current_uses: (couponRow.current_uses || 0) + 1 })
+            .eq('code', couponCodeUsed);
+        }
+      }
+    }
 
     // Sauvegarder les customizations en DB (les metadata Stripe sont trop petites)
     const customizationItems = normalizedItems

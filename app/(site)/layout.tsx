@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import ReassuranceBar from "@/components/ReassuranceBar";
 import { FloatingCart } from "@/components/FloatingCart";
 import { Commitments } from "@/components/Commitments";
 import { CartProvider } from "@/lib/cart-context";
@@ -23,6 +24,7 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
         <CartProvider>
           <FavoritesProvider>
             <div className="flex min-h-screen flex-col text-slate-900 overflow-x-hidden">
+              <ReassuranceBar />
               <Header />
               <main className="flex-1 overflow-x-hidden">{children}</main>
               <Commitments />
