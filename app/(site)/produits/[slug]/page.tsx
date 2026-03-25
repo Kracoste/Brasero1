@@ -5,6 +5,7 @@ import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
 import { VariantConfiguratorWrapper } from "@/components/VariantConfiguratorWrapper";
 import { RelatedProducts } from "@/components/RelatedProducts";
+import { VariantLinks } from "@/components/VariantLinks";
 import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { mapSupabaseProduct } from "@/lib/utils";
@@ -157,6 +158,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
           />
         </Container>
       </Section>
+
+      {/* Liens internes vers toutes les configurations /brasero-plancha/ — maillage SEO */}
+      <VariantLinks product={product} />
 
       {/* Section produits similaires - pleine largeur */}
       {relatedProducts.length > 0 && (

@@ -107,19 +107,8 @@ export function ProductCarousel({ products, className = '' }: ProductCarouselPro
         </div>
       </div>
 
-      {/* Grid layout 2 cols - visible on tablet */}
-      <div className="hidden md:grid lg:hidden gap-6 grid-cols-2">
-        {products.map((product) => (
-          <ProductCard
-            key={product.slug}
-            product={product}
-            className="home-highlight-card"
-          />
-        ))}
-      </div>
-
-      {/* Grid layout 4 cols - visible only on desktop */}
-      <div className="hidden lg:grid gap-6 grid-cols-4">
+      {/* Grid layout — single render for tablet & desktop (2 cols tablet, 4 cols desktop) */}
+      <div className="hidden md:grid gap-6 grid-cols-2 lg:grid-cols-4">
         {products.map((product) => (
           <ProductCard
             key={product.slug}

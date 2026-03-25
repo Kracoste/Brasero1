@@ -9,6 +9,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 import { generateStoreSchema } from "@/lib/seo/schemas";
+import { getAllVariantSlugs } from "@/lib/variant-slugs";
 import { Flame, Truck, Shield, Award, Scissors, Send, CheckCircle, Sparkles } from "lucide-react";
 
 // ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
@@ -339,6 +340,52 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* Section maillage interne — liens vers fiches brasero-plancha SEO */}
+      {(() => {
+        const allVariants = braseros.flatMap((p) => {
+          const shortName = p.specs?.shortName || p.name;
+          return getAllVariantSlugs(p).map((v) => ({ ...v, shortName }));
+        });
+        if (allVariants.length === 0) return null;
+        const FINISH_LABELS: Record<string, string> = { corten: 'Corten', peint: 'Peint' };
+        const PLANCHA_LABELS: Record<string, string> = { acier: 'Plancha Acier', inox: 'Plancha Inox' };
+        return (
+          <section className="py-12 sm:py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-8">
+                <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                  Nos braseros avec plancha
+                </h2>
+                <p className="mt-3 text-slate-600 max-w-2xl mx-auto">
+                  Découvrez toutes les configurations disponibles : finition, diamètre et type de plancha.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {allVariants.map(({ variantSlug, shortName, diameter, finish, plancha }) => (
+                  <Link
+                    key={variantSlug}
+                    href={`/brasero-plancha/${variantSlug}`}
+                    className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:border-[#CD853F] hover:shadow-md transition-all group"
+                  >
+                    <div>
+                      <span className="font-medium text-slate-900 group-hover:text-[#CD853F] transition-colors text-sm">
+                        {shortName} — {FINISH_LABELS[finish] || finish}
+                      </span>
+                      <span className="block text-xs text-slate-500 mt-0.5">
+                        {PLANCHA_LABELS[plancha] || plancha} · {diameter} cm
+                      </span>
+                    </div>
+                    <span className="text-[#CD853F] text-sm font-medium">
+                      Voir &rarr;
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Section SEO - Texte descriptif */}
       <section className="py-12 sm:py-16 bg-[#f6f1e9]">
