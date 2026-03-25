@@ -115,13 +115,27 @@ export function BlogFeaturedImageUpload({ value, onChange }: BlogImageUploadProp
 }
 
 type ContentImageInsertProps = {
-  /** Called with the markdown image string to insert */
-  onInsert: (markdown: string) => void;
+  /** Ref to the content textarea, used to read cursor position */
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  /** Called with the cursor position and markdown image string to insert */
+  onInsert: (markdown: string, cursorPos: number) => void;
 };
 
-export function BlogContentImageInsert({ onInsert }: ContentImageInsertProps) {
+export function BlogContentImageInsert({ textareaRef, onInsert }: ContentImageInsertProps) {
   const [uploading, setUploading] = useState(false);
+  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
+  const [alt, setAlt] = useState('');
+  const [savedCursorPos, setSavedCursorPos] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleClickUpload() {
+    // Sauvegarder la position du curseur AVANT d'ouvrir le file picker
+    const ta = textareaRef.current;
+    if (ta) {
+      setSavedCursorPos(ta.selectionStart);
+    }
+    inputRef.current?.click();
+  }
 
   async function handleUpload(file: File) {
     setUploading(true);
@@ -143,24 +157,64 @@ export function BlogContentImageInsert({ onInsert }: ContentImageInsertProps) {
       }
 
       const { publicUrl } = await res.json();
-      const alt = prompt('Description de l\'image (texte alternatif) :') || file.name;
-      onInsert(`![${alt}](${publicUrl})`);
+      setPendingUrl(publicUrl);
+      setAlt('');
     } finally {
       setUploading(false);
     }
   }
 
+  function handleConfirm() {
+    if (!pendingUrl) return;
+    onInsert(`![${alt || 'image'}](${pendingUrl})`, savedCursorPos);
+    setPendingUrl(null);
+    setAlt('');
+  }
+
+  function handleCancel() {
+    setPendingUrl(null);
+    setAlt('');
+  }
+
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        disabled={uploading}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded transition-colors disabled:opacity-50"
-      >
-        {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-        {uploading ? 'Upload...' : 'Insérer une image'}
-      </button>
+    <div className="flex items-center gap-2">
+      {pendingUrl ? (
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={alt}
+            onChange={(e) => setAlt(e.target.value)}
+            placeholder="Description de l'image"
+            className="px-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-[#8B4513] outline-none w-48"
+            autoFocus
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleConfirm(); } }}
+          />
+          <button
+            type="button"
+            onClick={handleConfirm}
+            className="px-2 py-1 text-xs font-medium text-white bg-[#8B4513] hover:bg-[#6d3610] rounded transition-colors"
+          >
+            OK
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="p-1 text-slate-400 hover:text-red-500 transition-colors"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={handleClickUpload}
+          disabled={uploading}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded transition-colors disabled:opacity-50"
+        >
+          {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+          {uploading ? 'Upload...' : 'Insérer une image'}
+        </button>
+      )}
       <input
         ref={inputRef}
         type="file"
@@ -172,6 +226,6 @@ export function BlogContentImageInsert({ onInsert }: ContentImageInsertProps) {
           e.target.value = '';
         }}
       />
-    </>
+    </div>
   );
 }

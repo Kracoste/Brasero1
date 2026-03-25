@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useRef, use } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import { BlogFeaturedImageUpload, BlogContentImageInsert } from '@/components/admin/BlogImageUpload';
+import { BlogFeaturedImageUpload } from '@/components/admin/BlogImageUpload';
+import BlogContentEditor from '@/components/admin/BlogContentEditor';
 
 type BlogPost = {
   id: string;
@@ -31,7 +32,6 @@ export default function EditBlogPostPage({ params }: { params: Promise<{ id: str
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
   const [featuredImage, setFeaturedImage] = useState<{ src: string; alt: string } | null>(null);
   const [form, setForm] = useState({
     title: '',
@@ -241,42 +241,10 @@ export default function EditBlogPostPage({ params }: { params: Promise<{ id: str
 
         <BlogFeaturedImageUpload value={featuredImage} onChange={setFeaturedImage} />
 
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-sm font-medium text-slate-700">Contenu (Markdown) *</label>
-            <BlogContentImageInsert
-              onInsert={(md) => {
-                const ta = contentRef.current;
-                if (ta) {
-                  const start = ta.selectionStart;
-                  const end = ta.selectionEnd;
-                  const before = form.content.slice(0, start);
-                  const after = form.content.slice(end);
-                  const newContent = before + '\n' + md + '\n' + after;
-                  setForm({ ...form, content: newContent });
-                  setTimeout(() => {
-                    ta.focus();
-                    const pos = start + md.length + 2;
-                    ta.setSelectionRange(pos, pos);
-                  }, 0);
-                } else {
-                  setForm({ ...form, content: form.content + '\n' + md + '\n' });
-                }
-              }}
-            />
-          </div>
-          <textarea
-            ref={contentRef}
-            rows={20}
-            required
-            value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#8B4513] focus:border-transparent outline-none font-mono text-sm"
-          />
-          <p className="text-xs text-slate-400 mt-1">
-            Markdown : ## H2, ### H3, **gras**, - listes, [texte](/lien), ![description](image)
-          </p>
-        </div>
+        <BlogContentEditor
+          value={form.content}
+          onChange={(content) => setForm({ ...form, content })}
+        />
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Produits liés (slugs)</label>

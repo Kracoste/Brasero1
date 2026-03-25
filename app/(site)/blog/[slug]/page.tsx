@@ -13,6 +13,7 @@ import {
   generateArticleSchema,
   generateBreadcrumbSchema,
 } from "@/lib/seo/schemas";
+import { renderMarkdownContent } from "@/components/MarkdownRenderer";
 
 export const revalidate = 60;
 
@@ -67,149 +68,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   inspiration: "Inspiration",
 };
 
-function renderMarkdown(content: string) {
-  // Simple markdown renderer for blog content
-  const lines = content.split("\n");
-  const elements: React.ReactNode[] = [];
-  let i = 0;
-
-  while (i < lines.length) {
-    const line = lines[i];
-
-    // Image: ![alt](url)
-    const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-    if (imgMatch) {
-      elements.push(
-        <figure key={i} className="my-8">
-          <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden">
-            <Image
-              src={imgMatch[2]}
-              alt={imgMatch[1]}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 720px"
-              unoptimized
-            />
-          </div>
-          {imgMatch[1] && (
-            <figcaption className="text-center text-sm text-slate-500 mt-2">
-              {imgMatch[1]}
-            </figcaption>
-          )}
-        </figure>
-      );
-      i++;
-      continue;
-    }
-
-    // H2
-    if (line.startsWith("## ")) {
-      elements.push(
-        <h2
-          key={i}
-          className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mt-12 mb-4"
-        >
-          {line.slice(3)}
-        </h2>
-      );
-      i++;
-      continue;
-    }
-
-    // H3
-    if (line.startsWith("### ")) {
-      elements.push(
-        <h3
-          key={i}
-          className="text-xl sm:text-2xl font-display font-semibold text-slate-900 mt-8 mb-3"
-        >
-          {line.slice(4)}
-        </h3>
-      );
-      i++;
-      continue;
-    }
-
-    // Unordered list
-    if (line.startsWith("- ") || line.startsWith("* ")) {
-      const listItems: string[] = [];
-      while (
-        i < lines.length &&
-        (lines[i].startsWith("- ") || lines[i].startsWith("* "))
-      ) {
-        listItems.push(lines[i].slice(2));
-        i++;
-      }
-      elements.push(
-        <ul key={`ul-${i}`} className="list-disc pl-6 space-y-2 my-4">
-          {listItems.map((item, idx) => (
-            <li key={idx} className="text-slate-700 leading-relaxed">
-              {renderInline(item)}
-            </li>
-          ))}
-        </ul>
-      );
-      continue;
-    }
-
-    // Empty line
-    if (line.trim() === "") {
-      i++;
-      continue;
-    }
-
-    // Paragraph
-    elements.push(
-      <p key={i} className="text-slate-700 leading-relaxed my-4">
-        {renderInline(line)}
-      </p>
-    );
-    i++;
-  }
-
-  return elements;
-}
-
-function renderInline(text: string): React.ReactNode {
-  // Bold
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, idx) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return (
-        <strong key={idx} className="font-semibold text-slate-900">
-          {part.slice(2, -2)}
-        </strong>
-      );
-    }
-    // Internal links [text](/url)
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const linkParts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let match;
-    while ((match = linkRegex.exec(part)) !== null) {
-      if (match.index > lastIndex) {
-        linkParts.push(part.slice(lastIndex, match.index));
-      }
-      linkParts.push(
-        <Link
-          key={`link-${idx}-${match.index}`}
-          href={match[2]}
-          className="text-[#8B4513] hover:underline font-medium"
-        >
-          {match[1]}
-        </Link>
-      );
-      lastIndex = match.index + match[0].length;
-    }
-    if (linkParts.length > 0) {
-      if (lastIndex < part.length) {
-        linkParts.push(part.slice(lastIndex));
-      }
-      return <span key={idx}>{linkParts}</span>;
-    }
-    return part;
-  });
-}
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
@@ -292,7 +150,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Content */}
           <article className="prose-slate max-w-none">
-            {renderMarkdown(post.content)}
+            {renderMarkdownContent(post.content)}
           </article>
 
           {/* Boutons de partage */}
