@@ -5,6 +5,8 @@ import { Section } from "@/components/Section";
 
 export const metadata: Metadata = {
   title: "Conditions Générales de Vente",
+  description: "Consultez les conditions générales de vente de l'Atelier LBF : paiement, livraison, garantie, droit de rétractation pour nos braseros artisanaux fabriqués en France.",
+  alternates: { canonical: "/cgv" },
 };
 
 export default function CGVPage() {

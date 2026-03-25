@@ -5,6 +5,8 @@ import { Section } from "@/components/Section";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
+  description: "Mentions légales de l'Atelier LBF — SARL au capital de 10 000 €, fabricant de braseros artisanaux à Chiché (79350), Deux-Sèvres.",
+  alternates: { canonical: "/mentions-legales" },
 };
 
 export default function MentionsLegalesPage() {

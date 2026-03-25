@@ -162,6 +162,16 @@ export default async function HomePage() {
       </section>
 
       {/* Section Découpe Laser Personnalisée */}
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        "name": "Découpe laser sur brasero — Atelier LBF",
+        "description": "Démonstration de la découpe laser pour personnalisation de brasero artisanal. Motifs découpés dans l'acier avec précision millimétrique.",
+        "contentUrl": "https://www.atelier-lbf.fr/acceuil/VideoDecoupeLaser.mp4",
+        "thumbnailUrl": "https://www.atelier-lbf.fr/Produits/og-brasero.webp",
+        "uploadDate": "2025-01-15",
+        "duration": "PT0M30S",
+      }} />
       <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">

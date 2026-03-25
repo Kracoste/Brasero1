@@ -58,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: settings.storeName,
       images: [
         {
-          url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
+          url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp",
           width: 1200,
           height: 630,
           alt: settings.storeName,
@@ -72,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `${settings.storeName} — Braseros artisanaux Made in France`,
       description: `Braseros artisanaux en acier corten, fendeurs à bûches et accessoires. Fabriqués à la main à ${settings.atelier.city}. Livraison France.`,
       images: [
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
+        "https://www.atelier-lbf.fr/Produits/og-brasero.webp",
       ],
     },
     manifest: "/manifest.json",
