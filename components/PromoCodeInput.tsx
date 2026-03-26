@@ -11,11 +11,12 @@ export interface CouponData {
 
 interface PromoCodeInputProps {
   cartTotal: number;
+  email?: string;
   onApply: (couponData: CouponData) => void;
   onRemove: () => void;
 }
 
-export const PromoCodeInput = ({ cartTotal, onApply, onRemove }: PromoCodeInputProps) => {
+export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCodeInputProps) => {
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -34,7 +35,7 @@ export const PromoCodeInput = ({ cartTotal, onApply, onRemove }: PromoCodeInputP
       const response = await fetch("/api/coupons/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: trimmed, cartTotal }),
+        body: JSON.stringify({ code: trimmed, cartTotal, email: email || undefined }),
       });
 
       if (response.status === 429) {

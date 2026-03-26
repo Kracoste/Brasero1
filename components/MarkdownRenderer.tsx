@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 /**
  * Parse image markdown with optional style attributes:
@@ -22,6 +23,17 @@ function parseImageLine(line: string) {
   }
 
   return { alt, src, attrs };
+}
+
+/**
+ * Parse CTA block: [cta:slug]Texte du bouton[/cta]
+ * slug can be a product slug (le-fermier, le-morris, lobelix, le-coffy)
+ * or "produits" to link to the catalog page.
+ */
+function parseCtaLine(line: string) {
+  const match = line.match(/^\[cta:([^\]]+)\](.+)\[\/cta\]$/);
+  if (!match) return null;
+  return { slug: match[1].trim(), text: match[2].trim() };
 }
 
 function getImageStyles(attrs: Record<string, string>) {
@@ -98,6 +110,7 @@ export type MarkdownBlock =
   | { type: "paragraph"; text: string; lineIndex: number }
   | { type: "list"; items: string[]; lineIndex: number }
   | { type: "image"; alt: string; src: string; attrs: Record<string, string>; lineIndex: number; raw: string }
+  | { type: "cta"; slug: string; text: string; lineIndex: number }
   | { type: "empty"; lineIndex: number };
 
 /** Parse markdown content into structured blocks */
@@ -108,6 +121,14 @@ export function parseMarkdownBlocks(content: string): MarkdownBlock[] {
 
   while (i < lines.length) {
     const line = lines[i];
+
+    // CTA button
+    const cta = parseCtaLine(line);
+    if (cta) {
+      blocks.push({ type: "cta", ...cta, lineIndex: i });
+      i++;
+      continue;
+    }
 
     // Image
     const img = parseImageLine(line);
@@ -188,7 +209,29 @@ export function renderBlocks(blocks: MarkdownBlock[]): React.ReactNode[] {
               className="w-full h-auto rounded-lg"
               loading="lazy"
             />
+            {block.alt && (
+              <figcaption className="text-xs text-slate-500 text-center mt-2 italic">
+                {block.alt}
+              </figcaption>
+            )}
           </figure>
+        );
+        break;
+      }
+      case "cta": {
+        const href = block.slug === "produits"
+          ? "/produits"
+          : `/produits/${block.slug}`;
+        elements.push(
+          <div key={idx} className="my-8 text-center clear-both">
+            <Link
+              href={href}
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide px-6 py-3 rounded-sm transition-all text-sm uppercase"
+            >
+              {block.text}
+              <ArrowRight size={16} />
+            </Link>
+          </div>
         );
         break;
       }

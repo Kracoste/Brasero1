@@ -415,6 +415,34 @@ export function generateArticleSchema(article: {
     ? article.content.split(/\s+/).filter(Boolean).length
     : undefined;
 
+  // Collect all images: featured + inline from content
+  const images: Array<{ "@type": string; url: string; caption?: string }> = [];
+
+  if (article.featured_image) {
+    images.push({
+      "@type": "ImageObject",
+      url: article.featured_image.src,
+      caption: article.featured_image.alt,
+    });
+  }
+
+  // Extract inline images from markdown content
+  if (article.content) {
+    const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+    let match;
+    while ((match = imgRegex.exec(article.content)) !== null) {
+      const alt = match[1];
+      const src = match[2];
+      if (src && !images.some((img) => img.url === src)) {
+        images.push({
+          "@type": "ImageObject",
+          url: src,
+          ...(alt ? { caption: alt } : {}),
+        });
+      }
+    }
+  }
+
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -443,13 +471,11 @@ export function generateArticleSchema(article: {
       "@type": "WebPage",
       "@id": `${BASE_URL}/blog/${article.slug}`,
     },
-    ...(article.featured_image ? {
-      image: {
-        "@type": "ImageObject",
-        url: article.featured_image.src,
-        caption: article.featured_image.alt,
-      },
-    } : {}),
+    ...(images.length === 1
+      ? { image: images[0] }
+      : images.length > 1
+        ? { image: images }
+        : {}),
   };
 }
 

@@ -11,6 +11,7 @@ type Coupon = {
   discount_value: number;
   min_purchase_amount: number | null;
   max_uses: number | null;
+  max_uses_per_user: number | null;
   current_uses: number;
   expires_at: string | null;
   is_active: boolean;
@@ -23,15 +24,26 @@ type ProductOption = {
   name: string;
 };
 
-const emptyCoupon: Omit<Coupon, 'id' | 'created_at' | 'current_uses'> = {
+type CouponForm = {
+  code: string;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  min_purchase_amount: number | null;
+  max_uses: number | null;
+  max_uses_per_user: number | null;
+  expires_at: string | null;
+  is_active: boolean;
+};
+
+const emptyCouponForm: CouponForm = {
   code: '',
   discount_type: 'percentage',
   discount_value: 0,
   min_purchase_amount: null,
   max_uses: null,
+  max_uses_per_user: 1,
   expires_at: null,
   is_active: true,
-  applicable_products: null,
 };
 
 export default function AdminCodesPromo() {
@@ -40,7 +52,7 @@ export default function AdminCodesPromo() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyCoupon);
+  const [form, setForm] = useState<CouponForm>(emptyCouponForm);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -51,17 +63,14 @@ export default function AdminCodesPromo() {
   }, []);
 
   const fetchCoupons = useCallback(async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('coupons')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Erreur chargement coupons:', error);
-      showToast('Erreur lors du chargement des codes promo', 'error');
-    } else {
+    try {
+      const res = await fetch('/api/admin/coupons');
+      if (!res.ok) throw new Error('Erreur chargement');
+      const data = await res.json();
       setCoupons(data || []);
+    } catch (err) {
+      console.error('Erreur chargement coupons:', err);
+      showToast('Erreur lors du chargement des codes promo', 'error');
     }
     setLoading(false);
   }, [showToast]);
@@ -86,14 +95,14 @@ export default function AdminCodesPromo() {
   }, [fetchCoupons, fetchProducts]);
 
   const resetForm = () => {
-    setForm(emptyCoupon);
+    setForm(emptyCouponForm);
     setSelectedProducts([]);
     setEditingId(null);
     setShowForm(false);
   };
 
   const startCreate = () => {
-    setForm(emptyCoupon);
+    setForm(emptyCouponForm);
     setSelectedProducts([]);
     setEditingId(null);
     setShowForm(true);
@@ -106,9 +115,9 @@ export default function AdminCodesPromo() {
       discount_value: coupon.discount_value,
       min_purchase_amount: coupon.min_purchase_amount,
       max_uses: coupon.max_uses,
+      max_uses_per_user: coupon.max_uses_per_user,
       expires_at: coupon.expires_at ? coupon.expires_at.slice(0, 16) : null,
       is_active: coupon.is_active,
-      applicable_products: coupon.applicable_products,
     });
     setSelectedProducts(coupon.applicable_products || []);
     setEditingId(coupon.id);
@@ -126,83 +135,80 @@ export default function AdminCodesPromo() {
     }
 
     setSaving(true);
-    const supabase = createClient();
 
     const payload = {
+      ...(editingId ? { id: editingId } : {}),
       code: form.code.toUpperCase().trim(),
       discount_type: form.discount_type,
       discount_value: form.discount_value,
       min_purchase_amount: form.min_purchase_amount || null,
       max_uses: form.max_uses || null,
+      max_uses_per_user: form.max_uses_per_user || null,
       expires_at: form.expires_at || null,
       is_active: form.is_active,
       applicable_products: selectedProducts.length > 0 ? selectedProducts : null,
     };
 
-    if (editingId) {
-      const { error } = await supabase
-        .from('coupons')
-        .update(payload)
-        .eq('id', editingId);
+    try {
+      const res = await fetch('/api/admin/coupons', {
+        method: editingId ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-      if (error) {
-        console.error('Erreur mise à jour:', error);
-        showToast('Erreur lors de la mise à jour', 'error');
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || 'Erreur lors de la sauvegarde', 'error');
       } else {
-        showToast('Code promo mis à jour', 'success');
+        showToast(editingId ? 'Code promo mis à jour' : 'Code promo créé', 'success');
         resetForm();
         fetchCoupons();
       }
-    } else {
-      const { error } = await supabase
-        .from('coupons')
-        .insert(payload);
-
-      if (error) {
-        console.error('Erreur création:', error);
-        showToast(error.message.includes('unique') ? 'Ce code promo existe déjà' : 'Erreur lors de la création', 'error');
-      } else {
-        showToast('Code promo créé', 'success');
-        resetForm();
-        fetchCoupons();
-      }
+    } catch (err) {
+      console.error('Erreur sauvegarde:', err);
+      showToast('Erreur réseau', 'error');
     }
     setSaving(false);
   };
 
   const handleToggleActive = async (coupon: Coupon) => {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('coupons')
-      .update({ is_active: !coupon.is_active })
-      .eq('id', coupon.id);
+    try {
+      const res = await fetch('/api/admin/coupons', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: coupon.id, is_active: !coupon.is_active }),
+      });
 
-    if (error) {
-      console.error('Erreur toggle:', error);
-      showToast('Erreur lors du changement de statut', 'error');
-    } else {
-      setCoupons((prev) =>
-        prev.map((c) => (c.id === coupon.id ? { ...c, is_active: !c.is_active } : c))
-      );
+      if (!res.ok) {
+        showToast('Erreur lors du changement de statut', 'error');
+      } else {
+        setCoupons((prev) =>
+          prev.map((c) => (c.id === coupon.id ? { ...c, is_active: !c.is_active } : c))
+        );
+      }
+    } catch {
+      showToast('Erreur réseau', 'error');
     }
   };
 
   const handleDelete = async (coupon: Coupon) => {
     if (!confirm(`Supprimer le code promo "${coupon.code}" ?`)) return;
 
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('coupons')
-      .delete()
-      .eq('id', coupon.id);
+    try {
+      const res = await fetch(`/api/admin/coupons?id=${coupon.id}`, {
+        method: 'DELETE',
+      });
 
-    if (error) {
-      console.error('Erreur suppression:', error);
-      showToast('Erreur lors de la suppression', 'error');
-    } else {
-      setCoupons((prev) => prev.filter((c) => c.id !== coupon.id));
-      showToast('Code promo supprimé', 'success');
-      if (editingId === coupon.id) resetForm();
+      if (!res.ok) {
+        showToast('Erreur lors de la suppression', 'error');
+      } else {
+        setCoupons((prev) => prev.filter((c) => c.id !== coupon.id));
+        showToast('Code promo supprimé', 'success');
+        if (editingId === coupon.id) resetForm();
+      }
+    } catch {
+      showToast('Erreur réseau', 'error');
     }
   };
 
@@ -336,9 +342,9 @@ export default function AdminCodesPromo() {
               />
             </div>
 
-            {/* Max utilisations */}
+            {/* Max utilisations globales */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Utilisations max.</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Utilisations max. (total)</label>
               <input
                 type="number"
                 min="0"
@@ -350,6 +356,26 @@ export default function AdminCodesPromo() {
                 placeholder="Illimité"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
               />
+              <p className="text-xs text-slate-400 mt-0.5">Nombre total de fois que le code peut être utilisé</p>
+            </div>
+
+            {/* Max utilisations par utilisateur */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Max. par utilisateur
+              </label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={form.max_uses_per_user ?? ''}
+                onChange={(e) =>
+                  setForm({ ...form, max_uses_per_user: e.target.value ? parseInt(e.target.value) : null })
+                }
+                placeholder="Illimité"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+              />
+              <p className="text-xs text-slate-400 mt-0.5">Combien de fois un même email peut utiliser ce code</p>
             </div>
 
             {/* Date d'expiration */}
@@ -449,6 +475,7 @@ export default function AdminCodesPromo() {
                   <th className="text-left py-3 px-4 font-semibold text-slate-700">Valeur</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-700">Min. achat</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-700">Utilisations</th>
+                  <th className="text-left py-3 px-4 font-semibold text-slate-700">Limite/user</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-700">Expire le</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-700">Produits</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-700">Statut</th>
@@ -477,7 +504,10 @@ export default function AdminCodesPromo() {
                     </td>
                     <td className="py-3 px-4 text-slate-600">
                       {coupon.current_uses}
-                      {coupon.max_uses !== null ? ` / ${coupon.max_uses}` : ' / ∞'}
+                      {coupon.max_uses !== null ? ` / ${coupon.max_uses}` : ' / \u221E'}
+                    </td>
+                    <td className="py-3 px-4 text-slate-600">
+                      {coupon.max_uses_per_user !== null ? `${coupon.max_uses_per_user}x` : '\u221E'}
                     </td>
                     <td className="py-3 px-4">
                       <span className={isExpired(coupon) ? 'text-red-500' : 'text-slate-600'}>

@@ -856,6 +856,7 @@ export default function CheckoutPage() {
             <div className="border-t border-slate-200 pt-4">
               <PromoCodeInput
                 cartTotal={totalPrice}
+                email={checkoutForm.email}
                 onApply={(couponData) => setAppliedCoupon(couponData)}
                 onRemove={() => setAppliedCoupon(null)}
               />

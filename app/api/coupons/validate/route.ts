@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * POST - Valider un code promo
+ * Vérifie : actif, expiration, uses globaux, uses par email, montant minimum
  */
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { code, cartTotal } = body;
+    const { code, cartTotal, email } = body;
 
     if (!code || typeof code !== 'string') {
       return NextResponse.json(
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
     // Récupérer le coupon
     const { data: coupon, error } = await supabase
       .from('coupons')
-      .select('id, code, discount_type, discount_value, min_purchase_amount, max_uses, current_uses, expires_at, is_active')
+      .select('id, code, discount_type, discount_value, min_purchase_amount, max_uses, current_uses, max_uses_per_user, expires_at, is_active')
       .eq('code', code.toUpperCase())
       .eq('is_active', true)
       .single();
@@ -62,12 +64,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier les utilisations
+    // Vérifier les utilisations globales
     if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) {
       return NextResponse.json(
         { valid: false, error: 'Code épuisé' },
         { status: 200 }
       );
+    }
+
+    // Vérifier la limite par utilisateur (par email)
+    if (coupon.max_uses_per_user && email && typeof email === 'string') {
+      const adminClient = getSupabaseAdminClient();
+      if (adminClient) {
+        const { count } = await adminClient
+          .from('coupon_uses')
+          .select('*', { count: 'exact', head: true })
+          .eq('coupon_id', coupon.id)
+          .eq('email', email.toLowerCase().trim());
+
+        if (count !== null && count >= coupon.max_uses_per_user) {
+          return NextResponse.json(
+            { valid: false, error: 'Vous avez déjà utilisé ce code promo' },
+            { status: 200 }
+          );
+        }
+      }
     }
 
     // Vérifier le montant minimum

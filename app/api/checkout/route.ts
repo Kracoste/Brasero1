@@ -227,12 +227,13 @@ export async function POST(request: NextRequest) {
     // Valider et appliquer le code promo côté serveur
     let stripeCouponId: string | undefined;
     let couponCodeUsed: string | undefined;
+    let couponIdUsed: string | undefined;
     if (couponCode && typeof couponCode === 'string') {
       const supabaseAdmin = getSupabaseAdminClient();
       if (supabaseAdmin) {
         const { data: coupon } = await supabaseAdmin
           .from('coupons')
-          .select('id, code, discount_type, discount_value, min_purchase_amount, max_uses, current_uses, expires_at, is_active')
+          .select('id, code, discount_type, discount_value, min_purchase_amount, max_uses, current_uses, max_uses_per_user, expires_at, is_active')
           .eq('code', couponCode.toUpperCase())
           .eq('is_active', true)
           .single();
@@ -243,7 +244,21 @@ export async function POST(request: NextRequest) {
           const cartTotal = lineItems.reduce((sum, li) => sum + (li.price_data.unit_amount * li.quantity), 0) / 100;
           const belowMin = coupon.min_purchase_amount && cartTotal < coupon.min_purchase_amount;
 
-          if (!isExpired && !isExhausted && !belowMin) {
+          // Vérifier la limite par utilisateur (par email)
+          let userExhausted = false;
+          if (coupon.max_uses_per_user && customerInfo.email) {
+            const { count } = await supabaseAdmin
+              .from('coupon_uses')
+              .select('*', { count: 'exact', head: true })
+              .eq('coupon_id', coupon.id)
+              .eq('email', customerInfo.email.toLowerCase().trim());
+
+            if (count !== null && count >= coupon.max_uses_per_user) {
+              userExhausted = true;
+            }
+          }
+
+          if (!isExpired && !isExhausted && !belowMin && !userExhausted) {
             // Créer un coupon Stripe à usage unique
             const stripeCoupon = await stripe.coupons.create(
               coupon.discount_type === 'percentage'
@@ -252,6 +267,12 @@ export async function POST(request: NextRequest) {
             );
             stripeCouponId = stripeCoupon.id;
             couponCodeUsed = coupon.code;
+            couponIdUsed = coupon.id;
+          } else if (userExhausted) {
+            return NextResponse.json(
+              { error: 'Vous avez déjà utilisé ce code promo le nombre de fois autorisé.' },
+              { status: 400 }
+            );
           }
         }
       }
@@ -285,10 +306,11 @@ export async function POST(request: NextRequest) {
       locale: 'fr',
     });
 
-    // Incrémenter l'utilisation du coupon
-    if (couponCodeUsed) {
+    // Incrémenter l'utilisation du coupon + enregistrer l'usage par email
+    if (couponCodeUsed && couponIdUsed) {
       const adminClient = getSupabaseAdminClient();
       if (adminClient) {
+        // Incrémenter le compteur global
         const { data: couponRow } = await adminClient
           .from('coupons')
           .select('current_uses')
@@ -300,6 +322,13 @@ export async function POST(request: NextRequest) {
             .update({ current_uses: (couponRow.current_uses || 0) + 1 })
             .eq('code', couponCodeUsed);
         }
+
+        // Enregistrer l'usage par email (pour la limite par utilisateur)
+        await adminClient.from('coupon_uses').insert({
+          coupon_id: couponIdUsed,
+          email: customerInfo.email.toLowerCase().trim(),
+          stripe_session_id: session.id,
+        });
       }
     }
 
