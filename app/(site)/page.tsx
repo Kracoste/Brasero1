@@ -104,15 +104,29 @@ export default async function HomePage() {
           <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6">
             {/* Colonne gauche */}
             <div className="w-full lg:w-1/3 flex flex-col gap-3 sm:gap-4">
-              {/* Braséros */}
-              <CategoryTile
-                title="Nos braséros"
-                alt="Braseros artisanaux en acier corten et acier peint — collection Atelier LBF"
-                cta="Découvrir nos braséro"
-                image="/Produits/og-brasero.webp"
+              {/* Braséros — vidéo */}
+              <Link
                 href="/produits?category=brasero"
-                contain
-              />
+                className="relative block overflow-hidden rounded-xl sm:rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl h-[180px] sm:h-[200px] lg:h-[240px]"
+              >
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                  aria-label="Braseros artisanaux en acier corten et acier peint — collection Atelier LBF"
+                >
+                  <source src="/acceuil/video_brasero_accueil_compresse.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-2 sm:px-3 lg:px-4">
+                  <h3 className="text-sm sm:text-base lg:text-lg font-semibold drop-shadow leading-tight">Nos braséros</h3>
+                  <span className="mt-1.5 sm:mt-2 lg:mt-3 rounded-full bg-white/90 px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 font-semibold text-slate-900 shadow text-xs sm:text-sm">
+                    Découvrir nos braséros
+                  </span>
+                </div>
+              </Link>
               {/* Fendeur et Accessoires côte à côte */}
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <CategoryTile
@@ -252,7 +266,7 @@ export default async function HomePage() {
 
               <div className="flex flex-wrap items-center gap-4 pt-4">
                 <Link
-                  href="/produits?category=braseros"
+                  href="/produits?category=brasero"
                   className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
                 >
                   Personnaliser mon brasero
