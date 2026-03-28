@@ -19,7 +19,7 @@ const features = [
 ];
 
 export const Commitments = () => (
-  <div className="py-8 sm:py-12">
+  <div className="py-8 sm:py-12 h-[136px] sm:h-[212px] lg:h-[240px] overflow-hidden">
     <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-16">
       <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-3">
         {features.map((feature) => {
