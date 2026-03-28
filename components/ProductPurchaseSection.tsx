@@ -396,6 +396,31 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
             )}
           </div>
         )}
+        {/* Indicateur de stock */}
+        <div className="flex items-center gap-2 text-sm">
+          {product.availability === "En stock" || product.availability === "in_stock" ? (
+            <>
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+              </span>
+              <span className="font-medium text-green-700">En stock</span>
+              <span className="text-slate-400">— expédié sous 5-10 jours</span>
+            </>
+          ) : product.onDemand ? (
+            <>
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+              <span className="font-medium text-amber-700">Sur commande</span>
+              <span className="text-slate-400">— délai sur devis</span>
+            </>
+          ) : (
+            <>
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
+              <span className="font-medium text-green-700">Disponible</span>
+            </>
+          )}
+        </div>
+
         <AddToCartButton
           product={productWithVariantPrice}
           selectedAccessories={selectedAccessories}

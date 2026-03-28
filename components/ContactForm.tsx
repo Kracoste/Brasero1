@@ -54,6 +54,7 @@ export const ContactForm = () => {
         <input
           id="name"
           name="name"
+          autoComplete="name"
           required
           disabled={status === "loading"}
           className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"
@@ -67,6 +68,7 @@ export const ContactForm = () => {
           id="email"
           name="email"
           type="email"
+          autoComplete="email"
           required
           disabled={status === "loading"}
           className="mt-2 w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-inner focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:opacity-50"

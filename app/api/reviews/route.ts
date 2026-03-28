@@ -1,82 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
-import { isValidUUID, sanitizeString } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * GET - Récupérer les avis d'un produit
+ * GET - Récupérer les avis approuvés d'un produit par slug
  */
 export async function GET(request: NextRequest) {
   try {
-    // Rate limiting public (60 requêtes/min)
     const clientIP = getClientIP(request.headers);
     if (!checkRateLimit(`reviews-get-${clientIP}`, 60, 60000)) {
-      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+      return NextResponse.json(
+        { error: 'Trop de requêtes' },
+        { status: 429 }
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const productId = searchParams.get('product_id');
     const slug = searchParams.get('slug');
 
-    if (!productId && !slug) {
+    if (!slug) {
       return NextResponse.json(
-        { error: 'product_id ou slug requis' },
+        { error: 'Le paramètre slug est requis' },
         { status: 400 }
       );
     }
 
     const supabase = await createClient();
 
-    // Si slug fourni, récupérer le product_id
-    let finalProductId = productId;
-    if (slug && !productId) {
-      const { data: product } = await supabase
-        .from('products')
-        .select('id')
-        .eq('slug', slug)
-        .single();
-
-      if (!product) {
-        return NextResponse.json({ reviews: [], average: 0, count: 0 });
-      }
-
-      finalProductId = product.id;
-    }
-
-    if (finalProductId && !isValidUUID(finalProductId)) {
-      return NextResponse.json(
-        { error: 'ID produit invalide' },
-        { status: 400 }
-      );
-    }
-
-    // Récupérer les avis approuvés
     const { data: reviews, error } = await supabase
       .from('reviews')
-      .select('id, rating, title, comment, is_verified_purchase, created_at, user_id')
-      .eq('product_id', finalProductId)
+      .select('id, product_slug, author_name, rating, comment, created_at')
+      .eq('product_slug', slug)
       .eq('is_approved', true)
       .order('created_at', { ascending: false });
 
     if (error) {
+      console.error('[Reviews API GET] Error:', error);
       return NextResponse.json(
-        { error: 'Erreur récupération avis' },
+        { error: 'Erreur lors de la récupération des avis' },
         { status: 500 }
       );
     }
 
-    // Calculer moyenne et nombre
     const count = reviews?.length || 0;
-    const average = count > 0
-      ? reviews!.reduce((sum, r) => sum + r.rating, 0) / count
-      : 0;
+    const average =
+      count > 0
+        ? Math.round(
+            (reviews!.reduce((sum, r) => sum + r.rating, 0) / count) * 10
+          ) / 10
+        : 0;
 
     return NextResponse.json({
       reviews: reviews || [],
-      average: Math.round(average * 10) / 10,
+      average,
       count,
     });
   } catch (error) {
@@ -89,101 +67,62 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST - Soumettre un avis
+ * POST - Soumettre un nouvel avis (modération requise)
  */
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
+    // Rate limiting : max 3 soumissions par heure par IP
     const clientIP = getClientIP(request.headers);
-    if (!checkRateLimit(`review-submit-${clientIP}`, 5, 60000)) {
+    if (!checkRateLimit(`review-submit-${clientIP}`, 3, 3600000)) {
       return NextResponse.json(
-        { error: 'Trop de tentatives' },
+        { error: 'Trop de tentatives. Veuillez réessayer plus tard.' },
         { status: 429 }
+      );
+    }
+
+    const body = await request.json();
+    const { product_slug, author_name, rating, comment, email } = body;
+
+    // Validation
+    if (!product_slug || typeof product_slug !== 'string') {
+      return NextResponse.json(
+        { error: 'Le slug du produit est requis' },
+        { status: 400 }
+      );
+    }
+
+    if (!author_name || typeof author_name !== 'string' || author_name.trim().length < 2) {
+      return NextResponse.json(
+        { error: 'Un nom valide est requis (minimum 2 caractères)' },
+        { status: 400 }
+      );
+    }
+
+    if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { error: 'La note doit être comprise entre 1 et 5' },
+        { status: 400 }
+      );
+    }
+
+    if (email && (typeof email !== 'string' || !email.includes('@'))) {
+      return NextResponse.json(
+        { error: 'Adresse email invalide' },
+        { status: 400 }
       );
     }
 
     const supabase = await createClient();
 
-    // Vérifier authentification
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentification requise' },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
-    const { product_id, rating, title, comment, order_id } = body;
-
-    // Validation
-    if (!product_id || !isValidUUID(product_id)) {
-      return NextResponse.json(
-        { error: 'ID produit invalide' },
-        { status: 400 }
-      );
-    }
-
-    if (!rating || rating < 1 || rating > 5) {
-      return NextResponse.json(
-        { error: 'Note invalide (1-5)' },
-        { status: 400 }
-      );
-    }
-
-    // Vérifier que l'utilisateur n'a pas déjà laissé un avis
-    const adminClient = getSupabaseAdminClient();
-    if (!adminClient) {
-      return NextResponse.json(
-        { error: 'Service non disponible' },
-        { status: 500 }
-      );
-    }
-
-    const { data: existing } = await adminClient
-      .from('reviews')
-      .select('id')
-      .eq('product_id', product_id)
-      .eq('user_id', user.id)
-      .single();
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Vous avez déjà laissé un avis pour ce produit' },
-        { status: 400 }
-      );
-    }
-
-    // Vérifier si c'est un achat vérifié
-    let isVerifiedPurchase = false;
-    if (order_id) {
-      const { data: order } = await adminClient
-        .from('orders')
-        .select('id')
-        .eq('id', order_id)
-        .eq('user_id', user.id)
-        .single();
-
-      isVerifiedPurchase = !!order;
-    }
-
-    // Sanitizer les entrées texte
-    const safeTitle = sanitizeString(title, 200) || null;
-    const safeComment = sanitizeString(comment, 2000) || null;
-
-    // Créer l'avis (nécessite approbation admin)
-    const { data: review, error: insertError } = await adminClient
+    const { data: review, error: insertError } = await supabase
       .from('reviews')
       .insert({
-        product_id,
-        user_id: user.id,
-        order_id: order_id || null,
-        rating,
-        title: safeTitle,
-        comment: safeComment,
-        is_verified_purchase: isVerifiedPurchase,
-        is_approved: false, // Modération requise
+        product_slug: product_slug.trim(),
+        author_name: author_name.trim().slice(0, 100),
+        rating: Math.round(rating),
+        comment: comment ? String(comment).trim().slice(0, 2000) : null,
+        email: email ? email.toLowerCase().trim() : null,
+        is_approved: false,
       })
       .select()
       .single();
@@ -191,15 +130,15 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error('[Reviews API POST] Insert error:', insertError);
       return NextResponse.json(
-        { error: 'Erreur création avis' },
+        { error: 'Erreur lors de la soumission de l\'avis' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
+      message: 'Merci ! Votre avis sera publié après validation.',
       review,
-      message: 'Avis soumis avec succès. Il sera publié après modération.',
     });
   } catch (error) {
     console.error('[Reviews API POST] Error:', error);

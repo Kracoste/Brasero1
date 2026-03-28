@@ -70,11 +70,6 @@ export const AccessoryGrid = ({
     });
   };
 
-  const getRating = (slug: string) => {
-    const hash = slug.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return 3.5 + (hash % 15) / 10;
-  };
-
   if (products.length === 0) return null;
 
   return (
@@ -106,9 +101,6 @@ export const AccessoryGrid = ({
         <div className="no-scrollbar flex gap-4 overflow-x-auto pb-4" ref={scrollRef}>
           {products.map((product) => {
             const isSelected = selectedItems.has(product.slug);
-            const rating = getRating(product.slug);
-            const fullStars = Math.floor(rating);
-            const hasHalfStar = rating % 1 >= 0.5;
             const oldPrice = product.comparePrice;
             const image = product.images[0];
 
@@ -157,21 +149,6 @@ export const AccessoryGrid = ({
                   <Link href={`/produits/${product.slug}`}>
                     <h3 className="min-h-[40px] text-base font-semibold text-gray-900 hover:text-[#1f7a1a]">{product.name}</h3>
                   </Link>
-
-                  <div className="flex gap-0.5 text-[#6fbf73]">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <svg
-                        key={`${product.slug}-star-${index}`}
-                        className={`h-5 w-5 ${
-                          index < fullStars || (index === fullStars && hasHalfStar) ? "text-[#6fbf73]" : "text-gray-200"
-                        }`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
 
                   <p>{formatDimensions(product as any)}</p>
                   <p className="line-clamp-1 text-gray-500">{product.shortDescription}</p>

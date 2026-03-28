@@ -220,6 +220,23 @@ export default function CheckoutPage() {
 
     setFormError(null);
     markSectionCompleted('infos', 'address');
+
+    // Sauvegarder le panier pour récupération abandon
+    if (checkoutForm.email && items.length > 0) {
+      fetch('/api/cart/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: checkoutForm.email,
+          items: items.map((item) => ({
+            name: item.product_name,
+            price: item.product_price,
+            slug: item.product_slug,
+            imageUrl: item.product_image,
+          })),
+        }),
+      }).catch(() => {}); // fire-and-forget
+    }
   };
 
   const handleAddressContinue = () => {
@@ -437,6 +454,7 @@ export default function CheckoutPage() {
                       Prénom *
                       <input
                         type="text"
+                        autoComplete="given-name"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.first_name}
                         onChange={handleInputChange('first_name')}
@@ -447,6 +465,7 @@ export default function CheckoutPage() {
                       Nom *
                       <input
                         type="text"
+                        autoComplete="family-name"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.last_name}
                         onChange={handleInputChange('last_name')}
@@ -459,6 +478,7 @@ export default function CheckoutPage() {
                     Email *
                     <input
                       type="email"
+                      autoComplete="email"
                       className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                       value={checkoutForm.email}
                       onChange={handleInputChange('email')}
@@ -470,6 +490,7 @@ export default function CheckoutPage() {
                     Téléphone
                     <input
                       type="tel"
+                      autoComplete="tel"
                       className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                       value={checkoutForm.phone}
                       onChange={handleInputChange('phone')}
@@ -481,6 +502,7 @@ export default function CheckoutPage() {
                       Adresse *
                       <input
                         type="text"
+                        autoComplete="street-address"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.address}
                         onChange={handleInputChange('address')}
@@ -491,6 +513,8 @@ export default function CheckoutPage() {
                       Code postal *
                       <input
                         type="text"
+                        autoComplete="postal-code"
+                        inputMode="numeric"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.postal_code}
                         onChange={handleInputChange('postal_code')}
@@ -504,6 +528,7 @@ export default function CheckoutPage() {
                       Ville *
                       <input
                         type="text"
+                        autoComplete="address-level2"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.city}
                         onChange={handleInputChange('city')}
@@ -576,6 +601,7 @@ export default function CheckoutPage() {
                       Prénom *
                       <input
                         type="text"
+                        autoComplete="given-name"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.first_name}
                         onChange={handleInputChange('first_name')}
@@ -586,6 +612,7 @@ export default function CheckoutPage() {
                       Nom *
                       <input
                         type="text"
+                        autoComplete="family-name"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.last_name}
                         onChange={handleInputChange('last_name')}
@@ -598,6 +625,7 @@ export default function CheckoutPage() {
                       Adresse *
                       <input
                         type="text"
+                        autoComplete="street-address"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.address}
                         onChange={handleInputChange('address')}
@@ -620,6 +648,8 @@ export default function CheckoutPage() {
                       Code postal *
                       <input
                         type="text"
+                        autoComplete="postal-code"
+                        inputMode="numeric"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.postal_code}
                         onChange={handleInputChange('postal_code')}
@@ -631,6 +661,7 @@ export default function CheckoutPage() {
                     Téléphone
                     <input
                       type="tel"
+                      autoComplete="tel"
                       className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                       value={checkoutForm.phone}
                       onChange={handleInputChange('phone')}
@@ -641,6 +672,7 @@ export default function CheckoutPage() {
                       Ville *
                       <input
                         type="text"
+                        autoComplete="address-level2"
                         className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
                         value={checkoutForm.city}
                         onChange={handleInputChange('city')}
@@ -881,7 +913,21 @@ export default function CheckoutPage() {
               <span>Total</span>
               <Price amount={appliedCoupon ? totalPrice - appliedCoupon.discount : totalPrice} />
             </div>
-            <p className="text-xs text-slate-500">Tous les paiements sont sécurisés et chiffrés.</p>
+            <div className="flex items-center justify-center gap-4 pt-2">
+              <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                <svg className="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                SSL 256 bits
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                <svg className="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+                Garantie 2 ans
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                <svg className="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
+                Retour 14j
+              </div>
+            </div>
+            <p className="text-center text-xs text-slate-400 mt-2">Paiement sécurisé et chiffré via Stripe</p>
           </div>
         </div>
       </Container>

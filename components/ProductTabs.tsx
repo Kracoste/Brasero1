@@ -4,6 +4,7 @@ import { useRef, useState, useMemo } from "react";
 import { Users, Flame, Box, Ruler, Weight, Paintbrush, CookingPot, Layers } from "lucide-react";
 
 import { AccessoryGrid } from "@/components/AccessoryGrid";
+import ReviewSection from "@/components/ReviewSection";
 import { FAQ } from "@/components/FAQ";
 import { ProductSeoContent } from "@/components/ProductSeoContent";
 import { getProductFAQ, type FAQOptions } from "@/lib/product-faq";
@@ -348,9 +349,7 @@ export const ProductTabs = ({ product, accessories = [], faqOptions, specsOverri
 
         {/* === CRITIQUES === */}
         {activeTab === "critiques" && (
-          <div className="text-center py-8 text-gray-500">
-            <p className="text-sm">Les avis clients seront bientôt disponibles.</p>
-          </div>
+          <ReviewSection productSlug={product.slug} />
         )}
       </div>
 
