@@ -30,8 +30,11 @@ export default function LanguageSelector() {
   }, []);
 
   useEffect(() => {
-    // Wait for GT combo to be ready, then detect
+    // Wait for GT combo to be ready, then detect (max 10s)
+    let attempts = 0;
     const id = setInterval(() => {
+      attempts++;
+      if (attempts > 20) { clearInterval(id); return; }
       const sel = document.querySelector('.goog-te-combo');
       if (sel) { detectCurrentLanguage(); clearInterval(id); }
     }, 500);

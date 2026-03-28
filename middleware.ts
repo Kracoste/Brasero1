@@ -11,7 +11,7 @@ const securityHeaders: Record<string, string> = {
   'Content-Security-Policy': [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googleapis.com https://*.gstatic.com https://*.googletagmanager.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://va.vercel-scripts.com",
-    "style-src 'self' 'unsafe-inline' https://*.googleapis.com",
+    "style-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com",
     "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://*.googletagmanager.com https://analytics.google.com",
     "font-src 'self' https://fonts.gstatic.com",
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://region1.google-analytics.com https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.googleapis.com https://*.google.com https://*.googletagmanager.com",
@@ -55,9 +55,9 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     const emailOk = user?.email ? isAdminEmail(user.email) : false;
     if (!user?.email || !emailOk) {
-      if (process.env.NODE_ENV === 'production') {
-        console.log('[middleware] Admin access denied:', { 
-          email: user?.email || 'no user', 
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[middleware] Admin access denied:', {
+          email: user?.email || 'no user',
           emailOk,
           adminEmailsConfigured: (process.env.ADMIN_EMAILS || '').length > 0
         });

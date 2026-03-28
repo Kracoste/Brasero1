@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       type: "website",
       locale: "fr_FR",
       url: `https://www.atelier-lbf.fr/produits/${product.slug}`,
-      images: product.images.slice(0, 3).map((image: any) => ({
+      images: product.images.slice(0, 3).map((image) => ({
         url: image.src,
         width: image.width,
         height: image.height,
@@ -101,7 +101,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       card: "summary_large_image",
       title: product.name,
       description: product.shortDescription,
-      images: product.images.slice(0, 1).map((img: any) => img.src),
+      images: product.images.slice(0, 1).map((img) => img.src),
     },
     alternates: {
       canonical: `/produits/${product.slug}`,
@@ -145,6 +145,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <JsonLd data={faqSchema} />
       <Section className="pt-4 sm:pt-6 lg:pt-10">
         <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
+          <h1 className="sr-only">{product.name}</h1>
           <VariantConfiguratorWrapper
             product={product}
             reference={reference}

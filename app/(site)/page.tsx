@@ -10,6 +10,8 @@ import { mapSupabaseProduct } from "@/lib/utils";
 import type { Product } from "@/lib/schema";
 import { generateStoreSchema } from "@/lib/seo/schemas";
 import { Flame, Truck, Shield, Award, Scissors, Send, CheckCircle, Sparkles } from "lucide-react";
+import { LazyVideo } from "@/components/LazyVideo";
+import { HeroVideo } from "@/components/HeroVideo";
 
 // ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
 export const revalidate = 60;
@@ -84,12 +86,12 @@ export default async function HomePage() {
       <section className="bg-[#f6f1e9] py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 xl:px-16 text-center">
           <div className="inline-flex items-center gap-2 mb-3">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-[#CD853F]">
+            <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-[#8B5A2B]">
               Atelier LBF
             </span>
           </div>
           <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 leading-tight">
-            Votre espace barbecue <span className="text-[#CD853F]">artisanal</span>
+            Votre espace barbecue <span className="text-[#8B5A2B]">artisanal</span>
           </h1>
           <p className="mt-3 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
             Braseros, planchas et accessoires fabriqués à la main en France. 
@@ -109,19 +111,18 @@ export default async function HomePage() {
                 href="/produits?category=brasero"
                 className="relative block overflow-hidden rounded-xl sm:rounded-2xl shadow-md transition hover:-translate-y-1 hover:shadow-xl h-[180px] sm:h-[200px] lg:h-[240px]"
               >
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover"
-                  aria-label="Braseros artisanaux en acier corten et acier peint — collection Atelier LBF"
-                >
-                  <source src="/acceuil/video_brasero_accueil_compresse.mp4" type="video/mp4" />
-                </video>
+                <Image
+                  src="/acceuil/video_brasero_poster.webp"
+                  alt="Braseros artisanaux en acier corten et acier peint — collection Atelier LBF"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover"
+                  priority
+                />
+                <HeroVideo />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-2 sm:px-3 lg:px-4">
-                  <h3 className="text-sm sm:text-base lg:text-lg font-semibold drop-shadow leading-tight">Nos braséros</h3>
+                  <span className="text-sm sm:text-base lg:text-lg font-semibold drop-shadow leading-tight block">Nos braséros</span>
                   <span className="mt-1.5 sm:mt-2 lg:mt-3 rounded-full bg-white/90 px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 font-semibold text-slate-900 shadow text-xs sm:text-sm">
                     Découvrir nos braséros
                   </span>
@@ -133,7 +134,7 @@ export default async function HomePage() {
                   title="Fendeur A Bûches"
                   alt="Fendeur à bûches artisanal en acier pour couper le bois de chauffage brasero"
                   cta="Voir tous"
-                  image="/acceuil/Fendeur-Buches.png"
+                  image="/acceuil/Fendeur-Buches.webp"
                   href="/produits?category=fendeur"
                   compact
                 />
@@ -141,7 +142,7 @@ export default async function HomePage() {
                   title="Accessoires"
                   alt="Accessoires brasero : plancha acier carbone, grille, spatule, pique — Atelier LBF"
                   cta="Voir tous"
-                  image="/accesoiresbrasero.jpg"
+                  image="/accesoiresbrasero.webp"
                   href="/produits?category=accessoire"
                   compact
                 />
@@ -189,16 +190,12 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Vidéo */}
-            <div className="relative overflow-hidden rounded-lg shadow-xl">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-auto"
-              >
-                <source src="/acceuil/VideoDecoupeLaser.mp4" type="video/mp4" />
-              </video>
+            <div className="relative overflow-hidden rounded-lg shadow-xl aspect-video">
+              <LazyVideo
+                src="/acceuil/VideoDecoupeLaser.mp4"
+                className="absolute inset-0 w-full h-full"
+                aria-label="Démonstration de découpe laser sur brasero artisanal"
+              />
               <div className="absolute bottom-4 left-4 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm">
                 Découpe laser en action
               </div>
@@ -299,30 +296,30 @@ export default async function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link href="/brasero-multifonction" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
               <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
-                <Flame className="w-6 h-6 text-[#CD853F]" />
+                <Flame className="w-6 h-6 text-[#8B5A2B]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Espace barbecue unique</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#8B5A2B] transition-colors">Espace barbecue unique</h3>
               <p className="text-sm text-slate-600">Créez un coin chaleureux dans votre jardin avec nos braseros multifonctions</p>
             </Link>
             <Link href="/made-in-france" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
               <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
-                <Award className="w-6 h-6 text-[#CD853F]" />
+                <Award className="w-6 h-6 text-[#8B5A2B]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Fabrication française</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#8B5A2B] transition-colors">Fabrication française</h3>
               <p className="text-sm text-slate-600">Chaque pièce est fabriquée à la main dans notre atelier des Deux-Sèvres</p>
             </Link>
             <Link href="/garantie" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
               <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
-                <Shield className="w-6 h-6 text-[#CD853F]" />
+                <Shield className="w-6 h-6 text-[#8B5A2B]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Garantie 2 ans</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#8B5A2B] transition-colors">Garantie 2 ans</h3>
               <p className="text-sm text-slate-600">Qualité garantie sur tous nos produits avec un SAV réactif</p>
             </Link>
             <Link href="/livraison-france" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
               <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
-                <Truck className="w-6 h-6 text-[#CD853F]" />
+                <Truck className="w-6 h-6 text-[#8B5A2B]" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#CD853F] transition-colors">Livraison soignée</h3>
+              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#8B5A2B] transition-colors">Livraison soignée</h3>
               <p className="text-sm text-slate-600">Emballage renforcé et livraison partout en France sous 5-10 jours</p>
             </Link>
           </div>
@@ -342,17 +339,17 @@ export default async function HomePage() {
             <Link href="/blog/plancha-inox-ou-acier-carbone" className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all text-left group">
               <span className="text-xs text-[#8B4513] font-medium">Guide</span>
               <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Plancha inox ou acier carbone ?</h3>
-              <p className="text-xs text-slate-500 mt-1">8 min de lecture</p>
+              <p className="text-xs text-slate-600 mt-1">8 min de lecture</p>
             </Link>
             <Link href="/blog/brasero-plancha-vs-barbecue" className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all text-left group">
               <span className="text-xs text-[#8B4513] font-medium">Guide</span>
               <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Brasero plancha vs barbecue</h3>
-              <p className="text-xs text-slate-500 mt-1">7 min de lecture</p>
+              <p className="text-xs text-slate-600 mt-1">7 min de lecture</p>
             </Link>
             <Link href="/blog/meilleur-bois-brasero-comparatif" className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all text-left group">
               <span className="text-xs text-[#8B4513] font-medium">Entretien</span>
               <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Les 5 meilleurs bois pour brasero</h3>
-              <p className="text-xs text-slate-500 mt-1">6 min de lecture</p>
+              <p className="text-xs text-slate-600 mt-1">6 min de lecture</p>
             </Link>
           </div>
           <Link
@@ -441,7 +438,7 @@ const CategoryTile = ({ title, alt, cta, image, href, compact = false, contain =
     </div>
     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
     <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-2 sm:px-3 lg:px-4">
-      <h3 className={`font-semibold drop-shadow leading-tight ${compact ? 'text-xs sm:text-sm lg:text-base' : 'text-sm sm:text-base lg:text-lg'}`}>{title}</h3>
+      <span className={`font-semibold drop-shadow leading-tight block ${compact ? 'text-xs sm:text-sm lg:text-base' : 'text-sm sm:text-base lg:text-lg'}`}>{title}</span>
       <span className={`mt-1.5 sm:mt-2 lg:mt-3 rounded-full bg-white/90 px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 font-semibold text-slate-900 shadow ${compact ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm'}`}>
         {cta}
       </span>
@@ -451,21 +448,21 @@ const CategoryTile = ({ title, alt, cta, image, href, compact = false, contain =
 
 const PromoTile = () => (
   <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-black text-white shadow-lg h-[320px] sm:h-[360px] lg:h-full lg:min-h-[420px]">
-    <Image
-      src="/Braserobanner.jpg"
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img
+      src="/Braserobanner.webp"
       alt="Promotion braseros artisanaux Atelier LBF — jusqu'à 40% de réduction sur braseros et accessoires"
-      fill
-      sizes="(max-width: 768px) 100vw, 66vw"
-      className="object-cover brightness-125"
-      loading="lazy"
+      fetchPriority="high"
+      decoding="async"
+      className="absolute inset-0 w-full h-full object-cover brightness-125"
     />
     <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
     <div className="relative flex h-full flex-col items-start justify-center gap-2 sm:gap-3 lg:gap-4 px-4 py-6 sm:px-6 sm:py-8 lg:px-12 lg:py-12">
       <p className="text-sm sm:text-base lg:text-lg font-semibold text-[#D2691E]">Nos promotions</p>
-      <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black leading-tight">
+      <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black leading-tight">
         PROMOTIONS <br /> JUSQU&apos;À 40%
-      </h3>
-      <p className="text-xs sm:text-sm lg:text-base text-[#CD853F] max-w-md">
+      </span>
+      <p className="text-xs sm:text-sm lg:text-base text-[#8B5A2B] max-w-md">
         Promotions pouvant aller jusqu&apos;à 40% sur nos braséros et accessoires.
       </p>
       <Link

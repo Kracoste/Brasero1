@@ -43,13 +43,13 @@ export const HeroMenu = () => {
           {/* Titre principal */}
           <div className="text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center gap-2 mb-4">
-              <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[#CD853F]">
+              <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[#8B5A2B]">
                 Atelier LBF
               </span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
               De la fabrication<br />
-              <span className="text-[#CD853F]">à votre jardin</span>
+              <span className="text-[#8B5A2B]">à votre jardin</span>
             </h2>
             <p className="mt-4 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
               Nous concevons, fabriquons et livrons nos braseros artisanaux directement depuis notre atelier français.
@@ -71,10 +71,10 @@ export const HeroMenu = () => {
                 
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-[#CD853F]/20 group-hover:bg-[#CD853F]/30 transition-colors">
-                    <card.icon className="w-8 h-8 text-[#CD853F]" />
+                    <card.icon className="w-8 h-8 text-[#8B5A2B]" />
                   </div>
                   
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-slate-900 group-hover:text-[#CD853F] transition-colors">
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-slate-900 group-hover:text-[#8B5A2B] transition-colors">
                     {card.title}
                   </h3>
                   <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-4">
@@ -82,7 +82,7 @@ export const HeroMenu = () => {
                   </p>
                   
                   {/* Bouton En savoir plus */}
-                  <span className="inline-flex items-center gap-2 text-[#CD853F] font-semibold text-sm uppercase tracking-wide group-hover:gap-3 transition-all">
+                  <span className="inline-flex items-center gap-2 text-[#8B5A2B] font-semibold text-sm uppercase tracking-wide group-hover:gap-3 transition-all">
                     En savoir plus
                     <ArrowRight className="w-4 h-4" />
                   </span>
@@ -98,7 +98,7 @@ export const HeroMenu = () => {
                 key={stat.label}
                 className="text-center p-4 sm:p-6"
               >
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#CD853F]">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#8B5A2B]">
                   {stat.value}
                 </div>
                 <div className="mt-1 text-sm sm:text-base text-slate-600">
@@ -113,7 +113,7 @@ export const HeroMenu = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 bg-[#CD853F] hover:bg-[#8B4513] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#6B3410] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
               >
                 <CheckCircle2 className="w-5 h-5" />
                 Découvrir nos produits
@@ -125,7 +125,7 @@ export const HeroMenu = () => {
                 Visiter notre atelier
               </Link>
             </div>
-            <p className="mt-6 text-sm text-slate-500 flex items-center justify-center gap-2">
+            <p className="mt-6 text-sm text-slate-600 flex items-center justify-center gap-2">
               <Shield className="w-4 h-4" />
               Paiement sécurisé • Livraison assurée • Satisfait ou remboursé
             </p>

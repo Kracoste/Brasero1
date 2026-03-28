@@ -96,13 +96,15 @@ export function ProductCarousel({ products, className = '' }: ProductCarouselPro
             <button
               key={index}
               onClick={() => scrollToIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
+              className="relative p-3"
+              aria-label={`Aller au produit ${index + 1}`}
+            >
+              <span className={`block h-3 rounded-full transition-all ${
                 currentIndex === index
                   ? 'bg-[#8B4513] w-6'
-                  : 'bg-slate-300 hover:bg-slate-400'
-              }`}
-              aria-label={`Aller au produit ${index + 1}`}
-            />
+                  : 'w-3 bg-slate-300'
+              }`} />
+            </button>
           ))}
         </div>
       </div>

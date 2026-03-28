@@ -4,6 +4,7 @@ import { Shield, Truck, RotateCcw, Lock } from "lucide-react";
 
 import { Container } from "@/components/Container";
 import NewsletterSignup from "@/components/NewsletterSignup";
+import { Commitments } from "@/components/Commitments";
 
 const serviceLinks = [
   { href: "/info/service-clientele", label: "Service à la clientèle" },
@@ -42,15 +43,17 @@ type FooterProps = {
 export const Footer = ({ storeName, atelierCity }: FooterProps) => {
 
   return (
+    <>
+    <Commitments />
     <footer className="border-t border-gray-200 bg-[#f6f1e9] text-gray-800">
       <Container className="py-6 sm:py-8 lg:py-12">
-        <div className="grid gap-6 sm:gap-8 grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Service à la clientèle</p>
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {serviceLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="transition hover:text-gray-900">
+                  <Link href={link.href} className="transition hover:text-gray-900 inline-block py-1">
                     {link.label}
                   </Link>
                 </li>
@@ -63,7 +66,7 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {categoryLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="transition hover:text-gray-900">
+                  <Link href={link.href} className="transition hover:text-gray-900 inline-block py-1">
                     {link.label}
                   </Link>
                 </li>
@@ -76,7 +79,7 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {proLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="transition hover:text-gray-900">
+                  <Link href={link.href} className="transition hover:text-gray-900 inline-block py-1">
                     {link.label}
                   </Link>
                 </li>
@@ -89,7 +92,7 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {aboutLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="transition hover:text-gray-900">
+                  <Link href={link.href} className="transition hover:text-gray-900 inline-block py-1">
                     {link.label}
                   </Link>
                 </li>
@@ -110,34 +113,34 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
               <Lock className="w-6 h-6 text-[#8B4513]" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Paiement sécurisé</p>
-                <p className="text-[10px] text-gray-500">SSL 256 bits</p>
+                <p className="text-xs text-gray-600">SSL 256 bits</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-2">
               <Truck className="w-6 h-6 text-[#8B4513]" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Livraison incluse</p>
-                <p className="text-[10px] text-gray-500">France métropolitaine</p>
+                <p className="text-xs text-gray-600">France métropolitaine</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-2">
               <Shield className="w-6 h-6 text-[#8B4513]" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Garantie 2 ans</p>
-                <p className="text-[10px] text-gray-500">SAV réactif sous 48h</p>
+                <p className="text-xs text-gray-600">SAV réactif sous 48h</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-2">
               <RotateCcw className="w-6 h-6 text-[#8B4513]" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Retour 14 jours</p>
-                <p className="text-[10px] text-gray-500">Satisfait ou remboursé</p>
+                <p className="text-xs text-gray-600">Satisfait ou remboursé</p>
               </div>
             </div>
           </div>
           {/* Moyens de paiement */}
           <div className="flex items-center justify-center gap-3 mt-6 pt-4 border-t border-gray-100">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wide mr-2">Moyens de paiement</span>
+            <span className="text-xs text-gray-600 uppercase tracking-wide mr-2">Moyens de paiement</span>
             <Image src="/logos/klarna.svg" alt="Klarna" width={48} height={18} className="h-4 w-auto opacity-60" />
             <svg viewBox="0 0 38 24" className="h-5 w-auto opacity-60" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="37" height="23" rx="3" fill="white" stroke="#D9D9D9"/><path d="M15.764 16.23H13.61L14.94 7.77H17.094L15.764 16.23Z" fill="#00579F"/><path d="M24.054 7.95C23.614 7.77 22.924 7.57 22.074 7.57C19.954 7.57 18.454 8.68 18.444 10.27C18.424 11.44 19.504 12.09 20.324 12.47C21.164 12.86 21.444 13.11 21.444 13.45C21.434 13.97 20.804 14.21 20.214 14.21C19.394 14.21 18.954 14.09 18.274 13.8L17.994 13.67L17.694 15.56C18.194 15.78 19.094 15.97 20.024 15.98C22.284 15.98 23.754 14.89 23.774 13.19C23.784 12.26 23.194 11.55 21.954 10.97C21.194 10.6 20.734 10.35 20.734 9.99C20.744 9.66 21.104 9.33 21.904 9.33C22.564 9.31 23.054 9.48 23.424 9.65L23.614 9.74L23.914 7.92L24.054 7.95Z" fill="#00579F"/><path d="M27.014 7.77H25.394C24.894 7.77 24.514 7.92 24.294 8.43L21.124 16.23H23.384L23.834 14.96H26.584L26.844 16.23H28.844L27.014 7.77ZM24.444 13.3C24.624 12.82 25.334 10.94 25.334 10.94L25.284 11.07L25.514 10.42L25.654 11.01C25.654 11.01 26.074 12.87 26.164 13.3H24.444Z" fill="#00579F"/><path d="M12.554 7.77L10.454 13.35L10.234 12.3C9.834 10.98 8.594 9.54 7.214 8.82L9.124 16.22H11.404L14.834 7.77H12.554Z" fill="#00579F"/><path d="M8.774 7.77H5.324L5.294 7.93C8.044 8.61 9.854 10.28 10.234 12.3L9.834 8.44C9.764 7.93 9.394 7.79 8.924 7.77H8.774Z" fill="#FAA61A"/></svg>
             <svg viewBox="0 0 38 24" className="h-5 w-auto opacity-60" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="37" height="23" rx="3" fill="white" stroke="#D9D9D9"/><circle cx="15" cy="12" r="7" fill="#EB001B"/><circle cx="23" cy="12" r="7" fill="#F79E1B"/><path d="M19 7.5C20.497 8.612 21.5 10.197 21.5 12C21.5 13.803 20.497 15.388 19 16.5C17.503 15.388 16.5 13.803 16.5 12C16.5 10.197 17.503 8.612 19 7.5Z" fill="#FF5F00"/></svg>
@@ -145,9 +148,10 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
           </div>
         </Container>
       </div>
-      <div className="border-t border-gray-200 py-3 sm:py-4 text-center text-[10px] sm:text-xs text-gray-500">
+      <div className="border-t border-gray-200 py-3 sm:py-4 text-center text-xs text-gray-600">
         © {new Date().getFullYear()} {storeName} — Fabriqué à {atelierCity} (79)
       </div>
     </footer>
+    </>
   );
 };

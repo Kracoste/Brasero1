@@ -36,6 +36,12 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Chaque brasero est fabriqué à la main dans notre atelier des Deux-Sèvres.`,
       type: "website",
       locale: "fr_FR",
+      images: [{
+        url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp",
+        width: 1200,
+        height: 630,
+        alt: "Atelier LBF — Braseros artisanaux Made in France",
+      }],
     },
     alternates: {
       canonical: "/fabrication",

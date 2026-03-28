@@ -115,8 +115,7 @@ export const AccessoryGrid = ({
             return (
               <article
                 key={product.slug}
-                className="flex flex-none flex-col rounded-lg border border-gray-200 bg-white shadow-sm"
-                style={{ width: "calc((100% - 48px) / 4)", minWidth: 200 }}
+                className="flex flex-none flex-col rounded-lg border border-gray-200 bg-white shadow-sm w-[70vw] sm:w-[calc((100%-24px)/2)] md:w-[calc((100%-36px)/3)] lg:w-[calc((100%-48px)/4)]"
               >
                 <div className="relative border-b border-gray-100 px-4 py-3 text-center">
                   <span className="text-sm text-gray-600">Commandez aussi</span>

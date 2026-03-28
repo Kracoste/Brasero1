@@ -72,7 +72,7 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
               src={image.src}
               alt={image.alt || product.name}
               fill
-              sizes="(max-width: 480px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}
               className="product-card__image-el"

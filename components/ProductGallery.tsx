@@ -77,7 +77,7 @@ export const ProductGallery = ({ product, configurationImages }: ProductGalleryP
     <div className="flex flex-col">
       {/* Image principale */}
       <div 
-        className="relative w-full aspect-[3/4] sm:aspect-[4/5] lg:aspect-[3/4] min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] overflow-hidden flex items-center justify-center"
+        className="relative w-full aspect-[3/4] sm:aspect-[4/5] lg:aspect-[3/4] min-h-[280px] sm:min-h-[400px] lg:min-h-[600px] overflow-hidden flex items-center justify-center"
       >
           <Image
             key={activeImage.src}
@@ -145,7 +145,7 @@ export const ProductGallery = ({ product, configurationImages }: ProductGalleryP
                 alt={image.alt}
                 width={200}
                 height={150}
-                className="h-16 w-20 sm:h-20 sm:w-24 object-cover rounded-md"
+                className="h-14 w-16 sm:h-20 sm:w-24 object-cover rounded-md"
                 placeholder={image.blurDataURL ? "blur" : "empty"}
                 blurDataURL={image.blurDataURL}
               />

@@ -99,7 +99,7 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
           {products.map((product) => (
             <div
               key={product.slug}
-              className="flex-shrink-0 w-full sm:w-[calc(50%-10px)] md:w-[calc(33.333%-13px)] lg:w-[calc(25%-15px)] min-w-[260px] snap-start"
+              className="flex-shrink-0 w-[75vw] sm:w-[calc(50%-10px)] md:w-[calc(33.333%-13px)] lg:w-[calc(25%-15px)] snap-start"
             >
               <ProductCard product={product} />
             </div>
@@ -127,13 +127,15 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
           <button
             key={index}
             onClick={() => scrollToPage(index)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              currentPage === index
-                ? 'bg-slate-800'
-                : 'bg-slate-300 hover:bg-slate-400'
-            }`}
+            className="relative p-3"
             aria-label={`Aller à la page ${index + 1}`}
-          />
+          >
+            <span className={`block h-3 rounded-full transition-all ${
+              currentPage === index
+                ? 'bg-slate-800 w-6'
+                : 'w-3 bg-slate-300'
+            }`} />
+          </button>
         ))}
       </div>
     </div>

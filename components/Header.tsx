@@ -11,7 +11,6 @@ import { navLinks } from '@/components/navigation';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from "@/lib/favorites-context";
 import { useAuth } from '@/lib/auth-context';
-import LanguageSelector from '@/components/LanguageSelector';
 
 export const Header = () => {
   const pathname = usePathname();
@@ -33,7 +32,7 @@ export const Header = () => {
           {/* Logo à gauche */}
           <Link href="/" className="flex-shrink-0">
           <Image
-            src="/logo/Logo1.png"
+            src="/logo/Logo1.webp"
             alt="Atelier LBF Logo"
             width={1400}
             height={500}
@@ -68,7 +67,7 @@ export const Header = () => {
                       <Link
                         href={link.href}
                         className={cn(
-                          "nav-link-hover text-[0.65rem] md:text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 inline-flex items-center",
+                          "nav-link-hover text-[0.7rem] md:text-xs xl:text-sm font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 inline-flex items-center",
                           isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                         )}
                       >
@@ -109,7 +108,7 @@ export const Header = () => {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "nav-link-hover text-[0.65rem] md:text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 mx-1 md:mx-2 lg:mx-3 xl:mx-6",
+                      "nav-link-hover text-[0.7rem] md:text-xs xl:text-sm font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] transition relative pb-1 mx-1 md:mx-2 lg:mx-3 xl:mx-6",
                       isActive ? "text-slate-900" : "text-slate-700 hover:text-slate-900",
                     )}
                   >
@@ -119,7 +118,7 @@ export const Header = () => {
               })}
               <Link
                 href="/recettes"
-                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-2 md:px-3 lg:px-4 py-1 md:py-1.5 lg:py-2 text-[0.65rem] md:text-[0.7rem] xl:text-[0.85rem] font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] text-white transition hover:brightness-110 mx-1 md:mx-2 lg:mx-3 xl:mx-6"
+                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-2 md:px-3 lg:px-4 py-1 md:py-1.5 lg:py-2 text-[0.7rem] md:text-xs xl:text-sm font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] text-white transition hover:brightness-110 mx-1 md:mx-2 lg:mx-3 xl:mx-6"
               >
                 Recettes
               </Link>
@@ -140,11 +139,9 @@ export const Header = () => {
               <span className="text-[7px] uppercase tracking-wide text-slate-500 leading-none whitespace-nowrap">Payer en plusieurs fois</span>
             </div>
 
-            {/* Sélecteur de langue */}
-            <LanguageSelector />
             
             {/* Favoris */}
-            <Link href="/favoris" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
+            <Link href="/favoris" aria-label="Favoris" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
               <span className="relative">
                 <Heart className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                 {favoriteCount > 0 && (
@@ -158,7 +155,7 @@ export const Header = () => {
 
             {/* Commandes - visible seulement quand connecté */}
             {user && (
-              <Link href="/mon-compte/commandes" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
+              <Link href="/mon-compte/commandes" aria-label="Mes commandes" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
                 <Package className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                 <span className="hidden md:block text-[8px] sm:text-[9px] uppercase tracking-wide mt-0.5">Commandes</span>
               </Link>
@@ -242,7 +239,7 @@ export const Header = () => {
             </div>
 
             {/* Panier */}
-            <Link href="/panier" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
+            <Link href="/panier" aria-label="Panier" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
               <span className="relative">
                 <ShoppingBag className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                 {itemCount > 0 && (
