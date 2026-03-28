@@ -43,9 +43,8 @@ type FooterProps = {
 export const Footer = ({ storeName, atelierCity }: FooterProps) => {
 
   return (
-    <>
-    <Commitments />
     <footer className="border-t border-gray-200 bg-[#f6f1e9] text-gray-800">
+      <Commitments />
       <Container className="py-6 sm:py-8 lg:py-12">
         <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -152,6 +151,5 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
         © {new Date().getFullYear()} {storeName} — Fabriqué à {atelierCity} (79)
       </div>
     </footer>
-    </>
   );
 };

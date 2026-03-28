@@ -87,7 +87,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://kxztmjqxsskvbqcohtgj.supabase.co" />
+        <link rel="dns-prefetch" href="https://kxztmjqxsskvbqcohtgj.supabase.co" />
         <link rel="preload" href="/Braserobanner.webp" as="image" type="image/webp" fetchPriority="high" />
+        <link rel="preload" href="/acceuil/video_brasero_poster.webp" as="image" type="image/webp" />
         {/* Google Tag Manager - deferred to not block main thread */}
         <Script id="gtm-head" strategy="lazyOnload">{`
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
