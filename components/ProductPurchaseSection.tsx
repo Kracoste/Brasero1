@@ -407,10 +407,6 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
         {/* Réassurance livraison & garantie */}
         <div className="grid grid-cols-2 gap-2 pt-2">
           <div className="flex items-center gap-2 text-xs text-slate-600">
-            <svg className="w-4 h-4 text-[#8B4513] flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21M3.375 14.25h3.75L8.25 9.75h7.5l1.125 4.5h3.75M3.375 14.25V6.375A1.125 1.125 0 0 1 4.5 5.25h6.75" /></svg>
-            <span>Livraison offerte en France</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-slate-600">
             <svg className="w-4 h-4 text-[#8B4513] flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
             <span>Garantie 2 ans</span>
           </div>

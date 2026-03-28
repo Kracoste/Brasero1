@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Truck, Hammer, Shield, CreditCard } from 'lucide-react'
+import { Hammer, Shield, CreditCard } from 'lucide-react'
 
 const items = [
-  { icon: Truck, label: 'Livraison offerte en France' },
   { icon: Hammer, label: 'Fabrication artisanale française' },
   { icon: Shield, label: 'Garantie 2 ans' },
   { icon: CreditCard, label: 'Paiement en 3x sans frais' },
