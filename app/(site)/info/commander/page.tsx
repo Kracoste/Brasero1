@@ -37,6 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Commandez votre brasero artisanal en toute simplicité. Fabrication française, paiement sécurisé, livraison soignée.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/commander",

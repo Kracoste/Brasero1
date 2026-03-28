@@ -39,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Toutes les informations pour nous contacter et nos données légales d'entreprise.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/donnees-entreprise-contact",

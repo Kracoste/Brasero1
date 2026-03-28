@@ -109,7 +109,7 @@ export const AccessoryGrid = ({
             const rating = getRating(product.slug);
             const fullStars = Math.floor(rating);
             const hasHalfStar = rating % 1 >= 0.5;
-            const oldPrice = Math.round(product.price * 1.15);
+            const oldPrice = product.comparePrice;
             const image = product.images[0];
 
             return (
@@ -135,9 +135,6 @@ export const AccessoryGrid = ({
                       )}
                     </span>
                   </button>
-                  <span className="absolute left-1/2 top-12 -translate-x-1/2 rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white">
-                    Black Friday
-                  </span>
                 </div>
 
                 <Link href={`/produits/${product.slug}`} className="block">
@@ -187,7 +184,9 @@ export const AccessoryGrid = ({
                   </div>
 
                   <div className="flex items-baseline gap-3 text-gray-900">
-                    <span className="text-xs text-gray-400 line-through">{formatCurrency(oldPrice)}</span>
+                    {oldPrice && oldPrice > product.price && (
+                      <span className="text-xs text-gray-400 line-through">{formatCurrency(oldPrice)}</span>
+                    )}
                     <span className="text-xl font-bold">{formatCurrency(product.price)}</span>
                   </div>
                 </div>

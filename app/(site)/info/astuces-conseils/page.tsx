@@ -43,6 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Guide complet pour l'utilisation et l'entretien de votre brasero artisanal.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/astuces-conseils",

@@ -39,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Actualités, inspirations et conseils autour du brasero artisanal.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/blog",

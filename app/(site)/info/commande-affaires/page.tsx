@@ -49,6 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Solutions brasero pour professionnels. Tarifs B2B, personnalisation et livraison Europe.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/commande-affaires",

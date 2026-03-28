@@ -41,6 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Notre équipe est à votre disposition pour vous accompagner avant, pendant et après votre achat.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/service-clientele",

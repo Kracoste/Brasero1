@@ -40,6 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Payez en toute sécurité votre brasero artisanal. Carte bancaire, virement, paiement en 3x sans frais.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/paiement",

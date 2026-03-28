@@ -47,6 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Créez le brasero de vos rêves. Dimensions, gravures, motifs : tout est personnalisable. Fabrication artisanale en France.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/produits-sur-mesure",

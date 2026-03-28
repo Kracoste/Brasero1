@@ -144,6 +144,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: meta.title,
     description: meta.description,
+    openGraph: {
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+    },
     alternates: {
       canonical: `/info/${slug}`,
     },
@@ -526,11 +529,11 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
         <h2 className="text-xl font-semibold">Informations sur l&apos;entreprise</h2>
         <div className="bg-gray-50 p-6 rounded-lg space-y-2">
           <p><strong>Raison sociale :</strong> {settings.storeName}</p>
-          <p><strong>Forme juridique :</strong> SAS</p>
+          <p><strong>Forme juridique :</strong> Entreprise individuelle</p>
           <p><strong>Siège social :</strong> {settings.storeAddress}</p>
-          <p><strong>SIRET :</strong> XXX XXX XXX XXXXX</p>
-          <p><strong>TVA Intracommunautaire :</strong> FR XX XXX XXX XXX</p>
-          <p><strong>Capital social :</strong> XX XXX €</p>
+          <p><strong>SIRET :</strong> 94847157800013</p>
+          <p><strong>TVA Intracommunautaire :</strong> FR62948471578</p>
+          <p><strong>Capital social :</strong> 10000€</p>
         </div>
         <h2 className="text-xl font-semibold">Coordonnées</h2>
         <div className="bg-gray-50 p-6 rounded-lg space-y-2">

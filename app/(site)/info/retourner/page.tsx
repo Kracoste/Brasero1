@@ -39,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Politique de retour flexible pour votre brasero. 14 jours de rétractation, remboursement sous 14 jours, accompagnement personnalisé.`,
       type: "website",
       locale: "fr_FR",
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
     },
     alternates: {
       canonical: "/info/retours",
