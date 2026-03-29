@@ -362,40 +362,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Section Témoignages — preuve sociale */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#8B4513]">Ils nous font confiance</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900 mt-2">
-              Ce que disent nos clients
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {[
-              { name: "Laurent D.", location: "Bordeaux", text: "Brasero reçu en parfait état, la qualité de l'acier corten est exceptionnelle. Le rendu avec les flammes le soir est magnifique. Je recommande à 100%.", rating: 5 },
-              { name: "Sophie M.", location: "Lyon", text: "Service client au top, réponse rapide à mes questions. La découpe laser personnalisée est d'une précision incroyable. Très satisfaite de mon achat.", rating: 5 },
-              { name: "Pierre R.", location: "Nantes", text: "Deuxième commande chez Atelier LBF. Cette fois pour le fendeur à bûches. Même qualité, même soin dans l'emballage. Bravo !", rating: 5 },
-            ].map((review, i) => (
-              <div key={i} className="p-6 border border-slate-200 bg-[#fafafa]">
-                <div className="flex gap-0.5 mb-3">
-                  {Array.from({ length: review.rating }).map((_, j) => (
-                    <svg key={j} className="h-4 w-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-sm text-slate-600 leading-relaxed mb-4">&ldquo;{review.text}&rdquo;</p>
-                <div className="text-sm">
-                  <span className="font-semibold text-slate-900">{review.name}</span>
-                  <span className="text-slate-400 mx-1">—</span>
-                  <span className="text-slate-500">{review.location}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Section Newsletter avec incentive */}
       <section className="py-12 sm:py-16 bg-slate-900 text-white">
