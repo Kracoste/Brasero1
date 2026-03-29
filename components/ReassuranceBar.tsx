@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Hammer, Shield, CreditCard } from 'lucide-react'
+import { Hammer, Shield, CreditCard, Tag } from 'lucide-react'
 
 const items = [
+  { icon: Tag, label: 'Code BIENVENUE10 : -10% sur votre 1ère commande' },
   { icon: Hammer, label: 'Fabrication artisanale française' },
   { icon: Shield, label: 'Garantie 2 ans' },
   { icon: CreditCard, label: 'Paiement en 3x sans frais' },
