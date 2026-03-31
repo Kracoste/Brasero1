@@ -36,10 +36,10 @@ export function ExitIntentPopup() {
       }
     };
 
-    // Delay listener to avoid triggering on page load
+    // Attendre 6 minutes avant d'activer le popup (exit-intent uniquement)
     const timer = setTimeout(() => {
       document.addEventListener('mouseleave', handleMouseLeave);
-    }, 5000);
+    }, 360000);
 
     return () => {
       clearTimeout(timer);
