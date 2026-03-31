@@ -371,7 +371,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
       <div className="space-y-3 sm:space-y-4">
         {!product.onDemand && (
           <div className="space-y-1">
-            <Price amount={activePrice + customizationSupplement} className="text-2xl sm:text-3xl lg:text-4xl font-bold" showHT />
+            <Price amount={activePrice + customizationSupplement} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
             {showPriceBreakdown && (
               <p className="text-sm text-slate-500">
                 Brasero {activePriceBrasero.toFixed(2).replace('.', ',')} € + Plancha {activePricePlancha.toFixed(2).replace('.', ',')} €

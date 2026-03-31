@@ -115,10 +115,10 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
                 <span>{formatCurrency(displayPrice)}</span>
                 <span className="product-card__promo-note">après remise</span>
               </div>
-              <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} TTC</span>
+              <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} HT</span>
             </div>
           ) : !product.onDemand ? (
-            <Price amount={displayPrice} className="product-card__price" tone="light" showHT />
+            <Price amount={displayPrice} className="product-card__price" tone="light" />
           ) : (
             <div className="product-card__price-placeholder" style={{ height: '2.5rem' }} />
           )}

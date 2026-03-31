@@ -194,8 +194,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
       };
       syncCart();
+    } else if (prevUserId) {
+      // Utilisateur vient de se déconnecter — vider le panier local
+      persistGuestCart([]);
+      setItems([]);
+      setCartId(null);
     } else {
-      // Déconnecté - revenir au panier local
+      // Pas connecté au départ — charger le panier local existant
       setItems(readGuestCart());
       setCartId(null);
     }

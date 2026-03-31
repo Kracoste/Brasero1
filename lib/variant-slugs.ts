@@ -76,6 +76,20 @@ export function getAllVariantSlugs(product: Product): {
     plancha: string;
   }[] = [];
 
+  // Collecter tous les diamètres uniques pour savoir si ce produit a plusieurs tailles
+  const allDiameters = new Set<string>();
+  for (const config of Object.values(product.configurations)) {
+    if (config.diameters) {
+      for (const d of Object.keys(config.diameters)) {
+        allDiameters.add(d);
+      }
+    }
+  }
+
+  // Ne pas générer de sous-fiches variantes si le produit n'a qu'un seul diamètre
+  // (produits enfants créés par diamètre — le sélecteur finition est sur la fiche produit)
+  if (allDiameters.size <= 1) return [];
+
   for (const [configKey, config] of Object.entries(product.configurations)) {
     const parts = configKey.split('-');
     const finish = parts[0]; // corten | peint
