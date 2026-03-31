@@ -15,6 +15,7 @@ type Coupon = {
   current_uses: number;
   expires_at: string | null;
   is_active: boolean;
+  show_in_banner: boolean;
   created_at: string;
   applicable_products: string[] | null;
 };
@@ -33,6 +34,7 @@ type CouponForm = {
   max_uses_per_user: number | null;
   expires_at: string | null;
   is_active: boolean;
+  show_in_banner: boolean;
 };
 
 const emptyCouponForm: CouponForm = {
@@ -44,6 +46,7 @@ const emptyCouponForm: CouponForm = {
   max_uses_per_user: 1,
   expires_at: null,
   is_active: true,
+  show_in_banner: false,
 };
 
 export default function AdminCodesPromo() {
@@ -118,6 +121,7 @@ export default function AdminCodesPromo() {
       max_uses_per_user: coupon.max_uses_per_user,
       expires_at: coupon.expires_at ? coupon.expires_at.slice(0, 16) : null,
       is_active: coupon.is_active,
+      show_in_banner: coupon.show_in_banner,
     });
     setSelectedProducts(coupon.applicable_products || []);
     setEditingId(coupon.id);
@@ -146,6 +150,7 @@ export default function AdminCodesPromo() {
       max_uses_per_user: form.max_uses_per_user || null,
       expires_at: form.expires_at || null,
       is_active: form.is_active,
+      show_in_banner: form.show_in_banner,
       applicable_products: selectedProducts.length > 0 ? selectedProducts : null,
     };
 
@@ -400,6 +405,20 @@ export default function AdminCodesPromo() {
                 />
                 <span className="text-sm font-medium text-slate-700">Actif</span>
               </label>
+            </div>
+
+            {/* Afficher dans la bannière */}
+            <div className="flex items-end">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.show_in_banner}
+                  onChange={(e) => setForm({ ...form, show_in_banner: e.target.checked })}
+                  className="w-4 h-4 rounded border-slate-300 text-[#8B4513] focus:ring-[#8B4513]"
+                />
+                <span className="text-sm font-medium text-slate-700">Afficher dans la bannière</span>
+              </label>
+              <span className="text-xs text-slate-400 ml-2" title="Le code sera affiché en haut du site. Un seul code peut être affiché à la fois.">?</span>
             </div>
           </div>
 

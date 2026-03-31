@@ -193,6 +193,11 @@ function sanitizeCouponData(data: unknown): Record<string, unknown> | null {
     sanitized.is_active = input.is_active;
   }
 
+  // show_in_banner
+  if (typeof input.show_in_banner === 'boolean') {
+    sanitized.show_in_banner = input.show_in_banner;
+  }
+
   // applicable_products
   if (input.applicable_products === null || input.applicable_products === undefined) {
     sanitized.applicable_products = null;

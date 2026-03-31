@@ -35,6 +35,31 @@ type CheckoutBody = {
   couponCode?: string | null;
 };
 
+async function computeShippingHash(customerInfo: {
+  first_name: string;
+  last_name: string;
+  address: string;
+  postal_code: string;
+}): Promise<string | null> {
+  try {
+    const raw = [
+      customerInfo.first_name,
+      customerInfo.last_name,
+      customerInfo.address,
+      customerInfo.postal_code,
+    ]
+      .map((s) => (s || '').toLowerCase().replace(/\s+/g, '').trim())
+      .join('|');
+    const encoded = new TextEncoder().encode(raw);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  } catch {
+    return null;
+  }
+}
+
 const parseQuantity = (value: unknown) => {
   const numeric = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(numeric)) return null;
@@ -244,17 +269,36 @@ export async function POST(request: NextRequest) {
           const cartTotal = lineItems.reduce((sum, li) => sum + (li.price_data.unit_amount * li.quantity), 0) / 100;
           const belowMin = coupon.min_purchase_amount && cartTotal < coupon.min_purchase_amount;
 
-          // Vérifier la limite par utilisateur (par email)
+          // Vérifier la limite par utilisateur (par email ET par adresse de livraison)
           let userExhausted = false;
-          if (coupon.max_uses_per_user && customerInfo.email) {
-            const { count } = await supabaseAdmin
-              .from('coupon_uses')
-              .select('*', { count: 'exact', head: true })
-              .eq('coupon_id', coupon.id)
-              .eq('email', customerInfo.email.toLowerCase().trim());
+          if (coupon.max_uses_per_user) {
+            // Vérification par email
+            if (customerInfo.email) {
+              const { count } = await supabaseAdmin
+                .from('coupon_uses')
+                .select('*', { count: 'exact', head: true })
+                .eq('coupon_id', coupon.id)
+                .eq('email', customerInfo.email.toLowerCase().trim());
 
-            if (count !== null && count >= coupon.max_uses_per_user) {
-              userExhausted = true;
+              if (count !== null && count >= coupon.max_uses_per_user) {
+                userExhausted = true;
+              }
+            }
+
+            // Vérification anti-multi-compte par adresse de livraison
+            if (!userExhausted) {
+              const shippingHash = await computeShippingHash(customerInfo);
+              if (shippingHash) {
+                const { count: countByAddress } = await supabaseAdmin
+                  .from('coupon_uses')
+                  .select('*', { count: 'exact', head: true })
+                  .eq('coupon_id', coupon.id)
+                  .eq('shipping_hash', shippingHash);
+
+                if (countByAddress !== null && countByAddress >= coupon.max_uses_per_user) {
+                  userExhausted = true;
+                }
+              }
             }
           }
 
@@ -323,11 +367,14 @@ export async function POST(request: NextRequest) {
             .eq('code', couponCodeUsed);
         }
 
-        // Enregistrer l'usage par email (pour la limite par utilisateur)
+        // Enregistrer l'usage par email + adresse (anti-multi-compte)
+        const shippingHashForInsert = await computeShippingHash(customerInfo);
         await adminClient.from('coupon_uses').insert({
           coupon_id: couponIdUsed,
           email: customerInfo.email.toLowerCase().trim(),
           stripe_session_id: session.id,
+          shipping_hash: shippingHashForInsert,
+          ip_address: clientIP || null,
         });
       }
     }
