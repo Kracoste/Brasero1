@@ -20,6 +20,7 @@ import {
   generateBreadcrumbSchema,
   generateFAQSchema,
 } from "@/lib/seo/schemas";
+import { getReviewStats } from "@/lib/data/reviews";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -87,6 +88,12 @@ export async function generateMetadata({ params }: VariantPageProps): Promise<Me
         alt: img.alt || product.name,
       })),
     },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: images.slice(0, 1).map((img: any) => img.src || img.url),
+    },
     alternates: {
       canonical: `/brasero-plancha/${variantSlug}`,
     },
@@ -114,7 +121,10 @@ export default async function VariantPage({ params }: VariantPageProps) {
   const shortName = product.specs?.shortName || product.name;
   const variantName = `Brasero ${shortName} ${finishLabel} Ø${parsed.diameter}cm ${planchaLabel}`;
 
-  const productSchema = generateProductSchema(product, `${variantName} - Brasero artisanal fabriqué en France par l'Atelier LBF.`);
+  // Review stats pour AggregateRating (étoiles dans Google)
+  const reviewStats = await getReviewStats(product.slug);
+
+  const productSchema = generateProductSchema(product, `${variantName} - Brasero artisanal fabriqué en France par l'Atelier LBF.`, reviewStats);
   // Override URL and name for this variant
   productSchema.url = `https://www.atelier-lbf.fr/brasero-plancha/${variantSlug}`;
   productSchema.name = variantName;

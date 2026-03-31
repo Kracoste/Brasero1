@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
     return [
       { source: '/info/blog', destination: '/blog', permanent: true },
       { source: '/info/contact', destination: '/contact', permanent: true },
+      // Anti-cannibalisation : rediriger les doublons vers les pages canoniques
+      { source: '/livraison-france', destination: '/livraison', permanent: true },
+      { source: '/info/accessoires', destination: '/produits?category=accessoire', permanent: true },
+      { source: '/info/braseros-exterieurs', destination: '/produits?category=brasero', permanent: true },
     ];
   },
   images: {

@@ -126,7 +126,6 @@ export default async function BlogPage() {
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       priority
-                      unoptimized
                     />
                   </div>
                 ) : (
@@ -193,8 +192,7 @@ export default async function BlogPage() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        unoptimized
-                      />
+                        />
                     </div>
                   ) : (
                     <div className="bg-[#f6f1e9] p-8 flex items-center justify-center">

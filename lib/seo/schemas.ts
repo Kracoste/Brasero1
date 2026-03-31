@@ -148,7 +148,11 @@ export function generateStoreSchema(settings: SiteSettings) {
 
 // ── Product + Offer ────────────────────────────────────────────────────────
 
-export function generateProductSchema(product: Product, seoDescription?: string) {
+export function generateProductSchema(
+  product: Product,
+  seoDescription?: string,
+  reviewStats?: { average: number; count: number } | null
+) {
   const reference = `REF-${product.slug.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
   const imageUrls = product.images.map((img) => img.src);
 
@@ -291,6 +295,17 @@ export function generateProductSchema(product: Product, seoDescription?: string)
     offers: offersSchema,
     url: `${BASE_URL}/produits/${product.slug}`,
   };
+
+  // AggregateRating (ajouté dynamiquement via reviewStats)
+  if (reviewStats && reviewStats.count > 0) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: reviewStats.average,
+      reviewCount: reviewStats.count,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
 
   // Dimensions
   if (product.weight) {

@@ -20,6 +20,9 @@ import {
   generateProductMetaTitle,
   generateProductMetaDescription,
 } from "@/lib/seo/product-seo";
+import { getReviewStats } from "@/lib/data/reviews";
+import { getBlogPostsForProduct, getAllBlogPosts } from "@/lib/data/blog";
+import { RelatedBlogPosts } from "@/components/RelatedBlogPosts";
 
 // ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
 export const revalidate = 60;
@@ -133,8 +136,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
     ? product.faq
     : seo.faq;
 
+  // Review stats pour AggregateRating (étoiles dans Google)
+  const reviewStats = await getReviewStats(product.slug);
+
+  // Articles blog associés (maillage interne produit → blog)
+  let blogPosts = await getBlogPostsForProduct(product.slug, 3);
+  if (blogPosts.length === 0) {
+    const allPosts = await getAllBlogPosts();
+    blogPosts = allPosts.slice(0, 3);
+  }
+
   // JSON-LD schemas
-  const productSchema = generateProductSchema(product, seo.description);
+  const productSchema = generateProductSchema(product, seo.description, reviewStats);
   const breadcrumbSchema = generateProductBreadcrumb(product);
   const faqSchema = generateFAQSchema(productFAQs);
 
@@ -169,6 +182,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <RelatedProducts products={relatedProducts} />
         </Section>
       )}
+
+      {/* Articles blog associés — maillage interne SEO */}
+      <RelatedBlogPosts posts={blogPosts} />
     </div>
   );
 }

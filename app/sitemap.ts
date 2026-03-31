@@ -83,26 +83,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     },
-    {
-      url: `${baseUrl}/livraison-france`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    },
+    // /livraison-france redirigé 301 vers /livraison (anti-cannibalisation)
     {
       url: `${baseUrl}/recettes`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.6,
     },
+    // /info/faq est déjà dans infoPages
+    // /info/contact redirigé 301 vers /contact
     {
-      url: `${baseUrl}/info/faq`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/info/contact`,
+      url: `${baseUrl}/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.5,
@@ -135,7 +126,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'commande-affaires',
     'commander',
     'confidentialite-politique',
-    'contact',
     'donnees-entreprise-contact',
     'expedition',
     'faq',

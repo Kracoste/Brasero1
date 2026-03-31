@@ -23,15 +23,18 @@ const proLinks = [
 
 const aboutLinks = [
   { href: "/info/a-propos-de-nous", label: "À propos de nous" },
+  { href: "/made-in-france", label: "Notre atelier Made in France" },
   { href: "/info/donnees-entreprise-contact", label: "Données sur l'entreprise et contact" },
   { href: "/info/bulletin-information", label: "Bulletin d'information" },
   { href: "/info/astuces-conseils", label: "Astuces et conseils" },
-  { href: "/info/blog", label: "Blog" },
+  { href: "/blog", label: "Blog" },
 ];
 
 const categoryLinks = [
   { href: "/produits?category=brasero", label: "Braseros extérieurs" },
+  { href: "/produits?category=fendeur", label: "Fendeurs à bûches" },
   { href: "/accessoires", label: "Accessoires" },
+  { href: "/produits?category=promotions", label: "Promotions" },
 ];
 
 type FooterProps = {

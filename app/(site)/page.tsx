@@ -134,7 +134,7 @@ export default async function HomePage() {
                 <CategoryTile
                   title="Fendeur A Bûches"
                   alt="Fendeur à bûches artisanal en acier pour couper le bois de chauffage brasero"
-                  cta="Voir tous"
+                  cta="Nos fendeurs"
                   image="/acceuil/Fendeur-Buches.webp"
                   href="/produits?category=fendeur"
                   compact
@@ -142,7 +142,7 @@ export default async function HomePage() {
                 <CategoryTile
                   title="Accessoires"
                   alt="Accessoires brasero : plancha acier carbone, grille, spatule, pique — Atelier LBF"
-                  cta="Voir tous"
+                  cta="Nos accessoires"
                   image="/accesoiresbrasero.webp"
                   href="/produits?category=accessoire"
                   compact
@@ -170,7 +170,7 @@ export default async function HomePage() {
               href="/produits"
               className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
             >
-              Voir notre catalogue
+              Voir tous nos braseros et accessoires
             </Link>
           </div>
         </div>
@@ -316,7 +316,7 @@ export default async function HomePage() {
               <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-[#8B5A2B] transition-colors">Garantie 2 ans</h3>
               <p className="text-sm text-slate-600">Qualité garantie sur tous nos produits avec un SAV réactif</p>
             </Link>
-            <Link href="/livraison-france" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
+            <Link href="/livraison" className="bg-white p-6 text-center border border-slate-200 hover:shadow-lg hover:border-[#CD853F] transition-all group">
               <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-[#CD853F]/30 transition-colors">
                 <Truck className="w-6 h-6 text-[#8B5A2B]" />
               </div>
@@ -357,23 +357,23 @@ export default async function HomePage() {
             href="/blog"
             className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all text-sm"
           >
-            Voir tous les articles
+            Tous nos guides brasero et plancha
           </Link>
         </div>
       </section>
 
 
       {/* Section Newsletter avec incentive */}
-      <section className="py-12 sm:py-16 bg-slate-900 text-white">
+      <section className="py-12 sm:py-16 bg-[#f6f1e9]">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
             Recevez 10% sur votre première commande
           </h2>
-          <p className="mt-3 text-slate-300">
+          <p className="mt-3 text-slate-600">
             Inscrivez-vous à notre newsletter et recevez votre code promo exclusif, ainsi que nos conseils brasero et nos offres en avant-première.
           </p>
           <HomepageNewsletter />
-          <p className="mt-3 text-xs text-slate-400">
+          <p className="mt-3 text-xs text-slate-500">
             Rejoignez + de 500 passionnés. Désabonnement en un clic.
           </p>
         </div>

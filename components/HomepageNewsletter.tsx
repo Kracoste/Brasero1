@@ -32,9 +32,9 @@ export function HomepageNewsletter() {
   if (status === 'success') {
     return (
       <div className="text-center">
-        <p className="text-lg font-semibold text-white">Bienvenue dans la communauté !</p>
-        <p className="mt-2 text-sm text-slate-300">
-          Votre code <span className="font-bold text-[#CD853F]">BIENVENUE10</span> est actif. Utilisez-le lors de votre commande.
+        <p className="text-lg font-semibold text-slate-900">Bienvenue dans la communauté !</p>
+        <p className="mt-2 text-sm text-slate-600">
+          Votre code <span className="font-bold text-[#8B4513]">BIENVENUE10</span> est actif. Utilisez-le lors de votre commande.
         </p>
       </div>
     );
@@ -49,7 +49,7 @@ export function HomepageNewsletter() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="votre@email.com"
         autoComplete="email"
-        className="flex-1 rounded-lg border-0 bg-white/10 px-4 py-3 text-sm text-white placeholder-slate-400 outline-none ring-1 ring-white/20 focus:ring-2 focus:ring-[#CD853F]"
+        className="flex-1 rounded-lg border-0 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none ring-1 ring-slate-300 focus:ring-2 focus:ring-[#8B4513]"
       />
       <button
         type="submit"
@@ -59,7 +59,7 @@ export function HomepageNewsletter() {
         {status === 'loading' ? 'Inscription...' : 'Recevoir mon code -10%'}
       </button>
       {status === 'error' && (
-        <p className="text-xs text-red-400 sm:col-span-2">Erreur, réessayez.</p>
+        <p className="text-xs text-red-600 sm:col-span-2">Erreur, réessayez.</p>
       )}
     </form>
   );
