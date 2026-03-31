@@ -42,7 +42,7 @@ const LOCAL_CART_KEY = 'brasero:guest-cart';
 const readGuestCart = (): CartItem[] => {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = window.localStorage.getItem(LOCAL_CART_KEY);
+    const raw = window.sessionStorage.getItem(LOCAL_CART_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
@@ -56,7 +56,7 @@ const readGuestCart = (): CartItem[] => {
 
 const persistGuestCart = (items: CartItem[]) => {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(items));
+  window.sessionStorage.setItem(LOCAL_CART_KEY, JSON.stringify(items));
 };
 
 const generateGuestId = (slug: string) =>
