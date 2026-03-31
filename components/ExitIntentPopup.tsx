@@ -36,10 +36,10 @@ export function ExitIntentPopup() {
       }
     };
 
-    // Attendre 6 minutes avant d'activer le popup (exit-intent uniquement)
+    // Activer l'exit-intent après 45 sec de navigation
     const timer = setTimeout(() => {
       document.addEventListener('mouseleave', handleMouseLeave);
-    }, 360000);
+    }, 45000);
 
     return () => {
       clearTimeout(timer);
