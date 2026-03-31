@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 
 import { Price } from "@/components/Price";
 import { useCart } from "@/lib/cart-context";
@@ -19,7 +19,7 @@ type ProductCardProps = {
   cardOverrides?: CardOverrides;
 };
 
-export const ProductCard = ({ product, className, cardOverrides }: ProductCardProps) => {
+export const ProductCard = memo(function ProductCard({ product, className, cardOverrides }: ProductCardProps) {
   const image = cardOverrides?.image ?? product.images[0];
   const { addItem } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -152,4 +152,4 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
       </div>
     </article>
   );
-};
+});

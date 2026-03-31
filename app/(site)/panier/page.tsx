@@ -214,10 +214,10 @@ export default function PanierPage() {
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Complétez votre commande</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { name: "Plancha acier", href: "/produits?category=accessoire", image: "/accesoiresbrasero.jpg" },
-                { name: "Fendeur à bûches", href: "/produits?category=fendeur", image: "/acceuil/Fendeur-Buches.png" },
-                { name: "Range-bûches", href: "/produits?category=range-buches", image: "/acceuil/acceuil1.jpg" },
-                { name: "Tous nos accessoires", href: "/produits?category=accessoire", image: "/accesoiresbrasero.jpg" },
+                { name: "Plancha acier", href: "/produits?category=accessoire", image: "/accesoiresbrasero.webp" },
+                { name: "Fendeur à bûches", href: "/produits?category=fendeur", image: "/acceuil/Fendeur-Buches.webp" },
+                { name: "Range-bûches", href: "/produits?category=range-buches", image: "/acceuil/acceuil1.webp" },
+                { name: "Tous nos accessoires", href: "/produits?category=accessoire", image: "/accesoiresbrasero.webp" },
               ].map((item) => (
                 <Link
                   key={item.name}

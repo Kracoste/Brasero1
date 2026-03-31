@@ -466,13 +466,13 @@ const CategoryTile = ({ title, alt, cta, image, href, compact = false, contain =
 
 const PromoTile = () => (
   <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-black text-white shadow-lg h-[320px] sm:h-[360px] lg:h-full lg:min-h-[420px]">
-    {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img
+    <Image
       src="/Braserobanner.webp"
       alt="Promotion braseros artisanaux Atelier LBF — jusqu'à 40% de réduction sur braseros et accessoires"
-      fetchPriority="high"
-      decoding="async"
-      className="absolute inset-0 w-full h-full object-cover brightness-125"
+      fill
+      priority
+      sizes="(max-width: 1024px) 100vw, 50vw"
+      className="object-cover brightness-125"
     />
     <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
     <div className="relative flex h-full flex-col items-start justify-center gap-2 sm:gap-3 lg:gap-4 px-4 py-6 sm:px-6 sm:py-8 lg:px-12 lg:py-12">
