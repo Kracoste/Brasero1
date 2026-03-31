@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import ReassuranceBar from "@/components/ReassuranceBar";
 import { FloatingCart } from "@/components/FloatingCart";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { Commitments } from "@/components/Commitments";
 import { CartProvider } from "@/lib/cart-context";
 import { FavoritesProvider } from "@/lib/favorites-context";
@@ -31,7 +30,6 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
               <Commitments />
               <Footer storeName={settings.storeName} atelierCity={settings.atelier.city} />
               <FloatingCart />
-              <ExitIntentPopup />
             </div>
           </FavoritesProvider>
         </CartProvider>
