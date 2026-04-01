@@ -7,9 +7,7 @@ import { VariantConfiguratorWrapper } from "@/components/VariantConfiguratorWrap
 import { RelatedProducts } from "@/components/RelatedProducts";
 import { VariantLinks } from "@/components/VariantLinks";
 import { JsonLd } from "@/components/JsonLd";
-import { createClient } from "@/lib/supabase/server";
-import { mapSupabaseProduct } from "@/lib/utils";
-import type { Product } from "@/lib/schema";
+import { getProduct, getRelatedProducts, getCompatibleAccessories } from "@/lib/data/products";
 import {
   generateProductSchema,
   generateProductBreadcrumb,
@@ -31,48 +29,6 @@ type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-// Fonction pour récupérer un produit depuis Supabase uniquement
-async function getProduct(slug: string) {
-  const supabase = await createClient();
-  const { data: p } = await supabase
-    .from('products')
-    .select(PRODUCT_COLUMNS)
-    .eq('slug', slug)
-    .single();
-
-  if (!p) return null;
-  return mapSupabaseProduct(p);
-}
-
-// Fonction pour récupérer les produits similaires (même catégorie, excluant le produit actuel)
-const PRODUCT_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations, seo_content';
-
-async function getRelatedProducts(currentSlug: string, category: string, limit: number = 8) {
-  const supabase = await createClient();
-  const { data: products } = await supabase
-    .from('products')
-    .select(PRODUCT_COLUMNS)
-    .eq('category', category)
-    .neq('slug', currentSlug)
-    .limit(limit);
-
-  if (!products) return [];
-  return products.map(mapSupabaseProduct).filter(Boolean) as Product[];
-}
-
-// Fonction pour récupérer les accessoires compatibles (server-side)
-async function getCompatibleAccessories(slugs: string[]) {
-  if (!slugs || slugs.length === 0) return [];
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('products')
-    .select('id, slug, name, price, images, category')
-    .in('slug', slugs)
-    .order('name');
-
-  if (error || !data) return [];
-  return data;
-}
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -90,15 +46,18 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     openGraph: {
       title,
       description,
-      type: "website",
       locale: "fr_FR",
-      url: `https://www.atelier-lbf.fr/produits/${product.slug}`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.atelier-lbf.fr'}/produits/${product.slug}`,
       images: product.images.slice(0, 3).map((image) => ({
         url: image.src,
         width: image.width,
         height: image.height,
         alt: image.alt,
       })),
+    },
+    other: {
+      'product:price:amount': String(product.price),
+      'product:price:currency': 'EUR',
     },
     twitter: {
       card: "summary_large_image",
@@ -118,15 +77,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) notFound();
 
   const reference = `REF-${product.slug.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
-  
+
   // Récupérer les slugs des accessoires compatibles depuis les specs du produit
   const compatibleAccessorySlugs: string[] = product.specs?.compatibleAccessories || [];
 
-  // Récupérer les accessoires compatibles côté serveur (instantané)
-  const compatibleAccessories = await getCompatibleAccessories(compatibleAccessorySlugs);
+  // Lancer toutes les requêtes indépendantes en parallèle
+  const [compatibleAccessories, relatedProducts, reviewStats, blogPostsDirect, allPosts] =
+    await Promise.all([
+      getCompatibleAccessories(compatibleAccessorySlugs),
+      getRelatedProducts(slug, product.category, 8),
+      getReviewStats(product.slug),
+      getBlogPostsForProduct(product.slug, 3),
+      getAllBlogPosts(),
+    ]);
 
-  // Récupérer les produits similaires (même catégorie)
-  const relatedProducts = await getRelatedProducts(slug, product.category, 8);
+  const blogPosts = blogPostsDirect.length > 0 ? blogPostsDirect : allPosts.slice(0, 3);
 
   // SEO dynamique — descriptions + FAQ générées par catégorie/variante
   const seo = generateProductSEO(product);
@@ -135,16 +100,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const productFAQs = product.faq && product.faq.length > 0
     ? product.faq
     : seo.faq;
-
-  // Review stats pour AggregateRating (étoiles dans Google)
-  const reviewStats = await getReviewStats(product.slug);
-
-  // Articles blog associés (maillage interne produit → blog)
-  let blogPosts = await getBlogPostsForProduct(product.slug, 3);
-  if (blogPosts.length === 0) {
-    const allPosts = await getAllBlogPosts();
-    blogPosts = allPosts.slice(0, 3);
-  }
 
   // JSON-LD schemas
   const productSchema = generateProductSchema(product, seo.description, reviewStats);
@@ -158,7 +113,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <JsonLd data={faqSchema} />
       <Section className="pt-4 sm:pt-6 lg:pt-10">
         <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
+          {/* SEO-09 : H1 sr-only rendu côté serveur (SSR) pour que Google indexe le titre
+              même si le H1 visible est dans le Client Component VariantConfiguratorWrapper */}
           <h1 className="sr-only">{product.name}</h1>
+          {/* SEO-11 : Breadcrumb HTML visible pour la navigation et le SEO */}
+          <nav aria-label="Fil d'Ariane" className="px-4 sm:px-6 lg:px-8 py-2 text-sm text-gray-500">
+            <ol className="flex items-center gap-1 flex-wrap">
+              <li><a href="/" className="hover:text-gray-700">Accueil</a></li>
+              <li aria-hidden="true" className="mx-1">›</li>
+              <li><a href="/produits" className="hover:text-gray-700">Produits</a></li>
+              <li aria-hidden="true" className="mx-1">›</li>
+              <li className="text-gray-900 font-medium" aria-current="page">{product.name}</li>
+            </ol>
+          </nav>
           <VariantConfiguratorWrapper
             product={product}
             reference={reference}

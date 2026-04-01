@@ -45,10 +45,16 @@ export async function updateSession(request: NextRequest): Promise<{ response: N
   // Refresh session et récupérer l'utilisateur
   let user: User | null = null
   try {
-    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    const { data: { user: currentUser }, error } = await supabase.auth.getUser()
+    if (error) {
+      // Loguer uniquement les erreurs inattendues (pas les sessions expirées normales)
+      if (!error.message?.includes('session_not_found') && !error.message?.includes('invalid claim')) {
+        console.warn('[middleware] supabase.auth.getUser error:', error.message);
+      }
+    }
     user = currentUser
-  } catch {
-    // If error, continue without blocking
+  } catch (err) {
+    console.error('[middleware] Unexpected error getting user:', err);
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

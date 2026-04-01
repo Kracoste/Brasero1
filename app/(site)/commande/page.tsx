@@ -109,6 +109,17 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
   const supabase = createClient();
 
+  // Réinitialiser isProcessingPayment si l'utilisateur revient en arrière depuis Stripe
+  useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        setIsProcessingPayment(false);
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
   // Tracker le début du checkout
   useEffect(() => {
     if (!loading && items.length > 0 && !hasTrackedCheckout.current) {
@@ -304,6 +315,9 @@ export default function CheckoutPage() {
         // Rediriger vers Stripe Checkout
         if (data.url) {
           window.location.href = data.url;
+        } else {
+          setPaymentError('Impossible de démarrer le paiement. Veuillez réessayer.');
+          setIsProcessingPayment(false);
         }
       } catch (error) {
         console.error('Erreur paiement:', error);

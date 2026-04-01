@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
-import { useState, memo } from "react";
+import { useState, useRef, memo } from "react";
 
 import { Price } from "@/components/Price";
 import { useCart } from "@/lib/cart-context";
@@ -24,6 +24,7 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
   const { addItem } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
   const [adding, setAdding] = useState(false);
+  const addingRef = useRef(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const displayPrice = cardOverrides?.price ?? product.price;
   const displayName = cardOverrides?.name ?? product.name;
@@ -48,18 +49,24 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
   };
 
   const handleAddToCart = async () => {
+    if (addingRef.current) return;
+    addingRef.current = true;
     setAdding(true);
     try {
       await addItem({
         slug: product.slug,
         name: product.name,
         price: product.price,
-        image: image.src,
+        image: image?.src,
       });
-      setTimeout(() => setAdding(false), 900);
+      setTimeout(() => {
+        setAdding(false);
+        addingRef.current = false;
+      }, 900);
     } catch (error) {
       console.error("Error adding to cart:", error);
       setAdding(false);
+      addingRef.current = false;
     }
   };
 

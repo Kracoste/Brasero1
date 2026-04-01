@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
         customization: item.customization || undefined,
         quantity: parseQuantity(item.quantity),
       }))
-      .filter((item) => item.slug && item.quantity);
+      .filter((item) => item.slug && item.quantity !== null);
 
     if (normalizedItems.length !== items.length) {
       return NextResponse.json(
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     // Déterminer l'URL de base
-    const origin = request.headers.get('origin') || 'https://www.atelier-lbf.fr';
+    const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://www.atelier-lbf.fr';
 
     const productSlugs = Array.from(new Set(normalizedItems.map((item) => item.slug)));
     const productClient = getSupabaseAdminClient() ?? supabase;
@@ -245,14 +245,14 @@ export async function POST(request: NextRequest) {
           },
           unit_amount: Math.round(price * 100), // Stripe utilise les centimes
         },
-        quantity: item.quantity as number,
+        quantity: item.quantity!,
       });
     }
 
     // Valider et appliquer le code promo côté serveur
     let stripeCouponId: string | undefined;
     let couponCodeUsed: string | undefined;
-    let couponIdUsed: string | undefined;
+    let couponReservationPlaceholder: string | undefined;
     if (couponCode && typeof couponCode === 'string') {
       const supabaseAdmin = getSupabaseAdminClient();
       if (supabaseAdmin) {
@@ -269,54 +269,50 @@ export async function POST(request: NextRequest) {
           const cartTotal = lineItems.reduce((sum, li) => sum + (li.price_data.unit_amount * li.quantity), 0) / 100;
           const belowMin = coupon.min_purchase_amount && cartTotal < coupon.min_purchase_amount;
 
-          // Vérifier la limite par utilisateur (par email ET par adresse de livraison)
-          let userExhausted = false;
-          if (coupon.max_uses_per_user) {
-            // Vérification par email
-            if (customerInfo.email) {
-              const { count } = await supabaseAdmin
-                .from('coupon_uses')
-                .select('*', { count: 'exact', head: true })
-                .eq('coupon_id', coupon.id)
-                .eq('email', customerInfo.email.toLowerCase().trim());
+          if (isExpired || isExhausted || belowMin) {
+            // Coupon invalide pour d'autres raisons, on l'ignore silencieusement
+          } else {
+            // Réservation atomique : vérification + incrément en une seule transaction Postgres
+            // Cela évite la race condition TOCTOU entre la lecture et l'incrément.
+            const shippingHash = await computeShippingHash(customerInfo);
+            const reservationPlaceholder = `pending-${crypto.randomUUID()}`;
 
-              if (count !== null && count >= coupon.max_uses_per_user) {
-                userExhausted = true;
+            const { data: reserved, error: reserveError } = await supabaseAdmin.rpc('try_reserve_coupon', {
+              p_code: coupon.code,
+              p_email: customerInfo.email?.toLowerCase().trim() || '',
+              p_shipping_hash: shippingHash || '',
+              p_ip: clientIP || '',
+              p_stripe_session_placeholder: reservationPlaceholder,
+            });
+
+            if (reserveError) {
+              console.error('[checkout] Erreur réservation coupon:', reserveError);
+              // Non bloquant : on continue sans coupon
+            } else if (!reserved) {
+              return NextResponse.json(
+                { error: 'Vous avez déjà utilisé ce code promo le nombre de fois autorisé.' },
+                { status: 400 }
+              );
+            } else {
+              // Réservation OK — créer le coupon Stripe
+              try {
+                const stripeCoupon = await stripe.coupons.create(
+                  coupon.discount_type === 'percentage'
+                    ? { percent_off: coupon.discount_value, duration: 'once' }
+                    : { amount_off: Math.round(coupon.discount_value * 100), currency: 'eur', duration: 'once' }
+                );
+                stripeCouponId = stripeCoupon.id;
+                couponCodeUsed = coupon.code;
+                couponReservationPlaceholder = reservationPlaceholder;
+              } catch (stripeErr) {
+                // Annuler la réservation si la création du coupon Stripe échoue
+                await supabaseAdmin.rpc('cancel_coupon_reservation', {
+                  p_code: coupon.code,
+                  p_placeholder: reservationPlaceholder,
+                });
+                throw stripeErr;
               }
             }
-
-            // Vérification anti-multi-compte par adresse de livraison
-            if (!userExhausted) {
-              const shippingHash = await computeShippingHash(customerInfo);
-              if (shippingHash) {
-                const { count: countByAddress } = await supabaseAdmin
-                  .from('coupon_uses')
-                  .select('*', { count: 'exact', head: true })
-                  .eq('coupon_id', coupon.id)
-                  .eq('shipping_hash', shippingHash);
-
-                if (countByAddress !== null && countByAddress >= coupon.max_uses_per_user) {
-                  userExhausted = true;
-                }
-              }
-            }
-          }
-
-          if (!isExpired && !isExhausted && !belowMin && !userExhausted) {
-            // Créer un coupon Stripe à usage unique
-            const stripeCoupon = await stripe.coupons.create(
-              coupon.discount_type === 'percentage'
-                ? { percent_off: coupon.discount_value, duration: 'once' }
-                : { amount_off: Math.round(coupon.discount_value * 100), currency: 'eur', duration: 'once' }
-            );
-            stripeCouponId = stripeCoupon.id;
-            couponCodeUsed = coupon.code;
-            couponIdUsed = coupon.id;
-          } else if (userExhausted) {
-            return NextResponse.json(
-              { error: 'Vous avez déjà utilisé ce code promo le nombre de fois autorisé.' },
-              { status: 400 }
-            );
           }
         }
       }
@@ -350,31 +346,14 @@ export async function POST(request: NextRequest) {
       locale: 'fr',
     });
 
-    // Incrémenter l'utilisation du coupon + enregistrer l'usage par email
-    if (couponCodeUsed && couponIdUsed) {
+    // Mettre à jour le stripe_session_id réel dans coupon_uses (la réservation atomique
+    // a déjà incrémenté le compteur et inséré la ligne avec un placeholder)
+    if (couponCodeUsed && couponReservationPlaceholder) {
       const adminClient = getSupabaseAdminClient();
       if (adminClient) {
-        // Incrémenter le compteur global
-        const { data: couponRow } = await adminClient
-          .from('coupons')
-          .select('current_uses')
-          .eq('code', couponCodeUsed)
-          .single();
-        if (couponRow) {
-          await adminClient
-            .from('coupons')
-            .update({ current_uses: (couponRow.current_uses || 0) + 1 })
-            .eq('code', couponCodeUsed);
-        }
-
-        // Enregistrer l'usage par email + adresse (anti-multi-compte)
-        const shippingHashForInsert = await computeShippingHash(customerInfo);
-        await adminClient.from('coupon_uses').insert({
-          coupon_id: couponIdUsed,
-          email: customerInfo.email.toLowerCase().trim(),
-          stripe_session_id: session.id,
-          shipping_hash: shippingHashForInsert,
-          ip_address: clientIP || null,
+        await adminClient.rpc('update_coupon_use_session', {
+          p_placeholder: couponReservationPlaceholder,
+          p_real_session_id: session.id,
         });
       }
     }

@@ -423,7 +423,10 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
 
         <AddToCartButton
           product={productWithVariantPrice}
-          selectedAccessories={selectedAccessories}
+          selectedAccessories={selectedAccessories.map(a => ({
+            ...a,
+            images: a.images.map(img => ({ src: img.src ?? img.url ?? '' })),
+          }))}
           selectedVariantLabel={variantLabel}
           customizationData={customizationFaces}
           disabled={showSelectors && !isSelectionValid}

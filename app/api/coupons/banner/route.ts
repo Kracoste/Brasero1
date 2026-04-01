@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 // GET /api/coupons/banner — get the coupon displayed in the banner (public)
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const clientIP = getClientIP(request.headers);
+  if (!checkRateLimit(`banner-${clientIP}`, 20, 60000)) {
+    return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+  }
+
   const adminClient = getSupabaseAdminClient();
   if (!adminClient) {
     return NextResponse.json(null);
@@ -25,5 +31,7 @@ export async function GET() {
       ? `Code ${data.code} : -${data.discount_value}% sur votre 1ère commande`
       : `Code ${data.code} : -${data.discount_value}€ sur votre 1ère commande`;
 
-  return NextResponse.json({ code: data.code, label });
+  const response = NextResponse.json({ code: data.code, label });
+  response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+  return response;
 }

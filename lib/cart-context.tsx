@@ -172,22 +172,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
           const cartFromDb = await loadCart(currentUserId);
           // Si l'utilisateur a des items guest, les migrer vers la DB en batch
           if (guestItems.length > 0 && cartFromDb) {
-            try {
-              await supabase.from('cart_items').insert(
-                guestItems.map(item => ({
-                  cart_id: cartFromDb,
-                  product_slug: item.product_slug,
-                  product_name: item.product_name,
-                  product_price: item.product_price,
-                  product_image: item.product_image,
-                  quantity: item.quantity,
-                }))
-              );
-            } catch {
-              // Ignorer les erreurs de migration
+            const { error: insertError } = await supabase.from('cart_items').insert(
+              guestItems.map(item => ({
+                cart_id: cartFromDb,
+                product_slug: item.product_slug,
+                product_name: item.product_name,
+                product_price: item.product_price,
+                product_image: item.product_image,
+                quantity: item.quantity,
+              }))
+            );
+            // Ne vider le panier guest QUE si la migration a réussi
+            if (!insertError) {
+              persistGuestCart([]);
+              await loadCart(currentUserId);
             }
-            persistGuestCart([]);
-            await loadCart(currentUserId);
           }
         } catch (error) {
           devWarn('Error syncing cart:', error);
@@ -207,7 +206,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   // Charger le panier depuis la base de données
-  const loadCart = async (userId: string) => {
+  const loadCart = useCallback(async (userId: string) => {
     try {
       // Récupérer ou créer le panier
       const { data: existingCart, error: cartError } = await supabase
@@ -253,60 +252,61 @@ export function CartProvider({ children }: { children: ReactNode }) {
       devWarn('Error loading cart:', error);
       return null;
     }
-  };
+  }, [supabase]);
 
   // Ajouter un article au panier
-  const addItem = async (
+  const addItem = useCallback(async (
     product: { slug: string; name: string; price: number; image?: string; variantLabel?: string; customization?: CartItem['customization'] },
     quantity: number = 1,
   ) => {
-    // Toujours ajouter d'abord localement pour une réponse instantanée
-    addGuestItem(product, quantity);
-    
-    // Si l'utilisateur est connecté, synchroniser avec la DB en arrière-plan
-    if (user) {
-      const ensuredCartId = cartId ?? (await loadCart(user.id));
-      if (ensuredCartId) {
-        try {
-          // Identifier par slug + variante
-          const itemKey = product.variantLabel 
-            ? `${product.slug}::${product.variantLabel}` 
-            : product.slug;
-          const existingItem = items.find(
-            item => !isGuestItem(item) && 
-              `${item.product_slug}${item.variant_label ? `::${item.variant_label}` : ''}` === itemKey
-          );
+    if (!user) {
+      // Chemin guest : uniquement le state local/sessionStorage
+      addGuestItem(product, quantity);
+      return;
+    }
 
-          if (existingItem) {
-            const newQuantity = existingItem.quantity + quantity;
-            await supabase
-              .from('cart_items')
-              .update({ quantity: newQuantity })
-              .eq('id', existingItem.id);
-          } else {
-            await supabase
-              .from('cart_items')
-              .insert({
-                cart_id: ensuredCartId,
-                product_slug: product.slug,
-                product_name: product.name,
-                product_price: product.price,
-                product_image: product.image || null,
-                quantity,
-              });
-          }
-          // Recharger le panier depuis la DB pour synchroniser
-          await loadCart(user.id);
-        } catch (error) {
-          devWarn('Error syncing item to DB:', error);
-          // L'item est déjà dans le panier local, donc pas de problème
+    // Chemin connecté : optimistic update local + sync DB
+    addGuestItem(product, quantity);
+
+    const ensuredCartId = cartId ?? (await loadCart(user.id));
+    if (ensuredCartId) {
+      try {
+        const itemKey = product.variantLabel
+          ? `${product.slug}::${product.variantLabel}`
+          : product.slug;
+        const existingItem = items.find(
+          item => !isGuestItem(item) &&
+            `${item.product_slug}${item.variant_label ? `::${item.variant_label}` : ''}` === itemKey
+        );
+
+        if (existingItem) {
+          const newQuantity = existingItem.quantity + quantity;
+          await supabase
+            .from('cart_items')
+            .update({ quantity: newQuantity })
+            .eq('id', existingItem.id);
+        } else {
+          await supabase
+            .from('cart_items')
+            .insert({
+              cart_id: ensuredCartId,
+              product_slug: product.slug,
+              product_name: product.name,
+              product_price: product.price,
+              product_image: product.image || null,
+              quantity,
+            });
         }
+        // Recharger depuis la DB pour avoir les vrais IDs (remplace les IDs guest)
+        await loadCart(user.id);
+      } catch (error) {
+        devWarn('Error syncing item to DB:', error);
       }
     }
-  };
+  }, [user, cartId, items, loadCart, supabase]);
 
   // Mettre à jour la quantité d'un article
-  const updateQuantity = async (itemId: string, quantity: number) => {
+  const updateQuantity = useCallback(async (itemId: string, quantity: number) => {
     if (quantity <= 0) {
       await removeItem(itemId);
       return;
@@ -339,10 +339,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateGuestItem(itemId, quantity);
       throw error;
     }
-  };
+  }, [user, cartId, loadCart, supabase]);
 
   // Supprimer un article du panier
-  const removeItem = async (itemId: string) => {
+  const removeItem = useCallback(async (itemId: string) => {
     if (!user) {
       removeGuestItem(itemId);
       return;
@@ -368,20 +368,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeGuestItem(itemId);
       throw error;
     }
-  };
+  }, [user, cartId, loadCart, supabase]);
 
   // Vider le panier
-  const clearCart = async () => {
-    // Toujours vider localement d'abord pour une réponse instantanée
-    setItems([]);
-    persistGuestCart([]);
-    
+  const clearCart = useCallback(async () => {
     if (!user) {
+      // Guest : vider directement
+      setItems([]);
+      persistGuestCart([]);
       return;
     }
 
     const ensuredCartId = cartId ?? (await loadCart(user.id));
     if (!ensuredCartId) {
+      setItems([]);
+      persistGuestCart([]);
       return;
     }
 
@@ -393,13 +394,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         devWarn('Error clearing cart in DB:', error);
-        // Pas de throw, on a déjà vidé localement
       }
     } catch (error) {
       devWarn('Error clearing cart:', error);
-      // Pas de throw, on a déjà vidé localement
+    } finally {
+      // Vider localement après la tentative DB (succès ou non)
+      setItems([]);
+      persistGuestCart([]);
     }
-  };
+  }, [user, cartId, loadCart, supabase]);
 
   return (
     <CartContext.Provider

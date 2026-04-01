@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() {
+  redirects() {
     return [
       { source: '/info/blog', destination: '/blog', permanent: true },
       { source: '/info/contact', destination: '/contact', permanent: true },
@@ -48,7 +48,7 @@ const nextConfig: NextConfig = {
       new URL("https://kxztmjqxsskvbqcohtgj.supabase.co/**"),
     ],
     // Réduire le cache des images pour permettre les mises à jour plus rapides
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 86400,
     // En développement local, les IPs NAT64 (IPv6) de Supabase sont rejetées
     // par la protection SSRF de Next.js. On désactive l'optimisation en dev.
     // En production (Vercel), l'optimisation reste active.

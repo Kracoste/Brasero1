@@ -16,25 +16,24 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Cache global pour persister l'état entre les navigations
-let cachedUser: User | null = null;
-let cachedIsAdmin: boolean = false;
-let isInitialized: boolean = false;
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Créer le client une seule fois au montage
   const supabase = useMemo(() => createClient(), []);
-  
-  // Initialiser avec le cache si disponible
-  const [user, setUser] = useState<User | null>(cachedUser);
-  const [isLoading, setIsLoading] = useState(!isInitialized);
-  const [isAdmin, setIsAdmin] = useState(cachedIsAdmin);
+
+  // Cache par instance (useRef) pour éviter les fuites d'état entre instances SSR/tests
+  const cachedUserRef = useRef<User | null>(null);
+  const cachedIsAdminRef = useRef<boolean>(false);
+  const isInitializedRef = useRef<boolean>(false);
+
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const initInProgress = useRef(false);
 
   const checkIsAdmin = useCallback(async (currentUser: User | null) => {
     if (!currentUser) {
       setIsAdmin(false);
-      cachedIsAdmin = false;
+      cachedIsAdminRef.current = false;
       return;
     }
 
@@ -43,22 +42,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await fetch('/api/auth/check-admin');
       const data = await res.json();
       setIsAdmin(!!data.isAdmin);
-      cachedIsAdmin = !!data.isAdmin;
+      cachedIsAdminRef.current = !!data.isAdmin;
     } catch {
       setIsAdmin(false);
-      cachedIsAdmin = false;
+      cachedIsAdminRef.current = false;
     }
   }, []);
 
   const updateUser = useCallback((newUser: User | null) => {
-    cachedUser = newUser;
+    cachedUserRef.current = newUser;
     setUser(newUser);
     checkIsAdmin(newUser);
   }, [checkIsAdmin]);
 
   const refreshUser = useCallback(async () => {
     // Ne pas faire de requête réseau si aucun utilisateur n'est connecté
-    if (!cachedUser) return;
+    if (!cachedUserRef.current) return;
     
     try {
       const { data: { user: currentUser }, error } = await supabase.auth.getUser();
@@ -81,9 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     try {
       // Réinitialiser le cache immédiatement
-      cachedUser = null;
-      cachedIsAdmin = false;
-      isInitialized = false;
+      cachedUserRef.current = null;
+      cachedIsAdminRef.current = false;
+      isInitializedRef.current = false;
       
       // Utiliser l'API route pour la déconnexion côté serveur (nettoie les cookies)
       await fetch(AUTH_ROUTES.logout, { method: 'POST' });
@@ -107,26 +106,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Éviter les initialisations multiples en parallèle
     if (initInProgress.current) return;
-    
+
     // Si déjà initialisé et on a un utilisateur en cache, ne pas re-fetcher
-    if (isInitialized && cachedUser) {
+    if (isInitializedRef.current && cachedUserRef.current) {
       setIsLoading(false);
       return;
     }
-    
+
     initInProgress.current = true;
-    
+
     // Phase 1 : getSession() local = INSTANTANÉ (pas de requête réseau)
     // Phase 2 : getUser() en arrière-plan pour vérifier avec le serveur
     const init = async () => {
       try {
         // Phase 1 : session locale (instantanée, depuis le cookie)
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
+
         if (!sessionError && session?.user) {
           devLog('Init auth (fast) - session locale trouvée:', session.user.email);
           updateUser(session.user);
-          isInitialized = true;
+          isInitializedRef.current = true;
           setIsLoading(false);
           initInProgress.current = false;
           
@@ -138,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               devLog('Background verify - session invalide, déconnexion');
               if (!err?.message?.includes('network') && !err?.message?.includes('fetch')) {
                 updateUser(null);
-                isInitialized = false;
+                isInitializedRef.current = false;
               }
             } else {
               updateUser(verifiedUser);
@@ -152,8 +151,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Pas de session locale = visiteur anonyme, pas besoin de vérifier avec le serveur
         devLog('Init auth - pas de session locale, visiteur anonyme');
         updateUser(null);
-        
-        isInitialized = true;
+
+        isInitializedRef.current = true;
       } catch (error) {
         devError('Erreur initialisation auth:', error);
       } finally {
@@ -189,7 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // lors de la transition SIGNED_OUT -> SIGNED_IN au login
         if (event === 'SIGNED_OUT') {
           updateUser(null);
-          isInitialized = false;
+          isInitializedRef.current = false;
           setIsLoading(false);
           return;
         }
@@ -203,7 +202,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Rafraîchir quand la page devient visible (seulement si connecté)
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && cachedUser) {
+      if (document.visibilityState === 'visible' && cachedUserRef.current) {
         refreshUser();
       }
     };
@@ -211,7 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Rafraîchir quand la fenêtre reprend le focus (seulement si connecté)
     const handleFocus = () => {
-      if (cachedUser) {
+      if (cachedUserRef.current) {
         refreshUser();
       }
     };

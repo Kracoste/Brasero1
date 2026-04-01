@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { cache } from 'react';
 
 import {
   DEFAULT_SITE_SETTINGS,
@@ -28,7 +29,9 @@ const sanitizeSettings = (input: Record<string, unknown>): SiteSettings => {
   return merged as SiteSettings;
 };
 
-export const getSiteSettings = async (): Promise<SiteSettings> => {
+// Mémoïsé par React cache() : une seule lecture disque par requête serveur,
+// partagée entre tous les composants qui appellent getSiteSettings().
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   try {
     const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
     const parsed = JSON.parse(raw);
@@ -36,7 +39,7 @@ export const getSiteSettings = async (): Promise<SiteSettings> => {
   } catch {
     return DEFAULT_SITE_SETTINGS;
   }
-};
+});
 
 export const saveSiteSettings = async (settings: SiteSettings) => {
   const sanitized = sanitizeSettings(settings as Record<string, unknown>);

@@ -34,7 +34,7 @@ export default function ReassuranceBar() {
   return (
     <div className="bg-[#1a1a1a] text-white text-xs py-1.5">
       {/* Mobile: single rotating item */}
-      <div className="flex items-center justify-center gap-1.5 md:hidden">
+      <div className="flex items-center justify-center gap-1.5 md:hidden" aria-live="polite" aria-atomic="true">
         {(() => {
           const Icon = items[current].icon
           return (

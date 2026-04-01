@@ -5,11 +5,20 @@ import { X } from 'lucide-react';
 
 const DISMISSED_KEY = 'brasero:exit-popup-dismissed';
 const SUBSCRIBED_KEY = 'brasero:newsletter-subscribed';
+const DEFAULT_COUPON_CODE = 'BIENVENUE10';
 
 export function ExitIntentPopup() {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [couponCode, setCouponCode] = useState(DEFAULT_COUPON_CODE);
+
+  useEffect(() => {
+    fetch('/api/coupons/banner')
+      .then(res => res.json())
+      .then(data => { if (data?.code) setCouponCode(data.code); })
+      .catch(() => {});
+  }, []);
 
   const dismiss = useCallback(() => {
     setShow(false);
@@ -76,12 +85,18 @@ export function ExitIntentPopup() {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="exit-popup-title"
+    >
       <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
         <button
           onClick={dismiss}
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-          aria-label="Fermer"
+          aria-label="Fermer la fenêtre"
+          autoFocus
         >
           <X className="h-5 w-5" />
         </button>
@@ -95,7 +110,7 @@ export function ExitIntentPopup() {
             </div>
             <h3 className="text-xl font-bold text-gray-900">Bienvenue !</h3>
             <p className="mt-2 text-sm text-gray-600">
-              Votre code <span className="font-semibold text-[#8B4513]">BIENVENUE10</span> est actif.
+              Votre code <span className="font-semibold text-[#8B4513]">{couponCode}</span> est actif.
               Utilisez-le lors de votre commande.
             </p>
           </div>
@@ -105,7 +120,7 @@ export function ExitIntentPopup() {
               <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#f6f1e9]">
                 <span className="text-2xl">🔥</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 id="exit-popup-title" className="text-xl font-bold text-gray-900">
                 Attendez ! 10% de réduction vous attendent
               </h3>
               <p className="mt-2 text-sm text-gray-600">

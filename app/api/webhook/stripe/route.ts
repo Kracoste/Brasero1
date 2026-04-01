@@ -123,9 +123,9 @@ export async function POST(request: NextRequest) {
       const result = await handleCheckoutCompleted(session);
       log("✅ Traitement terminé:", JSON.stringify(result));
     } catch (err) {
-      const msg = err instanceof Error ? err.stack || err.message : String(err);
+      const msg = err instanceof Error ? err.message : String(err);
       logError("❌ Erreur traitement checkout:", msg);
-      return NextResponse.json({ received: true, error: msg });
+      return NextResponse.json({ error: 'Erreur traitement commande' }, { status: 500 });
     }
   } else {
     log("Événement ignoré:", event.type);
@@ -227,7 +227,7 @@ async function handleCheckoutCompleted(
   // Vérifier doublon
   const { data: existingOrder } = await supabase
     .from("orders")
-    .select("id")
+    .select("id, confirmation_email_sent")
     .eq("stripe_session_id", session.id)
     .maybeSingle();
 
@@ -235,6 +235,54 @@ async function handleCheckoutCompleted(
     log("⚠️ Commande déjà existante:", existingOrder.id);
     result.order_id = existingOrder.id;
     result.already_exists = true;
+    // Si l'email n'a pas encore été envoyé (ex: crash entre création et envoi),
+    // continuer vers l'envoi d'email au lieu de retourner immédiatement.
+    if (existingOrder.confirmation_email_sent) {
+      return result;
+    }
+    log("Email non encore envoyé pour cette commande, tentative de renvoi...");
+    // Récupérer les données complètes de la commande pour l'email
+    const { data: fullOrder } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", existingOrder.id)
+      .single();
+    if (!fullOrder) return result;
+    // Passer à l'envoi d'email en utilisant les données existantes
+    const customerEmail = fullOrder.customer_email || session.customer_details?.email || "";
+    if (customerEmail) {
+      try {
+        const emailData = {
+          orderNumber: fullOrder.id.slice(0, 8).toUpperCase(),
+          customerName: fullOrder.customer_name || session.customer_details?.name || "Client",
+          customerEmail,
+          customerPhone: fullOrder.customer_phone || "",
+          totalAmount: fullOrder.total_amount,
+          items: (fullOrder.items as Array<Record<string, unknown>>).map((item) => ({
+            name: item.product_name as string,
+            quantity: item.quantity as number,
+            price: item.unit_price as number,
+            imageUrl: "",
+          })),
+          shippingAddress: [
+            fullOrder.shipping_address,
+            fullOrder.shipping_address_line2,
+            ((fullOrder.shipping_postal_code || "") + " " + (fullOrder.shipping_city || "")).trim(),
+            fullOrder.shipping_country,
+          ].filter(Boolean).join(", "),
+          orderDate: new Date(fullOrder.created_at).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        };
+        const emailResult = await sendOrderConfirmationEmail(emailData, supabase, fullOrder.id, fullOrder.user_id);
+        if (emailResult.success) {
+          await supabase.from("orders").update({ confirmation_email_sent: true }).eq("id", fullOrder.id);
+        }
+        result.email_retry = emailResult;
+      } catch (emailErr) {
+        const msg = emailErr instanceof Error ? emailErr.message : String(emailErr);
+        logError("Erreur email retry:", msg);
+        result.email_retry_error = msg;
+      }
+    }
     return result;
   }
   steps.push("no_duplicate");

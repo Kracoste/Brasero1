@@ -5,7 +5,10 @@
 
 type RateLimitRecord = { count: number; resetAt: number };
 
-// Map partagée pour le rate limiting
+// Map partagée pour le rate limiting en mémoire.
+// LIMITATION : sur Vercel (serverless), chaque instance a sa propre Map.
+// Le rate limit effectif est donc N × maxRequests avec N instances parallèles.
+// Pour un rate limiting distribué fiable en production, migrer vers Redis/Upstash.
 const rateLimitMap = new Map<string, RateLimitRecord>();
 
 // Configuration par défaut

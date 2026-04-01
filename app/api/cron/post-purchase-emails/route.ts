@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdminClient } from '@/lib/supabase/admin';
-import { resend, FROM_EMAIL, hasResendCredentials } from '@/lib/email';
+import { getSupabaseAdminClient } from '@/lib/supabase/admin';
+import { resend, FROM_EMAIL, hasResendCredentials, escapeHtml } from '@/lib/email';
 
 // Email types and their delay in days after order completion
 const EMAIL_SEQUENCE = [
@@ -12,10 +12,12 @@ type EmailSequenceType = (typeof EMAIL_SEQUENCE)[number]['type'];
 
 export async function GET(request: NextRequest) {
   // Vérifier l'autorisation
-  if (
-    request.headers.get('authorization') !==
-    `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'Configuration manquante' }, { status: 500 });
+  }
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   }
 
@@ -26,7 +28,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!supabaseAdminClient) {
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) {
     return NextResponse.json(
       { error: 'Supabase non configuré' },
       { status: 503 }
@@ -46,7 +49,7 @@ export async function GET(request: NextRequest) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const { data: orders, error: ordersError } = await supabaseAdminClient
+    const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('id, customer_email, customer_name, created_at, status, items')
       .in('status', ['pending', 'completed', 'delivered', 'shipped'])
@@ -70,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     // Récupérer les emails déjà envoyés
     const orderIds = orders.map((o) => o.id);
-    const { data: sentEmails, error: sentError } = await supabaseAdminClient
+    const { data: sentEmails, error: sentError } = await supabase
       .from('post_purchase_emails')
       .select('order_id, email_type')
       .in('order_id', orderIds);
@@ -118,7 +121,7 @@ export async function GET(request: NextRequest) {
           });
 
           // Enregistrer l'envoi
-          await supabaseAdminClient
+          await supabase
             .from('post_purchase_emails')
             .insert({
               order_id: order.id,
@@ -212,7 +215,7 @@ function getTipsEntretienHtml(name: string): string {
         <tr>
           <td style="padding:40px;">
             <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 20px 0;font-weight:600;">Bien entretenir votre brasero</h2>
-            <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 16px 0;">Bonjour ${name},</p>
+            <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 16px 0;">Bonjour ${escapeHtml(name)},</p>
             <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 24px 0;">Votre brasero est désormais chez vous ! Pour qu'il vous accompagne pendant de nombreuses années, voici quelques conseils d'entretien essentiels.</p>
 
             <!-- Acier Corten -->
@@ -291,6 +294,10 @@ function getDemandeAvisHtml(
     }
   }
 
+  const safeProductMention = escapeHtml(productMention);
+  const safeName = escapeHtml(name);
+  const safeCtaUrl = escapeHtml(ctaUrl);
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -307,9 +314,9 @@ function getDemandeAvisHtml(
         <!-- Body -->
         <tr>
           <td style="padding:40px;">
-            <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 20px 0;font-weight:600;">Comment trouvez-vous ${productMention} ?</h2>
-            <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 16px 0;">Bonjour ${name},</p>
-            <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 16px 0;">Cela fait maintenant quelques jours que vous profitez de ${productMention}. Nous espérons qu'il vous apporte entière satisfaction !</p>
+            <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 20px 0;font-weight:600;">Comment trouvez-vous ${safeProductMention} ?</h2>
+            <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 16px 0;">Bonjour ${safeName},</p>
+            <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 16px 0;">Cela fait maintenant quelques jours que vous profitez de ${safeProductMention}. Nous espérons qu'il vous apporte entière satisfaction !</p>
             <p style="color:#444;font-size:15px;line-height:1.7;margin:0 0 24px 0;">Votre avis compte et aide d'autres passionnés à faire leur choix. Pourriez-vous prendre un instant pour partager votre expérience ?</p>
 
             <!-- Stars visual -->
@@ -322,7 +329,7 @@ function getDemandeAvisHtml(
             <!-- CTA -->
             <table role="presentation" width="100%">
               <tr><td align="center">
-                <a href="${ctaUrl}" style="display:inline-block;background-color:#8b6914;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:15px;font-weight:500;letter-spacing:0.5px;">Donner mon avis</a>
+                <a href="${safeCtaUrl}" style="display:inline-block;background-color:#8b6914;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:15px;font-weight:500;letter-spacing:0.5px;">Donner mon avis</a>
               </td></tr>
             </table>
 
