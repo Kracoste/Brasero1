@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings";
 import { JsonLd } from "@/components/JsonLd";
 import { generateBreadcrumbSchema, generateFAQSchema } from "@/lib/seo/schemas";
+import { createClient } from "@/lib/supabase/server";
 import {
   Award,
   Factory,
@@ -57,7 +58,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MadeInFrancePage() {
+  const supabase = await createClient();
   const settings = await getSiteSettings();
+
+  // SEO-23 : Récupération dynamique des derniers articles de blog
+  const { data: latestBlogPosts } = await supabase
+    .from('blog_posts')
+    .select('slug, title, excerpt, featured_image')
+    .eq('is_published', true)
+    .order('published_at', { ascending: false })
+    .limit(3);
 
   const faqItems = [
     {
@@ -94,29 +104,10 @@ export default async function MadeInFrancePage() {
   const faqSchema = generateFAQSchema(faqItems);
 
   return (
-    <main className="bg-white">
+    <div className="bg-white">
       <JsonLd data={breadcrumb} />
       {faqSchema && <JsonLd data={faqSchema} />}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": settings.storeName,
-            "description": "Fabricant français de braseros artisanaux en acier corten et acier peint",
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": settings.atelier.city,
-              "addressRegion": settings.atelier.department,
-              "postalCode": "79320",
-              "addressCountry": "FR"
-            },
-            "areaServed": "FR",
-            "knowsAbout": ["Fabrication artisanale de braseros", "Ferronnerie d'art", "Travail de l'acier corten"]
-          })
-        }}
-      />
+      {/* SEO-19 : Schema Organization supprimé (doublon avec layout.tsx) */}
 
       {/* Hero */}
       <section className="bg-[#f6f1e9] py-16 sm:py-24">
@@ -432,18 +423,12 @@ export default async function MadeInFrancePage() {
             Articles sur la fabrication et la qualité
           </h2>
           <div className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <Link href="/blog/pourquoi-brasero-artisanal-francais" className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
-              <span className="text-xs text-[#8B4513] font-medium">Inspiration</span>
-              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Pourquoi choisir un brasero artisanal français</h3>
-            </Link>
-            <Link href="/blog/brasero-corten-avantages-inconvenients" className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
-              <span className="text-xs text-[#8B4513] font-medium">Guide</span>
-              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Brasero corten : avantages et inconvénients</h3>
-            </Link>
-            <Link href="/blog/plancha-inox-ou-acier-carbone" className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
-              <span className="text-xs text-[#8B4513] font-medium">Guide</span>
-              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Plancha inox ou acier carbone ?</h3>
-            </Link>
+            {(latestBlogPosts || []).map((post) => (
+              <Link key={post.slug} href={`/blog/${post.slug}`} className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
+                <span className="text-xs text-[#8B4513] font-medium">Guide</span>
+                <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">{post.title}</h3>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -551,6 +536,6 @@ export default async function MadeInFrancePage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

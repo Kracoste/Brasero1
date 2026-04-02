@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/site-settings";
 import { mapSupabaseProduct } from "@/lib/utils";
+import { PRODUCT_COLUMNS } from "@/lib/data/products";
 import type { Product } from "@/lib/schema";
 import { generateStoreSchema } from "@/lib/seo/schemas";
 import { Flame, Truck, Shield, Award, Scissors, Send, CheckCircle, Sparkles } from "lucide-react";
@@ -22,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   
   return {
     title: `Brasero artisanal | Espace barbecue & Ameublement jardin | ${settings.storeName}`,
-    description: `Boutique en ligne de braseros artisanaux fabriqués en France. Espace barbecue, plancha, fendeur à bûches et accessoires pour aménager votre jardin. Livraison partout en France.`,
+    description: `Braseros artisanaux, planchas et fendeurs fabriqués en France. Aménagez votre jardin avec nos créations en acier corten. Livraison partout en France.`,
     keywords: [
       "boutique brasero",
       "acheter brasero",
@@ -49,10 +50,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   // Récupérer les produits vedettes depuis Supabase (priorité aux produits marqués is_featured)
   const supabase = await createClient();
-  const PRODUCT_LIST_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations';
   const { data: braseroProduits } = await supabase
     .from('products')
-    .select(PRODUCT_LIST_COLUMNS)
+    .select(PRODUCT_COLUMNS)
     .eq('category', 'brasero')
     .eq('is_featured', true)
     .order('featured_order', { ascending: true })
@@ -63,7 +63,7 @@ export default async function HomePage() {
   if (allProducts.length < 4) {
     const { data: moreProducts } = await supabase
       .from('products')
-      .select(PRODUCT_LIST_COLUMNS)
+      .select(PRODUCT_COLUMNS)
       .eq('category', 'brasero')
       .eq('is_featured', false)
       .order('popularScore', { ascending: false })
@@ -75,6 +75,14 @@ export default async function HomePage() {
   const braseros = allProducts
     .map((p: Record<string, unknown>) => mapSupabaseProduct(p))
     .filter(Boolean) as Product[];
+
+  // SEO-23 : Récupération dynamique des derniers articles de blog
+  const { data: latestBlogPosts } = await supabase
+    .from('blog_posts')
+    .select('slug, title, excerpt, featured_image')
+    .eq('is_published', true)
+    .order('published_at', { ascending: false })
+    .limit(3);
 
   const settings = await getSiteSettings();
 
@@ -177,16 +185,22 @@ export default async function HomePage() {
       </section>
 
       {/* Section Découpe Laser Personnalisée */}
-      <JsonLd data={{
-        "@context": "https://schema.org",
-        "@type": "VideoObject",
-        "name": "Découpe laser sur brasero — Atelier LBF",
-        "description": "Démonstration de la découpe laser pour personnalisation de brasero artisanal. Motifs découpés dans l'acier avec précision millimétrique.",
-        "contentUrl": "https://www.atelier-lbf.fr/acceuil/VideoDecoupeLaser.mp4",
-        "thumbnailUrl": "https://www.atelier-lbf.fr/Produits/og-brasero.webp",
-        "uploadDate": "2025-01-15",
-        "duration": "PT0M30S",
-      }} />
+      {/* SEO-18 : Mettre à jour VIDEO_UPLOAD_DATE si la vidéo de découpe laser change */}
+      {(() => {
+        const VIDEO_UPLOAD_DATE = "2025-03-01"; // À mettre à jour si la vidéo change
+        return (
+          <JsonLd data={{
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": "Découpe laser sur brasero — Atelier LBF",
+            "description": "Démonstration de la découpe laser pour personnalisation de brasero artisanal. Motifs découpés dans l'acier avec précision millimétrique.",
+            "contentUrl": "https://www.atelier-lbf.fr/acceuil/VideoDecoupeLaser.mp4",
+            "thumbnailUrl": "https://www.atelier-lbf.fr/Produits/og-brasero.webp",
+            "uploadDate": VIDEO_UPLOAD_DATE,
+            "duration": "PT0M30S",
+          }} />
+        );
+      })()}
       <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -337,21 +351,13 @@ export default async function HomePage() {
             Comparatifs, techniques de cuisson, entretien : tout savoir pour profiter de votre brasero plancha.
           </p>
           <div className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
-            <Link href="/blog/plancha-inox-ou-acier-carbone" className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all text-left group">
-              <span className="text-xs text-[#8B4513] font-medium">Guide</span>
-              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Plancha inox ou acier carbone ?</h3>
-              <p className="text-xs text-slate-600 mt-1">8 min de lecture</p>
-            </Link>
-            <Link href="/blog/brasero-plancha-vs-barbecue" className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all text-left group">
-              <span className="text-xs text-[#8B4513] font-medium">Guide</span>
-              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Brasero plancha vs barbecue</h3>
-              <p className="text-xs text-slate-600 mt-1">7 min de lecture</p>
-            </Link>
-            <Link href="/blog/meilleur-bois-brasero-comparatif" className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all text-left group">
-              <span className="text-xs text-[#8B4513] font-medium">Entretien</span>
-              <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">Les 5 meilleurs bois pour brasero</h3>
-              <p className="text-xs text-slate-600 mt-1">6 min de lecture</p>
-            </Link>
+            {(latestBlogPosts || []).map((post) => (
+              <Link key={post.slug} href={`/blog/${post.slug}`} className="block p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all text-left group">
+                <span className="text-xs text-[#8B4513] font-medium">Guide</span>
+                <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">{post.title}</h3>
+                {post.excerpt && <p className="text-xs text-slate-600 mt-1 line-clamp-2">{post.excerpt}</p>}
+              </Link>
+            ))}
           </div>
           <Link
             href="/blog"

@@ -34,8 +34,8 @@ export const Header = () => {
           <Image
             src="/logo/Logo1.webp"
             alt="Atelier LBF Logo"
-            width={1400}
-            height={500}
+            width={280}
+            height={100}
             className="w-auto h-10 sm:h-12 md:h-14 lg:h-16 xl:h-20"
             style={{ objectFit: "contain" }}
             priority
@@ -44,7 +44,7 @@ export const Header = () => {
           
           {/* Navigation centrée - cachée sur mobile/tablette */}
           <div className="hidden lg:flex flex-1 justify-center">
-            <div className="flex items-center gap-2 lg:gap-3 xl:gap-6">
+            <nav aria-label="Navigation principale" className="flex items-center gap-2 lg:gap-3 xl:gap-6">
               {navLinks.map((link) => {
                 if (link.label === "Accessoires") {
                   const isActive =
@@ -122,9 +122,9 @@ export const Header = () => {
               >
                 Recettes
               </Link>
-            </div>
+            </nav>
           </div>
-          
+
           {/* Icônes à droite - toujours visibles */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-shrink-0">
             {/* Badge Klarna */}
@@ -208,14 +208,14 @@ export const Header = () => {
                       <User size={16} />
                       Mon profil
                     </Link>
-                    <a
-                      href="/api/auth/logout-redirect"
-                      onClick={() => setAccountMenuOpen(false)}
+                    <button
+                      type="button"
+                      onClick={() => { setAccountMenuOpen(false); window.location.href = '/api/auth/logout-redirect'; }}
                       className="px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 w-full text-left cursor-pointer"
                     >
                       <LogOut size={16} />
                       Déconnexion
-                    </a>
+                    </button>
                   </>
                 ) : (
                   <>
@@ -267,7 +267,7 @@ export const Header = () => {
 
       {open && (
         <div className="border-t border-slate-200 bg-white px-4 py-4 lg:hidden">
-          <div className="flex flex-col gap-3">
+          <nav aria-label="Navigation principale" className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -311,12 +311,13 @@ export const Header = () => {
                 >
                   Mon profil
                 </Link>
-                <a
-                  href="/api/auth/logout-redirect"
+                <button
+                  type="button"
+                  onClick={() => { setOpen(false); window.location.href = '/api/auth/logout-redirect'; }}
                   className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-sm font-semibold text-red-600"
                 >
                   Déconnexion
-                </a>
+                </button>
               </>
             ) : (
               <>
@@ -336,7 +337,7 @@ export const Header = () => {
                 </Link>
               </>
             )}
-          </div>
+          </nav>
         </div>
       )}
     </header>

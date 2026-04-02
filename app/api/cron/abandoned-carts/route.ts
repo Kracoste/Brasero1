@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { resend, FROM_EMAIL, hasResendCredentials } from '@/lib/email';
+import { resend, FROM_EMAIL, hasResendCredentials, escapeHtml } from '@/lib/email';
 
 interface CartItem {
   name: string;
@@ -36,12 +36,12 @@ function buildEmailHtml(items: CartItem[]): string {
               ${
                 item.imageUrl
                   ? `<td width="80" style="padding-right: 16px; vertical-align: top;">
-                      <img src="${item.imageUrl}" alt="${item.name}" width="80" height="80" style="border-radius: 8px; object-fit: cover; display: block;" />
+                      <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" width="80" height="80" style="border-radius: 8px; object-fit: cover; display: block;" />
                     </td>`
                   : ''
               }
               <td style="vertical-align: middle;">
-                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;">${item.name}</p>
+                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;">${escapeHtml(item.name)}</p>
                 <p style="margin: 4px 0 0; font-size: 15px; color: #92400e; font-weight: 600;">${formatPrice(item.price)}</p>
               </td>
             </tr>
@@ -95,7 +95,7 @@ function buildEmailHtml(items: CartItem[]): string {
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td align="center" style="padding: 8px 0 32px;">
-                    <a href="https://www.atelier-lbf.fr/panier" target="_blank" style="display: inline-block; background-color: #92400e; color: #ffffff; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.5px;">
+                    <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.atelier-lbf.fr'}/panier" target="_blank" style="display: inline-block; background-color: #92400e; color: #ffffff; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.5px;">
                       Finaliser ma commande
                     </a>
                   </td>
@@ -127,7 +127,7 @@ function buildEmailHtml(items: CartItem[]): string {
             <td style="background-color: #f9fafb; padding: 24px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="margin: 0 0 8px; font-size: 13px; color: #6b7280;">
                 Cet email a &eacute;t&eacute; envoy&eacute; car vous avez ajout&eacute; des articles &agrave; votre panier sur
-                <a href="https://www.atelier-lbf.fr" style="color: #92400e; text-decoration: underline;">atelier-lbf.fr</a>.
+                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.atelier-lbf.fr'}" style="color: #92400e; text-decoration: underline;">atelier-lbf.fr</a>.
               </p>
               <p style="margin: 0 0 8px; font-size: 13px; color: #6b7280;">
                 Si vous ne souhaitez plus recevoir ce type d'email, vous pouvez ignorer ce message. Nous ne vous enverrons qu'un seul rappel.
@@ -149,8 +149,12 @@ function buildEmailHtml(items: CartItem[]): string {
 export async function GET(request: NextRequest) {
   try {
     // Verify authorization
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret) {
+      return NextResponse.json({ error: 'Configuration manquante' }, { status: 500 });
+    }
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 

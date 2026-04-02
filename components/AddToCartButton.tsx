@@ -11,7 +11,7 @@ type SelectedAccessory = {
   slug: string;
   name: string;
   price: number;
-  images?: any[];
+  images?: { src: string }[];
 };
 
 type AddToCartButtonProps = {

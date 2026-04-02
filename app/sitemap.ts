@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { getAllVariantSlugs } from '@/lib/variant-slugs';
+import { mapSupabaseProduct } from '@/lib/utils';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.atelier-lbf.fr';
@@ -88,9 +90,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     // /info/faq est déjà dans infoPages
-    // /info/contact redirigé 301 vers /contact
     {
-      url: `${baseUrl}/contact`,
+      url: `${baseUrl}/info/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.5,
@@ -159,5 +160,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  return [...staticPages, ...infoPages, ...productUrls, ...blogUrls];
+  // SEO-21 : Récupérer les variantes /brasero-plancha/[variantSlug]
+  const { data: productsWithConfigs } = await supabase
+    .from('products')
+    .select('slug, name, updated_at, configurations, variants, specs, category, material, diameter')
+    .order('updated_at', { ascending: false });
+
+  const braseroPlancha: MetadataRoute.Sitemap = [];
+  for (const rawProduct of productsWithConfigs || []) {
+    const product = mapSupabaseProduct(rawProduct);
+    if (!product) continue;
+    const variantSlugs = getAllVariantSlugs(product);
+    for (const { variantSlug } of variantSlugs) {
+      braseroPlancha.push({
+        url: `${baseUrl}/brasero-plancha/${variantSlug}`,
+        lastModified: rawProduct.updated_at ? new Date(rawProduct.updated_at) : new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      });
+    }
+  }
+
+  return [...staticPages, ...infoPages, ...productUrls, ...blogUrls, ...braseroPlancha];
 }

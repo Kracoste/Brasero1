@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { isAdminEmail } from '@/lib/auth';
+import { verifyAdminAccess } from '@/lib/auth';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { devError } from '@/lib/supabase/utils';
 
@@ -87,8 +87,15 @@ function sanitizeBlogData(data: unknown): Record<string, unknown> | null {
 async function requireAdmin(): Promise<NextResponse | null> {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user || !isAdminEmail(user.email)) {
+  if (error || !user) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+  }
+  const adminClient = getSupabaseAdminClient();
+  if (!adminClient) {
+    return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
+  }
+  const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+  if (!isAdmin) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   }
   return null;

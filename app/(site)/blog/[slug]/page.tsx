@@ -49,6 +49,8 @@ export async function generateMetadata({
             images: [
               {
                 url: post.featured_image.src,
+                width: 1200,
+                height: 630,
                 alt: post.featured_image.alt,
               },
             ],
@@ -124,7 +126,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 720px"
                   priority
-                  unoptimized
                 />
               </div>
             )}

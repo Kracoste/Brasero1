@@ -5,6 +5,33 @@ import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 export const maxDuration = 30;
 
+async function validateFileMagicBytes(file: File): Promise<boolean> {
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer.slice(0, 12));
+  const mimeType = file.type;
+
+  if (mimeType === 'image/jpeg') {
+    return bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF;
+  }
+  if (mimeType === 'image/png') {
+    return bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47;
+  }
+  if (mimeType === 'image/webp') {
+    const riff = String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]);
+    const webp = String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]);
+    return riff === 'RIFF' && webp === 'WEBP';
+  }
+  if (mimeType === 'image/gif') {
+    return bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46;
+  }
+  if (mimeType === 'image/avif') {
+    // AVIF: ftyp box at offset 4
+    const ftyp = String.fromCharCode(bytes[4], bytes[5], bytes[6], bytes[7]);
+    return ftyp === 'ftyp';
+  }
+  return false;
+}
+
 const BUCKET = 'customizations';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 Mo
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png'];
@@ -41,6 +68,12 @@ export async function POST(request: NextRequest) {
         { error: 'Format non autorisé. Utilisez JPG ou PNG.' },
         { status: 400 }
       );
+    }
+
+    // Vérifier les magic bytes pour valider le vrai format du fichier
+    const magicBytesOk = await validateFileMagicBytes(file);
+    if (!magicBytesOk) {
+      return NextResponse.json({ error: 'Format de fichier invalide' }, { status: 400 });
     }
 
     if (file.size > MAX_FILE_SIZE) {

@@ -49,7 +49,7 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
       <Container className="py-6 sm:py-8 lg:py-12">
         <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Service à la clientèle</p>
+            <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Service à la clientèle</h3>
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {serviceLinks.map((link) => (
                 <li key={link.href}>
@@ -62,7 +62,7 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
           </div>
 
           <div>
-            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Catégories</p>
+            <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Catégories</h3>
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {categoryLinks.map((link) => (
                 <li key={link.href}>
@@ -75,7 +75,7 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
           </div>
 
           <div>
-            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Entreprises</p>
+            <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">Entreprises</h3>
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {proLinks.map((link) => (
                 <li key={link.href}>
@@ -88,7 +88,7 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
           </div>
 
           <div>
-            <p className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">À propos de {storeName}</p>
+            <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900">À propos de {storeName}</h3>
             <ul className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
               {aboutLinks.map((link) => (
                 <li key={link.href}>

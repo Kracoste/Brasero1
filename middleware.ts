@@ -24,16 +24,8 @@ const securityHeaders: Record<string, string> = {
 };
 
 export async function middleware(request: NextRequest) {
-  const hostname = request.headers.get('host') || '';
   const pathname = request.nextUrl.pathname;
-  
-  // Rediriger non-www vers www pour éviter les problèmes de cookies
-  if (hostname === 'atelier-lbf.fr') {
-    const newUrl = new URL(request.url);
-    newUrl.host = 'www.atelier-lbf.fr';
-    return NextResponse.redirect(newUrl, 301);
-  }
-  
+
   // Mettre à jour la session ET récupérer l'utilisateur en une seule opération
   // C'est critique : on utilise UN SEUL client Supabase qui gère correctement les cookies
   const { response, user } = await updateSession(request);
@@ -69,6 +61,13 @@ export async function middleware(request: NextRequest) {
       response.cookies.getAll().forEach((cookie) => {
         redirectResponse.cookies.set(cookie.name, cookie.value);
       });
+      // Appliquer les security headers sur la redirection aussi
+      Object.entries(securityHeaders).forEach(([key, value]) => {
+        redirectResponse.headers.set(key, value);
+      });
+      if (process.env.NODE_ENV === 'production') {
+        redirectResponse.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+      }
       return redirectResponse;
     }
   }

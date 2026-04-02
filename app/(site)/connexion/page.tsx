@@ -63,7 +63,7 @@ function ConnexionPageContent() {
     };
 
     syncAndRedirect();
-  }, [email, isAdmin, getRedirectTarget]);
+  }, [isAdmin, getRedirectTarget]);
 
   // Rediriger si déjà connecté (visite directe sur /connexion)
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 interface CartItem {
   name: string;
@@ -15,6 +16,11 @@ interface SaveCartBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIP = getClientIP(request.headers);
+    if (!checkRateLimit(`cart-save-${clientIP}`, 10, 60000)) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+    }
+
     const body: SaveCartBody = await request.json();
 
     if (!body.email || !body.items || !Array.isArray(body.items)) {

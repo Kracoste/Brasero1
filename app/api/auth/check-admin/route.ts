@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { isAdminEmail } from '@/lib/auth';
+import { verifyAdminAccess } from '@/lib/auth';
+import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function GET() {
   try {
@@ -11,7 +12,13 @@ export async function GET() {
       return NextResponse.json({ isAdmin: false });
     }
 
-    return NextResponse.json({ isAdmin: isAdminEmail(user.email) });
+    const adminClient = getSupabaseAdminClient();
+    if (!adminClient) {
+      return NextResponse.json({ isAdmin: false });
+    }
+
+    const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+    return NextResponse.json({ isAdmin });
   } catch {
     return NextResponse.json({ isAdmin: false });
   }

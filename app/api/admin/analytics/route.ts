@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
-import { isAdminEmail } from '@/lib/auth';
+import { verifyAdminAccess } from '@/lib/auth';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 // Force dynamic pour éviter le cache en production
@@ -44,20 +44,25 @@ export async function GET(request: NextRequest) {
 
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user || !isAdminEmail(user.email)) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    }
+
+    const adminClient = getSupabaseAdminClient();
+    if (!adminClient) {
+      return NextResponse.json({ error: 'Service non disponible' }, { status: 500 });
+    }
+
+    const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
     // Retourner le cache s'il est encore valide
     if (analyticsCache && Date.now() - analyticsCache.timestamp < CACHE_TTL) {
       return NextResponse.json(analyticsCache.data);
-    }
-
-    const adminClient = getSupabaseAdminClient();
-    if (!adminClient) {
-      return NextResponse.json({ error: 'Service non disponible' }, { status: 500 });
     }
 
     const now = new Date();

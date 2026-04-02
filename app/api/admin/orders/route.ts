@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
-import { isAdminEmail } from '@/lib/auth';
+import { verifyAdminAccess } from '@/lib/auth';
 import { VALID_ORDER_STATUSES, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
@@ -17,13 +17,18 @@ async function verifyAdmin(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (authError || !user || !isAdminEmail(user.email)) {
+  if (authError || !user) {
     return { error: 'Non autorisé', status: 401 };
   }
 
   const adminClient = getSupabaseAdminClient();
   if (!adminClient) {
     return { error: 'Configuration serveur manquante', status: 500 };
+  }
+
+  const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+  if (!isAdmin) {
+    return { error: 'Non autorisé', status: 401 };
   }
 
   return { adminClient, user };

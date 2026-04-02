@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
-import { isAdminEmail } from '@/lib/auth';
+import { verifyAdminAccess } from '@/lib/auth';
 import { VALID_USER_ROLES, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
 
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user || !isAdminEmail(user.email)) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
@@ -26,6 +26,11 @@ export async function GET(request: NextRequest) {
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
       return NextResponse.json({ error: 'Service non disponible' }, { status: 500 });
+    }
+
+    const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
     const { data, error } = await adminClient
@@ -55,9 +60,20 @@ export async function PUT(request: Request) {
 
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user || !isAdminEmail(user.email)) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    }
+
+    // Utiliser le client admin pour bypasser RLS
+    const adminClient = getSupabaseAdminClient();
+    if (!adminClient) {
+      return NextResponse.json({ error: 'Service non disponible' }, { status: 500 });
+    }
+
+    const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
@@ -70,12 +86,6 @@ export async function PUT(request: Request) {
 
     if (!clientId || !isValidUUID(clientId)) {
       return NextResponse.json({ error: 'ID client invalide' }, { status: 400 });
-    }
-
-    // Utiliser le client admin pour bypasser RLS
-    const adminClient = getSupabaseAdminClient();
-    if (!adminClient) {
-      return NextResponse.json({ error: 'Service non disponible' }, { status: 500 });
     }
 
     const { error } = await adminClient
@@ -105,9 +115,20 @@ export async function DELETE(request: Request) {
 
     // Vérifier que l'utilisateur est admin
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user || !isAdminEmail(user.email)) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    }
+
+    // Utiliser le client admin pour bypasser RLS
+    const adminClient = getSupabaseAdminClient();
+    if (!adminClient) {
+      return NextResponse.json({ error: 'Service non disponible' }, { status: 500 });
+    }
+
+    const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
@@ -116,12 +137,6 @@ export async function DELETE(request: Request) {
 
     if (!clientId || !isValidUUID(clientId)) {
       return NextResponse.json({ error: 'ID client invalide' }, { status: 400 });
-    }
-
-    // Utiliser le client admin pour bypasser RLS
-    const adminClient = getSupabaseAdminClient();
-    if (!adminClient) {
-      return NextResponse.json({ error: 'Service non disponible' }, { status: 500 });
     }
 
     // Supprimer les favoris d'abord

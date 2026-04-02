@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
   return {
-    title: `Notre atelier à ${settings.atelier.city} | Savoir-faire artisanal ${settings.atelier.department} | ${settings.storeName}`,
+    title: `Notre atelier artisanal à ${settings.atelier.city} | ${settings.storeName}`,
     description: `Visitez notre atelier de ferronnerie à ${settings.atelier.city} (79). Découvrez comment nous fabriquons vos braseros artisanaux à la main dans les ${settings.atelier.department}, Nouvelle-Aquitaine. Découpe laser, soudure TIG, finitions soignées.`,
     keywords: [
       "atelier brasero",

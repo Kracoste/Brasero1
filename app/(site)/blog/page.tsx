@@ -61,7 +61,7 @@ export default async function BlogPage() {
   const rest = posts.slice(1);
 
   return (
-    <main className="bg-white">
+    <div className="bg-white">
       <JsonLd data={breadcrumb} />
 
       {/* Hero */}
@@ -285,6 +285,6 @@ export default async function BlogPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

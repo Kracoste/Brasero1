@@ -6,12 +6,13 @@ import { Section } from "@/components/Section";
 import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { mapSupabaseProduct } from "@/lib/utils";
+import { PRODUCT_COLUMNS } from "@/lib/data/products";
 import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 
 const CATEGORY_META: Record<string, { title: string; description: string; keywords: string[] }> = {
   brasero: {
-    title: "Braseros artisanaux en acier corten et acier | Made in France | Atelier LBF",
-    description: "Découvrez notre collection de braseros artisanaux fabriqués en France. Acier corten, acier noir, diamètres de 55 à 100cm. Livraison soignée, garantie 2 ans.",
+    title: "Braseros artisanaux acier corten | Made in France | Atelier LBF",
+    description: "Collection de braseros artisanaux fabriqués en France. Acier corten ou noir, diamètres 55 à 100 cm. Livraison soignée, garantie 2 ans.",
     keywords: ["brasero artisanal", "brasero corten", "brasero acier", "brasero français", "brasero jardin", "brasero terrasse"],
   },
   fendeur: {
@@ -37,8 +38,8 @@ const CATEGORY_META: Record<string, { title: string; description: string; keywor
 };
 
 const DEFAULT_META = {
-  title: "Catalogue braseros, fendeurs et accessoires | Artisan Made in France | Atelier LBF",
-  description: "Parcourez notre catalogue complet de braseros artisanaux, fendeurs à bûches et accessoires. Fabriqués à la main en France. Acier corten, diamètres de 55 à 100cm. Filtres et tri disponibles.",
+  title: "Catalogue braseros, fendeurs et accessoires | Atelier LBF",
+  description: "Braseros artisanaux, fendeurs à bûches et accessoires fabriqués en France. Acier corten, diamètres 55 à 100 cm. Filtres et tri disponibles.",
   keywords: ["catalogue brasero", "brasero artisanal", "fendeur à bûches", "accessoire brasero", "made in France"],
 };
 
@@ -82,10 +83,9 @@ export default async function ProductsPage({ searchParams }: Props) {
   
   // Récupérer les produits depuis Supabase uniquement
   const supabase = await createClient();
-  const PRODUCT_LIST_COLUMNS = 'slug, name, price, compare_price, discount_percent, short_description, category, badge, images, material, diameter, thickness, height, weight, bowl_thickness, base_thickness, warranty, availability, shipping, popularScore, on_demand, specs, highlights, features, faq, customSpecs, location, variants, config_images, configurations';
   const { data: supabaseProducts } = await supabase
     .from('products')
-    .select(PRODUCT_LIST_COLUMNS)
+    .select(PRODUCT_COLUMNS)
     .order('created_at', { ascending: false });
 
   // Transformer les produits Supabase au format attendu

@@ -1,19 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { isAdminEmail } from '@/lib/auth';
+import { verifyAdminAccess } from '@/lib/auth';
+import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { getSiteSettings, saveSiteSettings } from '@/lib/site-settings';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
-const requireAdmin = async () => {
+const requireAdmin = async (): Promise<NextResponse | null> => {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user || !isAdminEmail(user.email)) {
-    return null;
+  if (error || !user) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   }
-
-  return user;
+  const adminClient = getSupabaseAdminClient();
+  if (!adminClient) {
+    return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
+  }
+  const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+  }
+  return null;
 };
 
 export async function GET(request: NextRequest) {
@@ -23,10 +30,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
   }
 
-  const adminUser = await requireAdmin();
-  if (!adminUser) {
-    return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
-  }
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
   const settings = await getSiteSettings();
   return NextResponse.json(settings);
@@ -39,10 +44,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
   }
 
-  const adminUser = await requireAdmin();
-  if (!adminUser) {
-    return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
-  }
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
   const payload = await request.json();
   await saveSiteSettings(payload);

@@ -114,6 +114,16 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
+    // Vérifier que le produit existe
+    const { data: product } = await supabase
+      .from('products')
+      .select('slug')
+      .eq('slug', product_slug)
+      .single();
+    if (!product) {
+      return NextResponse.json({ error: 'Produit introuvable' }, { status: 404 });
+    }
+
     const { data: review, error: insertError } = await supabase
       .from('reviews')
       .insert({

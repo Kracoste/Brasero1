@@ -34,6 +34,23 @@ type CustomizationPDFData = {
  */
 async function fetchImageAsBase64(url: string): Promise<{ data: string; format: 'JPEG' | 'PNG' } | null> {
   try {
+    // Validation anti-SSRF : uniquement URLs HTTPS de domaines autorisés
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return null;
+    }
+    if (parsedUrl.protocol !== 'https:') return null;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const supabaseHostname = supabaseUrl ? new URL(supabaseUrl).hostname : '';
+    const allowedHostnames = [
+      supabaseHostname,
+      // domaine générique supabase storage
+    ].filter(Boolean);
+    const isAllowed = allowedHostnames.some(h => parsedUrl.hostname === h || parsedUrl.hostname.endsWith('.supabase.co'));
+    if (!isAllowed) return null;
+
     const res = await fetch(url);
     if (!res.ok) return null;
     const buffer = await res.arrayBuffer();

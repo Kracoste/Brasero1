@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
+import { isValidEmail } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     const { email } = await request.json();
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
+    if (!email || typeof email !== 'string' || !isValidEmail(email)) {
       return NextResponse.json(
         { error: 'Adresse email invalide' },
         { status: 400 }

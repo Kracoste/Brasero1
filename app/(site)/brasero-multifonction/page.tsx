@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
   return {
-    title: `Brasero multifonction | Barbecue, plancha et chauffage | ${settings.storeName}`,
+    title: `Brasero multifonction 3 en 1 | Barbecue & plancha | ${settings.storeName}`,
     description: `Brasero multifonction 3 en 1 : barbecue, plancha et chauffage extérieur. Acier corten ou peint, fabriqué en France. Dès 800€. Garantie 2 ans.`,
     keywords: [
       "brasero multifonction",

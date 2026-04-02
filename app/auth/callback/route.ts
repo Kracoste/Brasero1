@@ -8,10 +8,20 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const rawNext = searchParams.get(REDIRECT_PARAM) ?? AUTH_ROUTES.home
-  
-  // Sécurité : n'autoriser que les redirections internes (commence par /)
-  // Empêche les attaques d'open redirect vers des sites externes
-  const next = (rawNext.startsWith('/') && !rawNext.startsWith('//')) ? rawNext : AUTH_ROUTES.home
+
+  // Sécurité : valider la redirection via URL parsing pour détecter les redirections externes
+  let next = AUTH_ROUTES.home;
+  if (rawNext && typeof rawNext === 'string') {
+    try {
+      // Résoudre contre l'origin pour détecter les redirections externes
+      const resolved = new URL(rawNext, request.nextUrl.origin);
+      if (resolved.origin === request.nextUrl.origin) {
+        next = resolved.pathname + resolved.search + resolved.hash;
+      }
+    } catch {
+      // URL invalide → redirection par défaut
+    }
+  }
 
   if (code) {
     const supabase = await createClient()

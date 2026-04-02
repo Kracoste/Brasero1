@@ -52,7 +52,7 @@ export function generateOrganizationSchema(settings: SiteSettings) {
     url: BASE_URL,
     email: settings.storeEmail,
     telephone: settings.storePhone,
-    logo: `${BASE_URL}/Braserobanner.jpg`,
+    logo: `${BASE_URL}/logo/Logo1.webp`,
     address: {
       "@type": "PostalAddress",
       streetAddress: settings.storeAddress,
@@ -76,6 +76,8 @@ export function generateOrganizationSchema(settings: SiteSettings) {
 // ── WebSite (pour la sitelinks search box Google) ──────────────────────────
 
 export function generateWebSiteSchema(settings: SiteSettings) {
+  // SEO-20 : SearchAction supprimée — /produits?q= n'est pas implémenté.
+  // Une SearchAction non fonctionnelle est préjudiciable au SEO.
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -83,14 +85,6 @@ export function generateWebSiteSchema(settings: SiteSettings) {
     name: settings.storeName,
     url: BASE_URL,
     publisher: { "@id": `${BASE_URL}/#organization` },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${BASE_URL}/produits?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 
@@ -105,7 +99,7 @@ export function generateStoreSchema(settings: SiteSettings) {
     description:
       "Boutique en ligne de braseros artisanaux fabriqués en France. Braseros en acier corten, fendeurs à bûches et accessoires.",
     url: BASE_URL,
-    image: `${BASE_URL}/Braserobanner.jpg`,
+    image: `${BASE_URL}/logo/Logo1.webp`,
     telephone: settings.storePhone,
     email: settings.storeEmail,
     address: {
@@ -479,7 +473,7 @@ export function generateArticleSchema(article: {
       url: BASE_URL,
       logo: {
         "@type": "ImageObject",
-        url: `${BASE_URL}/Braserobanner.jpg`,
+        url: `${BASE_URL}/logo/Logo1.webp`,
       },
     },
     mainEntityOfPage: {

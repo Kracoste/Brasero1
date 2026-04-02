@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdminClient } from '@/lib/supabase/admin';
-import { isAdminEmail } from '@/lib/auth';
+import { verifyAdminAccess } from '@/lib/auth';
 import { sanitizeProductData, devError } from '@/lib/supabase/utils';
 import { isValidUUID } from '@/lib/validation';
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !isAdminEmail(user.email)) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
@@ -35,6 +35,11 @@ export async function GET(request: NextRequest) {
     const adminClient = getSupabaseAdminClient();
     if (!adminClient) {
       return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
+    }
+
+    const isAdmin = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
     // Si un ID est fourni, récupérer un seul produit
@@ -117,14 +122,9 @@ export async function PUT(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !isAdminEmail(user.email)) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
-
-    const rawData = await request.json();
-    
-    // Sanitize les données pour n'autoriser que les champs valides
-    const productData = sanitizeProductData(rawData);
 
     // Utiliser le client admin pour bypass RLS
     const adminClient = getSupabaseAdminClient();
@@ -132,7 +132,17 @@ export async function PUT(request: NextRequest) {
       devError('Admin client non disponible - SUPABASE_SERVICE_ROLE_KEY manquante?');
       return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
     }
-    
+
+    const isAdminPut = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdminPut) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    }
+
+    const rawData = await request.json();
+
+    // Sanitize les données pour n'autoriser que les champs valides
+    const productData = sanitizeProductData(rawData);
+
     const { data: product, error } = await adminClient
       .from('products')
       .update(productData)
@@ -189,7 +199,18 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !isAdminEmail(user.email)) {
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    }
+
+    // Utiliser le client admin pour bypass RLS
+    const adminClient = getSupabaseAdminClient();
+    if (!adminClient) {
+      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
+    }
+
+    const isAdminPost = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdminPost) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
@@ -197,11 +218,6 @@ export async function POST(request: NextRequest) {
     // Sanitize les données pour n'autoriser que les champs valides
     const productData = sanitizeProductData(rawData);
 
-    // Utiliser le client admin pour bypass RLS
-    const adminClient = getSupabaseAdminClient();
-    if (!adminClient) {
-      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
-    }
     const { data: product, error } = await adminClient
       .from('products')
       .insert(productData)
@@ -240,7 +256,7 @@ export async function DELETE(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !isAdminEmail(user.email)) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
@@ -249,6 +265,12 @@ export async function DELETE(request: NextRequest) {
     if (!adminClient) {
       return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
     }
+
+    const isAdminDelete = await verifyAdminAccess(user.id, user.email, adminClient);
+    if (!isAdminDelete) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+    }
+
     const { error } = await adminClient
       .from('products')
       .delete()
