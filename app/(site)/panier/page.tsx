@@ -194,7 +194,7 @@ export default function PanierPage() {
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <Truck size={14} className="text-[#8B4513] flex-shrink-0" />
-                    <span>Livraison incluse — 5 à 7 jours ouvrés</span>
+                    <span>Livraison +80 € — 5 à 7 jours ouvrés</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <Shield size={14} className="text-[#8B4513] flex-shrink-0" />

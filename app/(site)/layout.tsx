@@ -31,8 +31,8 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
               <Commitments />
               <Footer storeName={settings.storeName} atelierCity={settings.atelier.city} />
               <FloatingCart />
-              <ChatBot />
             </div>
+            <ChatBot />
           </FavoritesProvider>
         </CartProvider>
       </AnalyticsProvider>

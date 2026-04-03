@@ -318,6 +318,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Ajouter les frais de livraison
+    lineItems.push({
+      price_data: {
+        currency: 'eur',
+        product_data: {
+          name: 'Livraison — Transport Schenker',
+          images: [],
+          metadata: {},
+        },
+        unit_amount: 8000, // 80€ en centimes
+      },
+      quantity: 1,
+    });
+
     // Créer la session de checkout Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: paymentMethod === 'klarna' ? ['klarna'] : ['card', 'link'],

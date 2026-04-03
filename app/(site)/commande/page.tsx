@@ -750,7 +750,7 @@ export default function CheckoutPage() {
                         </span>
                         <span className="text-sm text-slate-600">Livraison standard • 5 à 7 jours ouvrés</span>
                       </div>
-                      <span className="text-sm font-semibold text-emerald-600">Incluse</span>
+                      <span className="text-sm font-semibold text-slate-900">+80,00 €</span>
                     </div>
                     <p className="text-xs text-slate-500">
                       Livraison à domicile avec prise de rendez-vous par SMS. Dépôt au pied du domicile.
@@ -781,7 +781,7 @@ export default function CheckoutPage() {
                       <Image src="/logos/db-schenker.svg" alt="DB Schenker" width={80} height={30} />
                       <div>
                         <p className="font-semibold text-slate-900">Transport Schenker, messagerie standard</p>
-                        <p>Livraison standard • Incluse</p>
+                        <p>Livraison standard • +80,00 €</p>
                       </div>
                     </div>
                     {deliveryMessage && (
@@ -920,12 +920,12 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between text-slate-600">
                 <span>Livraison</span>
-                <span>Incluse</span>
+                <span>+80,00 €</span>
               </div>
             </div>
             <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold text-slate-900">
               <span>Total</span>
-              <Price amount={appliedCoupon ? totalPrice - appliedCoupon.discount : totalPrice} />
+              <Price amount={(appliedCoupon ? totalPrice - appliedCoupon.discount : totalPrice) + 80} />
             </div>
             <div className="flex items-center justify-center gap-4 pt-2">
               <div className="flex items-center gap-1.5 text-xs text-slate-500">
