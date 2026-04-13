@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Retrouvez toutes les réponses à vos questions sur nos braseros artisanaux fabriqués en France.`,
       type: "website",
       locale: "fr_FR",
-      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+      images: [{ url: "https://www.atelier-lbf.fr/accesoiresbrasero.webp" }],
     },
     alternates: {
       canonical: "/info/faq",

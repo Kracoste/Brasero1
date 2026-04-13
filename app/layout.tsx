@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.storeName}`,
       default: titleBase,
     },
-    description: `${settings.storeName} : braseros artisanaux en acier corten et acier, fabriqués à la main à ${settings.atelier.city} (${settings.atelier.department}). Fendeurs à bûches, planchas et accessoires. Livraison France. Garantie 2 ans.`,
+    description: `Atelier de ferronnerie à ${settings.atelier.city} (${settings.atelier.department}). Conception et fabrication française de braseros plancha, fendeurs à bûches et mobilier de jardin en acier corten.`,
     alternates: {
       canonical: baseUrl.href,
     },

@@ -82,7 +82,7 @@ export const ProductGallery = ({ product, configurationImages }: ProductGalleryP
           <Image
             key={activeImage.src}
             src={activeImage.src}
-            alt={activeImage.alt}
+            alt={activeImage.alt || `${product.name} — vue ${activeIndex + 1}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
             placeholder={activeImage.blurDataURL ? "blur" : "empty"}
@@ -142,7 +142,7 @@ export const ProductGallery = ({ product, configurationImages }: ProductGalleryP
               <span className="sr-only">Voir l&apos;image {index + 1}</span>
               <Image
                 src={image.src}
-                alt={image.alt}
+                alt={image.alt || `${product.name} — miniature ${index + 1}`}
                 width={200}
                 height={150}
                 className="h-14 w-16 sm:h-20 sm:w-24 object-cover rounded-md"

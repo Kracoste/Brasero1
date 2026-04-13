@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Protection de vos données personnelles. Politique RGPD, gestion des cookies et vos droits.`,
       type: "website",
       locale: "fr_FR",
-      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+      images: [{ url: "https://www.atelier-lbf.fr/acceuil/acceuil1.webp" }],
     },
     alternates: {
       canonical: "/info/confidentialite-politique",

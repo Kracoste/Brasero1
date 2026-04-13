@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Livraison soignée de votre brasero artisanal. France, Belgique, Luxembourg, Suisse et Allemagne. Emballage renforcé et suivi en temps réel.`,
       type: "website",
       locale: "fr_FR",
-      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+      images: [{ url: "https://www.atelier-lbf.fr/Braserobanner.webp" }],
     },
     alternates: {
       canonical: "/info/expedition",

@@ -134,7 +134,7 @@ export const AccessoryGrid = ({
                     {image ? (
                       <Image
                         src={image.src}
-                        alt={image.alt}
+                        alt={image.alt || `${product.name} — accessoire Atelier LBF`}
                         fill
                         sizes="280px"
                         className="object-contain p-6"

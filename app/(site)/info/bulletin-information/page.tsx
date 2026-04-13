@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Recevez nos offres exclusives et conseils brasero directement dans votre boîte mail.`,
       type: "website",
       locale: "fr_FR",
-      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+      images: [{ url: "https://www.atelier-lbf.fr/accesoiresbrasero.webp" }],
     },
     alternates: {
       canonical: "/info/bulletin-information",

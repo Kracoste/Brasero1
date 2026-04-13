@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Atelier artisanal de fabrication de braseros en France. Découvrez notre histoire et notre passion pour le travail du métal.`,
       type: "website",
       locale: "fr_FR",
-      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+      images: [{ url: "https://www.atelier-lbf.fr/Produits/Brasero-Hexa.webp" }],
     },
     alternates: {
       canonical: "/info/a-propos-de-nous",

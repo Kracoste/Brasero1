@@ -53,7 +53,7 @@ Contrairement aux braseros sur socle tubulaire, L'Obélix s'appuie sur quatre pi
 
 Format idéal pour ${guests} personnes, L'Obélix ${diameter}cm est taillé pour les terrasses de ${diameter <= 50 ? "petite et moyenne taille — moins de 15 m²" : diameter <= 80 ? "taille moyenne — entre 15 et 40 m²" : "grande taille — à partir de 30 m²"}. À ${price} €, c'est l'entrée dans la gamme Atelier LBF la plus polyvalente : feu de bois le soir, plancha le week-end, sans jamais avoir à choisir.
 
-Fabriqué à la main à Moncoutant dans les Deux-Sèvres. Livré monté, avec grille de cuisson incluse. Garantie 2 ans.`;
+Conçu et soudé à la main dans notre atelier de ferronnerie de Moncoutant (79). Expédition par transporteur spécialisé hayon, livré entièrement monté avec sa grille de cuisson. Garantie fabricant 2 ans, SAV direct depuis l'atelier.`;
 }
 
 function descCoffy(product: Product): string {
@@ -68,7 +68,7 @@ La plancha acier carbone du Coffy est la même que celle utilisée dans les cuis
 
 Le Coffy ${diameter}cm convient pour ${guests} personnes. ${diameter <= 50 ? "Sa petite empreinte au sol en fait le compagnon idéal des balcons généreux, terrasses d'appartements et petits jardins de ville." : diameter <= 80 ? "C'est la taille idéale pour les repas en famille ou entre amis — assez grand pour cuisiner pour 8, assez compact pour une terrasse standard." : "Dans sa version 100 cm, Le Coffy devient la pièce centrale des grandes réceptions — 10 à 12 personnes peuvent manger simultanément."}
 
-À ${price} €, Le Coffy ${diameter}cm est le rapport qualité/prix le plus serré de la gamme Atelier LBF. Fabriqué à la main à Moncoutant (79). Livré monté, grille incluse. Garantie 2 ans.`;
+À ${price} €, Le Coffy ${diameter}cm est le rapport qualité/prix le plus serré de la gamme Atelier LBF. Façonné un par un par nos ferronniers dans les Deux-Sèvres, livré assemblé sur palette avec grille de cuisson. Garantie 2 ans, pièces détachées disponibles à vie.`;
 }
 
 function descMorris(product: Product): string {
@@ -83,7 +83,7 @@ Ce qui distingue Le Morris de tous les autres braseros Atelier LBF, c'est sa con
 
 Avec ses ${weight} kg, Le Morris ${diameter}cm est conçu pour rester dehors toute l'année. Son acier traité résiste aux intempéries, et la ${plancha === "inox" ? "plancha inox" : "plancha acier carbone"} ne rouille pas. ${plancha === "inox" ? "L'inox est la finition recommandée pour une utilisation intensive ou en zone côtière." : "L'acier carbone culotté est la référence des cuisiniers au brasero."}
 
-Capacité 10 à 12 personnes. Fabriqué à la main dans les Deux-Sèvres. Livré monté. Garantie 2 ans.`;
+Capacité 10 à 12 personnes. Pièce d'exception assemblée à l'unité dans notre atelier de Moncoutant — chaque Morris est numéroté et signé. Livraison hayon obligatoire (poids ${weight} kg). Garantie 2 ans étendue à 5 ans sur la structure soudée.`;
 }
 
 function descFermier(product: Product): string {
@@ -97,19 +97,22 @@ Sa conception double-zone — plancha inox de ${diameter} cm entourant une grill
 
 Le corten du socle contraste avec l'inox brillant de la plancha : Le Fermier est autant un objet décoratif qu'un outil de cuisson. Il s'intègre parfaitement dans les jardins avec des matériaux naturels (bois, pierre, terre cuite) et apporte une chaleur visuelle unique dès que la patine commence à prendre — généralement après la première pluie.
 
-À ${price} €, Le Fermier est le seul brasero corten de la gamme Atelier LBF. Capacité 10 à 12 personnes. Poids : ${weight} kg. Dimensions : Ø${diameter} cm. Fabriqué à la main à Moncoutant (79). Livré monté. Garantie 2 ans.`;
+À ${price} €, Le Fermier est le seul brasero corten de la gamme Atelier LBF. Capacité 10 à 12 personnes. Poids : ${weight} kg. Dimensions : Ø${diameter} cm. Découpé, plié et soudé dans notre atelier des Deux-Sèvres, livré sur palette protégée pour préserver la patine en formation. Garantie structure 2 ans (la patine corten n'est pas un défaut couvert mais un atout durable).`;
 }
 
 function descGenericBrasero(product: Product): string {
   const diameter = product.diameter ?? 80;
   const price = product.price;
   const plancha = detectPlanchaType(product);
+  const weight = product.weight ?? (diameter >= 100 ? 95 : diameter >= 80 ? 78 : 60);
+  const guests = diameter >= 100 ? "10 à 12" : diameter >= 80 ? "6 à 8" : "2 à 4";
+  const material = product.material || "acier";
 
-  return `${product.name} est un brasero plancha artisanal fabriqué à la main par l'Atelier LBF à Moncoutant dans les Deux-Sèvres. Découpe laser, formage et soudure réalisés en France par nos artisans — chaque brasero sort d'atelier contrôlé à la main avant expédition.
+  return `${product.name} est un brasero plancha artisanal de ${diameter} cm fabriqué à la main par l'Atelier LBF à Moncoutant dans les Deux-Sèvres. Découpe laser, formage et soudure réalisés en France par nos artisans — chaque brasero sort d'atelier contrôlé à la main avant expédition.
 
-Sa plancha en ${plancha} de ${diameter} cm et 8 mm d'épaisseur offre une surface de cuisson homogène que les planchas à gaz ne peuvent pas égaler : la chaleur du feu de bois est irrégulière, vivante, et c'est précisément ce qui donne aux aliments ce goût fumé impossible à reproduire en cuisine.
+Sa plancha en ${plancha} de ${diameter} cm et 8 mm d'épaisseur offre une surface de cuisson homogène que les planchas à gaz ne peuvent pas égaler : la chaleur du feu de bois est irrégulière, vivante, et c'est précisément ce qui donne aux aliments ce goût fumé impossible à reproduire en cuisine. Avec ses ${weight} kg en ${material}, ${product.name} est dimensionné pour ${guests} personnes — un format adapté aux ${diameter <= 50 ? "petites terrasses et balcons généreux" : diameter <= 80 ? "repas en famille sur terrasse standard" : "grandes tablées et réceptions de jardin"}.
 
-À ${price} €, c'est un investissement dans un objet durable, fabriqué en France, qui peut se transmettre. Pas de pièces d'usure, pas d'électronique, pas de bouteille de gaz — juste de l'acier et du bois. Livré monté avec grille de cuisson. Garantie 2 ans.`;
+À ${price} €, c'est un investissement dans un objet durable, fabriqué en France, qui peut se transmettre. Pas de pièces d'usure, pas d'électronique, pas de bouteille de gaz — juste de l'acier et du bois. Livré monté avec grille de cuisson incluse. SAV joignable depuis l'atelier de Moncoutant. Garantie fabricant 2 ans.`;
 }
 
 // ── FAQ SEO par modèle ─────────────────────────────────────────────────────
@@ -520,11 +523,14 @@ function keywordsAccessoire(product: Product): string[] {
 // ── Descriptions fendeur/accessoire ───────────────────────────────────────
 
 function descFendeur(product: Product): string {
+  const price = product.price;
+  const weight = product.weight ?? 8;
+
   return `Le ${product.name} est un fendeur à bûches artisanal fabriqué à la main dans notre atelier de Moncoutant (Deux-Sèvres), en acier ${product.material}. Conçu pour simplifier la préparation du bois de chauffage de votre brasero Atelier LBF, il remplace avantageusement la hache traditionnelle : plus sécurisé, moins fatigant, plus précis.
 
-Le principe est simple : posez votre bûche sur le coin en acier, frappez avec un maillet et la bûche se fend net. Pas de geste de balancier risqué, pas de lame qui dévie sur un nœud. Les deux mains restent toujours en position sécurisée. C'est l'outil recommandé pour tous ceux qui préparent régulièrement leur bois (chêne, hêtre, charme) pour alimenter leur brasero.
+Le principe est simple : posez votre bûche sur le coin en acier, frappez avec un maillet et la bûche se fend net. Pas de geste de balancier risqué, pas de lame qui dévie sur un nœud. Les deux mains restent toujours en position sécurisée. C'est l'outil recommandé pour tous ceux qui préparent régulièrement leur bois (chêne, hêtre, charme) pour alimenter leur brasero — particulièrement adapté aux personnes âgées, aux enfants accompagnés, et à ceux qui ont mal au dos avec une hache classique.
 
-Fabriqué en ${product.material} dans nos ateliers des Deux-Sèvres. Garanti 2 ans. Livraison partout en France sous 5 à 10 jours ouvrés.`;
+À ${price} €, le ${product.name} pèse ${weight} kg : assez lourd pour rester stable au sol pendant la frappe, assez léger pour être déplacé d'une main vers la réserve de bois. Forgé en acier ${product.material} traité, il est garanti à vie contre la déformation du coin de fendage. Livré prêt à l'emploi avec consignes de sécurité, expédié sous 5 à 10 jours ouvrés. Garantie fabricant 2 ans.`;
 }
 
 function descAccessoire(product: Product): string {
@@ -554,7 +560,15 @@ Utilisez cette planche pour découper les viandes grillées directement à table
 Chaque pièce est fabriquée avec des matériaux résistants à la chaleur intense du feu de bois. Compatible avec l'ensemble de la gamme Atelier LBF (L'Obélix, Le Coffy, Le Morris, Le Fermier). Fabriqué en France, garanti 2 ans.`;
   }
 
-  return `${product.name} — accessoire artisanal pour brasero Atelier LBF, fabriqué en France à Moncoutant (Deux-Sèvres). Conçu pour s'intégrer à la gamme L'Obélix, Le Coffy, Le Morris et Le Fermier en 50, 80 et 100 cm. Matériaux de qualité, garanti 2 ans, livraison soignée.`;
+  const baseDesc = product.shortDescription?.trim();
+  const material = product.material || "acier";
+  const price = product.price;
+
+  if (baseDesc && baseDesc.length > 40) {
+    return `${product.name} — ${baseDesc}\n\nFabriqué à la main en ${material} dans notre atelier de Moncoutant (Deux-Sèvres), conçu pour compléter votre brasero plancha Atelier LBF (gamme L'Obélix, Le Coffy, Le Morris, Le Fermier en 50, 80 et 100 cm). À ${price} €, livré sous 5 à 10 jours, garantie fabricant 2 ans.`;
+  }
+
+  return `${product.name} est un accessoire de brasero forgé à la main en ${material} dans notre atelier de ferronnerie de Moncoutant (Deux-Sèvres). Pensé pour la cuisine au feu de bois et pour résister aux températures du foyer, il s'utilise en complément de tous les braseros Atelier LBF — L'Obélix (socle carré), Le Coffy (tripode), Le Morris (haut de gamme) et Le Fermier (corten) en 50, 80 et 100 cm.\n\nÀ ${price} €, ${product.name} est expédié sous 5 à 10 jours ouvrés en France métropolitaine et bénéficie d'une garantie fabricant de 2 ans. SAV et pièces détachées disponibles directement depuis l'atelier.`;
 }
 
 // ── Fonction principale ────────────────────────────────────────────────────

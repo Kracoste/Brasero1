@@ -145,7 +145,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: meta.title,
     description: meta.description,
     openGraph: {
-      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+      images: [{ url: "https://www.atelier-lbf.fr/acceuil/acceuil1.webp" }],
     },
     alternates: {
       canonical: `/info/${slug}`,

@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `Demandez votre devis brasero sur mesure. Atelier artisanal à ${settings.atelier.city}. Réponse garantie sous 24h ouvrées.`,
       type: "website",
       locale: "fr_FR",
-      images: [{ url: "https://www.atelier-lbf.fr/Produits/og-brasero.webp" }],
+      images: [{ url: "https://www.atelier-lbf.fr/Braserobanner.webp" }],
     },
     alternates: {
       canonical: "/info/contact",

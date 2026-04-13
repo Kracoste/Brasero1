@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   
   return {
     title: `Brasero artisanal | Espace barbecue & Ameublement jardin | ${settings.storeName}`,
-    description: `Braseros artisanaux, planchas et fendeurs fabriqués en France. Aménagez votre jardin avec nos créations en acier corten. Livraison partout en France.`,
+    description: `4 modèles de braseros plancha (L'Obélix, Le Coffy, Le Morris, Le Fermier) en 50, 80 et 100 cm. Acier corten ou peint, plancha 8 à 10 mm, livré monté. Garantie 2 ans.`,
     keywords: [
       "boutique brasero",
       "acheter brasero",
@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ],
     openGraph: {
       title: `${settings.storeName} | Espace barbecue & Jardin`,
-      description: `Braseros artisanaux, planchas et accessoires pour votre jardin. Fabriqués en France, livrés chez vous.`,
+      description: `Braseros plancha L'Obélix, Le Coffy, Le Morris et Le Fermier. Fabrication artisanale à Moncoutant (79), livraison France incluse.`,
       type: "website",
       locale: "fr_FR",
     },
