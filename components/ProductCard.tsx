@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { useState, useRef, memo } from "react";
 
 import { Price } from "@/components/Price";
@@ -17,9 +17,11 @@ type ProductCardProps = {
   className?: string;
   /** Overrides visuels calculés par les filtres (image/prix de la sous-fiche) */
   cardOverrides?: CardOverrides;
+  /** Statistiques d'avis client (moyenne + nombre) */
+  reviewStats?: { average: number; count: number } | null;
 };
 
-export const ProductCard = memo(function ProductCard({ product, className, cardOverrides }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product, className, cardOverrides, reviewStats }: ProductCardProps) {
   const image = cardOverrides?.image ?? product.images[0];
   const { addItem } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -99,6 +101,13 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
         </div>
         <div className="product-card__content">
           <span className="product-card__status">EN STOCK</span>
+          {reviewStats && reviewStats.count > 0 && (
+            <div className="product-card__rating" aria-label={`Note moyenne ${reviewStats.average} sur 5 — ${reviewStats.count} avis`}>
+              <Star size={14} className="fill-amber-400 stroke-amber-400" />
+              <span className="product-card__rating-value">{reviewStats.average.toFixed(1)}</span>
+              <span className="product-card__rating-count">({reviewStats.count})</span>
+            </div>
+          )}
           <div className="product-card__name-wrapper">
             <h3 className="product-card__name">{displayName}</h3>
             <button
@@ -125,7 +134,14 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
               <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} HT</span>
             </div>
           ) : !product.onDemand ? (
-            <Price amount={displayPrice} className="product-card__price" tone="light" />
+            <>
+              <Price amount={displayPrice} className="product-card__price" tone="light" />
+              {displayPrice >= 500 && (
+                <span className="product-card__installment">
+                  ou 3× {formatCurrency(Math.ceil(displayPrice / 3))} sans frais
+                </span>
+              )}
+            </>
           ) : (
             <div className="product-card__price-placeholder" style={{ height: '2.5rem' }} />
           )}

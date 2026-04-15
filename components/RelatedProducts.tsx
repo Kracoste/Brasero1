@@ -9,9 +9,10 @@ type RelatedProductsProps = {
   products: Product[];
   title?: string;
   className?: string;
+  reviewStatsMap?: Record<string, { average: number; count: number }>;
 };
 
-export function RelatedProducts({ products, title = "Ils vous plairont aussi...", className = '' }: RelatedProductsProps) {
+export function RelatedProducts({ products, title = "Ils vous plairont aussi...", className = '', reviewStatsMap }: RelatedProductsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -101,7 +102,7 @@ export function RelatedProducts({ products, title = "Ils vous plairont aussi..."
               key={product.slug}
               className="flex-shrink-0 w-[75vw] sm:w-[calc(50%-10px)] md:w-[calc(33.333%-13px)] lg:w-[calc(25%-15px)] snap-start"
             >
-              <ProductCard product={product} />
+              <ProductCard product={product} reviewStats={reviewStatsMap?.[product.slug] ?? null} />
             </div>
           ))}
         </div>

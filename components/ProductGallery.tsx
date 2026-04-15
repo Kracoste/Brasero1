@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -17,7 +17,21 @@ type ProductGalleryProps = {
 
 export const ProductGallery = ({ product, configurationImages }: ProductGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [zoomOpen, setZoomOpen] = useState(false);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!zoomOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setZoomOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [zoomOpen]);
 
   // Utiliser les images de configuration si disponibles, sinon fallback sur product.images
   const images = configurationImages && configurationImages.length > 0 ? configurationImages : product.images;
@@ -76,8 +90,11 @@ export const ProductGallery = ({ product, configurationImages }: ProductGalleryP
   return (
     <div className="flex flex-col">
       {/* Image principale */}
-      <div 
-        className="relative w-full aspect-[3/4] sm:aspect-[4/5] lg:aspect-[3/4] min-h-[280px] sm:min-h-[400px] lg:min-h-[600px] overflow-hidden flex items-center justify-center"
+      <button
+        type="button"
+        onClick={() => setZoomOpen(true)}
+        aria-label="Agrandir l'image"
+        className="group relative w-full aspect-[3/4] sm:aspect-[4/5] lg:aspect-[3/4] min-h-[280px] sm:min-h-[400px] lg:min-h-[600px] overflow-hidden flex items-center justify-center cursor-zoom-in"
       >
           <Image
             key={activeImage.src}
@@ -87,13 +104,45 @@ export const ProductGallery = ({ product, configurationImages }: ProductGalleryP
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
             placeholder={activeImage.blurDataURL ? "blur" : "empty"}
             blurDataURL={activeImage.blurDataURL}
-            className="object-contain transition-transform duration-300"
+            className="object-contain transition-transform duration-300 group-hover:scale-105"
             style={{
               padding: isAccessory ? '16px' : '8px',
             }}
             priority
           />
-      </div>
+          <span className="absolute top-3 right-3 rounded-full bg-white/85 p-2 shadow-md opacity-70 group-hover:opacity-100 transition">
+            <ZoomIn size={18} className="text-slate-700" />
+          </span>
+      </button>
+
+      {zoomOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setZoomOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image agrandie"
+        >
+          <button
+            type="button"
+            onClick={() => setZoomOpen(false)}
+            aria-label="Fermer"
+            className="absolute top-4 right-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition"
+          >
+            <X size={24} />
+          </button>
+          <div className="relative w-full h-full max-w-5xl max-h-[90vh]">
+            <Image
+              src={activeImage.src}
+              alt={activeImage.alt || `${product.name} — vue ${activeIndex + 1}`}
+              fill
+              sizes="90vw"
+              className="object-contain"
+              priority
+            />
+          </div>
+        </div>
+      )}
       
       {/* Miniatures et flèches de navigation - centrées sous l'image */}
       <div 

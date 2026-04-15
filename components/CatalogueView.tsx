@@ -13,9 +13,10 @@ type CatalogueViewProps = {
   showCategoryFilters?: boolean;
   category?: string;
   initialSection?: string;
+  reviewStatsMap?: Record<string, { average: number; count: number }>;
 };
 
-export const CatalogueView = ({ products, showCategoryFilters = true, category, initialSection }: CatalogueViewProps) => {
+export const CatalogueView = ({ products, showCategoryFilters = true, category, initialSection, reviewStatsMap }: CatalogueViewProps) => {
   // Initialiser le filtre avec la section si fournie (ex: range-buches)
   const initialFilters: FilterState = { sort: "popular" };
   if (initialSection) {
@@ -113,7 +114,7 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category, 
             : filteredProducts
           ).map((product) => (
             <div key={product.slug} className="h-full">
-              <ProductCard product={product} className="catalog-card h-full" cardOverrides={overridesMap.get(product.slug)} />
+              <ProductCard product={product} className="catalog-card h-full" cardOverrides={overridesMap.get(product.slug)} reviewStats={reviewStatsMap?.[product.slug] ?? null} />
             </div>
           ))}
           </div>

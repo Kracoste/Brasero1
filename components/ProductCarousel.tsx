@@ -8,9 +8,10 @@ import type { Product } from '@/lib/schema';
 type ProductCarouselProps = {
   products: Product[];
   className?: string;
+  reviewStatsMap?: Record<string, { average: number; count: number }>;
 };
 
-export function ProductCarousel({ products, className = '' }: ProductCarouselProps) {
+export function ProductCarousel({ products, className = '', reviewStatsMap }: ProductCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -65,7 +66,7 @@ export function ProductCarousel({ products, className = '' }: ProductCarouselPro
               key={product.slug}
               className="flex-shrink-0 w-full snap-center px-2"
             >
-              <ProductCard product={product} className="home-highlight-card" />
+              <ProductCard product={product} className="home-highlight-card" reviewStats={reviewStatsMap?.[product.slug] ?? null} />
             </div>
           ))}
         </div>
@@ -116,6 +117,7 @@ export function ProductCarousel({ products, className = '' }: ProductCarouselPro
             key={product.slug}
             product={product}
             className="home-highlight-card"
+            reviewStats={reviewStatsMap?.[product.slug] ?? null}
           />
         ))}
       </div>

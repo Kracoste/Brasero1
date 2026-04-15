@@ -19,6 +19,7 @@ import {
   generateProductMetaDescription,
 } from "@/lib/seo/product-seo";
 import { getReviewStats } from "@/lib/data/reviews";
+import { getReviewStatsBatch } from "@/lib/data/reviews-batch";
 import { getBlogPostsForProduct, getAllBlogPosts } from "@/lib/data/blog";
 import { RelatedBlogPosts } from "@/components/RelatedBlogPosts";
 
@@ -93,6 +94,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const blogPosts = blogPostsDirect.length > 0 ? blogPostsDirect : allPosts.slice(0, 3);
 
+  const relatedReviewStatsMap = await getReviewStatsBatch(relatedProducts.map((p) => p.slug));
+
   // SEO dynamique — descriptions + FAQ générées par catégorie/variante
   const seo = generateProductSEO(product);
 
@@ -146,7 +149,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {/* Section produits similaires - pleine largeur */}
       {relatedProducts.length > 0 && (
         <Section className="py-8 sm:py-12 w-full max-w-none">
-          <RelatedProducts products={relatedProducts} />
+          <RelatedProducts products={relatedProducts} reviewStatsMap={relatedReviewStatsMap} />
         </Section>
       )}
 

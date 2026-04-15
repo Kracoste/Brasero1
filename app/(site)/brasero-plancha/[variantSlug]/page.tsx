@@ -21,6 +21,7 @@ import {
   generateFAQSchema,
 } from "@/lib/seo/schemas";
 import { getReviewStats } from "@/lib/data/reviews";
+import { getReviewStatsBatch } from "@/lib/data/reviews-batch";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -111,6 +112,7 @@ export default async function VariantPage({ params }: VariantPageProps) {
   const compatibleAccessorySlugs: string[] = product.specs?.compatibleAccessories || [];
   const compatibleAccessories = await getCompatibleAccessories(compatibleAccessorySlugs);
   const relatedProducts = await getRelatedProducts(product.slug, product.category, 8);
+  const relatedReviewStatsMap = await getReviewStatsBatch(relatedProducts.map((p) => p.slug));
 
   // FAQ : diamètre > config > produit
   const faqs = config.faq || product.faq || [];
@@ -171,7 +173,7 @@ export default async function VariantPage({ params }: VariantPageProps) {
 
       {relatedProducts.length > 0 && (
         <Section className="py-8 sm:py-12 w-full max-w-none">
-          <RelatedProducts products={relatedProducts} />
+          <RelatedProducts products={relatedProducts} reviewStatsMap={relatedReviewStatsMap} />
         </Section>
       )}
     </div>

@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
+import dynamic from "next/dynamic";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import ReassuranceBar from "@/components/ReassuranceBar";
-import { FloatingCart } from "@/components/FloatingCart";
-import { ChatBot } from "@/components/ChatBot";
 import { Commitments } from "@/components/Commitments";
+
+const FloatingCart = dynamic(() => import("@/components/FloatingCart").then((m) => ({ default: m.FloatingCart })));
+const ChatBot = dynamic(() => import("@/components/ChatBot").then((m) => ({ default: m.ChatBot })));
 import { CartProvider } from "@/lib/cart-context";
 import { FavoritesProvider } from "@/lib/favorites-context";
 import { AuthProvider } from "@/lib/auth-context";

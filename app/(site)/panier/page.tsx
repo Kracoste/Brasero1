@@ -7,6 +7,7 @@ import { Price } from '@/components/Price';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Minus, Plus, Trash2, ShoppingBag, Shield, Truck, Lock, RotateCcw } from 'lucide-react';
+import { CartCrossSell } from '@/components/CartCrossSell';
 
 export default function PanierPage() {
   const { items, itemCount, totalPrice, loading, updateQuantity, removeItem, clearCart } = useCart();
@@ -162,15 +163,22 @@ export default function PanierPage() {
                     <Price amount={totalPrice} />
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Livraison</span>
-                    <span className="text-slate-500">Calculée à l'étape suivante</span>
+                    <span className="text-slate-600">Livraison France</span>
+                    <Price amount={80} />
                   </div>
                 </div>
 
                 <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold">
-                  <span className="text-slate-900">Total</span>
-                  <Price amount={totalPrice} className="text-slate-900" />
+                  <span className="text-slate-900">Total estimé</span>
+                  <Price amount={totalPrice + 80} className="text-slate-900" />
                 </div>
+
+                {totalPrice >= 500 && (
+                  <div className="rounded-lg bg-[#f6f1e9] px-3 py-2 text-xs text-[#8B4513] font-medium flex items-center gap-2">
+                    <Lock size={12} className="flex-shrink-0" />
+                    <span>ou 3× {Math.ceil((totalPrice + 80) / 3)} € sans frais via Klarna</span>
+                  </div>
+                )}
 
                 <Link
                   href="/commande"
@@ -209,31 +217,7 @@ export default function PanierPage() {
             </div>
           </div>
 
-          {/* Cross-sell */}
-          <div className="mt-10 pt-8 border-t border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Complétez votre commande</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { name: "Plancha acier", href: "/produits?category=accessoire", image: "/accesoiresbrasero.webp" },
-                { name: "Fendeur à bûches", href: "/produits?category=fendeur", image: "/acceuil/Fendeur-Buches.webp" },
-                { name: "Range-bûches", href: "/produits?category=range-buches", image: "/acceuil/acceuil1.webp" },
-                { name: "Tous nos accessoires", href: "/produits?category=accessoire", image: "/accesoiresbrasero.webp" },
-              ].map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="group block border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  <div className="relative h-24 bg-slate-50">
-                    <Image src={item.image} alt={item.name} fill className="object-cover group-hover:scale-105 transition-transform" />
-                  </div>
-                  <div className="p-2.5">
-                    <p className="text-xs font-semibold text-slate-900 group-hover:text-[#8B4513] transition-colors">{item.name}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <CartCrossSell />
         </div>
       </Container>
     </Section>

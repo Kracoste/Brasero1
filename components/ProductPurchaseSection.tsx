@@ -372,6 +372,12 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
         {!product.onDemand && (
           <div className="space-y-1">
             <Price amount={activePrice + customizationSupplement} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
+            {(activePrice + customizationSupplement) >= 500 && (
+              <p className="text-sm font-medium text-[#8B4513]">
+                ou 3× {Math.ceil((activePrice + customizationSupplement) / 3)} € sans frais
+                <span className="text-slate-500 font-normal"> · via Klarna</span>
+              </p>
+            )}
             {showPriceBreakdown && (
               <p className="text-sm text-slate-500">
                 Brasero {activePriceBrasero.toFixed(2).replace('.', ',')} € + Plancha {activePricePlancha.toFixed(2).replace('.', ',')} €

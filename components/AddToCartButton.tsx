@@ -5,6 +5,7 @@ import { useCart } from '@/lib/cart-context';
 import { useAnalytics } from '@/lib/analytics-context';
 import { ShoppingCart, Check, Minus, Plus } from 'lucide-react';
 import { AddToFavoritesButton } from "@/components/AddToFavoritesButton";
+import { StickyAddToCart } from "@/components/StickyAddToCart";
 import type { FacesCustomization } from '@/components/CustomizationSelector';
 
 type SelectedAccessory = {
@@ -163,6 +164,14 @@ export function AddToCartButton({ product, selectedAccessories = [], selectedVar
           </>
         )}
       </button>
+
+      <StickyAddToCart
+        productName={selectedVariantLabel ? `${product.name} — ${selectedVariantLabel}` : product.name}
+        price={product.price}
+        onAdd={handleAddToCart}
+        disabled={adding || added || disabled}
+        onDemand={product.onDemand}
+      />
     </div>
   );
 }

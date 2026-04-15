@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { mapSupabaseProduct } from "@/lib/utils";
 import { PRODUCT_COLUMNS } from "@/lib/data/products";
+import { getReviewStatsBatch } from "@/lib/data/reviews-batch";
 import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 
 const CATEGORY_META: Record<string, { title: string; description: string; keywords: string[] }> = {
@@ -104,6 +105,8 @@ export default async function ProductsPage({ searchParams }: Props) {
       ? allProducts.filter((product) => product.category === category)
       : allProducts.filter((product) => !product.discountPercent || product.discountPercent === 0);
 
+  const reviewStatsMap = await getReviewStatsBatch(filteredProducts.map((p) => p.slug));
+
   const title = category === "brasero"
     ? "Nos Braséros"
     : category === "fendeur"
@@ -173,6 +176,7 @@ export default async function ProductsPage({ searchParams }: Props) {
             showCategoryFilters={category !== "accessoire" && category !== "promotions"}
             category={category}
             initialSection={section}
+            reviewStatsMap={reviewStatsMap}
           />
         </div>
       </Container>

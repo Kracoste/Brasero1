@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/site-settings";
 import { mapSupabaseProduct } from "@/lib/utils";
 import { PRODUCT_COLUMNS } from "@/lib/data/products";
+import { getReviewStatsBatch } from "@/lib/data/reviews-batch";
 import type { Product } from "@/lib/schema";
 import { generateStoreSchema } from "@/lib/seo/schemas";
 import { Flame, Truck, Shield, Award, Scissors, Send, CheckCircle, Sparkles } from "lucide-react";
@@ -15,8 +16,8 @@ import { LazyVideo } from "@/components/LazyVideo";
 import { HeroVideo } from "@/components/HeroVideo";
 import { HomepageNewsletter } from "@/components/HomepageNewsletter";
 
-// ISR : revalidation toutes les 60s (bon compromis fraîcheur/performance)
-export const revalidate = 60;
+// ISR : revalidation toutes les 2 min (produits vedettes changent rarement)
+export const revalidate = 120;
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -75,6 +76,8 @@ export default async function HomePage() {
   const braseros = allProducts
     .map((p: Record<string, unknown>) => mapSupabaseProduct(p))
     .filter(Boolean) as Product[];
+
+  const reviewStatsMap = await getReviewStatsBatch(braseros.map((p) => p.slug));
 
   // SEO-23 : Récupération dynamique des derniers articles de blog
   const { data: latestBlogPosts } = await supabase
@@ -172,7 +175,7 @@ export default async function HomePage() {
               Nos produits les plus vendus
             </h2>
           </div>
-          <ProductCarousel products={braseros} />
+          <ProductCarousel products={braseros} reviewStatsMap={reviewStatsMap} />
           <div className="flex justify-center">
             <Link
               href="/produits"

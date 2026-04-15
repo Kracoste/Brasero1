@@ -6,7 +6,7 @@ import { getAllBlogPosts } from "@/lib/data/blog";
 import { JsonLd } from "@/components/JsonLd";
 import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 const CATEGORY_LABELS: Record<string, string> = {
   tous: "Tous",
