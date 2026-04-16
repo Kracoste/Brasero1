@@ -21,6 +21,8 @@ function escapeXml(str: string): string {
 function getCategoryLabel(category: string): string {
   switch (category) {
     case 'brasero': return 'Maison et jardin > Chauffage extérieur > Braseros';
+    case 'plancha': return 'Maison et jardin > Barbecues et grillades > Planchas';
+    case 'grille': return 'Maison et jardin > Barbecues et grillades > Grilles de cuisson';
     case 'fendeur': return 'Maison et jardin > Outils de jardin > Fendeurs à bûches';
     case 'accessoire': return 'Maison et jardin > Barbecues et grillades > Accessoires barbecue';
     case 'range-buches': return 'Maison et jardin > Rangement extérieur > Range-bûches';
@@ -31,6 +33,8 @@ function getCategoryLabel(category: string): string {
 function getGoogleCategory(category: string): string {
   switch (category) {
     case 'brasero': return '3399'; // Outdoor heating > Fire pits
+    case 'plancha': return '4632'; // Outdoor cooking > Griddles
+    case 'grille': return '4564'; // Outdoor cooking > Accessories (grilles)
     case 'fendeur': return '3798'; // Tools > Axes
     case 'accessoire': return '4564'; // Outdoor cooking > Accessories
     case 'range-buches': return '6433'; // Firewood storage

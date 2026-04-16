@@ -20,7 +20,12 @@ export function HeroVideo() {
       muted
       playsInline
       preload="none"
-      className="absolute inset-0 w-full h-full object-cover"
+      disablePictureInPicture
+      disableRemotePlayback
+      controls={false}
+      tabIndex={-1}
+      aria-hidden="true"
+      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
     >
       <source src="/acceuil/video_brasero_hero.mp4" type="video/mp4" />
     </video>

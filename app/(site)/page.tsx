@@ -54,7 +54,7 @@ export default async function HomePage() {
   const { data: braseroProduits } = await supabase
     .from('products')
     .select(PRODUCT_COLUMNS)
-    .eq('category', 'brasero')
+    .in('category', ['brasero', 'plancha', 'grille'])
     .eq('is_featured', true)
     .order('featured_order', { ascending: true })
     .limit(4);
@@ -65,7 +65,7 @@ export default async function HomePage() {
     const { data: moreProducts } = await supabase
       .from('products')
       .select(PRODUCT_COLUMNS)
-      .eq('category', 'brasero')
+      .in('category', ['brasero', 'plancha', 'grille'])
       .eq('is_featured', false)
       .order('popularScore', { ascending: false })
       .limit(4 - allProducts.length);

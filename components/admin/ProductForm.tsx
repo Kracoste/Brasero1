@@ -100,6 +100,8 @@ export type ProductFormData = {
   imageScale: string;
   detailImageScale: string;
   detailImageOffsetX: string;
+  gridShape: '' | 'ronde' | 'rectangulaire';
+  customDiameter: string;
 };
 
 // ────────────────────────────── Constants ──────────────────────────────
@@ -203,6 +205,8 @@ const defaultFormData = (): ProductFormData => ({
   imageScale: '100',
   detailImageScale: '100',
   detailImageOffsetX: '0',
+  gridShape: '',
+  customDiameter: '',
 });
 
 // ────────────────────────────── Helpers ──────────────────────────────
@@ -270,7 +274,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
 
   const [loading, setLoading] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(mode === 'edit');
-  const [availableProducts, setAvailableProducts] = useState<{id: string, name: string, slug: string, images: any[], category: string}[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<{id: string, name: string, slug: string, images: any[], category: string, material?: string, specs?: any}[]>([]);
   const [formData, setFormData] = useState<ProductFormData>(defaultFormData());
   const [images, setImages] = useState<ProductImage[]>([]);
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
@@ -315,6 +319,24 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
     }
     return keys;
   }, [formData.category]);
+
+  // Filtre les braséros compatibles avec le produit courant selon sa matière.
+  // Une plancha/grille "inox" n'est compatible qu'avec un braséro dont la plancha est "inox", idem "acier".
+  const compatibleBraseros = useMemo(() => {
+    const needsMaterialMatch = formData.category === 'plancha' || formData.category === 'grille';
+    return availableProducts.filter((p) => {
+      if (p.category !== 'brasero') return false;
+      if (!needsMaterialMatch) return true;
+      const mat = formData.material;
+      if (mat !== 'acier' && mat !== 'inox') return true;
+      const parsed = typeof p.specs === 'string'
+        ? (() => { try { return JSON.parse(p.specs); } catch { return {}; } })()
+        : p.specs || {};
+      const braseroPlanchaMat = parsed?.planchaMaterial;
+      if (!braseroPlanchaMat) return true;
+      return braseroPlanchaMat === mat;
+    });
+  }, [availableProducts, formData.category, formData.material]);
 
   // ────────────────────────────── Load existing product (edit mode) ──────────────────────────────
 
@@ -376,6 +398,8 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
           imageScale: parsedSpecs?.imageScale?.toString() || '100',
           detailImageScale: parsedSpecs?.detailImageScale?.toString() || '100',
           detailImageOffsetX: parsedSpecs?.detailImageOffsetX?.toString() || '0',
+          gridShape: parsedSpecs?.gridShape || '',
+          customDiameter: parsedSpecs?.customDiameter?.toString() || '',
         });
 
         // Charger les caractéristiques existantes
@@ -600,8 +624,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
         if (response.ok) {
           const data = await response.json();
           if (mode === 'create') {
-            // En création, filtrer uniquement braséros et accessoires
-            const filtered = data.filter((p: any) => ['brasero', 'accessoire'].includes(p.category));
+            const filtered = data.filter((p: any) => ['brasero', 'plancha', 'grille', 'accessoire'].includes(p.category));
             setAvailableProducts(filtered);
           } else {
             setAvailableProducts(data);
@@ -687,6 +710,19 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
     if (formData.category === 'brasero' && !formData.diameter) {
       newErrors.diameter = 'Le diamètre est requis pour filtrer ce braséro';
     }
+    if (formData.category === 'grille' && !formData.gridShape) {
+      newErrors.gridShape = 'Indiquez si la grille est ronde ou rectangulaire';
+    }
+    if (formData.category === 'grille' && formData.gridShape === 'ronde' && !formData.customDiameter) {
+      newErrors.customDiameter = 'Indiquez le diamètre de la grille';
+    }
+    if (
+      (formData.category === 'plancha' ||
+        (formData.category === 'grille' && formData.gridShape === 'rectangulaire')) &&
+      (!formData.length || !formData.width)
+    ) {
+      newErrors.length = newErrors.length || 'Longueur et largeur sont requises';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -739,6 +775,8 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
         if (formData.imageScale && formData.imageScale !== '100') specsPayload.imageScale = parseInt(formData.imageScale); else delete specsPayload.imageScale;
         if (formData.detailImageScale && formData.detailImageScale !== '100') specsPayload.detailImageScale = parseInt(formData.detailImageScale); else delete specsPayload.detailImageScale;
         if (formData.detailImageOffsetX && formData.detailImageOffsetX !== '0') specsPayload.detailImageOffsetX = parseInt(formData.detailImageOffsetX); else delete specsPayload.detailImageOffsetX;
+        if (formData.category === 'grille' && formData.gridShape) specsPayload.gridShape = formData.gridShape; else delete specsPayload.gridShape;
+        if (formData.category === 'grille' && formData.gridShape === 'ronde' && formData.customDiameter) specsPayload.customDiameter = parseFloat(formData.customDiameter); else delete specsPayload.customDiameter;
         // Characteristics
         const validChars = characteristics.filter(c => c.label.trim() && c.value.trim());
         if (validChars.length > 0) specsPayload.characteristics = validChars; else delete specsPayload.characteristics;
@@ -754,6 +792,8 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
         if (formData.imageScale && formData.imageScale !== '100') specsPayload.imageScale = parseInt(formData.imageScale);
         if (formData.detailImageScale && formData.detailImageScale !== '100') specsPayload.detailImageScale = parseInt(formData.detailImageScale);
         if (formData.detailImageOffsetX && formData.detailImageOffsetX !== '0') specsPayload.detailImageOffsetX = parseInt(formData.detailImageOffsetX);
+        if (formData.category === 'grille' && formData.gridShape) specsPayload.gridShape = formData.gridShape;
+        if (formData.category === 'grille' && formData.gridShape === 'ronde' && formData.customDiameter) specsPayload.customDiameter = parseFloat(formData.customDiameter);
         const validChars = characteristics.filter(c => c.label.trim() && c.value.trim());
         if (validChars.length > 0) specsPayload.characteristics = validChars;
       }
@@ -1047,6 +1087,8 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                 className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
               >
                 <option value="brasero">Braséro</option>
+                <option value="plancha">Plancha</option>
+                <option value="grille">Grille</option>
                 <option value="accessoire">Accessoire</option>
                 <option value="range-buches">Range bûches</option>
                 <option value="fendeur">Fendeur à bûches</option>
@@ -1357,11 +1399,11 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Dimensions et caractéristiques</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {formData.category !== 'accessoire' && formData.category !== 'range-buches' && (
+            {formData.category === 'brasero' && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Diamètre (cm) {formData.category === 'brasero' && <span className="text-red-500">*</span>}
+                    Diamètre (cm) <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="diameter"
@@ -1398,22 +1440,100 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
               </>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Longueur (cm)</label>
-              <input type="number" name="length" value={formData.length} onChange={handleInputChange} min="0" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder={isCreate ? '60' : undefined} />
-            </div>
+            {formData.category === 'grille' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Forme de la grille <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="gridShape"
+                    value={formData.gridShape}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
+                      errors.gridShape ? 'border-red-500' : 'border-slate-200'
+                    }`}
+                  >
+                    <option value="">Sélectionnez une forme</option>
+                    <option value="ronde">Ronde</option>
+                    <option value="rectangulaire">Rectangulaire</option>
+                  </select>
+                  {errors.gridShape && <p className="text-red-500 text-sm mt-1">{errors.gridShape}</p>}
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Largeur (cm)</label>
-              <input type="number" name="width" value={formData.width} onChange={handleInputChange} min="0" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder={isCreate ? '60' : undefined} />
-            </div>
+                {formData.gridShape === 'ronde' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Diamètre (cm) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="customDiameter"
+                      value={formData.customDiameter}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.5"
+                      placeholder="ex. 45"
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
+                        errors.customDiameter ? 'border-red-500' : 'border-slate-200'
+                      }`}
+                    />
+                    {errors.customDiameter && <p className="text-red-500 text-sm mt-1">{errors.customDiameter}</p>}
+                  </div>
+                )}
+              </>
+            )}
+
+            {(() => {
+              const needsLW =
+                formData.category === 'plancha' ||
+                (formData.category === 'grille' && formData.gridShape === 'rectangulaire');
+              const hideLW = formData.category === 'grille' && formData.gridShape === 'ronde';
+              if (hideLW) return null;
+              return (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Longueur (cm) {needsLW && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="number"
+                      name="length"
+                      value={formData.length}
+                      onChange={handleInputChange}
+                      min="0"
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 ${
+                        errors.length ? 'border-red-500' : 'border-slate-200'
+                      }`}
+                      placeholder={isCreate ? '60' : undefined}
+                    />
+                    {errors.length && <p className="text-red-500 text-sm mt-1">{errors.length}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Largeur (cm) {needsLW && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="number"
+                      name="width"
+                      value={formData.width}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                      placeholder={isCreate ? '60' : undefined}
+                    />
+                  </div>
+                </>
+              );
+            })()}
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Hauteur (cm)</label>
               <input type="number" name="height" value={formData.height} onChange={handleInputChange} min="0" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder={isCreate ? '30' : undefined} />
             </div>
 
-            {formData.category !== 'accessoire' && formData.category !== 'range-buches' && (
+            {formData.category === 'brasero' && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Épaisseur du bol (mm)</label>
@@ -1424,7 +1544,11 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Épaisseur du socle (mm)</label>
                   <input type="number" name="baseThickness" value={formData.baseThickness} onChange={handleInputChange} min="0" step="0.1" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder={isCreate ? '5' : undefined} />
                 </div>
+              </>
+            )}
 
+            {(formData.category === 'brasero' || formData.category === 'plancha' || formData.category === 'grille' || formData.category === 'fendeur') && (
+              <>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Poids</label>
                   <input type="text" name="weight" value={formData.weight} onChange={handleInputChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="25 kg" />
@@ -1572,8 +1696,8 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
           </div>
         )}
 
-        {/* Produits compatibles pour accessoires / range-buches */}
-        {(formData.category === 'accessoire' || formData.category === 'range-buches') && (
+        {/* Produits compatibles pour accessoires / range-buches / plancha / grille */}
+        {(formData.category === 'accessoire' || formData.category === 'range-buches' || formData.category === 'plancha' || formData.category === 'grille') && (
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Produits compatibles</h2>
             {!isCreate && (
@@ -1626,7 +1750,10 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                     ) : (
                       <>
                         <div className="px-4 py-2 bg-slate-100 text-xs font-semibold text-slate-600 uppercase">Braséros</div>
-                        {availableProducts.filter(p => p.category === 'brasero').map((product) => {
+                        {compatibleBraseros.length === 0 && (
+                          <p className="p-4 text-xs text-slate-500">Aucun braséro compatible avec la matière sélectionnée.</p>
+                        )}
+                        {compatibleBraseros.map((product) => {
                           const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
                           const isSelected = formData.compatibleAccessories.includes(product.slug);
                           return (
@@ -1656,27 +1783,37 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                       </>
                     )
                   ) : (
-                    // Mode édition: liste plate excluant le produit actuel
-                    availableProducts.filter(p => p.slug !== formData.slug).length === 0 ? (
-                      <p className="p-4 text-sm text-slate-500">Aucun produit disponible</p>
-                    ) : (
-                      availableProducts.filter(p => p.slug !== formData.slug).map((product) => {
-                        const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
-                        const isSelected = formData.compatibleAccessories.includes(product.slug);
-                        return (
-                          <button key={product.slug} type="button" onClick={() => handleAccessoryChange(product.slug)} className={`w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0 ${isSelected ? 'bg-green-50' : ''}`}>
-                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-green-500 border-green-500' : 'border-slate-300'}`}>
-                              {isSelected && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                            </div>
-                            <img src={imageUrl} alt={product.name} className="w-12 h-12 object-contain rounded-lg border border-slate-200 bg-white p-1" />
-                            <div className="flex flex-col items-start">
-                              <span className="text-xs text-slate-400 uppercase">{product.category}</span>
-                              <span className={`text-sm font-medium ${isSelected ? 'text-green-700' : 'text-slate-700'}`}>{product.name}</span>
-                            </div>
-                          </button>
-                        );
-                      })
-                    )
+                    // Mode édition: liste plate excluant le produit actuel + filtre matière pour les braséros
+                    (() => {
+                      const compatibleSlugs = new Set(compatibleBraseros.map(b => b.slug));
+                      const editList = availableProducts.filter(p => {
+                        if (p.slug === formData.slug) return false;
+                        if (p.category === 'brasero' && (formData.category === 'plancha' || formData.category === 'grille')) {
+                          return compatibleSlugs.has(p.slug);
+                        }
+                        return true;
+                      });
+                      return editList.length === 0 ? (
+                        <p className="p-4 text-sm text-slate-500">Aucun produit disponible</p>
+                      ) : (
+                        editList.map((product) => {
+                          const imageUrl = product.images?.[0]?.src || '/logo/placeholder.png';
+                          const isSelected = formData.compatibleAccessories.includes(product.slug);
+                          return (
+                            <button key={product.slug} type="button" onClick={() => handleAccessoryChange(product.slug)} className={`w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0 ${isSelected ? 'bg-green-50' : ''}`}>
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-green-500 border-green-500' : 'border-slate-300'}`}>
+                                {isSelected && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                              </div>
+                              <img src={imageUrl} alt={product.name} className="w-12 h-12 object-contain rounded-lg border border-slate-200 bg-white p-1" />
+                              <div className="flex flex-col items-start">
+                                <span className="text-xs text-slate-400 uppercase">{product.category}</span>
+                                <span className={`text-sm font-medium ${isSelected ? 'text-green-700' : 'text-slate-700'}`}>{product.name}</span>
+                              </div>
+                            </button>
+                          );
+                        })
+                      );
+                    })()
                   )}
                 </div>
               )}

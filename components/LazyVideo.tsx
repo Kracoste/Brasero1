@@ -39,8 +39,12 @@ export function LazyVideo({ src, className, 'aria-label': ariaLabel }: LazyVideo
           muted
           playsInline
           preload="none"
-          className="w-full h-full object-cover"
+          disablePictureInPicture
+          disableRemotePlayback
+          controls={false}
+          tabIndex={-1}
           aria-label={ariaLabel}
+          className="w-full h-full object-cover pointer-events-none"
         >
           <source src={src} type="video/mp4" />
         </video>

@@ -101,6 +101,8 @@ export default async function ProductsPage({ searchParams }: Props) {
           .sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0))
       : category === "accessoire"
       ? allProducts.filter((product) => product.category === category && (!product.discountPercent || product.discountPercent === 0))
+      : category === "brasero"
+      ? allProducts.filter((product) => ["brasero", "plancha", "grille"].includes(product.category))
       : category
       ? allProducts.filter((product) => product.category === category)
       : allProducts.filter((product) => !product.discountPercent || product.discountPercent === 0);
