@@ -160,37 +160,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <ShareButtons slug={slug} title={post.title} />
           </div>
 
-          {/* CTA Product — specific or generic fallback */}
-          {post.cta_product_slug ? (
-            <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200">
-              <p className="text-lg font-semibold text-slate-900 mb-3">
-                {post.cta_text || "Découvrir le produit"}
-              </p>
-              <Link
-                href={`/produits/${post.cta_product_slug}`}
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
-              >
-                Voir le produit
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-          ) : (
-            <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">
-              <p className="text-lg font-semibold text-slate-900 mb-2">
-                Nos braseros artisanaux fabriqués en France
-              </p>
-              <p className="text-sm text-slate-600 mb-4">
-                Le Fermier, Le Morris, L&apos;Obélix, Le Coffy — découvrez la gamme complète.
-              </p>
-              <Link
-                href="/produits"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
-              >
-                Découvrir nos braseros
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-          )}
+          {/* CTA : toujours vers la catégorie braséro pour laisser le client choisir */}
+          <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">
+            <p className="text-lg font-semibold text-slate-900 mb-2">
+              Nos braseros artisanaux fabriqués en France
+            </p>
+            <p className="text-sm text-slate-600 mb-4">
+              Le Fermier, Le Morris, L&apos;Obélix, Le Coffy — découvrez la gamme complète.
+            </p>
+            <Link
+              href="/produits?category=brasero"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+            >
+              Découvrir nos braseros
+              <ArrowRight size={16} />
+            </Link>
+          </div>
 
           {/* Newsletter CTA */}
           <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">
