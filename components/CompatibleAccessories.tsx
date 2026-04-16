@@ -30,8 +30,6 @@ export function CompatibleAccessories({
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(!preloadedProducts || preloadedProducts.length === 0);
   const [error, setError] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const VISIBLE_LIMIT = 4;
   
   // Stabiliser la référence des slugs pour éviter les re-renders inutiles
   const slugsKey = useMemo(() => JSON.stringify([...compatibleSlugs].sort()), [compatibleSlugs]);
@@ -179,8 +177,8 @@ export function CompatibleAccessories({
           </p>
         )}
       </div>
-      <div className="divide-y divide-slate-300">
-        {(expanded ? products : products.slice(0, VISIBLE_LIMIT)).map((product) => {
+      <div className="divide-y divide-slate-300 max-h-[360px] overflow-y-auto overscroll-contain">
+        {products.map((product) => {
           // Support both formats: { url: ... } and { src: ... }
           const getImageUrl = () => {
             if (!Array.isArray(product.images) || product.images.length === 0) {
@@ -226,25 +224,6 @@ export function CompatibleAccessories({
           );
         })}
       </div>
-      {products.length > VISIBLE_LIMIT && (
-        <button
-          type="button"
-          onClick={() => setExpanded((v) => !v)}
-          className="w-full border-t border-slate-300 bg-slate-50 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2"
-        >
-          {expanded
-            ? 'Voir moins'
-            : `Voir les ${products.length - VISIBLE_LIMIT} autres produits`}
-          <svg
-            className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      )}
     </div>
   );
 }
