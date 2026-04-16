@@ -178,10 +178,10 @@ export default async function HomePage() {
           <ProductCarousel products={braseros} reviewStatsMap={reviewStatsMap} />
           <div className="flex justify-center">
             <Link
-              href="/produits"
+              href="/produits?category=brasero"
               className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
             >
-              Voir tous nos braseros et accessoires
+              Voir tous nos braseros
             </Link>
           </div>
         </div>
