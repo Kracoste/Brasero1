@@ -94,7 +94,7 @@ export function ExitIntentPopup() {
       <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
         <button
           onClick={dismiss}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+          className="absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
           aria-label="Fermer la fenêtre"
           autoFocus
         >

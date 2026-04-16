@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: `Brasero multifonction 3 en 1 | Barbecue & plancha | ${settings.storeName}`,
-    description: `Brasero multifonction 3 en 1 : barbecue, plancha et chauffage extérieur. Acier corten ou peint, fabriqué en France. Dès 800€. Garantie 2 ans.`,
+    description: `Brasero multifonction 3 en 1 : barbecue, plancha et chauffage extérieur. Acier corten ou peint, manufacturé en France. Dès 800€. Garantie 2 ans.`,
     keywords: [
       "brasero multifonction",
       "brasero barbecue plancha",
@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ],
     openGraph: {
       title: `Brasero multifonction 3 en 1 | ${settings.storeName}`,
-      description: `Barbecue, plancha et chauffage : un seul brasero pour toutes vos envies. Fabriqué en France.`,
+      description: `Barbecue, plancha et chauffage : un seul brasero pour toutes vos envies. Manufacturé en France.`,
       type: "website",
       locale: "fr_FR",
       images: [{
@@ -161,7 +161,7 @@ export default async function BraseroMultifonctionPage() {
         "@context": "https://schema.org",
         "@type": "Product",
         name: "Brasero multifonction 3 en 1",
-        description: "Brasero artisanal multifonction : barbecue, plancha et chauffage d'extérieur. Fabriqué en France.",
+        description: "Brasero artisanal multifonction : barbecue, plancha et chauffage d'extérieur. Manufacturé en France.",
         image: braseros[0]?.images?.[0]?.src || "https://www.atelier-lbf.fr/Braserobanner.jpg",
         brand: { "@type": "Brand", name: settings.storeName },
         offers: {

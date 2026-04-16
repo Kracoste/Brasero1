@@ -9,38 +9,39 @@ import { mapSupabaseProduct } from "@/lib/utils";
 import { PRODUCT_COLUMNS } from "@/lib/data/products";
 import { getReviewStatsBatch } from "@/lib/data/reviews-batch";
 import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
+import { isBraseroGroupCategory } from "@/lib/categories";
 
 const CATEGORY_META: Record<string, { title: string; description: string; keywords: string[] }> = {
   brasero: {
     title: "Braseros artisanaux acier corten | Made in France | Atelier LBF",
-    description: "Collection de braseros artisanaux fabriqués en France. Acier corten ou noir, diamètres 55 à 100 cm. Livraison soignée, garantie 2 ans.",
+    description: "Collection de braseros artisanaux manufacturés en France. Acier corten ou noir, diamètres 55 à 100 cm. Livraison soignée, garantie 2 ans.",
     keywords: ["brasero artisanal", "brasero corten", "brasero acier", "brasero français", "brasero jardin", "brasero terrasse"],
   },
   fendeur: {
-    title: "Fendeur à bûches professionnel | Fabriqué en France | Atelier LBF",
-    description: "Fendeur à bûches robuste et sécurisé, fabriqué artisanalement en France. Préparez votre bois de chauffage facilement. Garantie 2 ans.",
+    title: "Fendeur à bûches professionnel | Manufacture française | Atelier LBF",
+    description: "Fendeur à bûches robuste et sécurisé, manufacturé artisanalement en France. Préparez votre bois de chauffage facilement. Garantie 2 ans.",
     keywords: ["fendeur à bûches", "fendeur bois", "fendeur manuel", "fendeur français", "couper bûches"],
   },
   accessoire: {
     title: "Accessoires pour brasero : plancha, grille, couvercle | Atelier LBF",
-    description: "Complétez votre brasero avec nos accessoires artisanaux : planchas amovibles, grilles de cuisson, couvercles, pare-étincelles. Fabriqués en France.",
+    description: "Complétez votre brasero avec nos accessoires artisanaux : planchas amovibles, grilles de cuisson, couvercles, pare-étincelles. Manufacturés en France.",
     keywords: ["accessoire brasero", "plancha brasero", "grille brasero", "couvercle brasero", "pare-étincelles"],
   },
   "range-buches": {
     title: "Range-bûches design et pratique | Made in France | Atelier LBF",
-    description: "Range-bûches artisanaux en acier pour organiser et stocker votre bois de chauffage avec style. Fabriqués en France.",
+    description: "Range-bûches artisanaux en acier pour organiser et stocker votre bois de chauffage avec style. Manufacturés en France.",
     keywords: ["range-bûches", "rangement bois", "range-bûches design", "range-bûches acier"],
   },
   promotions: {
     title: "Promotions braseros : jusqu'à -40% | Atelier LBF",
-    description: "Profitez de nos promotions exceptionnelles sur les braseros artisanaux et accessoires. Jusqu'à -40% sur une sélection de produits Made in France.",
+    description: "Promotions exceptionnelles jusqu'à -40% sur nos braseros artisanaux et accessoires Made in France. Offres limitées.",
     keywords: ["promotion brasero", "brasero pas cher", "soldes brasero", "réduction brasero", "brasero promo"],
   },
 };
 
 const DEFAULT_META = {
   title: "Catalogue braseros, fendeurs et accessoires | Atelier LBF",
-  description: "Braseros artisanaux, fendeurs à bûches et accessoires fabriqués en France. Acier corten, diamètres 55 à 100 cm. Filtres et tri disponibles.",
+  description: "Braseros artisanaux, fendeurs à bûches et accessoires manufacturés en France. Acier corten, diamètres 55 à 100 cm. Filtres et tri disponibles.",
   keywords: ["catalogue brasero", "brasero artisanal", "fendeur à bûches", "accessoire brasero", "made in France"],
 };
 
@@ -102,7 +103,7 @@ export default async function ProductsPage({ searchParams }: Props) {
       : category === "accessoire"
       ? allProducts.filter((product) => product.category === category && (!product.discountPercent || product.discountPercent === 0))
       : category === "brasero"
-      ? allProducts.filter((product) => ["brasero", "plancha", "grille"].includes(product.category))
+      ? allProducts.filter((product) => isBraseroGroupCategory(product.category))
       : category
       ? allProducts.filter((product) => product.category === category)
       : allProducts.filter((product) => !product.discountPercent || product.discountPercent === 0);
@@ -126,7 +127,7 @@ export default async function ProductsPage({ searchParams }: Props) {
   const description = category === "brasero"
     ? "Diamètres de 55 à 100 cm, aciers corten ou thermolaqués prêts à rejoindre votre terrasse."
     : category === "fendeur"
-    ? "Préparez vos bûches en toute sécurité avec notre fendeur manuel fabriqué en France."
+    ? "Préparez vos bûches en toute sécurité avec notre fendeur manuel manufacturé en France."
     : category === "range-buches"
     ? "Découvrez nos ranges bûches design et pratiques pour organiser votre bois."
     : category === "accessoire" && section === "range-buches"

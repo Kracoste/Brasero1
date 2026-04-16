@@ -198,7 +198,7 @@ export default async function CommandeAffairesPage() {
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-slate-600 leading-relaxed">
                 Restaurants, hôtels, paysagistes, collectivités : équipez vos espaces extérieurs 
-                avec nos braseros artisanaux fabriqués en France. Tarifs B2B, personnalisation 
+                avec nos braseros artisanaux manufacturés en France. Tarifs B2B, personnalisation
                 sur mesure et accompagnement dédié.
               </p>
               

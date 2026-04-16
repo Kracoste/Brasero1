@@ -39,17 +39,18 @@ export async function verifyAdminAccess(
 ): Promise<boolean> {
   if (!isAdminEmail(email)) return false;
 
-  try {
-    const { data } = await adminClient
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
-    return data?.role === 'admin';
-  } catch {
-    // En cas d'erreur DB (ex: colonne role inexistante), fallback sur email uniquement
-    return isAdminEmail(email);
+  const { data, error } = await adminClient
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('[AUTH] verifyAdminAccess DB error:', error.message);
+    return false;
   }
+
+  return data?.role === 'admin';
 }
 
 /**

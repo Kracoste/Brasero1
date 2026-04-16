@@ -52,8 +52,8 @@ export async function generateMetadata(): Promise<Metadata> {
       settings.storeName,
     ],
     openGraph: {
-      title: `${settings.storeName} — Braseros artisanaux fabriqués en France à ${settings.atelier.city}`,
-      description: `Braseros artisanaux en acier corten, fendeurs à bûches et accessoires. Fabriqués à la main dans notre atelier de ${settings.atelier.city} (${settings.atelier.department}). Livraison France.`,
+      title: `${settings.storeName} — Braseros artisanaux manufacturés en France à ${settings.atelier.city}`,
+      description: `Braseros artisanaux en acier corten, fendeurs à bûches et accessoires. Manufacturés à la main dans notre atelier de ${settings.atelier.city} (${settings.atelier.department}). Livraison France.`,
       url: baseUrl.href,
       siteName: settings.storeName,
       images: [

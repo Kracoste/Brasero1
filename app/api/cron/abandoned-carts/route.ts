@@ -213,8 +213,9 @@ export async function GET(request: NextRequest) {
         });
 
         if (sendError) {
-          console.error(`Erreur envoi email à ${cart.email}:`, sendError);
-          errors.push(`${cart.email}: ${sendError.message}`);
+          const maskedEmail = cart.email.replace(/(.{2}).*(@.*)/, '$1***$2');
+          console.error(`Erreur envoi email à ${maskedEmail}:`, sendError);
+          errors.push(`${maskedEmail}: ${sendError.message}`);
           failed++;
           continue;
         }

@@ -71,7 +71,7 @@ const PAGE_META: Record<string, { title: string; description: string }> = {
   },
   "braseros-exterieurs": {
     title: "Braseros extérieurs — Collection complète",
-    description: "Braseros extérieurs artisanaux en acier corten et acier peint. Chauffage, cuisson et design pour votre jardin. Fabriqués en France.",
+    description: "Braseros extérieurs artisanaux en acier corten et acier peint. Chauffage, cuisson et design pour votre jardin. Manufacturés en France.",
   },
   accessoires: {
     title: "Accessoires brasero — Plancha, grille, outils",
@@ -490,7 +490,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
           <li>Livraison et installation si nécessaire</li>
         </ol>
         <p className="mt-4">
-          Contactez-nous à <strong>atelier-lbf@outlook.com</strong> pour démarrer votre projet.
+          Contactez-nous à <strong>atelier-lbf@outlook.fr</strong> pour démarrer votre projet.
         </p>
       </div>
     ),

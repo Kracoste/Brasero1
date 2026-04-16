@@ -128,6 +128,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (normalizedItems.length === 0) {
+      return NextResponse.json(
+        { error: 'Panier vide' },
+        { status: 400 }
+      );
+    }
+
     // Récupérer l'utilisateur connecté (optionnel)
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -202,9 +209,13 @@ export async function POST(request: NextRequest) {
         itemName = `${itemName} — ${item.variantLabel}`;
       }
 
-      // Détecter les tentatives de manipulation de prix
-      if (item.clientPrice > 0 && Math.abs(price - item.clientPrice) > 1) {
-        console.warn(`[CHECKOUT SECURITY] Prix divergent pour ${item.slug}: serveur=${price}, client=${item.clientPrice}`);
+      // Sécurité : rejeter toute divergence de prix (client vs serveur)
+      if (item.clientPrice > 0 && Math.abs(price - item.clientPrice) >= 0.01) {
+        console.error(`[CHECKOUT SECURITY] Prix divergent pour ${item.slug}: serveur=${price}, client=${item.clientPrice}`);
+        return NextResponse.json(
+          { error: 'Prix invalide, veuillez rafraîchir votre panier.' },
+          { status: 400 }
+        );
       }
 
       if (!Number.isFinite(price) || price <= 0) {

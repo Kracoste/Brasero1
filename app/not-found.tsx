@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Page introuvable | Atelier LBF",
-  description: "La page que vous cherchez n'existe pas ou a été déplacée. Découvrez nos braseros artisanaux fabriqués en France.",
+  description: "La page que vous cherchez n'existe pas ou a été déplacée. Découvrez nos braseros artisanaux manufacturés en France.",
   robots: { index: false, follow: true },
 };
 

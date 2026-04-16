@@ -2,7 +2,7 @@ export const STORE_SETTINGS_ID = "default";
 
 export const DEFAULT_SITE_SETTINGS = {
   storeName: "Atelier LBF",
-  storeEmail: "atelier-lbf@outlook.com",
+  storeEmail: "atelier-lbf@outlook.fr",
   storePhone: "06 85 64 33 40",
   storeAddress: "Moncoutant, 79320 France",
   schedules: [

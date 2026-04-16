@@ -51,7 +51,7 @@ function generateStructuredData(settings: Awaited<ReturnType<typeof getSiteSetti
     "@context": "https://schema.org",
     "@type": "HowTo",
     "name": `Comment commander un brasero chez ${settings.storeName}`,
-    "description": `Guide étape par étape pour commander votre brasero artisanal fabriqué en France`,
+    "description": `Guide étape par étape pour commander votre brasero artisanal manufacturé en France`,
     "step": [
       {
         "@type": "HowToStep",
@@ -95,7 +95,7 @@ export default async function CommanderPage() {
     {
       number: "1",
       title: "Choisissez votre brasero",
-      description: "Parcourez notre collection de braseros artisanaux fabriqués en France. Chaque modèle est conçu dans notre atelier à Moncoutant avec des matériaux de qualité.",
+      description: "Parcourez notre collection de braseros artisanaux manufacturés en France. Chaque modèle est conçu dans notre atelier à Moncoutant avec des matériaux de qualité.",
       icon: ShoppingCart,
       cta: { text: "Voir nos braseros", href: "/produits" }
     },

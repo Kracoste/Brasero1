@@ -11,7 +11,7 @@ const securityHeaders: Record<string, string> = {
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Content-Security-Policy': [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googleapis.com https://*.gstatic.com https://*.googletagmanager.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://va.vercel-scripts.com",
+    "script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://*.googletagmanager.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://va.vercel-scripts.com",
     "style-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com",
     "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://*.googletagmanager.com https://analytics.google.com",
     "font-src 'self' https://fonts.gstatic.com",
@@ -49,8 +49,11 @@ export async function middleware(request: NextRequest) {
     const emailOk = user?.email ? isAdminEmail(user.email) : false;
     if (!user?.email || !emailOk) {
       if (process.env.NODE_ENV !== 'production') {
+        const maskedEmail = user?.email
+          ? user.email.replace(/(.{2}).*(@.*)/, '$1***$2')
+          : 'no user';
         console.log('[middleware] Admin access denied:', {
-          email: user?.email || 'no user',
+          email: maskedEmail,
           emailOk,
           adminEmailsConfigured: (process.env.ADMIN_EMAILS || '').length > 0
         });

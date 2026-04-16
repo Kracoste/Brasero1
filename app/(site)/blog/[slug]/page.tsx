@@ -163,7 +163,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* CTA : toujours vers la catégorie braséro pour laisser le client choisir */}
           <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">
             <p className="text-lg font-semibold text-slate-900 mb-2">
-              Nos braseros artisanaux fabriqués en France
+              Nos braseros artisanaux manufacturés en France
             </p>
             <p className="text-sm text-slate-600 mb-4">
               Le Fermier, Le Morris, L&apos;Obélix, Le Coffy — découvrez la gamme complète.

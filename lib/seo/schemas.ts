@@ -97,7 +97,7 @@ export function generateStoreSchema(settings: SiteSettings) {
     "@id": `${BASE_URL}/#store`,
     name: settings.storeName,
     description:
-      "Boutique en ligne de braseros artisanaux fabriqués en France. Braseros en acier corten, fendeurs à bûches et accessoires.",
+      "Boutique en ligne de braseros artisanaux manufacturés en France. Braseros en acier corten, fendeurs à bûches et accessoires.",
     url: BASE_URL,
     image: `${BASE_URL}/logo/Logo1.webp`,
     telephone: settings.storePhone,
@@ -521,7 +521,7 @@ export function generateProductImageAlt(
   // Image principale (index 0)
   if (imageIndex === 0) {
     const diameterStr = product.diameter ? ` ${product.diameter}cm` : "";
-    return `${product.name} - Brasero artisanal ${product.material}${diameterStr} fabriqué en France | Atelier LBF`;
+    return `${product.name} - Brasero artisanal ${product.material}${diameterStr} manufacturé en France | Atelier LBF`;
   }
 
   // Images secondaires

@@ -128,7 +128,7 @@ const FAQ_ACIER_PEINT: FAQItem[] = [
   {
     question: "Quelle est la différence entre un braséro Corten et un braséro peint ?",
     answer:
-      "Le braséro en acier Corten développe une patine de rouille naturelle qui le protège sans aucun entretien. Son aspect évolue au fil des saisons pour un rendu unique et organique. Le braséro peint (thermolaqué) offre un aspect plus lisse et moderne avec un choix de coloris. Il nécessite un entretien léger (retouches de peinture possibles) mais reste plus abordable. Les deux sont fabriqués en France dans le même atelier et offrent les mêmes performances de chauffe.",
+      "Le braséro en acier Corten développe une patine de rouille naturelle qui le protège sans aucun entretien. Son aspect évolue au fil des saisons pour un rendu unique et organique. Le braséro peint (thermolaqué) offre un aspect plus lisse et moderne avec un choix de coloris. Il nécessite un entretien léger (retouches de peinture possibles) mais reste plus abordable. Les deux sortent de la même manufacture française et offrent les mêmes performances de chauffe.",
   },
   {
     question: "Mon braséro peint peut-il rester dehors toute l'année ?",

@@ -19,7 +19,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export const metadata: Metadata = {
   title: "Blog brasero plancha | Guides, conseils et astuces | Atelier LBF",
   description:
-    "Guides d'achat, conseils d'entretien, techniques de cuisson et comparatifs pour choisir et utiliser votre brasero plancha. Fabriqué en France.",
+    "Guides d'achat, conseils d'entretien, techniques de cuisson et comparatifs pour choisir et utiliser votre brasero plancha. Manufacture française.",
   keywords: [
     "blog brasero",
     "guide brasero plancha",
@@ -271,7 +271,7 @@ export default async function BlogPage() {
             Envie de passer à l&apos;action ?
           </h2>
           <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-            Découvrez nos braseros plancha artisanaux, fabriqués en France dans
+            Découvrez nos braseros plancha artisanaux, manufacturés en France dans
             les Deux-Sèvres.
           </p>
           <div className="mt-8">

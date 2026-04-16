@@ -316,6 +316,21 @@ async function handleCheckoutCompleted(
     .single();
 
   if (orderError) {
+    // Duplicate key (23505) → course entre 2 webhooks Stripe concurrents pour la même session.
+    // On récupère la commande existante et on continue (idempotent).
+    if (orderError.code === "23505") {
+      log("Duplicate detected on insert — fetching existing order");
+      const { data: existing } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("stripe_session_id", session.id)
+        .single();
+      if (existing) {
+        result.order_id = existing.id;
+        result.already_exists = true;
+        return result;
+      }
+    }
     logError("❌ Insert order failed:", JSON.stringify(orderError));
     result.order_error = orderError;
     throw new Error("Insert order: " + orderError.message + " (code: " + orderError.code + ", details: " + orderError.details + ")");

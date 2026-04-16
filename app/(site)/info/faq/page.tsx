@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ],
     openGraph: {
       title: `Questions fréquentes | ${settings.storeName}`,
-      description: `Retrouvez toutes les réponses à vos questions sur nos braseros artisanaux fabriqués en France.`,
+      description: `Retrouvez toutes les réponses à vos questions sur nos braseros artisanaux manufacturés en France.`,
       type: "website",
       locale: "fr_FR",
       images: [{ url: "https://www.atelier-lbf.fr/accesoiresbrasero.webp" }],
@@ -414,7 +414,7 @@ export default async function FAQPage() {
               Prêt à découvrir nos braseros ?
             </h2>
             <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-              Parcourez notre collection de braseros artisanaux fabriqués en France 
+              Parcourez notre collection de braseros artisanaux manufacturés en France
               et trouvez le modèle parfait pour votre extérieur.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">

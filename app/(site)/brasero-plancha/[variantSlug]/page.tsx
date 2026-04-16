@@ -64,12 +64,12 @@ export async function generateMetadata({ params }: VariantPageProps): Promise<Me
 
   // Meta title optimisé pour le clic : priorité metaTitle > génération automatique
   const title = diameterData.metaTitle
-    || `Brasero ${shortName} ${finishLabel} Ø${parsed.diameter}cm ${planchaLabel} | Fabriqué en France - Atelier LBF`;
+    || `Brasero ${shortName} ${finishLabel} Ø${parsed.diameter}cm ${planchaLabel} | Manufacturé en France - Atelier LBF`;
 
   // Meta description optimisée pour la conversion
   const priceStr = diameterData.price ? ` À partir de ${diameterData.price}€ HT.` : '';
   const description = diameterData.metaDescription
-    || `Brasero artisanal ${shortName} en ${finishLabel.toLowerCase()} Ø${parsed.diameter}cm avec ${planchaLabel.toLowerCase()}. Fabriqué en France par l'Atelier LBF.${priceStr} Livraison partout en France.`;
+    || `Brasero artisanal ${shortName} en ${finishLabel.toLowerCase()} Ø${parsed.diameter}cm avec ${planchaLabel.toLowerCase()}. Manufacturé en France par l'Atelier LBF.${priceStr} Livraison partout en France.`;
 
   const images = config.images?.length
     ? config.images
@@ -126,7 +126,7 @@ export default async function VariantPage({ params }: VariantPageProps) {
   // Review stats pour AggregateRating (étoiles dans Google)
   const reviewStats = await getReviewStats(product.slug);
 
-  const productSchema = generateProductSchema(product, `${variantName} - Brasero artisanal fabriqué en France par l'Atelier LBF.`, reviewStats);
+  const productSchema = generateProductSchema(product, `${variantName} - Brasero artisanal manufacturé en France par l'Atelier LBF.`, reviewStats);
   // Override URL and name for this variant
   productSchema.url = `https://www.atelier-lbf.fr/brasero-plancha/${variantSlug}`;
   productSchema.name = variantName;

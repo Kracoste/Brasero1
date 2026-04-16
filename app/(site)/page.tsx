@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/site-settings";
 import { mapSupabaseProduct } from "@/lib/utils";
 import { PRODUCT_COLUMNS } from "@/lib/data/products";
+import { BRASERO_GROUP_CATEGORIES } from "@/lib/categories";
 import { getReviewStatsBatch } from "@/lib/data/reviews-batch";
 import type { Product } from "@/lib/schema";
 import { generateStoreSchema } from "@/lib/seo/schemas";
@@ -54,7 +55,7 @@ export default async function HomePage() {
   const { data: braseroProduits } = await supabase
     .from('products')
     .select(PRODUCT_COLUMNS)
-    .in('category', ['brasero', 'plancha', 'grille'])
+    .in('category', BRASERO_GROUP_CATEGORIES as unknown as string[])
     .eq('is_featured', true)
     .order('featured_order', { ascending: true })
     .limit(4);
@@ -65,7 +66,7 @@ export default async function HomePage() {
     const { data: moreProducts } = await supabase
       .from('products')
       .select(PRODUCT_COLUMNS)
-      .in('category', ['brasero', 'plancha', 'grille'])
+      .in('category', BRASERO_GROUP_CATEGORIES as unknown as string[])
       .eq('is_featured', false)
       .order('popularScore', { ascending: false })
       .limit(4 - allProducts.length);

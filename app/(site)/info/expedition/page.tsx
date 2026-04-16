@@ -386,8 +386,8 @@ export default async function ExpeditionPage() {
                   supplémentaire sera communiqué lors de votre demande de devis.
                 </p>
                 <p className="text-slate-600 leading-relaxed">
-                  Nos braseros en stock sont expédiés sous 24 à 48h. Chaque brasero artisanal 
-                  fabriqué en France bénéficie du savoir-faire de notre atelier.
+                  Nos braseros en stock sont expédiés sous 24 à 48h. Chaque brasero artisanal
+                  manufacturé en France bénéficie du savoir-faire de notre atelier.
                 </p>
               </div>
             </div>

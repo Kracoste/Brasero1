@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Heart, Menu, Package, ShoppingBag, User, X, LogOut } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -24,6 +24,15 @@ export const Header = () => {
   const accountTimer = useRef<NodeJS.Timeout | null>(null);
 
   const toggle = () => setOpen((prev) => !prev);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = open ? 'hidden' : previous;
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-[#f6f1e9] shadow-sm overflow-visible">
@@ -255,11 +264,11 @@ export const Header = () => {
             <button
               type="button"
               onClick={toggle}
-              className="rounded-full border border-slate-300 p-1.5 sm:p-2 text-slate-900 lg:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 text-slate-900 lg:hidden"
               aria-label="Ouvrir le menu"
               aria-expanded={open}
             >
-              {open ? <X className="w-4 h-4 sm:w-[18px] sm:h-[18px]" /> : <Menu className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />}
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>

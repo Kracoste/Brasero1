@@ -112,7 +112,7 @@ function descGenericBrasero(product: Product): string {
 
 Sa plancha en ${plancha} de ${diameter} cm et 8 mm d'épaisseur offre une surface de cuisson homogène que les planchas à gaz ne peuvent pas égaler : la chaleur du feu de bois est irrégulière, vivante, et c'est précisément ce qui donne aux aliments ce goût fumé impossible à reproduire en cuisine. Avec ses ${weight} kg en ${material}, ${product.name} est dimensionné pour ${guests} personnes — un format adapté aux ${diameter <= 50 ? "petites terrasses et balcons généreux" : diameter <= 80 ? "repas en famille sur terrasse standard" : "grandes tablées et réceptions de jardin"}.
 
-À ${price} €, c'est un investissement dans un objet durable, fabriqué en France, qui peut se transmettre. Pas de pièces d'usure, pas d'électronique, pas de bouteille de gaz — juste de l'acier et du bois. Livré monté avec grille de cuisson incluse. SAV joignable depuis l'atelier de Moncoutant. Garantie fabricant 2 ans.`;
+À ${price} €, c'est un investissement dans un objet durable, manufacturé en France, qui peut se transmettre. Pas de pièces d'usure, pas d'électronique, pas de bouteille de gaz — juste de l'acier et du bois. Livré monté avec grille de cuisson incluse. SAV joignable depuis l'atelier de Moncoutant. Garantie fabricant 2 ans.`;
 }
 
 // ── FAQ SEO par modèle ─────────────────────────────────────────────────────
@@ -327,8 +327,8 @@ function faqFendeur(product: Product): Array<{ question: string; answer: string 
       answer: `Oui, significativement. Avec une hache, la lame peut dévier en cas de nœud, et le geste de balancier expose les pieds et les jambes. Avec le fendeur ${product.name}, la bûche est posée au sol et le fendeur est guidé verticalement — les mains restent toujours en sécurité derrière le point de frappe. C'est l'outil recommandé pour les personnes qui n'ont pas l'habitude de manier une hache, notamment en présence d'enfants.`,
     },
     {
-      question: `Le fendeur ${product.name} est-il fabriqué en France ?`,
-      answer: `Oui, le ${product.name} est fabriqué artisanalement dans notre atelier de Moncoutant (Deux-Sèvres), en acier ${product.material}. Chaque fendeur est contrôlé avant expédition. Nous utilisons de l'acier français de première qualité pour garantir la résistance aux impacts répétés.`,
+      question: `Le fendeur ${product.name} est-il manufacturé en France ?`,
+      answer: `Oui, le ${product.name} est manufacturé artisanalement dans notre atelier de Moncoutant (Deux-Sèvres), en acier ${product.material}. Chaque fendeur est contrôlé avant expédition. Nous utilisons de l'acier français de première qualité pour garantir la résistance aux impacts répétés.`,
     },
     {
       question: `Quel maillet utiliser avec le fendeur ${product.name} ?`,
@@ -386,7 +386,7 @@ function faqAccessoire(product: Product): Array<{ question: string; answer: stri
     },
     {
       question: `Quelle est la garantie de ${name} ?`,
-      answer: `${name} bénéficie d'une garantie fabricant de 2 ans. Fabriqué en France dans notre atelier de Moncoutant (Deux-Sèvres). SAV joignable par téléphone et email.`,
+      answer: `${name} bénéficie d'une garantie fabricant de 2 ans. Manufacturé en France dans notre atelier de Moncoutant (Deux-Sèvres). SAV joignable par téléphone et email.`,
     },
     {
       question: `Comment entretenir ${name} ?`,
@@ -557,7 +557,7 @@ Utilisez cette planche pour découper les viandes grillées directement à table
   if (nameLower.includes("kit") || nameLower.includes("ustensile")) {
     return `Le ${product.name} regroupe tous les ustensiles essentiels pour cuisiner sur votre brasero Atelier LBF. Conçu pour fonctionner avec les planchas en acier carbone et inox de 50 à 100 cm, ce kit vous équipe pour griller, retourner, servir et entretenir votre plancha sans manquer d'outil.
 
-Chaque pièce est fabriquée avec des matériaux résistants à la chaleur intense du feu de bois. Compatible avec l'ensemble de la gamme Atelier LBF (L'Obélix, Le Coffy, Le Morris, Le Fermier). Fabriqué en France, garanti 2 ans.`;
+Chaque pièce est manufacturée avec des matériaux résistants à la chaleur intense du feu de bois. Compatible avec l'ensemble de la gamme Atelier LBF (L'Obélix, Le Coffy, Le Morris, Le Fermier). Manufacturé en France, garanti 2 ans.`;
   }
 
   const baseDesc = product.shortDescription?.trim();
@@ -621,7 +621,7 @@ export function generateProductMetaTitle(product: Product): string {
   }
 
   if (product.category === "fendeur") {
-    return `${product.name} | Fendeur à bûches sécurisé, fabriqué en France | Atelier LBF — ${price}€`;
+    return `${product.name} | Fendeur à bûches sécurisé, manufacturé en France | Atelier LBF — ${price}€`;
   }
 
   return `${product.name} | Accessoire brasero artisanal | Atelier LBF — ${price}€`;
@@ -650,15 +650,15 @@ export function generateProductMetaDescription(product: Product): string {
         desc = `Brasero Le Morris${diameter} : double zone cuisson (plancha + grille simultané), plancha ${plancha} 10mm. ${guests} pers. Atelier LBF. ${price}€.`;
         break;
       case "fermier":
-        desc = `Brasero Le Fermier${diameter} : acier corten sans entretien, plancha inox 8mm. ${guests} pers. Unique dans la gamme. Fabriqué en France. ${price}€.`;
+        desc = `Brasero Le Fermier${diameter} : acier corten sans entretien, plancha inox 8mm. ${guests} pers. Unique dans la gamme. Manufacturé en France. ${price}€.`;
         break;
       default:
         desc = `${product.name}${diameter} : brasero plancha artisanal, fabriqué à la main en France. ${guests} pers. ${price}€ livraison incluse. Garantie 2 ans.`;
     }
   } else if (product.category === "fendeur") {
-    desc = `${product.name} : fendeur à bûches artisanal, plus sécurisé qu'une hache. Fabriqué en France dans les Deux-Sèvres. ${price}€. Garantie 2 ans.`;
+    desc = `${product.name} : fendeur à bûches artisanal, plus sécurisé qu'une hache. Manufacturé en France dans les Deux-Sèvres. ${price}€. Garantie 2 ans.`;
   } else {
-    desc = `${product.name} : accessoire brasero artisanal, compatible tous modèles Atelier LBF. Fabriqué en France. ${price}€. Garanti 2 ans.`;
+    desc = `${product.name} : accessoire brasero artisanal, compatible tous modèles Atelier LBF. Manufacturé en France. ${price}€. Garanti 2 ans.`;
   }
 
   return desc.length > 155 ? desc.slice(0, 152) + "..." : desc;

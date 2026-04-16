@@ -28,10 +28,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: `Brasero Made in France | Fabrication artisanale Deux-Sèvres | ${settings.storeName}`,
-    description: `Braseros 100% fabriqués en France à Moncoutant (79). Acier 3 mm, soudure artisanale, garantie 2 ans. Pourquoi le Made in France change tout.`,
+    description: `Braseros 100% manufacturés en France à Moncoutant (79). Acier 3 mm, soudure artisanale, garantie 2 ans. Pourquoi la manufacture française change tout.`,
     keywords: [
       "brasero made in France",
-      "brasero fabriqué en France",
+      "brasero manufacturé en France",
       "brasero artisan français",
       "brasero production française",
       "brasero artisanal Deux-Sèvres",
@@ -156,7 +156,7 @@ export default async function MadeInFrancePage() {
               Notre engagement français
             </h2>
             <p className="mt-4 text-lg text-slate-600">
-              Fabriqué en France n&apos;est pas qu&apos;un label, c&apos;est notre fierté
+              Manufacturé en France n&apos;est pas qu&apos;un label, c&apos;est notre fierté
             </p>
           </div>
 
@@ -491,7 +491,7 @@ export default async function MadeInFrancePage() {
             Soutenez le savoir-faire français
           </h2>
           <p className="mt-4 text-lg text-slate-600">
-            Choisissez un brasero 100% fabriqué en France et participez au maintien de l&apos;artisanat local.
+            Choisissez un brasero 100% manufacturé en France et participez au maintien de l&apos;artisanat local.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link

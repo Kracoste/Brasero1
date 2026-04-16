@@ -164,12 +164,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (currentUserId === prevUserId) return;
     prevUserIdRef.current = currentUserId;
 
+    let cancelled = false;
+
     if (currentUserId) {
       // Utilisateur connecté - charger son panier depuis la DB
       const guestItems = readGuestCart();
       const syncCart = async () => {
         try {
           const cartFromDb = await loadCart(currentUserId);
+          if (cancelled) return;
           // Si l'utilisateur a des items guest, les migrer vers la DB en batch
           if (guestItems.length > 0 && cartFromDb) {
             const { error: insertError } = await supabase.from('cart_items').insert(
@@ -182,6 +185,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 quantity: item.quantity,
               }))
             );
+            if (cancelled) return;
             // Ne vider le panier guest QUE si la migration a réussi
             if (!insertError) {
               persistGuestCart([]);
@@ -189,7 +193,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             }
           }
         } catch (error) {
-          devWarn('Error syncing cart:', error);
+          if (!cancelled) devWarn('Error syncing cart:', error);
         }
       };
       syncCart();
@@ -203,6 +207,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setItems(readGuestCart());
       setCartId(null);
     }
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Charger le panier depuis la base de données

@@ -26,7 +26,7 @@ const processCards = [
 ];
 
 const stats = [
-  { value: '100%', label: 'Fabriqué en France' },
+  { value: '100%', label: 'Manufacture française' },
   { value: '2 ans', label: 'Garantie minimum' },
   { value: '5-10j', label: 'Délai de livraison' },
   { value: '98%', label: 'Clients satisfaits' },

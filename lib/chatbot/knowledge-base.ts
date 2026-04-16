@@ -38,7 +38,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   {
     keywords: ['international', 'étranger', 'belgique', 'suisse', 'europe', 'hors france'],
     question: 'Livrez-vous à l\'étranger ?',
-    answer: 'Nous livrons principalement en **France métropolitaine**. Pour une livraison en Belgique, Suisse ou ailleurs en Europe, contactez-nous par email à contact@atelier-lbf.fr pour un devis personnalisé.',
+    answer: 'Nous livrons principalement en **France métropolitaine**. Pour une livraison en Belgique, Suisse ou ailleurs en Europe, contactez-nous par email à atelier-lbf@outlook.fr pour un devis personnalisé.',
     category: 'livraison',
   },
 
@@ -52,7 +52,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   {
     keywords: ['retour', 'rembours', 'renvoyer', 'échanger', 'échange', 'rétractation', 'retractation'],
     question: 'Puis-je retourner mon brasero ?',
-    answer: 'Vous disposez d\'un **droit de rétractation de 14 jours** après réception. Le produit doit être retourné dans son emballage d\'origine, non utilisé. Les frais de retour sont à votre charge en raison du poids et de la taille des braseros. Contactez-nous à contact@atelier-lbf.fr pour organiser le retour.',
+    answer: 'Vous disposez d\'un **droit de rétractation de 14 jours** après réception. Le produit doit être retourné dans son emballage d\'origine, non utilisé. Les frais de retour sont à votre charge en raison du poids et de la taille des braseros. Contactez-nous à atelier-lbf@outlook.fr pour organiser le retour.',
     category: 'garantie',
   },
 
@@ -144,7 +144,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   {
     keywords: ['contact', 'email', 'mail', 'téléphone', 'appeler', 'joindre', 'question', 'parler'],
     question: 'Comment vous contacter ?',
-    answer: 'Vous pouvez nous contacter :\n\n• **Par email** : contact@atelier-lbf.fr\n• **Via le formulaire** de contact sur notre site\n\nNous répondons généralement sous **24 à 48h** en jours ouvrés.',
+    answer: 'Vous pouvez nous contacter :\n\n• **Par email** : atelier-lbf@outlook.fr\n• **Via le formulaire** de contact sur notre site\n\nNous répondons généralement sous **24 à 48h** en jours ouvrés.',
     category: 'contact',
   },
 
@@ -160,7 +160,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   {
     keywords: ['accessoire', 'spatule', 'pique', 'ustensile', 'planche', 'découpe', 'kit'],
     question: 'Quels accessoires proposez-vous ?',
-    answer: 'Nous proposons des accessoires artisanaux assortis à nos braseros :\n\n• **Spatule** — en acier forgé, idéale pour la plancha\n• **Pique à viande** — pour retourner et servir\n• **Planche à découper** — en bois d\'acajou massif\n• **Kit ustensiles** — l\'ensemble complet pour cuisiner au brasero\n\nTous nos accessoires sont fabriqués en France avec les mêmes standards de qualité.',
+    answer: 'Nous proposons des accessoires artisanaux assortis à nos braseros :\n\n• **Spatule** — en acier forgé, idéale pour la plancha\n• **Pique à viande** — pour retourner et servir\n• **Planche à découper** — en bois d\'acajou massif\n• **Kit ustensiles** — l\'ensemble complet pour cuisiner au brasero\n\nTous nos accessoires sont manufacturés en France avec les mêmes standards de qualité.',
     category: 'accessoires',
   },
 ];
@@ -170,7 +170,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
  */
 export const GREETING_MESSAGE = 'Bonjour ! 👋 Je suis l\'assistant de l\'**Atelier LBF**. Je peux vous renseigner sur nos braseros artisanaux, vous aider à choisir le modèle idéal, ou répondre à vos questions sur la livraison, l\'entretien et la garantie. Comment puis-je vous aider ?';
 
-export const FALLBACK_MESSAGE = 'Je n\'ai pas trouvé de réponse précise à votre question. Voici ce que je vous suggère :\n\n• Reformulez votre question avec des mots-clés (ex: livraison, entretien, prix…)\n• Consultez notre [FAQ complète](/faq)\n• Contactez-nous à **contact@atelier-lbf.fr**\n\nJe reste à votre disposition !';
+export const FALLBACK_MESSAGE = 'Je n\'ai pas trouvé de réponse précise à votre question. Voici ce que je vous suggère :\n\n• Reformulez votre question avec des mots-clés (ex: livraison, entretien, prix…)\n• Consultez notre [FAQ complète](/faq)\n• Contactez-nous à **atelier-lbf@outlook.fr**\n\nJe reste à votre disposition !';
 
 /**
  * Recherche la meilleure réponse FAQ pour un message utilisateur

@@ -10,7 +10,7 @@ export const hasResendCredentials = () => !!process.env.RESEND_API_KEY;
 // Email par défaut pour l'envoi
 const fromAddress = process.env.RESEND_FROM_EMAIL || 'noreply@atelier-lbf.fr';
 export const FROM_EMAIL = `Atelier LBF <${fromAddress}>`;
-export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'atelier-lbf@outlook.com';
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'atelier-lbf@outlook.fr';
 
 // Types d'emails
 export type EmailType =
@@ -409,7 +409,7 @@ export function generateOrderConfirmationHTML(order: OrderEmailData): string {
     <!-- Footer -->
     <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
       <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
-        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
+        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.fr" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.fr</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
         © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
@@ -529,7 +529,7 @@ export function generateOrderShippedHTML(order: OrderEmailData): string {
     <!-- Footer -->
     <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
       <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
-        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
+        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.fr" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.fr</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
         © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
@@ -635,7 +635,7 @@ export function generateOrderProcessingHTML(order: OrderEmailData): string {
     <!-- Footer -->
     <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
       <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
-        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
+        Besoin d'aide ? Répondez à ce mail ou contactez nous : <a href="mailto:atelier-lbf@outlook.fr" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.fr</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
         © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
@@ -750,7 +750,7 @@ export function generateOrderDeliveredHTML(order: OrderEmailData): string {
     <!-- Footer -->
     <div style="background-color: #1f2937; padding: 24px 20px; text-align: center; border-radius: 0 0 4px 4px;">
       <p style="margin: 0 0 8px 0; font-size: 14px; color: #d1d5db;">
-        Merci pour votre confiance ! <a href="mailto:atelier-lbf@outlook.com" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.com</a>
+        Merci pour votre confiance ! <a href="mailto:atelier-lbf@outlook.fr" style="color: #f5deb3; text-decoration: none;">atelier-lbf@outlook.fr</a>
       </p>
       <p style="margin: 0; font-size: 12px; color: #9ca3af;">
         © ${new Date().getFullYear()} ATELIER LBF &ndash; Moncoutant-sur-Sèvre, France
