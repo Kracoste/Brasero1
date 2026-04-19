@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
+import { useAuth } from '@/lib/auth-context';
 import { Container } from '@/components/Container';
 import { Section } from '@/components/Section';
 import { Price } from '@/components/Price';
@@ -13,6 +14,7 @@ import { PromoCodeInput, type CouponData } from '@/components/PromoCodeInput';
 
 export default function PanierPage() {
   const { items, itemCount, totalPrice, loading, updateQuantity, removeItem, clearCart } = useCart();
+  const { user } = useAuth();
   const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
 
   if (loading) {
@@ -163,6 +165,7 @@ export default function PanierPage() {
                 <div className="space-y-2 border-t border-slate-200 pt-4">
                   <PromoCodeInput
                     cartTotal={totalPrice}
+                    email={user?.email}
                     onApply={(coupon) => setAppliedCoupon(coupon)}
                     onRemove={() => setAppliedCoupon(null)}
                   />

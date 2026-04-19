@@ -28,6 +28,9 @@ function SuccessPageContent() {
 
     // Vider le panier local après un paiement réussi
     clearCart();
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('brasero:applied-coupon');
+    }
 
     // Récupérer les détails de la session et tracker l'achat
     if (sessionId) {

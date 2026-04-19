@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 export interface CouponData {
   code: string;
@@ -16,11 +16,56 @@ interface PromoCodeInputProps {
   onRemove: () => void;
 }
 
+const STORAGE_KEY = "brasero:applied-coupon";
+
 export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCodeInputProps) => {
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
+  const hasHydrated = useRef(false);
+
+  // Réhydrater le coupon depuis sessionStorage et re-valider pour s'assurer qu'il est toujours valide
+  useEffect(() => {
+    if (hasHydrated.current) return;
+    hasHydrated.current = true;
+    if (typeof window === "undefined") return;
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const saved = JSON.parse(raw) as CouponData;
+      if (!saved?.code) return;
+      (async () => {
+        try {
+          const response = await fetch("/api/coupons/validate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: saved.code, cartTotal, email: email || undefined }),
+          });
+          const data = await response.json();
+          if (!response.ok || data.valid === false) {
+            sessionStorage.removeItem(STORAGE_KEY);
+            return;
+          }
+          const couponData: CouponData = {
+            code: saved.code,
+            discount: data.discount ?? 0,
+            discountType: data.discountType,
+            discountValue: data.discountValue ?? 0,
+          };
+          setAppliedCoupon(couponData);
+          setStatus("success");
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(couponData));
+          onApply(couponData);
+        } catch {
+          // silencieux : on laisse l'utilisateur ressaisir si besoin
+        }
+      })();
+    } catch {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -61,6 +106,9 @@ export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCod
 
       setAppliedCoupon(couponData);
       setStatus("success");
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(couponData));
+      }
       onApply(couponData);
     } catch {
       setStatus("error");
@@ -73,6 +121,9 @@ export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCod
     setStatus("idle");
     setErrorMessage("");
     setAppliedCoupon(null);
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
     onRemove();
   };
 

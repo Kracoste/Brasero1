@@ -16,6 +16,7 @@ type Coupon = {
   expires_at: string | null;
   is_active: boolean;
   show_in_banner: boolean;
+  show_on_products: boolean;
   created_at: string;
   applicable_products: string[] | null;
 };
@@ -35,6 +36,7 @@ type CouponForm = {
   expires_at: string | null;
   is_active: boolean;
   show_in_banner: boolean;
+  show_on_products: boolean;
 };
 
 const emptyCouponForm: CouponForm = {
@@ -47,6 +49,7 @@ const emptyCouponForm: CouponForm = {
   expires_at: null,
   is_active: true,
   show_in_banner: false,
+  show_on_products: false,
 };
 
 export default function AdminCodesPromo() {
@@ -122,6 +125,7 @@ export default function AdminCodesPromo() {
       expires_at: coupon.expires_at ? coupon.expires_at.slice(0, 16) : null,
       is_active: coupon.is_active,
       show_in_banner: coupon.show_in_banner,
+      show_on_products: coupon.show_on_products ?? false,
     });
     setSelectedProducts(coupon.applicable_products || []);
     setEditingId(coupon.id);
@@ -151,6 +155,7 @@ export default function AdminCodesPromo() {
       expires_at: form.expires_at || null,
       is_active: form.is_active,
       show_in_banner: form.show_in_banner,
+      show_on_products: form.show_on_products,
       applicable_products: selectedProducts.length > 0 ? selectedProducts : null,
     };
 
@@ -433,6 +438,20 @@ export default function AdminCodesPromo() {
                 <span className="text-sm font-medium text-slate-700">Afficher dans la bannière</span>
               </label>
               <span className="text-xs text-slate-400 ml-2" title="Le code sera affiché en haut du site. Un seul code peut être affiché à la fois.">?</span>
+            </div>
+
+            {/* Afficher sur les pages produits */}
+            <div className="flex items-end">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.show_on_products}
+                  onChange={(e) => setForm({ ...form, show_on_products: e.target.checked })}
+                  className="w-4 h-4 rounded border-slate-300 text-[#8B4513] focus:ring-[#8B4513]"
+                />
+                <span className="text-sm font-medium text-slate-700">Afficher sur les produits</span>
+              </label>
+              <span className="text-xs text-slate-400 ml-2" title="Affiche la bulle rouge de réduction sur les produits concernés (ou tous si aucun n'est sélectionné).">?</span>
             </div>
           </div>
 

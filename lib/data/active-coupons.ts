@@ -28,6 +28,7 @@ export async function getActiveProductCoupons(): Promise<ActiveCoupon[]> {
     .from('coupons')
     .select('code, discount_type, discount_value, applicable_products, show_in_banner, expires_at, max_uses, current_uses')
     .eq('is_active', true)
+    .eq('show_on_products', true)
     .in('discount_type', ['percentage', 'fixed']);
 
   if (!data) return [];

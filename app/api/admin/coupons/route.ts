@@ -209,6 +209,11 @@ function sanitizeCouponData(data: unknown): Record<string, unknown> | null {
     sanitized.show_in_banner = input.show_in_banner;
   }
 
+  // show_on_products
+  if (typeof input.show_on_products === 'boolean') {
+    sanitized.show_on_products = input.show_on_products;
+  }
+
   // applicable_products
   if (input.applicable_products === null || input.applicable_products === undefined) {
     sanitized.applicable_products = null;
