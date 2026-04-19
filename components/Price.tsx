@@ -4,6 +4,7 @@ type PriceProps = {
   amount: number;
   className?: string;
   tone?: "light" | "dark";
+  showHT?: boolean;
 };
 
 const toneClasses = {

@@ -546,7 +546,7 @@ export const mapSupabaseProduct = (p: Record<string, unknown>): Product | null =
       const productContext = {
         name: (p.name as string) || "Produit",
         material: (p.material as string) || "Acier",
-        diameter,
+        diameter: resolveDiameter({ ...p, specs }) ?? 0,
         category: (p.category as string) || "accessoire",
       };
       return {

@@ -94,18 +94,22 @@
 
 .product-card__promo-ribbon {
   position: absolute;
-  top: 10px;
-  left: -30px;
-  padding: 6px 28px;
-  background: linear-gradient(120deg, #0f172a, #1e293b);
-  color: #f8fafc;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transform: rotate(-45deg);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.25);
+  top: 12px;
+  left: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.35);
   pointer-events: none;
+  z-index: 2;
 }
 
 .product-card__content {
@@ -253,27 +257,56 @@
   gap: 4px;
 }
 
-.product-card__promo-current {
-  font-size: clamp(1.8rem, 2.4vw, 2.2rem);
-  font-weight: 600;
-  color: #064e3b;
+.product-card__promo-row {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.product-card__promo-note {
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #047857;
+.product-card__promo-prices {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .product-card__promo-old {
-  font-size: 0.95rem;
-  color: #9ca3af;
+  font-size: 1rem;
+  color: #dc2626;
   text-decoration: line-through;
-  letter-spacing: 0.08em;
+  text-decoration-color: #dc2626;
+  text-decoration-thickness: 2px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.product-card__promo-current {
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.1;
+}
+
+.product-card__promo-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  padding: 6px;
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .product-card__actions {

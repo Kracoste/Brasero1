@@ -6,6 +6,7 @@ import { CustomizationSelector, type FacesCustomization } from '@/components/Cus
 import { AddToCartButton } from '@/components/AddToCartButton';
 import { Price } from '@/components/Price';
 import { useAnalytics } from '@/lib/analytics-context';
+import { useProductCoupon } from '@/lib/active-coupons-context';
 import type { Product, ProductVariant, ProductConfiguration, DiameterData } from '@/lib/schema';
 
 type Accessory = {
@@ -207,6 +208,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
   const isSelectionValid = hasConfigurations || isBaseProduct || matchedVariant !== null;
   // Prix : priorité diameterData > variant > produit de base
   const activePrice = activeDiameterData?.price ?? (matchedVariant ? matchedVariant.price : product.price);
+  const activeCoupon = useProductCoupon(product.slug, activePrice);
   const activePriceBrasero = activeDiameterData?.priceBrasero ?? matchedVariant?.priceBrasero ?? null;
   const activePricePlancha = activeDiameterData?.pricePlancha ?? matchedVariant?.pricePlancha ?? null;
   const showPriceBreakdown = activePriceBrasero !== null && activePricePlancha !== null && activePriceBrasero > 0 && activePricePlancha > 0;
@@ -371,7 +373,47 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
       <div className="space-y-3 sm:space-y-4">
         {!product.onDemand && (
           <div className="space-y-1">
-            <Price amount={activePrice + customizationSupplement} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
+            {(() => {
+              const finalPrice = activePrice + customizationSupplement;
+              // Priorité : coupon actif > promo directe sur le produit
+              const hasDirectDiscount = typeof product.discountPercent === "number" && product.discountPercent > 0;
+              const directOldPrice = product.comparePrice
+                ?? (hasDirectDiscount ? Math.round(activePrice / (1 - (product.discountPercent! / 100))) : undefined);
+
+              const isShippingOnlyCoupon = activeCoupon && activeCoupon.discountedPrice === finalPrice && !!activeCoupon.shippingLabel;
+              const couponNewPrice = (activeCoupon && !isShippingOnlyCoupon) ? activeCoupon.discountedPrice + customizationSupplement : null;
+              const promoOldPrice = (activeCoupon && !isShippingOnlyCoupon) ? finalPrice : (directOldPrice !== undefined ? directOldPrice + customizationSupplement : undefined);
+              const promoNewPrice = couponNewPrice ?? finalPrice;
+              const promoCodeLabel = activeCoupon?.code ?? product.promoCode;
+              const promoDiscountLabel = activeCoupon?.label;
+              const shippingLabel = activeCoupon?.shippingLabel;
+              const isPricePromo = (!!activeCoupon && !isShippingOnlyCoupon) || (hasDirectDiscount && directOldPrice !== undefined);
+              const isPromo = isPricePromo || !!shippingLabel;
+
+              if (!isPromo) {
+                return <Price amount={finalPrice} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />;
+              }
+              return (
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div className="flex flex-col gap-0.5">
+                    {isPricePromo && (
+                      <span className="text-base sm:text-lg font-medium text-red-600 line-through decoration-2">
+                        {(promoOldPrice ?? 0).toFixed(2).replace('.', ',')} € HT
+                      </span>
+                    )}
+                    <Price amount={promoNewPrice} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
+                    {shippingLabel && (
+                      <span className="text-sm font-medium text-green-700">{shippingLabel}</span>
+                    )}
+                  </div>
+                  {promoCodeLabel && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-700 whitespace-nowrap">
+                      Code {promoCodeLabel}{promoDiscountLabel ? ` ${promoDiscountLabel}` : (shippingLabel ? ` ${shippingLabel}` : '')}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
             {(activePrice + customizationSupplement) >= 500 && (
               <p className="text-sm font-medium text-[#8B4513]">
                 ou 3× {Math.ceil((activePrice + customizationSupplement) / 3)} € sans frais

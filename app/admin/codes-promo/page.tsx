@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 type Coupon = {
   id: string;
   code: string;
-  discount_type: 'percentage' | 'fixed';
+  discount_type: 'percentage' | 'fixed' | 'free_shipping' | 'shipping_discount' | 'shipping_percent';
   discount_value: number;
   min_purchase_amount: number | null;
   max_uses: number | null;
@@ -27,7 +27,7 @@ type ProductOption = {
 
 type CouponForm = {
   code: string;
-  discount_type: 'percentage' | 'fixed';
+  discount_type: 'percentage' | 'fixed' | 'free_shipping' | 'shipping_discount' | 'shipping_percent';
   discount_value: number;
   min_purchase_amount: number | null;
   max_uses: number | null;
@@ -133,7 +133,7 @@ export default function AdminCodesPromo() {
       showToast('Le code promo est obligatoire', 'error');
       return;
     }
-    if (form.discount_value <= 0) {
+    if (form.discount_type !== 'free_shipping' && form.discount_value <= 0) {
       showToast('La valeur de remise doit être supérieure à 0', 'error');
       return;
     }
@@ -228,6 +228,9 @@ export default function AdminCodesPromo() {
 
   const formatValue = (coupon: Coupon) => {
     if (coupon.discount_type === 'percentage') return `${coupon.discount_value}%`;
+    if (coupon.discount_type === 'free_shipping') return 'Livraison offerte';
+    if (coupon.discount_type === 'shipping_discount') return `-${coupon.discount_value} € livraison`;
+    if (coupon.discount_type === 'shipping_percent') return `-${coupon.discount_value}% livraison`;
     return `${coupon.discount_value} €`;
   };
 
@@ -306,30 +309,41 @@ export default function AdminCodesPromo() {
               <select
                 value={form.discount_type}
                 onChange={(e) =>
-                  setForm({ ...form, discount_type: e.target.value as 'percentage' | 'fixed' })
+                  setForm({ ...form, discount_type: e.target.value as CouponForm['discount_type'] })
                 }
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
               >
                 <option value="percentage">Pourcentage (%)</option>
                 <option value="fixed">Montant fixe (€)</option>
+                <option value="free_shipping">Livraison gratuite</option>
+                <option value="shipping_discount">Réduction sur livraison (€)</option>
+                <option value="shipping_percent">Réduction sur livraison (%)</option>
               </select>
             </div>
 
             {/* Valeur */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Valeur {form.discount_type === 'percentage' ? '(%)' : '(€)'} *
-              </label>
-              <input
-                type="number"
-                min="0"
-                step={form.discount_type === 'percentage' ? '1' : '0.01'}
-                value={form.discount_value || ''}
-                onChange={(e) => setForm({ ...form, discount_value: parseFloat(e.target.value) || 0 })}
-                placeholder="10"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
-              />
-            </div>
+            {form.discount_type !== 'free_shipping' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Valeur {form.discount_type === 'percentage' || form.discount_type === 'shipping_percent' ? '(%)' : '(€)'} *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step={form.discount_type === 'percentage' || form.discount_type === 'shipping_percent' ? '1' : '0.01'}
+                  value={form.discount_value || ''}
+                  onChange={(e) => setForm({ ...form, discount_value: parseFloat(e.target.value) || 0 })}
+                  placeholder={form.discount_type === 'shipping_discount' ? '40' : form.discount_type === 'shipping_percent' ? '50' : '10'}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                />
+                {form.discount_type === 'shipping_discount' && (
+                  <p className="text-xs text-slate-500 mt-1">Réduction appliquée sur les 80€ de livraison (ex: 40 → livraison à 40€)</p>
+                )}
+                {form.discount_type === 'shipping_percent' && (
+                  <p className="text-xs text-slate-500 mt-1">% de réduction sur les 80€ de livraison (ex: 50 → livraison à 40€)</p>
+                )}
+              </div>
+            )}
 
             {/* Min achat */}
             <div>
@@ -515,7 +529,11 @@ export default function AdminCodesPromo() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-slate-600">
-                      {coupon.discount_type === 'percentage' ? 'Pourcentage' : 'Fixe'}
+                      {coupon.discount_type === 'percentage' ? 'Pourcentage'
+                        : coupon.discount_type === 'fixed' ? 'Fixe'
+                        : coupon.discount_type === 'free_shipping' ? 'Livraison offerte'
+                        : coupon.discount_type === 'shipping_percent' ? 'Réduc. livraison %'
+                        : 'Réduc. livraison'}
                     </td>
                     <td className="py-3 px-4 font-medium text-slate-900">{formatValue(coupon)}</td>
                     <td className="py-3 px-4 text-slate-600">

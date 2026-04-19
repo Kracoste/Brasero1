@@ -340,6 +340,31 @@ async function handleCheckoutCompleted(
   result.order_id = order.id;
   steps.push("order_created");
 
+  // Enregistrer l'usage du coupon (seulement au paiement confirmé)
+  const couponCodeUsed = metadata.coupon_code || '';
+  if (couponCodeUsed) {
+    try {
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select('id, max_uses_per_user')
+        .eq('code', couponCodeUsed.toUpperCase())
+        .single();
+      if (coupon) {
+        const email = (session.customer_details?.email || metadata.customer_email || '').toLowerCase().trim();
+        await supabase.from('coupon_uses').insert({
+          coupon_id: coupon.id,
+          email,
+          stripe_session_id: session.id,
+        });
+        await supabase.rpc('increment_coupon_uses', { p_code: couponCodeUsed.toUpperCase() });
+        steps.push("coupon_recorded");
+        log("✅ Coupon enregistré:", couponCodeUsed);
+      }
+    } catch (couponErr) {
+      log("⚠️ Erreur enregistrement coupon (non bloquant):", couponErr);
+    }
+  }
+
   // Envoyer les emails
   const customerEmail = order.customer_email || session.customer_details?.email || "";
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { Container } from '@/components/Container';
 import { Section } from '@/components/Section';
@@ -8,9 +9,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Minus, Plus, Trash2, ShoppingBag, Shield, Truck, Lock, RotateCcw } from 'lucide-react';
 import { CartCrossSell } from '@/components/CartCrossSell';
+import { PromoCodeInput, type CouponData } from '@/components/PromoCodeInput';
 
 export default function PanierPage() {
   const { items, itemCount, totalPrice, loading, updateQuantity, removeItem, clearCart } = useCart();
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
 
   if (loading) {
     return (
@@ -158,19 +161,37 @@ export default function PanierPage() {
                 <h2 className="text-lg font-semibold text-slate-900">Résumé de la commande</h2>
 
                 <div className="space-y-2 border-t border-slate-200 pt-4">
+                  <PromoCodeInput
+                    cartTotal={totalPrice}
+                    onApply={(coupon) => setAppliedCoupon(coupon)}
+                    onRemove={() => setAppliedCoupon(null)}
+                  />
+                </div>
+
+                <div className="space-y-2 border-t border-slate-200 pt-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-600">Sous-total</span>
                     <Price amount={totalPrice} />
                   </div>
+                  {appliedCoupon && (
+                    <div className="flex justify-between text-sm text-green-600 font-medium">
+                      <span>Code {appliedCoupon.code}</span>
+                      <span>-{appliedCoupon.discount.toFixed(2).replace('.', ',')} €</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-600">Livraison France</span>
-                    <Price amount={80} />
+                    {appliedCoupon?.discountType === 'free_shipping' ? (
+                      <span className="text-green-600 font-medium">Offerte</span>
+                    ) : (
+                      <Price amount={(appliedCoupon?.discountType === 'shipping_discount' || appliedCoupon?.discountType === 'shipping_percent') ? 80 - (appliedCoupon.discount) : 80} />
+                    )}
                   </div>
                 </div>
 
                 <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold">
                   <span className="text-slate-900">Total estimé</span>
-                  <Price amount={totalPrice + 80} className="text-slate-900" />
+                  <Price amount={Math.max(0, totalPrice - (appliedCoupon?.discountType !== 'free_shipping' && appliedCoupon?.discountType !== 'shipping_discount' && appliedCoupon?.discountType !== 'shipping_percent' ? (appliedCoupon?.discount ?? 0) : 0)) + (appliedCoupon?.discountType === 'free_shipping' ? 0 : 80 - ((appliedCoupon?.discountType === 'shipping_discount' || appliedCoupon?.discountType === 'shipping_percent') ? (appliedCoupon?.discount ?? 0) : 0))} className="text-slate-900" />
                 </div>
 
                 {totalPrice >= 500 && (

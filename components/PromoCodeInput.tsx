@@ -46,7 +46,7 @@ export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCod
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || data.valid === false) {
         setStatus("error");
         setErrorMessage(data.error || "Code promo invalide");
         return;
@@ -54,9 +54,9 @@ export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCod
 
       const couponData: CouponData = {
         code: trimmed,
-        discount: data.discount,
+        discount: data.discount ?? 0,
         discountType: data.discountType,
-        discountValue: data.discountValue,
+        discountValue: data.discountValue ?? 0,
       };
 
       setAppliedCoupon(couponData);
@@ -79,6 +79,15 @@ export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCod
   const formatDiscount = (coupon: CouponData) => {
     if (coupon.discountType === "percentage") {
       return `-${coupon.discountValue}%`;
+    }
+    if (coupon.discountType === "free_shipping") {
+      return "Livraison offerte";
+    }
+    if (coupon.discountType === "shipping_discount") {
+      return `-${coupon.discountValue}€ livraison`;
+    }
+    if (coupon.discountType === "shipping_percent") {
+      return `-${coupon.discountValue}% livraison`;
     }
     return `-${coupon.discountValue}€`;
   };

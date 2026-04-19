@@ -103,15 +103,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculer la réduction
+    const SHIPPING_COST = 80; // € — doit rester aligné avec checkout
     let discount = 0;
     if (coupon.discount_type === 'percentage') {
       discount = (total * coupon.discount_value) / 100;
-    } else {
-      discount = coupon.discount_value;
+      discount = Math.min(discount, total);
+    } else if (coupon.discount_type === 'fixed') {
+      discount = Math.min(coupon.discount_value, total);
+    } else if (coupon.discount_type === 'free_shipping') {
+      discount = SHIPPING_COST;
+    } else if (coupon.discount_type === 'shipping_discount') {
+      discount = Math.min(coupon.discount_value, SHIPPING_COST);
+    } else if (coupon.discount_type === 'shipping_percent') {
+      discount = (SHIPPING_COST * coupon.discount_value) / 100;
+      discount = Math.min(discount, SHIPPING_COST);
     }
-
-    // Ne pas dépasser le total
-    discount = Math.min(discount, total);
 
     return NextResponse.json({
       valid: true,

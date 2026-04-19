@@ -9,6 +9,8 @@ import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
 import { JsonLd } from "@/components/JsonLd";
 import { getBlogPost, getRelatedBlogPosts } from "@/lib/data/blog";
+import { createClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   generateArticleSchema,
   generateBreadcrumbSchema,
@@ -77,6 +79,26 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   if (!post) notFound();
 
   const relatedPosts = await getRelatedBlogPosts(slug, post.category, 3);
+
+  const supabase = await createClient();
+  const { count: promoCount } = await supabase
+    .from("products")
+    .select("slug", { count: "exact", head: true })
+    .gt("discount_percent", 0);
+
+  let hasActiveCoupon = false;
+  const adminClient = getSupabaseAdminClient();
+  if (adminClient && (promoCount ?? 0) === 0) {
+    const now = new Date().toISOString();
+    const { count: couponCount } = await adminClient
+      .from("coupons")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true)
+      .in("discount_type", ["percentage", "fixed"])
+      .or(`expires_at.is.null,expires_at.gt.${now}`);
+    hasActiveCoupon = (couponCount ?? 0) > 0;
+  }
+  const hasPromotions = (promoCount ?? 0) > 0 || hasActiveCoupon;
 
   const articleSchema = generateArticleSchema(post);
   const breadcrumb = generateBreadcrumbSchema([
@@ -159,6 +181,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <p className="text-sm font-semibold text-slate-700 mb-3">Partager cet article</p>
             <ShareButtons slug={slug} title={post.title} />
           </div>
+
+          {/* CTA Promotions — visible uniquement si au moins un produit est en promo */}
+          {hasPromotions && (
+            <div className="mt-12 p-6 sm:p-8 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 text-center rounded-lg">
+              <span className="inline-block bg-red-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+                Offres en cours
+              </span>
+              <p className="text-lg sm:text-xl font-bold text-slate-900 mb-2">
+                Profitez de nos promotions
+              </p>
+              <p className="text-sm text-slate-600 mb-4">
+                Braseros et accessoires en réduction — quantités limitées.
+              </p>
+              <Link
+                href="/promotions"
+                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold tracking-wide uppercase px-6 py-3 rounded-md transition-all"
+              >
+                Voir nos promotions
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          )}
 
           {/* CTA : toujours vers la catégorie braséro pour laisser le client choisir */}
           <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">

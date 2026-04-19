@@ -35,30 +35,6 @@ type CheckoutBody = {
   couponCode?: string | null;
 };
 
-async function computeShippingHash(customerInfo: {
-  first_name: string;
-  last_name: string;
-  address: string;
-  postal_code: string;
-}): Promise<string | null> {
-  try {
-    const raw = [
-      customerInfo.first_name,
-      customerInfo.last_name,
-      customerInfo.address,
-      customerInfo.postal_code,
-    ]
-      .map((s) => (s || '').toLowerCase().replace(/\s+/g, '').trim())
-      .join('|');
-    const encoded = new TextEncoder().encode(raw);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-  } catch {
-    return null;
-  }
-}
 
 const parseQuantity = (value: unknown) => {
   const numeric = typeof value === 'number' ? value : Number(value);
@@ -261,9 +237,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Valider et appliquer le code promo côté serveur
+    // L'usage n'est comptabilisé qu'au paiement confirmé (webhook checkout.session.completed)
     let stripeCouponId: string | undefined;
     let couponCodeUsed: string | undefined;
-    let couponReservationPlaceholder: string | undefined;
+    const SHIPPING_COST_CENTS = 8000;
+    let shippingAmountCents = SHIPPING_COST_CENTS;
     if (couponCode && typeof couponCode === 'string') {
       const supabaseAdmin = getSupabaseAdminClient();
       if (supabaseAdmin) {
@@ -280,68 +258,72 @@ export async function POST(request: NextRequest) {
           const cartTotal = lineItems.reduce((sum, li) => sum + (li.price_data.unit_amount * li.quantity), 0) / 100;
           const belowMin = coupon.min_purchase_amount && cartTotal < coupon.min_purchase_amount;
 
+          // Vérification limite par utilisateur (email) — seulement les paiements confirmés
+          // coupon_uses ne contient que les usages confirmés (insérés par le webhook)
+          let alreadyUsedByUser = false;
+          if (coupon.max_uses_per_user && customerInfo.email) {
+            const { count } = await supabaseAdmin
+              .from('coupon_uses')
+              .select('*', { count: 'exact', head: true })
+              .eq('coupon_id', coupon.id)
+              .eq('email', customerInfo.email.toLowerCase().trim());
+            if (count !== null && count >= coupon.max_uses_per_user) {
+              alreadyUsedByUser = true;
+            }
+          }
+
           if (isExpired || isExhausted || belowMin) {
-            // Coupon invalide pour d'autres raisons, on l'ignore silencieusement
+            // Coupon invalide, ignoré silencieusement
+          } else if (alreadyUsedByUser) {
+            return NextResponse.json(
+              { error: 'Vous avez déjà utilisé ce code promo le nombre de fois autorisé.' },
+              { status: 400 }
+            );
           } else {
-            // Réservation atomique : vérification + incrément en une seule transaction Postgres
-            // Cela évite la race condition TOCTOU entre la lecture et l'incrément.
-            const shippingHash = await computeShippingHash(customerInfo);
-            const reservationPlaceholder = `pending-${crypto.randomUUID()}`;
-
-            const { data: reserved, error: reserveError } = await supabaseAdmin.rpc('try_reserve_coupon', {
-              p_code: coupon.code,
-              p_email: customerInfo.email?.toLowerCase().trim() || '',
-              p_shipping_hash: shippingHash || '',
-              p_ip: clientIP || '',
-              p_stripe_session_placeholder: reservationPlaceholder,
-            });
-
-            if (reserveError) {
-              console.error('[checkout] Erreur réservation coupon:', reserveError);
-              // Non bloquant : on continue sans coupon
-            } else if (!reserved) {
-              return NextResponse.json(
-                { error: 'Vous avez déjà utilisé ce code promo le nombre de fois autorisé.' },
-                { status: 400 }
-              );
-            } else {
-              // Réservation OK — créer le coupon Stripe
-              try {
+            // Appliquer la remise selon le type (sans incrémenter — le webhook le fera)
+            try {
+              if (coupon.discount_type === 'free_shipping') {
+                shippingAmountCents = 0;
+              } else if (coupon.discount_type === 'shipping_discount') {
+                const reductionCents = Math.round(coupon.discount_value * 100);
+                shippingAmountCents = Math.max(0, SHIPPING_COST_CENTS - reductionCents);
+              } else if (coupon.discount_type === 'shipping_percent') {
+                const reductionCents = Math.round((SHIPPING_COST_CENTS * coupon.discount_value) / 100);
+                shippingAmountCents = Math.max(0, SHIPPING_COST_CENTS - reductionCents);
+              } else {
                 const stripeCoupon = await stripe.coupons.create(
                   coupon.discount_type === 'percentage'
                     ? { percent_off: coupon.discount_value, duration: 'once' }
                     : { amount_off: Math.round(coupon.discount_value * 100), currency: 'eur', duration: 'once' }
                 );
                 stripeCouponId = stripeCoupon.id;
-                couponCodeUsed = coupon.code;
-                couponReservationPlaceholder = reservationPlaceholder;
-              } catch (stripeErr) {
-                // Annuler la réservation si la création du coupon Stripe échoue
-                await supabaseAdmin.rpc('cancel_coupon_reservation', {
-                  p_code: coupon.code,
-                  p_placeholder: reservationPlaceholder,
-                });
-                throw stripeErr;
               }
+              couponCodeUsed = coupon.code;
+            } catch (stripeErr) {
+              throw stripeErr;
             }
           }
         }
       }
     }
 
-    // Ajouter les frais de livraison
-    lineItems.push({
-      price_data: {
-        currency: 'eur',
-        product_data: {
-          name: 'Livraison — Transport Schenker',
-          images: [],
-          metadata: {},
+    // Ajouter les frais de livraison (ajustés si code promo livraison appliqué)
+    if (shippingAmountCents > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: shippingAmountCents < SHIPPING_COST_CENTS
+              ? 'Livraison — Transport Schenker (promo appliquée)'
+              : 'Livraison — Transport Schenker',
+            images: [],
+            metadata: {},
+          },
+          unit_amount: shippingAmountCents,
         },
-        unit_amount: 8000, // 80€ en centimes
-      },
-      quantity: 1,
-    });
+        quantity: 1,
+      });
+    }
 
     // Créer la session de checkout Stripe
     const session = await stripe.checkout.sessions.create({
@@ -370,18 +352,6 @@ export async function POST(request: NextRequest) {
       },
       locale: 'fr',
     });
-
-    // Mettre à jour le stripe_session_id réel dans coupon_uses (la réservation atomique
-    // a déjà incrémenté le compteur et inséré la ligne avec un placeholder)
-    if (couponCodeUsed && couponReservationPlaceholder) {
-      const adminClient = getSupabaseAdminClient();
-      if (adminClient) {
-        await adminClient.rpc('update_coupon_use_session', {
-          p_placeholder: couponReservationPlaceholder,
-          p_real_session_id: session.id,
-        });
-      }
-    }
 
     // Sauvegarder les customizations en DB (les metadata Stripe sont trop petites)
     const customizationItems = normalizedItems

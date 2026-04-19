@@ -155,13 +155,17 @@ function sanitizeCouponData(data: unknown): Record<string, unknown> | null {
   }
 
   // discount_type
-  if (input.discount_type === 'percentage' || input.discount_type === 'fixed') {
+  const validTypes = ['percentage', 'fixed', 'free_shipping', 'shipping_discount', 'shipping_percent'];
+  if (typeof input.discount_type === 'string' && validTypes.includes(input.discount_type)) {
     sanitized.discount_type = input.discount_type;
   }
 
-  // discount_value
-  if (typeof input.discount_value === 'number' && input.discount_value > 0 && input.discount_value <= 100000) {
+  // discount_value (0 autorisé pour free_shipping)
+  const isFreeShipping = input.discount_type === 'free_shipping';
+  if (typeof input.discount_value === 'number' && (isFreeShipping ? input.discount_value >= 0 : input.discount_value > 0) && input.discount_value <= 100000) {
     sanitized.discount_value = input.discount_value;
+  } else if (isFreeShipping) {
+    sanitized.discount_value = 0;
   }
 
   // min_purchase_amount

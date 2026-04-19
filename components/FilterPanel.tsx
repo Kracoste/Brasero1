@@ -115,7 +115,7 @@ export const FilterPanel = ({
       >
         Filtres
       </button>
-      {isOpen && <div className="w-full sm:w-72 space-y-8 pr-4">{content}</div>}
+      {isOpen && <div className="w-72 space-y-8 pr-4">{content}</div>}
     </div>
   );
 };

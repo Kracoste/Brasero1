@@ -7,6 +7,7 @@ import "@/styles/globals.css";
 
 import { getSiteSettings } from "@/lib/site-settings";
 import { SiteSettingsProvider } from "@/components/SiteSettingsProvider";
+import { ActiveCouponsProvider } from "@/lib/active-coupons-context";
 import { generateOrganizationSchema, generateWebSiteSchema } from "@/lib/seo/schemas";
 
 const geistSans = Geist({
@@ -123,9 +124,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }}
         />
         <SiteSettingsProvider value={settings}>
-          {children}
-          <Analytics />
-          <SpeedInsights />
+          <ActiveCouponsProvider>
+            {children}
+            <Analytics />
+            <SpeedInsights />
+          </ActiveCouponsProvider>
         </SiteSettingsProvider>
       </body>
     </html>

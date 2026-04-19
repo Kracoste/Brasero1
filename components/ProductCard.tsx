@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Star } from "lucide-react";
-import { useState, useRef, memo } from "react";
+import { Heart } from "lucide-react";
+import { useState } from "react";
 
 import { Price } from "@/components/Price";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
+import { useProductCoupon } from "@/lib/active-coupons-context";
 import type { Product } from "@/lib/schema";
 import { formatCurrency, type CardOverrides } from "@/lib/utils";
 import "@/styles/product-card.css";
@@ -17,21 +18,33 @@ type ProductCardProps = {
   className?: string;
   /** Overrides visuels calculés par les filtres (image/prix de la sous-fiche) */
   cardOverrides?: CardOverrides;
-  /** Statistiques d'avis client (moyenne + nombre) */
-  reviewStats?: { average: number; count: number } | null;
 };
 
-export const ProductCard = memo(function ProductCard({ product, className, cardOverrides, reviewStats }: ProductCardProps) {
+export const ProductCard = ({ product, className, cardOverrides }: ProductCardProps) => {
   const image = cardOverrides?.image ?? product.images[0];
   const { addItem } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
   const [adding, setAdding] = useState(false);
-  const addingRef = useRef(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const displayPrice = cardOverrides?.price ?? product.price;
   const displayName = cardOverrides?.name ?? product.name;
   const displayDescription = cardOverrides?.shortDescription ?? product.shortDescription;
-  const isPromo = typeof product.discountPercent === "number" && product.discountPercent > 0 && !!product.comparePrice;
+
+  // Coupon actif depuis la DB (ex: code LBF)
+  const activeCoupon = useProductCoupon(product.slug, displayPrice);
+
+  // Promo statique (discount_percent + comparePrice sur le produit)
+  const hasStaticPromo = typeof product.discountPercent === "number" && product.discountPercent > 0 && !!product.comparePrice;
+
+  // Priorité : coupon actif > promo statique
+  const isPromo = !!activeCoupon || hasStaticPromo;
+  const promoNewPrice = activeCoupon ? activeCoupon.discountedPrice : displayPrice;
+  const promoOldPrice = activeCoupon ? displayPrice : (product.comparePrice ?? displayPrice);
+  const promoCodeLabel = activeCoupon?.code;
+  const promoDiscountLabel = activeCoupon?.label;
+  const ribbonLabel = activeCoupon
+    ? `-${activeCoupon.discountPercent}%`
+    : hasStaticPromo ? `-${product.discountPercent}%` : null;
 
   const handleToggleFavorite = async () => {
     if (favoriteLoading) return;
@@ -51,24 +64,18 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
   };
 
   const handleAddToCart = async () => {
-    if (addingRef.current) return;
-    addingRef.current = true;
     setAdding(true);
     try {
       await addItem({
         slug: product.slug,
         name: product.name,
         price: product.price,
-        image: image?.src,
+        image: image.src,
       });
-      setTimeout(() => {
-        setAdding(false);
-        addingRef.current = false;
-      }, 900);
+      setTimeout(() => setAdding(false), 900);
     } catch (error) {
       console.error("Error adding to cart:", error);
       setAdding(false);
-      addingRef.current = false;
     }
   };
 
@@ -81,7 +88,7 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
               src={image.src}
               alt={image.alt || product.name}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              sizes="(max-width: 480px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
               placeholder={image.blurDataURL ? "blur" : "empty"}
               blurDataURL={image.blurDataURL}
               className="product-card__image-el"
@@ -95,19 +102,12 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
               Image non disponible
             </div>
           )}
-          {isPromo && (
-            <span className="product-card__promo-ribbon">-{product.discountPercent}%</span>
+          {ribbonLabel && (
+            <span className="product-card__promo-ribbon">{ribbonLabel}</span>
           )}
         </div>
         <div className="product-card__content">
           <span className="product-card__status">EN STOCK</span>
-          {reviewStats && reviewStats.count > 0 && (
-            <div className="product-card__rating" aria-label={`Note moyenne ${reviewStats.average} sur 5 — ${reviewStats.count} avis`}>
-              <Star size={14} className="fill-amber-400 stroke-amber-400" />
-              <span className="product-card__rating-value">{reviewStats.average.toFixed(1)}</span>
-              <span className="product-card__rating-count">({reviewStats.count})</span>
-            </div>
-          )}
           <div className="product-card__name-wrapper">
             <h3 className="product-card__name">{displayName}</h3>
             <button
@@ -127,21 +127,23 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
           <p className="product-card__description">{displayDescription}</p>
           {isPromo ? (
             <div className="product-card__promo-pricing">
-              <div className="product-card__promo-current">
-                <span>{formatCurrency(displayPrice)}</span>
-                <span className="product-card__promo-note">après remise</span>
+              <div className="product-card__promo-row">
+                <div className="product-card__promo-prices">
+                  <span className="product-card__promo-old">{formatCurrency(promoOldPrice)} HT</span>
+                  <div className="product-card__promo-current">
+                    {formatCurrency(promoNewPrice)}
+                    <span className="product-card__promo-note" style={{ fontSize: '0.55em', marginLeft: '4px' }}>HT</span>
+                  </div>
+                </div>
+                {promoCodeLabel && (
+                  <span className="product-card__promo-code">
+                    Code {promoCodeLabel}{promoDiscountLabel ? ` -${promoDiscountLabel}` : ''}
+                  </span>
+                )}
               </div>
-              <span className="product-card__promo-old">{formatCurrency(product.comparePrice!)} HT</span>
             </div>
           ) : !product.onDemand ? (
-            <>
-              <Price amount={displayPrice} className="product-card__price" tone="light" />
-              {displayPrice >= 500 && (
-                <span className="product-card__installment">
-                  ou 3× {formatCurrency(Math.ceil(displayPrice / 3))} sans frais
-                </span>
-              )}
-            </>
+            <Price amount={displayPrice} className="product-card__price" tone="light" showHT />
           ) : (
             <div className="product-card__price-placeholder" style={{ height: '2.5rem' }} />
           )}
@@ -175,4 +177,4 @@ export const ProductCard = memo(function ProductCard({ product, className, cardO
       </div>
     </article>
   );
-});
+};
