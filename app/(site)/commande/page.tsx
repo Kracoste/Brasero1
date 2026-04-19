@@ -12,6 +12,7 @@ import { Section } from '@/components/Section';
 import { Container } from '@/components/Container';
 import { Price } from '@/components/Price';
 import { PromoCodeInput, type CouponData } from '@/components/PromoCodeInput';
+import { AddressBook, type Address } from '@/components/AddressBook';
 import { createClient } from '@/lib/supabase/client';
 
 type CheckoutForm = {
@@ -107,7 +108,30 @@ export default function CheckoutPage() {
   const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const supabase = createClient();
+
+  const applyAddress = (a: Address) => {
+    setSelectedAddressId(a.id);
+    setCheckoutForm((prev) => ({
+      ...prev,
+      alias: a.label ?? prev.alias,
+      first_name: a.first_name,
+      last_name: a.last_name,
+      phone: a.phone ?? '',
+      address: a.address,
+      address_line2: a.address_line2 ?? '',
+      postal_code: a.postal_code,
+      city: a.city,
+      country: a.country,
+    }));
+  };
+
+  const handleAddressesLoaded = (list: Address[]) => {
+    if (selectedAddressId) return;
+    const def = list.find((a) => a.is_default) || list[0];
+    if (def) applyAddress(def);
+  };
 
   // Réinitialiser isProcessingPayment si l'utilisateur revient en arrière depuis Stripe
   useEffect(() => {
@@ -251,6 +275,11 @@ export default function CheckoutPage() {
   };
 
   const handleAddressContinue = () => {
+    if (!checkoutForm.address || !checkoutForm.postal_code || !checkoutForm.city) {
+      setFormError('Sélectionnez une adresse');
+      return;
+    }
+    setFormError(null);
     markSectionCompleted('address', 'delivery');
   };
 
@@ -599,122 +628,38 @@ export default function CheckoutPage() {
                 isActive={activeSection === 'address'}
                 onReopen={reopenSection}
               />
-              {activeSection === 'address' && (
-                <form className="mt-6 space-y-4" onSubmit={handleAddressContinue}>
-                  <label className="text-sm font-semibold text-slate-700">
-                    Alias (optionnel)
-                    <input
-                      type="text"
-                      className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                      value={checkoutForm.alias}
-                      onChange={handleInputChange('alias')}
-                    />
-                  </label>
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <label className="text-sm font-semibold text-slate-700">
-                      Prénom *
-                      <input
-                        type="text"
-                        autoComplete="given-name"
-                        className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                        value={checkoutForm.first_name}
-                        onChange={handleInputChange('first_name')}
-                        required
-                      />
-                    </label>
-                    <label className="text-sm font-semibold text-slate-700">
-                      Nom *
-                      <input
-                        type="text"
-                        autoComplete="family-name"
-                        className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                        value={checkoutForm.last_name}
-                        onChange={handleInputChange('last_name')}
-                        required
-                      />
-                    </label>
-                  </div>
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <label className="text-sm font-semibold text-slate-700">
-                      Adresse *
-                      <input
-                        type="text"
-                        autoComplete="street-address"
-                        className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                        value={checkoutForm.address}
-                        onChange={handleInputChange('address')}
-                        required
-                      />
-                    </label>
-                  </div>
-                  <label className="text-sm font-semibold text-slate-700">
-                    Complément d'adresse (optionnel)
-                    <input
-                      type="text"
-                      className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                      value={checkoutForm.address_line2}
-                      onChange={handleInputChange('address_line2')}
-                      placeholder="Bâtiment, étage..."
-                    />
-                  </label>
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <label className="text-sm font-semibold text-slate-700">
-                      Code postal *
-                      <input
-                        type="text"
-                        autoComplete="postal-code"
-                        inputMode="numeric"
-                        className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                        value={checkoutForm.postal_code}
-                        onChange={handleInputChange('postal_code')}
-                        required
-                      />
-                    </label>
-                  </div>
-                  <label className="text-sm font-semibold text-slate-700">
-                    Téléphone
-                    <input
-                      type="tel"
-                      autoComplete="tel"
-                      className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                      value={checkoutForm.phone}
-                      onChange={handleInputChange('phone')}
-                    />
-                  </label>
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <label className="text-sm font-semibold text-slate-700">
-                      Ville *
-                      <input
-                        type="text"
-                        autoComplete="address-level2"
-                        className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                        value={checkoutForm.city}
-                        onChange={handleInputChange('city')}
-                        required
-                      />
-                    </label>
-                    <label className="text-sm font-semibold text-slate-700">
-                      Pays
-                      <select
-                        className="mt-1 w-full rounded-none border border-slate-300 px-3 py-2 text-sm"
-                        value={checkoutForm.country}
-                        onChange={(event) =>
-                          setCheckoutForm((prev) => ({ ...prev, country: event.target.value }))
-                        }
-                      >
-                        <option value="France">France</option>
-                        <option value="Allemagne">Allemagne</option>
-                        <option value="Belgique">Belgique</option>
-                      </select>
-                    </label>
-                  </div>
+              {activeSection === 'address' ? (
+                <div className="mt-6 space-y-4">
+                  <p className="text-sm text-slate-600">
+                    Sélectionnez une adresse de livraison ou ajoutez-en une nouvelle.
+                  </p>
+                  <AddressBook
+                    selectable
+                    selectedId={selectedAddressId}
+                    onSelect={applyAddress}
+                    onChange={handleAddressesLoaded}
+                  />
                   <button
-                    type="submit"
-                    className="w-full rounded-none bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800"
+                    type="button"
+                    onClick={handleAddressContinue}
+                    disabled={!selectedAddressId}
+                    className="w-full rounded-none bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
                   >
                     Valider l’adresse
                   </button>
-                </form>
+                </div>
+              ) : (
+                completedSections.address && (
+                  <div className="mt-6 text-sm text-slate-700">
+                    <p className="font-semibold text-slate-900">
+                      {checkoutForm.first_name} {checkoutForm.last_name}
+                    </p>
+                    <p>{checkoutForm.address}</p>
+                    {checkoutForm.address_line2 && <p>{checkoutForm.address_line2}</p>}
+                    <p>{checkoutForm.postal_code} {checkoutForm.city}</p>
+                    <p>{checkoutForm.country}</p>
+                  </div>
+                )
               )}
             </div>
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { AUTH_ROUTES } from '@/lib/auth';
 import { isValidName, validatePassword, isValidEmail } from '@/lib/validation';
 import Link from 'next/link';
@@ -17,6 +16,12 @@ export default function InscriptionPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('France');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -66,24 +71,35 @@ export default function InscriptionPage() {
       return;
     }
 
+    if (!address.trim() || !postalCode.trim() || !city.trim()) {
+      setError('L\'adresse, le code postal et la ville sont obligatoires');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          client_type: clientType,
+          civilite,
+          prenom,
+          nom,
+          phone,
+          address,
+          address_line2: addressLine2,
+          postal_code: postalCode,
+          city,
+          country,
           emailRedirectTo: `${window.location.origin}${AUTH_ROUTES.callback}`,
-          data: {
-            client_type: clientType,
-            civilite: civilite,
-            prenom: prenom,
-            nom: nom,
-            full_name: `${prenom} ${nom}`,
-          },
-        },
+        }),
       });
 
-      if (error) throw error;
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Inscription échouée');
 
       setSuccess(true);
     } catch (error: any) {
@@ -266,6 +282,107 @@ export default function InscriptionPage() {
                 </button>
               </div>
               <p className="mt-1 text-xs text-slate-500">Au moins 5 caractères</p>
+            </div>
+
+            {/* Téléphone */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-semibold text-slate-800">
+                Téléphone
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                placeholder="06 12 34 56 78"
+              />
+            </div>
+
+            {/* Adresse */}
+            <div>
+              <label htmlFor="address" className="block text-sm font-semibold text-slate-800">
+                Adresse *
+              </label>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                autoComplete="street-address"
+                required
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                placeholder="12 rue de la République"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="address_line2" className="block text-sm font-semibold text-slate-800">
+                Complément (optionnel)
+              </label>
+              <input
+                id="address_line2"
+                name="address_line2"
+                type="text"
+                value={addressLine2}
+                onChange={(e) => setAddressLine2(e.target.value)}
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                placeholder="Bâtiment, étage..."
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <label htmlFor="postal_code" className="block text-sm font-semibold text-slate-800">
+                  Code postal *
+                </label>
+                <input
+                  id="postal_code"
+                  name="postal_code"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                  required
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="city" className="block text-sm font-semibold text-slate-800">
+                  Ville *
+                </label>
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  autoComplete="address-level2"
+                  required
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="country" className="block text-sm font-semibold text-slate-800">
+                Pays *
+              </label>
+              <select
+                id="country"
+                name="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-[#CD853F] focus:outline-none"
+              >
+                <option value="France">France</option>
+                <option value="Belgique">Belgique</option>
+                <option value="Allemagne">Allemagne</option>
+              </select>
             </div>
 
             {/* Confirmation mot de passe */}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Container } from '@/components/Container';
 import { Section } from '@/components/Section';
 import { ProfileForm } from '@/components/ProfileForm';
+import { AddressBook } from '@/components/AddressBook';
 import { useAuth } from '@/lib/auth-context';
 import { AUTH_ROUTES } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/client';
@@ -90,6 +91,16 @@ export default function MonComptePage() {
             <ProfileForm user={user} initialProfile={profile} />
           )}
         </div>
+
+        {user && (
+          <div className="mt-12">
+            <h2 className="font-display text-2xl font-semibold text-slate-900">Mes adresses</h2>
+            <p className="mt-1 text-sm text-slate-600">Gérez vos adresses de livraison</p>
+            <div className="mt-6">
+              <AddressBook />
+            </div>
+          </div>
+        )}
       </Container>
     </Section>
   );
