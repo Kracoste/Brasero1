@@ -18,6 +18,7 @@ type ProductCardProps = {
   className?: string;
   /** Overrides visuels calculés par les filtres (image/prix de la sous-fiche) */
   cardOverrides?: CardOverrides;
+  reviewStats?: { average: number; count: number } | null;
 };
 
 export const ProductCard = ({ product, className, cardOverrides }: ProductCardProps) => {
