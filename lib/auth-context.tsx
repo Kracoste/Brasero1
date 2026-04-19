@@ -89,11 +89,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Aussi déconnecter côté client
       await supabase.auth.signOut();
-      
+
+      // Nettoyer le panier local et le code promo avant le reload,
+      // pour éviter qu'ils ne ressurgissent au retour en visiteur.
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.removeItem('brasero:guest-cart');
+        window.sessionStorage.removeItem('brasero:applied-coupon');
+      }
+
       // Réinitialiser l'état
       setUser(null);
       setIsAdmin(false);
-      
+
       // Rediriger avec un rechargement complet pour nettoyer tout l'état
       window.location.href = AUTH_ROUTES.home;
     } catch (error) {

@@ -59,6 +59,7 @@ export async function POST(request: Request) {
           last_name: nom,
           phone: phone || null,
           address,
+          address_line2: address_line2 || null,
           postal_code,
           city,
           country,

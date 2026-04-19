@@ -8,6 +8,7 @@ const ALLOWED_PROFILE_FIELDS = [
   'last_name',
   'phone',
   'address',
+  'address_line2',
   'postal_code',
   'city',
   'country',
@@ -60,7 +61,7 @@ export async function GET() {
 
     const { data: profile, error } = await adminClient
       .from('profiles')
-      .select('id, email, first_name, last_name, phone, address, postal_code, city, country')
+      .select('id, email, first_name, last_name, phone, address, address_line2, postal_code, city, country')
       .eq('id', user.id)
       .single();
 
@@ -104,7 +105,7 @@ export async function PUT(request: Request) {
         updated_at: new Date().toISOString(),
         ...updates 
       })
-      .select('id, email, first_name, last_name, phone, address, postal_code, city, country')
+      .select('id, email, first_name, last_name, phone, address, address_line2, postal_code, city, country')
       .single();
 
     if (error) {
