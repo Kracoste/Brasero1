@@ -157,6 +157,7 @@ export default async function VariantPage({ params }: VariantPageProps) {
       <JsonLd data={faqSchema} />
       <Section className="pt-4 sm:pt-6 lg:pt-10">
         <Container className="max-w-6xl px-3 sm:px-4 lg:px-6">
+          <h1 className="sr-only">{variantName}</h1>
           <VariantConfiguratorWrapper
             product={product}
             reference={reference}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Sparkles } from 'lucide-react';
 
 type BlogPost = {
   id: string;
@@ -77,13 +77,22 @@ export default function AdminBlogPage() {
             {posts.length} article{posts.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Link
-          href="/admin/blog/nouveau"
-          className="inline-flex items-center gap-2 bg-[#8B4513] text-white px-4 py-2.5 rounded-lg hover:bg-[#6d3610] transition-colors text-sm font-medium"
-        >
-          <Plus size={16} />
-          Nouvel article
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/blog/generer"
+            className="inline-flex items-center gap-2 bg-white border border-[#8B4513] text-[#8B4513] px-4 py-2.5 rounded-lg hover:bg-[#f6f1e9] transition-colors text-sm font-medium"
+          >
+            <Sparkles size={16} />
+            Générer avec l&apos;IA
+          </Link>
+          <Link
+            href="/admin/blog/nouveau"
+            className="inline-flex items-center gap-2 bg-[#8B4513] text-white px-4 py-2.5 rounded-lg hover:bg-[#6d3610] transition-colors text-sm font-medium"
+          >
+            <Plus size={16} />
+            Nouvel article
+          </Link>
+        </div>
       </div>
 
       {loading ? (
