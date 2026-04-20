@@ -2,6 +2,10 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
 import { isAdminEmail } from '@/lib/auth'
 
+// En dev, Next.js utilise eval() pour le HMR/Fast Refresh : on autorise
+// 'unsafe-eval' uniquement dans ce contexte. En prod la CSP reste stricte.
+const devScriptSrc = process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : '';
+
 // Headers de sécurité HTTP
 const securityHeaders: Record<string, string> = {
   'X-Frame-Options': 'DENY',
@@ -11,7 +15,7 @@ const securityHeaders: Record<string, string> = {
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Content-Security-Policy': [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://*.googletagmanager.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://va.vercel-scripts.com",
+    `script-src 'self' 'unsafe-inline'${devScriptSrc} https://js.stripe.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://*.googletagmanager.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google-analytics.com https://analytics.google.com https://va.vercel-scripts.com`,
     "style-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com",
     "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://*.googletagmanager.com https://analytics.google.com",
     "font-src 'self' https://fonts.gstatic.com",

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useRef, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const isDev = process.env.NODE_ENV === 'development';
 function devWarn(msg: string, ...args: unknown[]) { if (isDev) console.warn(msg, ...args); }
@@ -78,7 +79,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
   const prevUserIdRef = useRef<string | null>(null);
-  const syncGuestCart = (updater: (items: CartItem[]) => CartItem[]) => {
+  const loadCartRef = useRef<((userId: string) => Promise<string | null>) | null>(null);
+  const syncGuestCart = (updater: (items: CartItem[]) => CartItem[], persist: boolean = true) => {
     setItems(prev => {
       const next = updater(prev);
       // Limiter le nombre d'items dans le panier
@@ -86,7 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         ...item,
         quantity: Math.min(item.quantity, MAX_QUANTITY_PER_ITEM)
       }));
-      persistGuestCart(limitedNext);
+      if (persist) persistGuestCart(limitedNext);
       return limitedNext;
     });
   };
@@ -94,6 +96,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addGuestItem = (
     product: { slug: string; name: string; price: number; image?: string; variantLabel?: string; customization?: CartItem['customization'] },
     quantity: number,
+    persist: boolean = true,
   ) => {
     syncGuestCart(prev => {
       // Vérifier si on a atteint la limite
@@ -127,7 +130,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         quantity: Math.min(quantity, MAX_QUANTITY_PER_ITEM),
       };
       return [...prev, newItem];
-    });
+    }, persist);
   };
 
   const updateGuestItem = (itemId: string, quantity: number) => {
@@ -148,11 +151,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Calculer le prix total
   const totalPrice = items.reduce((sum, item) => sum + item.product_price * item.quantity, 0);
 
-  // Charger immédiatement le panier local au montage
+  // Charger immédiatement le panier local au montage — uniquement pour les visiteurs.
+  // Pour un utilisateur connecté, c'est l'effet [user] qui chargera depuis la DB,
+  // sinon on risque d'afficher brièvement (et d'écraser) le panier DB.
+  // Important: ne pas mettre loading=false ici pour un user connecté, sinon
+  // la page panier peut afficher "panier vide" avant que loadCart ne termine.
   useEffect(() => {
-    const guestItems = readGuestCart();
-    setItems(guestItems);
-    setLoading(false);
+    if (!user) {
+      const guestItems = readGuestCart();
+      setItems(guestItems);
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync inter-onglets : si un autre onglet se déconnecte (Supabase écrit
+  // dans localStorage), on vide immédiatement le state local de cet onglet
+  // pour éviter d'afficher un panier qui n'appartient plus à personne.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onStorage = (e: StorageEvent) => {
+      // Supabase stocke la session sous une clé qui commence par 'sb-'.
+      // newValue null = la session a été supprimée (logout dans un autre onglet).
+      if (e.key && e.key.startsWith('sb-') && e.newValue === null) {
+        persistGuestCart([]);
+        setItems([]);
+        setCartId(null);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  // Écoute directe des events Supabase — garde-fou si le state `user` de
+  // useAuth prend du retard. SIGNED_IN => recharger le panier DB.
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session | null) => {
+        if (event === 'SIGNED_IN' && session?.user?.id && loadCartRef.current) {
+          loadCartRef.current(session.user.id).finally(() => setLoading(false));
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Synchroniser avec Supabase quand l'utilisateur change (via useAuth)
@@ -173,27 +215,76 @@ export function CartProvider({ children }: { children: ReactNode }) {
         try {
           const cartFromDb = await loadCart(currentUserId);
           if (cancelled) return;
-          // Si l'utilisateur a des items guest, les migrer vers la DB en batch
+          // Si l'utilisateur a des items guest, les migrer vers la DB
+          // en dédoublonnant par (slug + variant) contre le panier DB existant.
           if (guestItems.length > 0 && cartFromDb) {
-            const { error: insertError } = await supabase.from('cart_items').insert(
-              guestItems.map(item => ({
-                cart_id: cartFromDb,
-                product_slug: item.product_slug,
-                product_name: item.product_name,
-                product_price: item.product_price,
-                product_image: item.product_image,
-                quantity: item.quantity,
-              }))
-            );
+            const { data: existingDbItems, error: fetchError } = await supabase
+              .from('cart_items')
+              .select('id, product_slug, variant_label, quantity')
+              .eq('cart_id', cartFromDb);
             if (cancelled) return;
-            // Ne vider le panier guest QUE si la migration a réussi
-            if (!insertError) {
+            if (fetchError) {
+              devWarn('Error fetching existing cart for merge:', fetchError);
+              return;
+            }
+
+            const keyOf = (slug: string, variant?: string | null) =>
+              variant ? `${slug}::${variant}` : slug;
+            const existingByKey = new Map<string, { id: string; quantity: number }>();
+            (existingDbItems || []).forEach((row: { id: string; product_slug: string; variant_label: string | null; quantity: number }) => {
+              existingByKey.set(keyOf(row.product_slug, row.variant_label), {
+                id: row.id,
+                quantity: row.quantity,
+              });
+            });
+
+            const toInsert: Array<Record<string, unknown>> = [];
+            const toUpdate: Array<{ id: string; quantity: number }> = [];
+            for (const item of guestItems) {
+              const key = keyOf(item.product_slug, item.variant_label);
+              const existing = existingByKey.get(key);
+              if (existing) {
+                toUpdate.push({
+                  id: existing.id,
+                  quantity: Math.min(existing.quantity + item.quantity, MAX_QUANTITY_PER_ITEM),
+                });
+              } else {
+                toInsert.push({
+                  cart_id: cartFromDb,
+                  product_slug: item.product_slug,
+                  product_name: item.product_name,
+                  product_price: item.product_price,
+                  product_image: item.product_image,
+                  variant_label: item.variant_label || null,
+                  customization: item.customization ?? null,
+                  quantity: item.quantity,
+                });
+              }
+            }
+
+            let mergeOk = true;
+            if (toInsert.length > 0) {
+              const { error: insertError } = await supabase.from('cart_items').insert(toInsert);
+              if (insertError) { mergeOk = false; devWarn('Insert merge error:', insertError); }
+            }
+            if (cancelled) return;
+            for (const u of toUpdate) {
+              const { error: updError } = await supabase
+                .from('cart_items')
+                .update({ quantity: u.quantity })
+                .eq('id', u.id);
+              if (updError) { mergeOk = false; devWarn('Update merge error:', updError); break; }
+              if (cancelled) return;
+            }
+            if (!cancelled && mergeOk) {
               persistGuestCart([]);
               await loadCart(currentUserId);
             }
           }
         } catch (error) {
           if (!cancelled) devWarn('Error syncing cart:', error);
+        } finally {
+          if (!cancelled) setLoading(false);
         }
       };
       syncCart();
@@ -202,10 +293,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       persistGuestCart([]);
       setItems([]);
       setCartId(null);
+      setLoading(false);
     } else {
       // Pas connecté au départ — charger le panier local existant
       setItems(readGuestCart());
       setCartId(null);
+      setLoading(false);
     }
 
     return () => {
@@ -250,7 +343,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Charger les articles du panier
       const { data: cartItems, error: itemsError } = await supabase
         .from('cart_items')
-        .select('id, product_slug, product_name, product_price, product_image, variant_label, quantity')
+        .select('id, product_slug, product_name, product_price, product_image, variant_label, quantity, customization')
         .eq('cart_id', cart.id);
 
       if (itemsError) throw itemsError;
@@ -263,6 +356,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [supabase]);
 
+  // Exposer loadCart via ref pour le listener onAuthStateChange plus haut
+  loadCartRef.current = loadCart;
+
   // Ajouter un article au panier
   const addItem = useCallback(async (
     product: { slug: string; name: string; price: number; image?: string; variantLabel?: string; customization?: CartItem['customization'] },
@@ -274,22 +370,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Chemin connecté : optimistic update local + sync DB
-    addGuestItem(product, quantity);
+    // Chemin connecté : optimistic update local (sans écrire en sessionStorage) + sync DB
+    addGuestItem(product, quantity, false);
 
     const ensuredCartId = cartId ?? (await loadCart(user.id));
     if (ensuredCartId) {
       try {
-        const itemKey = product.variantLabel
-          ? `${product.slug}::${product.variantLabel}`
-          : product.slug;
-        const existingItem = items.find(
-          item => !isGuestItem(item) &&
-            `${item.product_slug}${item.variant_label ? `::${item.variant_label}` : ''}` === itemKey
-        );
+        // Source de vérité: la DB, pas le state local (qui peut être stale après l'optimistic update).
+        // Avec customization, on insère toujours une nouvelle ligne (chaque perso est unique).
+        const variantLabel = product.variantLabel || null;
+        let existingItem: { id: string; quantity: number } | null = null;
+        if (!product.customization) {
+          const query = supabase
+            .from('cart_items')
+            .select('id, quantity')
+            .eq('cart_id', ensuredCartId)
+            .eq('product_slug', product.slug)
+            .is('customization', null);
+          const { data: existingRows } = variantLabel
+            ? await query.eq('variant_label', variantLabel)
+            : await query.is('variant_label', null);
+          existingItem = (existingRows && existingRows[0]) || null;
+        }
 
         if (existingItem) {
-          const newQuantity = existingItem.quantity + quantity;
+          const newQuantity = Math.min(existingItem.quantity + quantity, MAX_QUANTITY_PER_ITEM);
           await supabase
             .from('cart_items')
             .update({ quantity: newQuantity })
@@ -303,6 +408,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
               product_name: product.name,
               product_price: product.price,
               product_image: product.image || null,
+              variant_label: product.variantLabel || null,
+              customization: product.customization ?? null,
               quantity,
             });
         }
@@ -312,7 +419,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         devWarn('Error syncing item to DB:', error);
       }
     }
-  }, [user, cartId, items, loadCart, supabase]);
+  }, [user, cartId, loadCart, supabase]);
 
   // Mettre à jour la quantité d'un article
   const updateQuantity = useCallback(async (itemId: string, quantity: number) => {
