@@ -106,6 +106,51 @@ export function generateVideoSchema(input: VideoSchemaInput) {
   };
 }
 
+// ── Recipe (résultats enrichis Google : image + temps + étoiles) ───────────
+
+type RecipeSchemaInput = {
+  name: string;
+  description: string;
+  slug: string;
+  image?: string;
+  datePublished: string;
+  prepTimeMinutes: number;
+  cookTimeMinutes: number;
+  servings: number;
+  category: string;
+  ingredients: string[]; // lignes formatées "200g de bœuf"
+  instructions: string[];
+  keywords?: string[];
+  author?: string;
+};
+
+export function generateRecipeSchema(input: RecipeSchemaInput) {
+  const totalMinutes = input.prepTimeMinutes + input.cookTimeMinutes;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    name: input.name,
+    description: input.description,
+    image: input.image ? (input.image.startsWith("http") ? input.image : `${BASE_URL}${input.image}`) : undefined,
+    url: `${BASE_URL}/recettes/${input.slug}`,
+    datePublished: input.datePublished,
+    author: { "@type": "Organization", name: input.author || "Atelier LBF" },
+    prepTime: `PT${input.prepTimeMinutes}M`,
+    cookTime: `PT${input.cookTimeMinutes}M`,
+    totalTime: `PT${totalMinutes}M`,
+    recipeCategory: input.category,
+    recipeCuisine: "Française",
+    recipeYield: `${input.servings} personnes`,
+    recipeIngredient: input.ingredients,
+    recipeInstructions: input.instructions.map((text, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      text,
+    })),
+    keywords: input.keywords?.join(", "),
+  };
+}
+
 // ── WebSite (pour la sitelinks search box Google) ──────────────────────────
 
 export function generateWebSiteSchema(settings: SiteSettings) {

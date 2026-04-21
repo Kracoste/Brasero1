@@ -166,6 +166,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
+  // Recettes publiées
+  const { data: recipes } = await supabase
+    .from('recipes')
+    .select('slug, published_at, updated_at')
+    .eq('is_published', true)
+    .order('published_at', { ascending: false });
+
+  const recipeUrls: MetadataRoute.Sitemap = (recipes || []).map((recipe) => ({
+    url: `${baseUrl}/recettes/${recipe.slug}`,
+    lastModified: recipe.updated_at ? new Date(recipe.updated_at) : new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
   // SEO-21 : Récupérer les variantes /brasero-plancha/[variantSlug]
   const { data: productsWithConfigs } = await supabase
     .from('products')
@@ -187,5 +201,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticPages, ...infoPages, ...productUrls, ...blogUrls, ...braseroPlancha];
+  return [...staticPages, ...infoPages, ...productUrls, ...blogUrls, ...recipeUrls, ...braseroPlancha];
 }
