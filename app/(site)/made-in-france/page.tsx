@@ -502,7 +502,7 @@ export default async function MadeInFrancePage() {
               Nos braseros français
             </Link>
             <Link
-              href="/info/contact"
+              href="/contact"
               className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               Nous contacter

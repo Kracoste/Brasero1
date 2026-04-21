@@ -139,7 +139,7 @@ export default async function ServiceClientelePage() {
       icon: MessageCircle,
       title: "Formulaire de contact",
       value: "Écrivez-nous",
-      href: "/info/contact",
+      href: "/contact",
       description: "Pour toute demande détaillée"
     }
   ];
@@ -219,7 +219,7 @@ export default async function ServiceClientelePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
-                href="/info/contact"
+                href="/contact"
                 className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
               >
                 <MessageCircle size={18} />
@@ -445,7 +445,7 @@ export default async function ServiceClientelePage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href="/info/contact"
+              href="/contact"
               className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
             >
               <MessageCircle size={18} />

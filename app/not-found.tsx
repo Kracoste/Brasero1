@@ -36,7 +36,7 @@ export default function NotFound() {
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-slate-500">
           <Link href="/blog" className="hover:text-[#8B4513] transition-colors">Blog</Link>
           <span>·</span>
-          <Link href="/info/contact" className="hover:text-[#8B4513] transition-colors">Contact</Link>
+          <Link href="/contact" className="hover:text-[#8B4513] transition-colors">Contact</Link>
           <span>·</span>
           <Link href="/info/faq" className="hover:text-[#8B4513] transition-colors">FAQ</Link>
         </div>

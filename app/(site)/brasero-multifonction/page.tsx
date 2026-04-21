@@ -202,7 +202,7 @@ export default async function BraseroMultifonctionPage() {
                 <ArrowRight size={18} />
               </Link>
               <Link
-                href="/info/contact"
+                href="/contact"
                 className="inline-flex items-center gap-2 bg-[#1a1a1a] hover:bg-slate-800 text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
               >
                 Demander un devis

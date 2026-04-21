@@ -12,7 +12,7 @@ const serviceLinks = [
   { href: "/info/expedition", label: "Expédition" },
   { href: "/info/retourner", label: "Retourner" },
   { href: "/info/confidentialite-politique", label: "Confidentialité & Politique" },
-  { href: "/info/contact", label: "Contact" },
+  { href: "/contact", label: "Contact" },
   { href: "/info/faq", label: "Questions fréquemment posées" },
 ];
 
