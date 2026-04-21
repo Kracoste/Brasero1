@@ -73,6 +73,39 @@ export function generateOrganizationSchema(settings: SiteSettings) {
   };
 }
 
+// ── VideoObject (pour l'indexation vidéo Google) ───────────────────────────
+
+type VideoSchemaInput = {
+  name: string;
+  description: string;
+  contentUrl: string;
+  thumbnailUrl: string;
+  uploadDate: string; // ISO 8601: YYYY-MM-DD
+  durationSeconds: number;
+};
+
+/**
+ * Génère un JSON-LD VideoObject conforme aux recommandations Google.
+ * Utilisation : <JsonLd data={generateVideoSchema({ ... })} />
+ * Pour que la vidéo soit indexée, contentUrl et thumbnailUrl doivent être publiques.
+ */
+export function generateVideoSchema(input: VideoSchemaInput) {
+  const mins = Math.floor(input.durationSeconds / 60);
+  const secs = input.durationSeconds % 60;
+  const duration = `PT${mins}M${secs}S`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: input.name,
+    description: input.description,
+    contentUrl: input.contentUrl.startsWith("http") ? input.contentUrl : `${BASE_URL}${input.contentUrl}`,
+    thumbnailUrl: input.thumbnailUrl.startsWith("http") ? input.thumbnailUrl : `${BASE_URL}${input.thumbnailUrl}`,
+    uploadDate: input.uploadDate,
+    duration,
+  };
+}
+
 // ── WebSite (pour la sitelinks search box Google) ──────────────────────────
 
 export function generateWebSiteSchema(settings: SiteSettings) {

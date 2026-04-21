@@ -113,6 +113,18 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* VideoObject pour la vidéo hero : améliore le référencement dans l'onglet Vidéos Google */}
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        "name": "Braseros artisanaux Atelier LBF — fabrication française",
+        "description": "Découvrez les braseros-planchas Atelier LBF : fabrication artisanale en France, acier corten et acier peint, cuisson au feu de bois. Modèles L'Obélix, Le Coffy, Le Morris, Le Fermier.",
+        "contentUrl": "https://www.atelier-lbf.fr/acceuil/video_brasero_hero.mp4",
+        "thumbnailUrl": "https://www.atelier-lbf.fr/acceuil/video_brasero_poster.webp",
+        "uploadDate": "2025-06-01",
+        "duration": "PT0M20S",
+      }} />
+
       <section className="py-4 sm:py-6 lg:py-10 overflow-hidden">
         <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 xl:px-16">
           {/* Layout simple et fiable */}
