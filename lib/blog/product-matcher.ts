@@ -1,4 +1,27 @@
+import { createClient as createSupabaseJsClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+
+let publicReadClient: SupabaseClient | null = null;
+function getPublicReadClient(): SupabaseClient {
+  if (publicReadClient) return publicReadClient;
+  publicReadClient = createSupabaseJsClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { fetch: (url, options) => fetch(url, { ...options, cache: "no-store" }) },
+    },
+  );
+  return publicReadClient;
+}
+
+async function getReadClient() {
+  try {
+    return await createClient();
+  } catch {
+    return getPublicReadClient();
+  }
+}
 
 /**
  * Matche un article de blog avec le brasero le plus pertinent.
@@ -168,7 +191,7 @@ export function pickModelForArticle(input: {
  * Les slugs DB peuvent varier (le-fermier, l-obelix, etc.), on fait un ILIKE.
  */
 export async function resolveProductSlug(model: ModelKey): Promise<string | null> {
-  const supabase = await createClient();
+  const supabase = await getReadClient();
   const patterns: Record<ModelKey, string> = {
     coffy: "%coffy%",
     fermier: "%fermier%",

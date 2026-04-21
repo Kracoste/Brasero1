@@ -1,4 +1,29 @@
+import { createClient as createSupabaseJsClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
+
+// Client sans cookies pour les lectures publiques appelées depuis
+// generateStaticParams / generateMetadata (pas de request scope à la build).
+let publicReadClient: SupabaseClient | null = null;
+function getPublicReadClient(): SupabaseClient {
+  if (publicReadClient) return publicReadClient;
+  publicReadClient = createSupabaseJsClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }) },
+    },
+  );
+  return publicReadClient;
+}
+
+async function getReadClient() {
+  try {
+    return await createClient();
+  } catch {
+    return getPublicReadClient();
+  }
+}
 
 export type Ingredient = {
   quantity: string;
@@ -50,7 +75,7 @@ const RECIPE_COLUMNS =
   'id, slug, title, meta_title, meta_description, category, excerpt, description, ingredients, instructions, tips, prep_time_minutes, cook_time_minutes, servings, difficulty, featured_image, related_product_slug, tags, keywords, is_published, published_at, author, created_at, updated_at';
 
 export async function getAllPublishedRecipes(): Promise<Recipe[]> {
-  const supabase = await createClient();
+  const supabase = await getReadClient();
   const { data } = await supabase
     .from('recipes')
     .select(RECIPE_COLUMNS)
@@ -60,7 +85,7 @@ export async function getAllPublishedRecipes(): Promise<Recipe[]> {
 }
 
 export async function getRecipe(slug: string): Promise<Recipe | null> {
-  const supabase = await createClient();
+  const supabase = await getReadClient();
   const { data } = await supabase
     .from('recipes')
     .select(RECIPE_COLUMNS)
@@ -71,7 +96,7 @@ export async function getRecipe(slug: string): Promise<Recipe | null> {
 }
 
 export async function getRecipesByCategory(category: string): Promise<Recipe[]> {
-  const supabase = await createClient();
+  const supabase = await getReadClient();
   const { data } = await supabase
     .from('recipes')
     .select(RECIPE_COLUMNS)
