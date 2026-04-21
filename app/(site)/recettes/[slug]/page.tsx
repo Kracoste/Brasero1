@@ -10,6 +10,7 @@ import { Section } from "@/components/Section";
 import { generateBreadcrumbSchema, generateRecipeSchema } from "@/lib/seo/schemas";
 import { getRecipe, getAllPublishedRecipes, RECIPE_CATEGORIES } from "@/lib/data/recipes";
 import { getProduct } from "@/lib/data/products";
+import { pickProductSlugForRecipe } from "@/lib/blog/product-matcher";
 
 export const revalidate = 120;
 export const dynamicParams = true;
@@ -66,8 +67,18 @@ export default async function RecipePage({ params }: RecipePageProps) {
   const totalTime = recipe.prep_time_minutes + recipe.cook_time_minutes;
   const categoryLabel = RECIPE_CATEGORIES.find((c) => c.slug === recipe.category)?.label || recipe.category;
 
-  // Produit recommandé (chargé en parallèle)
-  const relatedProduct = recipe.related_product_slug ? await getProduct(recipe.related_product_slug) : null;
+  // Produit recommandé : slug manuel si défini, sinon matcher auto selon le contenu
+  const recommendedSlug =
+    recipe.related_product_slug ||
+    (await pickProductSlugForRecipe({
+      slug: recipe.slug,
+      title: recipe.title,
+      description: recipe.description || recipe.excerpt || "",
+      ingredients: recipe.ingredients.map((i) => i.name).filter(Boolean),
+      instructions: recipe.instructions.map((i) => i.text).filter(Boolean),
+      category: recipe.category,
+    }));
+  const relatedProduct = recommendedSlug ? await getProduct(recommendedSlug) : null;
 
   // Schemas
   const breadcrumb = generateBreadcrumbSchema([

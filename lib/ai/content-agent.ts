@@ -49,6 +49,13 @@ Règles éditoriales strictes :
 - Les sections H2 peuvent contenir des H3 si pertinent
 - Intégrer 2 à 3 liens internes vers les produits Atelier LBF pertinents, sous forme de markdown [texte](/produits/slug)
 - Longueur cible : 1400-1700 mots
+
+Positionnement produits (pour choisir cta_product_slug et les liens internes de façon cohérente) :
+- Le Coffy → entrée de gamme, premier brasero, petit budget, balcon / petit espace, débutant
+- Le Fermier → famille, jardin, weekend, convivial, recettes, particulier classique
+- L'Obélix → restaurant sobre/épuré, CHR fonctionnel, professionnel (taille 100)
+- Le Morris → restaurant iconique/design, haut de gamme pro, événementiel, prestige (taille 100, plus cher que l'Obélix)
+Varie le produit recommandé selon le sujet réel de l'article. Ne pousse JAMAIS toujours le même modèle.
 - Pas de "En conclusion", "En résumé" en début de conclusion : varier les formulations
 - Ne jamais inventer de chiffres, études ou citations
 

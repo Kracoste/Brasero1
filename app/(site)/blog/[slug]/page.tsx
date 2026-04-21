@@ -16,6 +16,9 @@ import {
   generateBreadcrumbSchema,
 } from "@/lib/seo/schemas";
 import { renderMarkdownContent } from "@/components/MarkdownRenderer";
+import { BlogProductRecommendation } from "@/components/BlogProductRecommendation";
+import { BlogNewsletterInline } from "@/components/BlogNewsletterInline";
+import { pickProductSlugForArticle } from "@/lib/blog/product-matcher";
 
 export const revalidate = 60;
 
@@ -100,6 +103,30 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
   const hasPromotions = (promoCount ?? 0) > 0 || hasActiveCoupon;
 
+  // Split le contenu au milieu (sur une frontière H2) pour insérer un bloc newsletter
+  const lines = post.content.split("\n");
+  const h2Indexes = lines
+    .map((l, i) => (l.startsWith("## ") ? i : -1))
+    .filter((i) => i > 0);
+  let splitIndex = -1;
+  if (h2Indexes.length >= 2) {
+    const middleLine = lines.length / 2;
+    splitIndex = h2Indexes.reduce((best, i) =>
+      Math.abs(i - middleLine) < Math.abs(best - middleLine) ? i : best,
+    h2Indexes[0]);
+  }
+  const firstHalf = splitIndex > 0 ? lines.slice(0, splitIndex).join("\n") : post.content;
+  const secondHalf = splitIndex > 0 ? lines.slice(splitIndex).join("\n") : "";
+
+  const recommendedProductSlug =
+    post.cta_product_slug ||
+    (await pickProductSlugForArticle({
+      slug: post.slug,
+      title: post.title,
+      content: post.content,
+      category: post.category,
+    }));
+
   const articleSchema = generateArticleSchema(post);
   const breadcrumb = generateBreadcrumbSchema([
     { name: "Accueil", url: "/" },
@@ -173,8 +200,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Content */}
           <article className="prose-slate max-w-none">
-            {renderMarkdownContent(post.content)}
+            {renderMarkdownContent(firstHalf)}
+            {secondHalf && <BlogNewsletterInline />}
+            {secondHalf && renderMarkdownContent(secondHalf)}
           </article>
+
+          {/* Produit recommandé contextuel : slug manuel si défini, sinon matching auto */}
+          {recommendedProductSlug && (
+            <BlogProductRecommendation
+              productSlug={recommendedProductSlug}
+              ctaText={post.cta_text}
+            />
+          )}
 
           {/* Boutons de partage */}
           <div className="mt-10 pt-6 border-t border-slate-200">
@@ -218,22 +255,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             >
               Découvrir nos braseros
               <ArrowRight size={16} />
-            </Link>
-          </div>
-
-          {/* Newsletter CTA */}
-          <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
-              Recevez nos conseils brasero & plancha
-            </h3>
-            <p className="text-sm text-slate-600 mb-4">
-              Guides, recettes et offres exclusives directement dans votre boîte mail.
-            </p>
-            <Link
-              href="/info/bulletin-information"
-              className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-medium tracking-wide uppercase px-6 py-3 transition-all text-sm"
-            >
-              S&apos;inscrire à la newsletter
             </Link>
           </div>
 
