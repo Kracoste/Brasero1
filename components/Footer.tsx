@@ -33,6 +33,7 @@ const aboutLinks = [
 const categoryLinks = [
   { href: "/produits?category=brasero", label: "Braseros extérieurs" },
   { href: "/produits?category=fendeur", label: "Fendeurs à bûches" },
+  { href: "/produits?category=range-buches", label: "Range-bûches" },
   { href: "/accessoires", label: "Accessoires" },
   { href: "/produits?category=promotions", label: "Promotions" },
 ];
