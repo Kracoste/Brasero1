@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Sparkles, FileText } from 'lucide-react';
 
 type BlogPost = {
   id: string;
@@ -13,6 +14,7 @@ type BlogPost = {
   published_at: string | null;
   read_time: number;
   created_at: string;
+  featured_image: { src: string; alt: string } | null;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -127,15 +129,28 @@ export default function AdminBlogPage() {
               {posts.map((post) => (
                 <tr key={post.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/blog/${post.id}`}
-                      className="font-medium text-slate-900 hover:text-[#8B4513]"
-                    >
-                      {post.title}
-                    </Link>
-                    <span className="block text-xs text-slate-400 mt-0.5">
-                      /blog/{post.slug}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      {post.featured_image?.src ? (
+                        <div className="relative w-12 h-12 rounded overflow-hidden bg-slate-100 flex-shrink-0">
+                          <Image src={post.featured_image.src} alt={post.featured_image.alt || post.title} fill className="object-cover" sizes="48px" />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded bg-slate-100 flex items-center justify-center flex-shrink-0">
+                          <FileText size={20} className="text-slate-400" />
+                        </div>
+                      )}
+                      <div>
+                        <Link
+                          href={`/admin/blog/${post.id}`}
+                          className="font-medium text-slate-900 hover:text-[#8B4513]"
+                        >
+                          {post.title}
+                        </Link>
+                        <span className="block text-xs text-slate-400 mt-0.5">
+                          /blog/{post.slug}
+                        </span>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span className="text-xs bg-[#f6f1e9] text-[#8B4513] px-2 py-1 rounded">
