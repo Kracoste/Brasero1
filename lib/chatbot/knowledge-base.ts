@@ -20,7 +20,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   {
     keywords: ['livraison', 'livrer', 'délai', 'expédition', 'envoi', 'recevoir', 'combien de temps', 'quand', 'expedition'],
     question: 'Quels sont les délais de livraison ?',
-    answer: 'Nos braseros sont fabriqués artisanalement à la commande. Le délai de fabrication est de **2 à 4 semaines**. La livraison est ensuite assurée par transporteur spécialisé sous **3 à 5 jours ouvrés**. Vous recevrez un email de suivi dès l\'expédition.',
+    answer: 'Nos braseros sont fabriqués artisanalement à la commande. Comptez **2 à 4 semaines** au total (fabrication et livraison incluses) pour la France métropolitaine, et **3 à 5 semaines** pour la Belgique, le Luxembourg, la Suisse et l\'Allemagne. Vous recevrez un email de suivi dès l\'expédition.',
     category: 'livraison',
   },
   {

@@ -146,7 +146,7 @@ function faqObelix(product: Product): Array<{ question: string; answer: string }
     },
     {
       question: `L'Obélix ${diameter}cm est-il livré monté ?`,
-      answer: `Oui, L'Obélix ${diameter}cm est livré entièrement assemblé, prêt à l'utilisation dès déballage. Plancha et grille de cuisson sont incluses. L'emballage est sur mesure : carton double cannelure renforcé et mousse haute densité pour absorber les chocs du transport. Nous livrons partout en France métropolitaine sous 5 à 10 jours ouvrés. Le prix de livraison est inclus dans le prix affiché de ${price} €.`,
+      answer: `Oui, L'Obélix ${diameter}cm est livré entièrement assemblé, prêt à l'utilisation dès déballage. Plancha et grille de cuisson sont incluses. L'emballage est sur mesure : carton double cannelure renforcé et mousse haute densité pour absorber les chocs du transport. Chaque brasero étant fabriqué artisanalement à la commande, comptez 2 à 4 semaines en France métropolitaine (fabrication et livraison incluses). Le prix de livraison est inclus dans le prix affiché de ${price} €.`,
     },
     {
       question: `L'Obélix ${diameter}cm est-il adapté à une terrasse en bois ?`,
@@ -191,7 +191,7 @@ function faqCoffy(product: Product): Array<{ question: string; answer: string }>
     },
     {
       question: `Le Coffy ${diameter}cm est-il livré assemblé ?`,
-      answer: `Oui, Le Coffy ${diameter}cm arrive à domicile entièrement monté et prêt à l'emploi. Plancha acier carbone et grille de cuisson sont incluses. Emballage sur mesure carton double cannelure + mousse haute densité. Livraison partout en France métropolitaine sous 5 à 10 jours ouvrés. Le prix de ${price} € inclut la livraison.`,
+      answer: `Oui, Le Coffy ${diameter}cm arrive à domicile entièrement monté et prêt à l'emploi. Plancha acier carbone et grille de cuisson sont incluses. Emballage sur mesure carton double cannelure + mousse haute densité. Chaque brasero étant fabriqué artisanalement à la commande, comptez 2 à 4 semaines en France métropolitaine (fabrication et livraison incluses). Le prix de ${price} € inclut la livraison.`,
     },
     {
       question: `Quelle est la durée de vie d'un Coffy ${diameter}cm ?`,
@@ -273,7 +273,7 @@ function faqFermier(product: Product): Array<{ question: string; answer: string 
     },
     {
       question: `Le Fermier est-il livré assemblé ?`,
-      answer: `Oui, Le Fermier est livré entièrement monté et prêt à l'emploi. Plancha inox et grille inox sont incluses. Emballage renforcé pour protéger la patine en cours de formation. Livraison partout en France métropolitaine sous 5 à 10 jours ouvrés. Le prix de ${price} € inclut la livraison.`,
+      answer: `Oui, Le Fermier est livré entièrement monté et prêt à l'emploi. Plancha inox et grille inox sont incluses. Emballage renforcé pour protéger la patine en cours de formation. Chaque brasero étant fabriqué artisanalement à la commande, comptez 2 à 4 semaines en France métropolitaine (fabrication et livraison incluses). Le prix de ${price} € inclut la livraison.`,
     },
     {
       question: `Quelle est la garantie du Fermier ?`,
@@ -305,7 +305,7 @@ function faqGenericBrasero(product: Product): Array<{ question: string; answer: 
     },
     {
       question: `${product.name} est-il livré monté ?`,
-      answer: `Oui, ${product.name} est livré entièrement assemblé et prêt à l'emploi. Plancha et grille de cuisson sont incluses. Livraison partout en France métropolitaine sous 5 à 10 jours ouvrés.`,
+      answer: `Oui, ${product.name} est livré entièrement assemblé et prêt à l'emploi. Plancha et grille de cuisson sont incluses. Chaque brasero étant fabriqué artisanalement à la commande, comptez 2 à 4 semaines en France métropolitaine (fabrication et livraison incluses).`,
     },
   ];
 }

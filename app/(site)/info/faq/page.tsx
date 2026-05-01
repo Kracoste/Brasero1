@@ -126,7 +126,7 @@ export default async function FAQPage() {
       questions: [
         {
           question: "Quels sont les délais de livraison ?",
-          answer: "Les braseros en stock sont expédiés sous 24 à 48h. Comptez 3 à 7 jours ouvrés pour la France métropolitaine, 5 à 10 jours pour la Belgique et le Luxembourg, 7 à 14 jours pour la Suisse et l'Allemagne."
+          answer: "Nos braseros sont fabriqués artisanalement à la commande. Comptez 2 à 4 semaines pour la France métropolitaine (fabrication et livraison incluses), 3 à 5 semaines pour la Belgique, le Luxembourg, la Suisse et l'Allemagne."
         },
         {
           question: "Dans quels pays livrez-vous ?",
@@ -234,7 +234,7 @@ export default async function FAQPage() {
         },
         {
           question: "Quel est le délai pour un brasero personnalisé ?",
-          answer: "Le délai de fabrication pour un brasero personnalisé est généralement de 2 à 4 semaines selon la complexité. Le délai précis vous sera communiqué lors du devis."
+          answer: "Le délai pour un brasero personnalisé est généralement de 3 à 5 semaines selon la complexité, livraison incluse. Le délai précis vous sera communiqué lors du devis."
         },
         {
           question: "Comment obtenir un devis pour un brasero sur mesure ?",

@@ -35,7 +35,7 @@ export const Header = () => {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-[#f6f1e9] shadow-sm overflow-visible">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-100 bg-white overflow-visible">
       <div className="w-full px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between py-1 gap-2">
           {/* Logo à gauche */}
@@ -127,7 +127,7 @@ export const Header = () => {
               })}
               <Link
                 href="/recettes"
-                className="rounded-md bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-2 md:px-3 lg:px-4 py-1 md:py-1.5 lg:py-2 text-[0.7rem] md:text-xs xl:text-sm font-semibold uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] text-white transition hover:brightness-110 mx-1 md:mx-2 lg:mx-3 xl:mx-6"
+                className="bg-slate-900 px-2 md:px-3 lg:px-4 py-1 md:py-1.5 lg:py-2 text-[0.7rem] md:text-xs xl:text-sm font-medium uppercase tracking-[0.1em] md:tracking-[0.15em] xl:tracking-[0.25em] text-white transition hover:bg-slate-700 mx-1 md:mx-2 lg:mx-3 xl:mx-6"
               >
                 Recettes
               </Link>
@@ -136,19 +136,6 @@ export const Header = () => {
 
           {/* Icônes à droite - toujours visibles */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-shrink-0">
-            {/* Badge Klarna */}
-            <div className="hidden sm:flex flex-col items-center gap-0.5">
-              <Image
-                src="/logos/klarna.svg"
-                alt="Klarna"
-                width={52}
-                height={20}
-                className="h-5 w-auto"
-              />
-              <span className="text-[7px] uppercase tracking-wide text-slate-500 leading-none whitespace-nowrap">Payer en plusieurs fois</span>
-            </div>
-
-            
             {/* Favoris */}
             <Link href="/favoris" aria-label="Favoris" className="flex flex-col items-center text-slate-700 hover:text-slate-900 transition min-w-[40px]">
               <span className="relative">
@@ -290,7 +277,7 @@ export const Header = () => {
             <Link
               href="/recettes"
               onClick={() => setOpen(false)}
-              className="rounded-lg bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-3 py-2 text-center text-sm font-semibold text-white"
+              className="bg-slate-900 px-3 py-2 text-center text-xs uppercase tracking-wider font-medium text-white"
             >
               Recettes
             </Link>

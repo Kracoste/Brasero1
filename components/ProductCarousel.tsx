@@ -102,7 +102,7 @@ export function ProductCarousel({ products, className = '', reviewStatsMap }: Pr
             >
               <span className={`block h-3 rounded-full transition-all ${
                 currentIndex === index
-                  ? 'bg-[#8B4513] w-6'
+                  ? 'bg-slate-900 w-6'
                   : 'w-3 bg-slate-300'
               }`} />
             </button>

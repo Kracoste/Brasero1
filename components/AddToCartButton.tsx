@@ -41,14 +41,14 @@ export function AddToCartButton({ product, selectedAccessories = [], selectedVar
   if (product.onDemand) {
     return (
       <div className={`space-y-4 ${className}`}>
-        <div className="rounded-lg bg-amber-50 border-2 border-amber-300 p-6 text-center">
-          <h3 className="text-xl font-bold text-amber-900 mb-3">Produit sur demande</h3>
-          <p className="text-amber-800 mb-4">
-            Ce produit n'est pas disponible à l'achat en ligne.
+        <div className="border border-slate-200 bg-white p-6 text-center">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-3">Pièce sur commande</p>
+          <p className="text-sm text-slate-600 mb-5 leading-relaxed">
+            Ce modèle est réalisé à la commande. Échangeons sur votre projet.
           </p>
           <a
             href="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-md px-6 py-3 font-semibold shadow-lg transition bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-xs sm:text-sm font-medium tracking-[0.2em] uppercase transition bg-slate-900 text-white hover:bg-slate-700"
           >
             Demander un devis
           </a>
@@ -146,10 +146,10 @@ export function AddToCartButton({ product, selectedAccessories = [], selectedVar
         type="button"
         onClick={handleAddToCart}
         disabled={adding || added || disabled}
-        className={`flex items-center justify-center gap-2 px-6 py-3 font-medium tracking-wide uppercase transition ${
+        className={`flex items-center justify-center gap-2 px-8 py-3.5 text-xs sm:text-sm font-medium tracking-[0.2em] uppercase transition ${
           added
-            ? "bg-emerald-600 text-white hover:bg-emerald-700"
-            : "bg-[#9C8572] text-white hover:bg-[#8B7461]"
+            ? "bg-emerald-700 text-white"
+            : "bg-slate-900 text-white hover:bg-slate-700"
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {added ? (

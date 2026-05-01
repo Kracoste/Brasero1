@@ -352,19 +352,19 @@ export default async function CommanderPage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center py-3 border-b border-slate-200">
                       <span className="text-slate-600">France métropolitaine</span>
-                      <span className="font-semibold text-slate-900">3 à 7 jours</span>
+                      <span className="font-semibold text-slate-900">2 à 4 semaines</span>
                     </div>
                     <div className="flex justify-between items-center py-3 border-b border-slate-200">
                       <span className="text-slate-600">Belgique, Luxembourg</span>
-                      <span className="font-semibold text-slate-900">5 à 10 jours</span>
+                      <span className="font-semibold text-slate-900">3 à 5 semaines</span>
                     </div>
                     <div className="flex justify-between items-center py-3 border-b border-slate-200">
                       <span className="text-slate-600">Allemagne</span>
-                      <span className="font-semibold text-slate-900">7 à 14 jours</span>
+                      <span className="font-semibold text-slate-900">3 à 5 semaines</span>
                     </div>
                     <div className="flex justify-between items-center py-3">
                       <span className="text-slate-600">Suisse</span>
-                      <span className="font-semibold text-slate-900">7 à 14 jours</span>
+                      <span className="font-semibold text-slate-900">3 à 5 semaines</span>
                     </div>
                   </div>
                   

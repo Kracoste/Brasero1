@@ -6,11 +6,9 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 
 import { Price } from "@/components/Price";
-import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
-import { useProductCoupon } from "@/lib/active-coupons-context";
 import type { Product } from "@/lib/schema";
-import { formatCurrency, type CardOverrides } from "@/lib/utils";
+import { type CardOverrides } from "@/lib/utils";
 import "@/styles/product-card.css";
 
 type ProductCardProps = {
@@ -23,29 +21,11 @@ type ProductCardProps = {
 
 export const ProductCard = ({ product, className, cardOverrides }: ProductCardProps) => {
   const image = cardOverrides?.image ?? product.images[0];
-  const { addItem } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
-  const [adding, setAdding] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const displayPrice = cardOverrides?.price ?? product.price;
   const displayName = cardOverrides?.name ?? product.name;
   const displayDescription = cardOverrides?.shortDescription ?? product.shortDescription;
-
-  // Coupon actif depuis la DB (ex: code LBF)
-  const activeCoupon = useProductCoupon(product.slug, displayPrice);
-
-  // Promo statique (discount_percent + comparePrice sur le produit)
-  const hasStaticPromo = typeof product.discountPercent === "number" && product.discountPercent > 0 && !!product.comparePrice;
-
-  // Priorité : coupon actif > promo statique
-  const isPromo = !!activeCoupon || hasStaticPromo;
-  const promoNewPrice = activeCoupon ? activeCoupon.discountedPrice : displayPrice;
-  const promoOldPrice = activeCoupon ? displayPrice : (product.comparePrice ?? displayPrice);
-  const promoCodeLabel = activeCoupon?.code;
-  const promoDiscountLabel = activeCoupon?.label;
-  const ribbonLabel = activeCoupon
-    ? `-${activeCoupon.discountPercent}%`
-    : hasStaticPromo ? `-${product.discountPercent}%` : null;
 
   const handleToggleFavorite = async () => {
     if (favoriteLoading) return;
@@ -61,22 +41,6 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
       console.error("Error toggling favorite:", error);
     } finally {
       setFavoriteLoading(false);
-    }
-  };
-
-  const handleAddToCart = async () => {
-    setAdding(true);
-    try {
-      await addItem({
-        slug: product.slug,
-        name: product.name,
-        price: product.price,
-        image: image.src,
-      });
-      setTimeout(() => setAdding(false), 900);
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      setAdding(false);
     }
   };
 
@@ -103,9 +67,6 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
               Image non disponible
             </div>
           )}
-          {ribbonLabel && (
-            <span className="product-card__promo-ribbon">{ribbonLabel}</span>
-          )}
         </div>
         <div className="product-card__content">
           <span className="product-card__status">EN STOCK</span>
@@ -126,52 +87,20 @@ export const ProductCard = ({ product, className, cardOverrides }: ProductCardPr
             </button>
           </div>
           <p className="product-card__description">{displayDescription}</p>
-          {isPromo ? (
-            <div className="product-card__promo-pricing">
-              <div className="product-card__promo-row">
-                <div className="product-card__promo-prices">
-                  <span className="product-card__promo-old">{formatCurrency(promoOldPrice)} HT</span>
-                  <div className="product-card__promo-current">
-                    {formatCurrency(promoNewPrice)}
-                    <span className="product-card__promo-note" style={{ fontSize: '0.55em', marginLeft: '4px' }}>HT</span>
-                  </div>
-                </div>
-                {promoCodeLabel && (
-                  <span className="product-card__promo-code">
-                    Code {promoCodeLabel}{promoDiscountLabel ? ` -${promoDiscountLabel}` : ''}
-                  </span>
-                )}
-              </div>
-            </div>
-          ) : !product.onDemand ? (
+          {!product.onDemand ? (
             <Price amount={displayPrice} className="product-card__price" tone="light" showHT />
           ) : (
             <div className="product-card__price-placeholder" style={{ height: '2.5rem' }} />
           )}
           <div className="product-card__actions">
             {product.onDemand ? (
-              <>
-                <Link href="/contact" className="product-card__btn product-card__btn--primary">
-                  Sur demande
-                </Link>
-                <Link href={`/produits/${product.slug}`} className="product-card__cta">
-                  Voir les détails
-                </Link>
-              </>
+              <Link href="/contact" className="product-card__btn product-card__btn--primary">
+                Demander un devis
+              </Link>
             ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  disabled={adding}
-                  className="product-card__btn product-card__btn--primary"
-                >
-                  {adding ? "Ajouté au panier" : "Ajouter au panier"}
-                </button>
-                <Link href={`/produits/${product.slug}`} className="product-card__cta">
-                  Voir les détails
-                </Link>
-              </>
+              <Link href={`/produits/${product.slug}`} className="product-card__btn product-card__btn--primary">
+                Voir les détails
+              </Link>
             )}
           </div>
         </div>

@@ -92,7 +92,7 @@ export default async function MadeInFrancePage() {
     },
     {
       question: "Livrez-vous partout en France ?",
-      answer: "Oui, nous livrons partout en France métropolitaine sous 5 à 10 jours ouvrés. Chaque brasero est emballé avec un carton double cannelure et une mousse haute densité pour garantir une livraison en parfait état."
+      answer: "Oui, nous livrons partout en France métropolitaine. Chaque brasero étant fabriqué artisanalement à la commande, comptez 2 à 4 semaines (fabrication et livraison incluses). Chaque pièce est emballée avec un carton double cannelure et une mousse haute densité pour garantir une livraison en parfait état."
     },
   ];
 

@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   
   return {
     title: `Livraison brasero | Emballage et transport soigné | ${settings.storeName}`,
-    description: `Livraison soignée de votre brasero artisanal. Emballage renforcé sur-mesure, transporteurs spécialisés, suivi en temps réel. Livraison France et Europe en 5-10 jours.`,
+    description: `Livraison soignée de votre brasero artisanal. Emballage renforcé sur-mesure, transporteurs spécialisés, suivi en temps réel. Fabrication et livraison France et Europe sous 2 à 4 semaines.`,
     keywords: [
       "livraison brasero soignée",
       "emballage brasero renforcé",
@@ -82,9 +82,9 @@ export default async function LivraisonPage() {
   const features = [
     {
       icon: Clock,
-      value: "5-10 jours",
-      title: "Délai de livraison",
-      description: "Comptez 5 à 10 jours ouvrés après expédition pour les livraisons en France métropolitaine. Les braseros sur-mesure nécessitent un délai de fabrication supplémentaire."
+      value: "2 à 4 semaines",
+      title: "Fabrication et livraison",
+      description: "Comptez 2 à 4 semaines à compter de la validation de la commande pour la fabrication artisanale et la livraison en France métropolitaine. Les braseros personnalisés nécessitent 3 à 5 semaines."
     },
     {
       icon: Bell,
@@ -101,11 +101,11 @@ export default async function LivraisonPage() {
   ];
 
   const zones = [
-    { country: "France métropolitaine", delay: "5-10 jours", price: "Selon le poids" },
-    { country: "Belgique", delay: "7-12 jours", price: "Selon le poids" },
-    { country: "Luxembourg", delay: "7-12 jours", price: "Selon le poids" },
-    { country: "Suisse", delay: "10-15 jours", price: "Sur devis" },
-    { country: "Allemagne", delay: "10-15 jours", price: "Selon le poids" },
+    { country: "France métropolitaine", delay: "2 à 4 semaines", price: "Selon le poids" },
+    { country: "Belgique", delay: "3 à 5 semaines", price: "Selon le poids" },
+    { country: "Luxembourg", delay: "3 à 5 semaines", price: "Selon le poids" },
+    { country: "Suisse", delay: "3 à 5 semaines", price: "Sur devis" },
+    { country: "Allemagne", delay: "3 à 5 semaines", price: "Selon le poids" },
   ];
 
   const tips = [

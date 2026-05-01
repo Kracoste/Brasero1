@@ -151,7 +151,7 @@ export default async function ServiceClientelePage() {
     },
     {
       question: "Quels sont les délais de livraison ?",
-      answer: "Les délais varient de 3 à 7 jours ouvrés selon le produit et votre localisation. Les braseros sur mesure nécessitent un délai de fabrication supplémentaire."
+      answer: "Nos braseros sont fabriqués artisanalement à la commande. Comptez 2 à 4 semaines pour la France métropolitaine (fabrication et livraison incluses), 3 à 5 semaines pour les braseros personnalisés ou sur mesure."
     },
     {
       question: "Puis-je modifier ou annuler ma commande ?",

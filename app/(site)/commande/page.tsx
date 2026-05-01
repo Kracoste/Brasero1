@@ -693,7 +693,7 @@ export default function CheckoutPage() {
                         <span className="text-sm font-semibold text-slate-900">
                           Transport Schenker, messagerie standard
                         </span>
-                        <span className="text-sm text-slate-600">Livraison standard • 5 à 7 jours ouvrés</span>
+                        <span className="text-sm text-slate-600">Fabrication et livraison • 2 à 4 semaines</span>
                       </div>
                       <span className="text-sm font-semibold text-slate-900">+80,00 €</span>
                     </div>

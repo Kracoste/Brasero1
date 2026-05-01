@@ -32,9 +32,9 @@ export function HomepageNewsletter() {
   if (status === 'success') {
     return (
       <div className="text-center">
-        <p className="text-lg font-semibold text-slate-900">Bienvenue dans la communauté !</p>
-        <p className="mt-2 text-sm text-slate-600">
-          Votre code <span className="font-bold text-[#8B4513]">BIENVENUE10</span> est actif. Utilisez-le lors de votre commande.
+        <p className="font-display text-xl font-light text-slate-900">Bienvenue dans l&apos;aventure.</p>
+        <p className="mt-3 text-sm text-slate-500 leading-relaxed">
+          Vous recevrez prochainement nos prochaines créations et actualités directement dans votre boîte mail.
         </p>
       </div>
     );
@@ -49,14 +49,14 @@ export function HomepageNewsletter() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="votre@email.com"
         autoComplete="email"
-        className="flex-1 rounded-lg border-0 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none ring-1 ring-slate-300 focus:ring-2 focus:ring-[#8B4513]"
+        className="flex-1 border-0 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none ring-1 ring-slate-300 focus:ring-2 focus:ring-slate-900"
       />
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="rounded-lg bg-[#8B4513] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#CD853F] disabled:opacity-50"
+        className="bg-slate-900 px-6 py-3 text-xs font-medium uppercase tracking-wider text-white transition hover:bg-slate-700 disabled:opacity-50"
       >
-        {status === 'loading' ? 'Inscription...' : 'Recevoir mon code -10%'}
+        {status === 'loading' ? 'Inscription...' : 'Rejoindre l’aventure'}
       </button>
       {status === 'error' && (
         <p className="text-xs text-red-600 sm:col-span-2">Erreur, réessayez.</p>

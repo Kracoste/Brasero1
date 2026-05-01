@@ -453,7 +453,7 @@ export default async function ProduitsSurMesurePage() {
                 },
                 {
                   question: "Quel est le délai de fabrication ?",
-                  answer: "Le délai varie selon la complexité du projet, généralement de 2 à 4 semaines après validation du devis. Pour les projets très élaborés ou les périodes de forte demande, le délai peut être plus long. Nous vous communiquons le délai précis avec le devis."
+                  answer: "Le délai varie selon la complexité du projet, généralement de 3 à 5 semaines après validation du devis (livraison incluse). Pour les projets très élaborés ou les périodes de forte demande, le délai peut être plus long. Nous vous communiquons le délai précis avec le devis."
                 },
                 {
                   question: "Puis-je faire graver un logo ou une image ?",

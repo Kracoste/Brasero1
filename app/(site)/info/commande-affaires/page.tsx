@@ -378,7 +378,7 @@ export default async function CommandeAffairesPage() {
                 },
                 {
                   question: "Quel est le délai de fabrication pour une commande professionnelle ?",
-                  answer: "Le délai dépend de la quantité et des personnalisations demandées. Comptez généralement 2 à 4 semaines pour une commande standard, plus pour les projets sur mesure. Le délai précis est indiqué dans le devis."
+                  answer: "Le délai dépend de la quantité et des personnalisations demandées. Comptez généralement 2 à 4 semaines pour une commande standard et 3 à 5 semaines pour les projets sur mesure (livraison incluse). Le délai précis est indiqué dans le devis."
                 },
                 {
                   question: "Proposez-vous la personnalisation avec logo ?",

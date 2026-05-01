@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f1e9;
+  --background: #faf8f5;
   --foreground: #111111;
   --brand-primary: #1a1a1a;
   --muted: #9ca3af;
@@ -108,7 +108,7 @@ body {
     linear-gradient(170deg, rgba(5, 7, 13, 0.95), rgba(3, 3, 7, 0.9));
 }
 
-/* Animation trait marron sous le bouton Filtres */
+/* Animation trait sous le bouton Filtres */
 .filter-button::after {
   content: "";
   position: absolute;
@@ -116,7 +116,7 @@ body {
   left: 0;
   width: 0;
   height: 2px;
-  background-color: #8B4513;
+  background-color: #0f172a;
   transition: width 0.3s ease-out;
 }
 
@@ -133,7 +133,7 @@ body {
   display: none;
 }
 
-/* Animation trait marron sous les liens de navigation */
+/* Animation trait sous les liens de navigation */
 .nav-link-hover::after {
   content: "";
   position: absolute;
@@ -141,7 +141,7 @@ body {
   left: 0;
   width: 0;
   height: 2px;
-  background-color: #8B4513;
+  background-color: #0f172a;
   transition: width 0.3s ease-out;
 }
 

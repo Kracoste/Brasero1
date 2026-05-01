@@ -135,10 +135,10 @@
 }
 
 .product-card__status {
-  font-size: 0.78rem;
-  letter-spacing: 0.25em;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: #047857;
+  color: #64748b;
 }
 
 .product-card__description {
@@ -350,7 +350,7 @@
 }
 
 .product-card__btn--primary {
-  background: linear-gradient(135deg, #8B4513, #CD853F);
+  background: #0f172a;
   border: none;
   color: #ffffff;
   font-weight: 600;
@@ -362,7 +362,7 @@
 }
 
 .product-card__btn--primary:hover {
-  background: linear-gradient(135deg, #9B5523, #DD954F);
+  background: #334155;
 }
 
 .product-card__btn--primary:disabled {

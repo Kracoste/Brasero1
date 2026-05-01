@@ -23,7 +23,7 @@ const PAGE_META: Record<string, { title: string; description: string }> = {
   },
   expedition: {
     title: "Livraison et expédition — Délais et tarifs",
-    description: "Livraison de votre brasero en 3 à 7 jours ouvrés en France. Livraison sur palette avec prise de rendez-vous pour les braseros.",
+    description: "Fabrication artisanale et livraison de votre brasero sous 2 à 4 semaines en France. Livraison sur palette avec prise de rendez-vous pour les braseros.",
   },
   retourner: {
     title: "Retours et échanges — Politique de retour 14 jours",
@@ -235,11 +235,11 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
         <p>
           Nous expédions vos commandes avec le plus grand soin pour garantir une livraison en parfait état.
         </p>
-        <h2 className="text-xl font-semibold">Délais de livraison</h2>
+        <h2 className="text-xl font-semibold">Délais de fabrication et livraison</h2>
         <ul className="list-disc pl-6 space-y-2">
-          <li><strong>France métropolitaine :</strong> 3 à 7 jours ouvrés</li>
-          <li><strong>Belgique, Luxembourg :</strong> 5 à 10 jours ouvrés</li>
-          <li><strong>Suisse :</strong> 7 à 14 jours ouvrés</li>
+          <li><strong>France métropolitaine :</strong> 2 à 4 semaines</li>
+          <li><strong>Belgique, Luxembourg :</strong> 3 à 5 semaines</li>
+          <li><strong>Suisse, Allemagne :</strong> 3 à 5 semaines</li>
         </ul>
         <h2 className="text-xl font-semibold">Frais de livraison</h2>
         <p>
@@ -356,7 +356,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
         <div className="space-y-4">
           <div className="border-l-4 border-orange-500 pl-4">
             <p className="font-medium">Quels sont les délais de livraison ?</p>
-            <p className="text-gray-600 mt-1">En France métropolitaine, comptez 3 à 7 jours ouvrés. Pour les braseros volumineux, une livraison sur rendez-vous est organisée.</p>
+            <p className="text-gray-600 mt-1">Comptez 2 à 4 semaines en France métropolitaine (fabrication artisanale et livraison incluses). Pour les braseros volumineux, une livraison sur rendez-vous est organisée.</p>
           </div>
           <div className="border-l-4 border-orange-500 pl-4">
             <p className="font-medium">Livrez-vous à l&apos;étranger ?</p>
@@ -486,7 +486,7 @@ const createPages = (settings: SiteSettings): Record<string, PageConfig> => ({
           <li>Prise de contact et discussion de votre projet</li>
           <li>Étude de faisabilité et proposition de design</li>
           <li>Validation du devis</li>
-          <li>Fabrication dans notre atelier (4 à 8 semaines)</li>
+          <li>Fabrication dans notre atelier (3 à 5 semaines)</li>
           <li>Livraison et installation si nécessaire</li>
         </ol>
         <p className="mt-4">

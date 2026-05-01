@@ -46,7 +46,7 @@ type FooterProps = {
 export const Footer = ({ storeName, atelierCity }: FooterProps) => {
 
   return (
-    <footer className="border-t border-gray-200 bg-[#f6f1e9] text-gray-800">
+    <footer className="border-t border-slate-100 bg-white text-slate-800">
       <Container className="py-6 sm:py-8 lg:py-12">
         <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -146,28 +146,28 @@ export const Footer = ({ storeName, atelierCity }: FooterProps) => {
         <Container className="py-6 sm:py-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <div className="flex flex-col items-center text-center gap-2">
-              <Lock className="w-6 h-6 text-[#8B4513]" />
+              <Lock className="w-6 h-6 text-slate-900" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Paiement sécurisé</p>
                 <p className="text-xs text-gray-600">SSL 256 bits</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-2">
-              <Truck className="w-6 h-6 text-[#8B4513]" />
+              <Truck className="w-6 h-6 text-slate-900" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Livraison incluse</p>
                 <p className="text-xs text-gray-600">France métropolitaine</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-2">
-              <Shield className="w-6 h-6 text-[#8B4513]" />
+              <Shield className="w-6 h-6 text-slate-900" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Garantie 2 ans</p>
                 <p className="text-xs text-gray-600">SAV réactif sous 48h</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-2">
-              <RotateCcw className="w-6 h-6 text-[#8B4513]" />
+              <RotateCcw className="w-6 h-6 text-slate-900" />
               <div>
                 <p className="text-xs font-semibold text-gray-900">Retour 14 jours</p>
                 <p className="text-xs text-gray-600">Satisfait ou remboursé</p>

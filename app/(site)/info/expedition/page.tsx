@@ -58,7 +58,7 @@ function generateStructuredData() {
         "name": "Quels sont les délais de livraison pour un brasero ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "En France métropolitaine, comptez 3 à 7 jours ouvrés. Pour la Belgique et le Luxembourg, 5 à 10 jours. Pour la Suisse et l'Allemagne, 7 à 14 jours."
+          "text": "Fabrication et livraison sous 2 à 4 semaines en France métropolitaine. Pour la Belgique, le Luxembourg, la Suisse et l'Allemagne, comptez 3 à 5 semaines."
         }
       },
       {
@@ -88,33 +88,33 @@ export default async function ExpeditionPage() {
   const deliveryZones = [
     {
       zone: "France métropolitaine",
-      delay: "3 à 7 jours ouvrés",
+      delay: "2 à 4 semaines",
       icon: "🇫🇷",
-      description: "Livraison sur toute la France continentale"
+      description: "Fabrication artisanale et livraison sur toute la France continentale"
     },
     {
       zone: "Belgique",
-      delay: "5 à 10 jours ouvrés",
+      delay: "3 à 5 semaines",
       icon: "🇧🇪",
-      description: "Livraison dans tout le royaume"
+      description: "Fabrication artisanale et livraison dans tout le royaume"
     },
     {
       zone: "Luxembourg",
-      delay: "5 à 10 jours ouvrés",
+      delay: "3 à 5 semaines",
       icon: "🇱🇺",
-      description: "Livraison dans tout le pays"
+      description: "Fabrication artisanale et livraison dans tout le pays"
     },
     {
       zone: "Suisse",
-      delay: "7 à 14 jours ouvrés",
+      delay: "3 à 5 semaines",
       icon: "🇨🇭",
-      description: "Livraison dans tous les cantons"
+      description: "Fabrication artisanale et livraison dans tous les cantons"
     },
     {
       zone: "Allemagne",
-      delay: "7 à 14 jours ouvrés",
+      delay: "3 à 5 semaines",
       icon: "🇩🇪",
-      description: "Livraison dans tous les Länder"
+      description: "Fabrication artisanale et livraison dans tous les Länder"
     }
   ];
 
@@ -386,8 +386,9 @@ export default async function ExpeditionPage() {
                   supplémentaire sera communiqué lors de votre demande de devis.
                 </p>
                 <p className="text-slate-600 leading-relaxed">
-                  Nos braseros en stock sont expédiés sous 24 à 48h. Chaque brasero artisanal
-                  manufacturé en France bénéficie du savoir-faire de notre atelier.
+                  Nos braseros sont fabriqués artisanalement à la commande sous 2 à 4 semaines,
+                  livraison incluse. Chaque pièce manufacturée en France bénéficie du savoir-faire
+                  de notre atelier.
                 </p>
               </div>
             </div>

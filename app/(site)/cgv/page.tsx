@@ -42,10 +42,13 @@ export default function CGVPage() {
               encaissement du paiement.
             </p>
             <p>
-              Le délai maximum de fabrication et de livraison est de <strong>4 semaines</strong>{" "}
-              à compter de la validation de la commande. Ce délai peut être réduit en période
-              creuse et peut exceptionnellement être prolongé en cas de forte affluence ou de
-              rupture d&apos;approvisionnement matière ; le client en est alors informé par email.
+              Le délai maximum de fabrication et de livraison est de <strong>6 semaines</strong>{" "}
+              à compter de la validation de la commande. En conditions normales, la livraison
+              intervient sous 2 à 4 semaines. Ce délai peut exceptionnellement être prolongé
+              en cas de forte affluence ou de rupture d&apos;approvisionnement matière ; le
+              client en est alors informé par email. Conformément à l&apos;article L216-1 du
+              Code de la consommation, en cas de dépassement du délai maximum, le client peut
+              résoudre le contrat après mise en demeure restée infructueuse.
             </p>
           </section>
 

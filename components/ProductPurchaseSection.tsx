@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { CompatibleAccessories } from '@/components/CompatibleAccessories';
 import { CustomizationSelector, type FacesCustomization } from '@/components/CustomizationSelector';
 import { AddToCartButton } from '@/components/AddToCartButton';
+import { ExpressPayment } from '@/components/ExpressPayment';
 import { Price } from '@/components/Price';
 import { useAnalytics } from '@/lib/analytics-context';
 import { useProductCoupon } from '@/lib/active-coupons-context';
@@ -391,7 +392,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
               const isPromo = isPricePromo || !!shippingLabel;
 
               if (!isPromo) {
-                return <Price amount={finalPrice} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />;
+                return <Price amount={finalPrice} className="font-display text-3xl sm:text-4xl font-light text-slate-900 tracking-tight" />;
               }
               return (
                 <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -401,7 +402,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
                         {(promoOldPrice ?? 0).toFixed(2).replace('.', ',')} € HT
                       </span>
                     )}
-                    <Price amount={promoNewPrice} className="text-2xl sm:text-3xl lg:text-4xl font-bold" />
+                    <Price amount={promoNewPrice} className="font-display text-3xl sm:text-4xl font-light text-slate-900 tracking-tight" />
                     {shippingLabel && (
                       <span className="text-sm font-medium text-green-700">{shippingLabel}</span>
                     )}
@@ -415,7 +416,7 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
               );
             })()}
             {(activePrice + customizationSupplement) >= 500 && (
-              <p className="text-sm font-medium text-[#8B4513]">
+              <p className="text-sm font-medium text-slate-700">
                 ou 3× {Math.ceil((activePrice + customizationSupplement) / 3)} € sans frais
                 <span className="text-slate-500 font-normal"> · via Klarna</span>
               </p>
@@ -444,28 +445,14 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
             )}
           </div>
         )}
-        {/* Indicateur de stock */}
-        <div className="flex items-center gap-2 text-sm">
+        {/* Indicateur de disponibilité — sobre */}
+        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">
           {product.availability === "En stock" || product.availability === "in_stock" ? (
-            <>
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-              </span>
-              <span className="font-medium text-green-700">En stock</span>
-              <span className="text-slate-400">— expédié sous 5-10 jours</span>
-            </>
+            <span>Disponible — fabriqué et livré sous 2 à 4 semaines</span>
           ) : product.onDemand ? (
-            <>
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-              <span className="font-medium text-amber-700">Sur commande</span>
-              <span className="text-slate-400">— délai sur devis</span>
-            </>
+            <span>Sur commande — délai sur devis</span>
           ) : (
-            <>
-              <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
-              <span className="font-medium text-green-700">Disponible</span>
-            </>
+            <span>Disponible</span>
           )}
         </div>
 
@@ -480,21 +467,38 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
           disabled={showSelectors && !isSelectionValid}
         />
 
-        {/* Réassurance livraison & garantie */}
-        <div className="grid grid-cols-2 gap-2 pt-2">
-          <div className="flex items-center gap-2 text-xs text-slate-600">
-            <svg className="w-4 h-4 text-[#8B4513] flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+        {/* Paiement express : Apple Pay / Google Pay / Klarna — masqué si personnalisation active */}
+        {!customizationFaces && (
+          <ExpressPayment
+            product={productWithVariantPrice}
+            variantLabel={matchedVariant?.label}
+            disabled={showSelectors && !isSelectionValid}
+          />
+        )}
+
+        {/* Réassurance — ton sobre */}
+        <ul className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-2 pt-3 border-t border-slate-100 mt-2 text-xs text-slate-600">
+          <li className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-slate-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
             <span>Garantie 2 ans</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-slate-600">
-            <svg className="w-4 h-4 text-[#8B4513] flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-            <span>Délai 5-10 jours ouvrés</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-slate-600">
-            <svg className="w-4 h-4 text-[#8B4513] flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
+          </li>
+          <li className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-slate-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+            <span>Fabrication 2 à 4 semaines</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-slate-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
             <span>Retour sous 14 jours</span>
-          </div>
-        </div>
+          </li>
+        </ul>
+
+        {/* Mention personnalisation — uniquement si la personnalisation est activée */}
+        {product.customization?.enabled && (
+          <p className="text-xs text-slate-500 leading-relaxed pt-1">
+            Pour une personnalisation spécifique (motif, gravure, dimension sur mesure),
+            <a href="/info/produits-sur-mesure" className="ml-1 text-slate-900 underline decoration-slate-300 underline-offset-4 hover:decoration-slate-900 transition">demandez un devis</a>.
+          </p>
+        )}
       </div>
     </div>
   );

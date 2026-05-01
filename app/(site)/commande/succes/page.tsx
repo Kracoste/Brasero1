@@ -99,7 +99,7 @@ function SuccessPageContent() {
                   2
                 </span>
                 <span>
-                  Votre commande sera préparée et expédiée sous 3 à 5 jours ouvrés.
+                  Votre brasero sera fabriqué artisanalement puis livré sous 2 à 4 semaines.
                 </span>
               </li>
               <li className="flex items-start gap-3">
