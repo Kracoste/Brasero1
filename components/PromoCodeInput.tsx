@@ -168,13 +168,13 @@ export const PromoCodeInput = ({ cartTotal, email, onApply, onRemove }: PromoCod
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Code promo"
-          className="flex-1 min-w-0 border border-slate-300 rounded-l-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#8B4513] focus:border-[#8B4513]"
+          className="flex-1 min-w-0 border border-slate-300 rounded-l-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] focus:border-[#0f172a]"
           disabled={status === "loading"}
         />
         <button
           type="submit"
           disabled={status === "loading" || !code.trim()}
-          className="bg-[#8B4513] text-white rounded-r-lg px-4 py-2 text-sm font-medium hover:bg-[#723A10] disabled:opacity-50 transition-colors whitespace-nowrap"
+          className="bg-[#0f172a] text-white rounded-r-lg px-4 py-2 text-sm font-medium hover:bg-[#723A10] disabled:opacity-50 transition-colors whitespace-nowrap"
         >
           {status === "loading" ? "..." : "Appliquer"}
         </button>

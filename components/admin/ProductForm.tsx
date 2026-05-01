@@ -1048,6 +1048,7 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
               >
                 <option value="brasero">Braséro</option>
                 <option value="accessoire">Accessoire</option>
+                <option value="housse-protection">Housse de protection</option>
                 <option value="range-buches">Range bûches</option>
                 <option value="fendeur">Fendeur à bûches</option>
               </select>
@@ -1068,6 +1069,11 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                     <option value="acier">Acier</option>
                     <option value="inox">Acier inoxydable</option>
                     <option value="bois">Bois</option>
+                  </>
+                ) : formData.category === 'housse-protection' ? (
+                  <>
+                    <option value="housse">Tissu imperméable</option>
+                    <option value="polyester">Polyester renforcé</option>
                   </>
                 ) : (
                   <>
@@ -2000,12 +2006,98 @@ export default function ProductForm({ mode, productId }: ProductFormProps) {
                   }));
                 };
 
+                const promoteToMain = () => {
+                  const [newFinish, newPlancha] = openConfigKey.split('-');
+                  if (newFinish !== 'corten' && newFinish !== 'peint') return;
+                  if (newPlancha !== 'acier' && newPlancha !== 'inox') return;
+
+                  // Capturer l'ancienne fiche principale pour la rétrograder en sous-fiche
+                  const oldFinish = formData.material?.toLowerCase().includes('corten') ? 'corten' : 'peint';
+                  const oldPlancha: '' | 'acier' | 'inox' = formData.planchaMaterial || 'acier';
+                  const oldKey = `${oldFinish}-${oldPlancha}`;
+                  const oldMainImages = images.map<ConfigImageEntry>((img) => ({
+                    src: img.src ?? img.preview ?? '',
+                    alt: formData.name,
+                    file: img.file,
+                    preview: img.preview,
+                  }));
+                  const oldShortDesc = formData.shortDescription;
+                  const oldPrice = formData.price;
+
+                  // Convertir les images de la sous-fiche en images principales
+                  const newMainImages: ProductImage[] = sf.images.map((img, idx) => ({
+                    id: `promoted-${Date.now()}-${idx}`,
+                    src: img.src,
+                    alt: img.alt,
+                    isCardImage: idx === 0,
+                    file: (img as ConfigImageEntry & { file?: File }).file,
+                    preview: (img as ConfigImageEntry & { preview?: string }).preview,
+                  } as ProductImage));
+
+                  // 1) Mise à jour formData (matière, plancha, prix, description courte)
+                  setFormData((prev) => ({
+                    ...prev,
+                    material: newFinish === 'corten' ? 'Acier corten' : 'Acier peint',
+                    planchaMaterial: newPlancha,
+                    price: sf.price || prev.price,
+                    shortDescription: sf.description || prev.shortDescription,
+                  }));
+
+                  // 2) Mise à jour images principales
+                  if (newMainImages.length > 0) {
+                    setImages(newMainImages);
+                  }
+
+                  // 3) Rétrograder l'ancienne fiche principale en sous-fiche (sauf si c'est la même clé)
+                  setConfigurations((prev) => {
+                    const next = { ...prev };
+                    if (oldKey !== openConfigKey) {
+                      const existingOld = next[oldKey] || emptySubFiche();
+                      next[oldKey] = {
+                        ...existingOld,
+                        images: oldMainImages.length > 0 ? oldMainImages : existingOld.images,
+                        description: existingOld.description || oldShortDesc,
+                        price: existingOld.price || oldPrice,
+                      };
+                    }
+                    // Vider la sous-fiche promue (elle est désormais la fiche principale)
+                    next[openConfigKey] = {
+                      ...emptySubFiche(),
+                      // On garde la FAQ et le SEO existants car ils restent pertinents pour la sous-fiche
+                      faq: next[openConfigKey]?.faq || [],
+                      seoSections: next[openConfigKey]?.seoSections || [],
+                    };
+                    return next;
+                  });
+
+                  // Fermer le panneau pour laisser l'utilisateur enregistrer
+                  setOpenConfigKey(null);
+                };
+
                 return (
                   <div className="p-4 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-bold text-slate-800">{activeLabel}</h3>
                       <button type="button" onClick={() => setOpenConfigKey(null)} className="p-1 text-slate-400 hover:text-slate-600 transition">
                         <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Bouton : promouvoir cette sous-fiche en fiche principale */}
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2">
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Promouvoir cette sous-fiche en fiche principale du produit. L&apos;ancienne fiche principale sera automatiquement déplacée en sous-fiche correspondante.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm(`Définir « ${activeLabel} » comme fiche principale ?\n\nLes images, prix et description de cette sous-fiche remplaceront ceux de la fiche principale. L'ancienne fiche principale sera sauvegardée en sous-fiche. N'oubliez pas d'enregistrer le produit ensuite.`)) {
+                            promoteToMain();
+                          }
+                        }}
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-wider transition bg-slate-900 text-white hover:bg-slate-700"
+                      >
+                        Définir comme fiche principale
                       </button>
                     </div>
 

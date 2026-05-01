@@ -62,12 +62,12 @@ export default function NewsletterSignup() {
             if (status === 'error') setStatus('idle')
           }}
           placeholder="Votre adresse email"
-          className="flex-1 rounded-lg sm:rounded-l-lg sm:rounded-r-none border border-slate-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#8B4513]"
+          className="flex-1 rounded-lg sm:rounded-l-lg sm:rounded-r-none border border-slate-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#0f172a]"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="mt-2 sm:mt-0 rounded-lg sm:rounded-r-lg sm:rounded-l-none bg-[#8B4513] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#723a0f] disabled:opacity-60"
+          className="mt-2 sm:mt-0 rounded-lg sm:rounded-r-lg sm:rounded-l-none bg-[#0f172a] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#723a0f] disabled:opacity-60"
         >
           {status === 'loading' ? '...' : "S'inscrire"}
         </button>

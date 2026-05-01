@@ -116,19 +116,19 @@ export default async function GarantiePage() {
       />
 
       {/* Hero */}
-      <section className="bg-[#f6f1e9] py-16 sm:py-24">
+      <section className="bg-[#f1f5f9] py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center">
-                <Shield className="w-6 h-6 text-[#CD853F]" />
+              <div className="w-12 h-12 bg-[#475569]/20 flex items-center justify-center">
+                <Shield className="w-6 h-6 text-[#475569]" />
               </div>
-              <span className="text-[#CD853F] font-semibold uppercase tracking-wide text-sm">
+              <span className="text-[#475569] font-semibold uppercase tracking-wide text-sm">
                 Qualité garantie
               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900 leading-tight">
-              Garantie <span className="text-[#CD853F]">2 ans minimum</span>
+              Garantie <span className="text-[#475569]">2 ans minimum</span>
             </h1>
             <p className="mt-6 text-xl text-slate-600 leading-relaxed">
               Achetez en toute confiance. Tous nos braseros sont garantis 2 ans minimum avec un service 
@@ -137,7 +137,7 @@ export default async function GarantiePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/produits?category=brasero"
-                className="inline-flex items-center gap-2 bg-[#CD853F] hover:bg-[#8B4513] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
+                className="inline-flex items-center gap-2 bg-[#475569] hover:bg-[#0f172a] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
               >
                 Voir nos braseros
                 <ArrowRight size={18} />
@@ -168,9 +168,9 @@ export default async function GarantiePage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {coverages.map((coverage) => (
-              <div key={coverage.title} className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-                <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mb-4">
-                  <coverage.icon className="w-7 h-7 text-[#CD853F]" />
+              <div key={coverage.title} className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+                <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mb-4">
+                  <coverage.icon className="w-7 h-7 text-[#475569]" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-3">{coverage.title}</h3>
                 <p className="text-slate-600 leading-relaxed">{coverage.description}</p>
@@ -181,7 +181,7 @@ export default async function GarantiePage() {
       </section>
 
       {/* Durée garantie par modèle */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
@@ -197,26 +197,26 @@ export default async function GarantiePage() {
               <table className="w-full min-w-[400px]">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#8B4513]">Type de brasero</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#8B4513]">Garantie</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f172a]">Type de brasero</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#0f172a]">Garantie</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-slate-200">
                     <td className="px-6 py-4 text-slate-900">Braseros acier corten</td>
-                    <td className="px-6 py-4 text-center text-[#CD853F] font-semibold">5 ans</td>
+                    <td className="px-6 py-4 text-center text-[#475569] font-semibold">5 ans</td>
                   </tr>
                   <tr className="border-b border-slate-200">
                     <td className="px-6 py-4 text-slate-900">Braseros acier noir peint</td>
-                    <td className="px-6 py-4 text-center text-[#CD853F] font-semibold">3 ans</td>
+                    <td className="px-6 py-4 text-center text-[#475569] font-semibold">3 ans</td>
                   </tr>
                   <tr className="border-b border-slate-200">
                     <td className="px-6 py-4 text-slate-900">Planchas et grilles</td>
-                    <td className="px-6 py-4 text-center text-[#CD853F] font-semibold">2 ans</td>
+                    <td className="px-6 py-4 text-center text-[#475569] font-semibold">2 ans</td>
                   </tr>
                   <tr>
                     <td className="px-6 py-4 text-slate-900">Accessoires</td>
-                    <td className="px-6 py-4 text-center text-[#CD853F] font-semibold">2 ans</td>
+                    <td className="px-6 py-4 text-center text-[#475569] font-semibold">2 ans</td>
                   </tr>
                 </tbody>
               </table>
@@ -243,8 +243,8 @@ export default async function GarantiePage() {
           <div className="grid md:grid-cols-3 gap-6">
             {services.map((service) => (
               <div key={service.title} className="bg-white border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
-                <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
-                  <service.icon className="w-7 h-7 text-[#CD853F]" />
+                <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mx-auto mb-4">
+                  <service.icon className="w-7 h-7 text-[#475569]" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-3">{service.title}</h3>
                 <p className="text-slate-600 leading-relaxed">{service.description}</p>
@@ -255,7 +255,7 @@ export default async function GarantiePage() {
       </section>
 
       {/* Conditions garantie */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
@@ -315,8 +315,8 @@ export default async function GarantiePage() {
               { step: "3", title: "Solution", desc: "Nous vous proposons une solution : pièce de rechange ou remplacement" },
               { step: "4", title: "Expédition", desc: "Nous envoyons la pièce ou organisons le retour du brasero" },
             ].map((item) => (
-              <div key={item.step} className="bg-[#f6f1e9] p-6 border border-slate-200 flex gap-4 items-start">
-                <div className="w-10 h-10 bg-[#CD853F] text-white flex items-center justify-center font-bold flex-shrink-0">
+              <div key={item.step} className="bg-[#f1f5f9] p-6 border border-slate-200 flex gap-4 items-start">
+                <div className="w-10 h-10 bg-[#475569] text-white flex items-center justify-center font-bold flex-shrink-0">
                   {item.step}
                 </div>
                 <div>
@@ -330,7 +330,7 @@ export default async function GarantiePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
             Un problème avec votre brasero ?
@@ -341,14 +341,14 @@ export default async function GarantiePage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-[#0f172a] hover:bg-[#475569] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               <Phone size={18} />
               Contacter le SAV
             </Link>
             <Link
               href="/info/faq"
-              className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               Voir la FAQ
             </Link>
@@ -362,20 +362,20 @@ export default async function GarantiePage() {
           <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
             <a 
               href={`mailto:${settings.storeEmail}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Mail className="w-4 h-4 text-[#8B4513]" />
+              <Mail className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storeEmail}</span>
             </a>
             <a 
               href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Phone className="w-4 h-4 text-[#8B4513]" />
+              <Phone className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storePhone}</span>
             </a>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#8B4513]" />
+              <MapPin className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.atelier.city}, {settings.atelier.department}</span>
             </div>
           </div>

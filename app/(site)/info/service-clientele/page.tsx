@@ -203,10 +203,10 @@ export default async function ServiceClientelePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                <Headphones className="w-6 h-6 text-[#8B4513]" />
+              <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                <Headphones className="w-6 h-6 text-[#0f172a]" />
               </div>
-              <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+              <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                 Assistance
               </span>
             </div>
@@ -220,14 +220,14 @@ export default async function ServiceClientelePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
               >
                 <MessageCircle size={18} />
                 Nous contacter
               </Link>
               <Link
                 href="/info/faq"
-                className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-6 py-3 transition-all"
               >
                 <HelpCircle size={18} />
                 Consulter la FAQ
@@ -238,7 +238,7 @@ export default async function ServiceClientelePage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
@@ -254,18 +254,18 @@ export default async function ServiceClientelePage() {
               <Link
                 key={service.title}
                 href={service.href}
-                className="group bg-white p-6 border border-slate-200 hover:border-[#8B4513] hover:shadow-lg transition-all"
+                className="group bg-white p-6 border border-slate-200 hover:border-[#0f172a] hover:shadow-lg transition-all"
               >
                 <div className={`w-14 h-14 ${service.color} flex items-center justify-center mb-4`}>
-                  <service.icon className="w-7 h-7 text-[#8B4513]" />
+                  <service.icon className="w-7 h-7 text-[#0f172a]" />
                 </div>
-                <h3 className="font-semibold text-xl mb-2 text-slate-900 group-hover:text-[#8B4513] transition-colors">
+                <h3 className="font-semibold text-xl mb-2 text-slate-900 group-hover:text-[#0f172a] transition-colors">
                   {service.title}
                 </h3>
                 <p className="text-slate-600 leading-relaxed mb-4">
                   {service.description}
                 </p>
-                <span className="inline-flex items-center gap-1 text-[#8B4513] font-medium text-sm group-hover:gap-2 transition-all">
+                <span className="inline-flex items-center gap-1 text-[#0f172a] font-medium text-sm group-hover:gap-2 transition-all">
                   En savoir plus
                   <ArrowRight size={14} />
                 </span>
@@ -293,8 +293,8 @@ export default async function ServiceClientelePage() {
                 key={commitment.title}
                 className="text-center p-6"
               >
-                <div className="w-16 h-16 bg-[#f6f1e9] flex items-center justify-center mx-auto mb-4">
-                  <commitment.icon className="w-8 h-8 text-[#8B4513]" />
+                <div className="w-16 h-16 bg-[#f1f5f9] flex items-center justify-center mx-auto mb-4">
+                  <commitment.icon className="w-8 h-8 text-[#0f172a]" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-slate-900">{commitment.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
@@ -307,7 +307,7 @@ export default async function ServiceClientelePage() {
       </section>
 
       {/* Contact Methods */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
@@ -323,13 +323,13 @@ export default async function ServiceClientelePage() {
               <Link
                 key={method.title}
                 href={method.href}
-                className="group bg-white p-8 border border-slate-200 text-center hover:border-[#8B4513] hover:shadow-lg transition-all"
+                className="group bg-white p-8 border border-slate-200 text-center hover:border-[#0f172a] hover:shadow-lg transition-all"
               >
-                <div className="w-16 h-16 bg-[#f6f1e9] flex items-center justify-center mx-auto mb-4 group-hover:bg-[#8B4513] transition-colors">
-                  <method.icon className="w-8 h-8 text-[#8B4513] group-hover:text-white transition-colors" />
+                <div className="w-16 h-16 bg-[#f1f5f9] flex items-center justify-center mx-auto mb-4 group-hover:bg-[#0f172a] transition-colors">
+                  <method.icon className="w-8 h-8 text-[#0f172a] group-hover:text-white transition-colors" />
                 </div>
                 <h3 className="font-semibold text-lg mb-1 text-slate-900">{method.title}</h3>
-                <p className="text-[#8B4513] font-medium mb-2">{method.value}</p>
+                <p className="text-[#0f172a] font-medium mb-2">{method.value}</p>
                 <p className="text-slate-500 text-sm">{method.description}</p>
               </Link>
             ))}
@@ -338,15 +338,15 @@ export default async function ServiceClientelePage() {
           <div className="mt-12 bg-white p-8 border border-slate-200">
             <div className="flex flex-wrap justify-center items-center gap-8 text-sm">
               <div className="flex items-center gap-2 text-slate-600">
-                <Clock className="w-5 h-5 text-[#8B4513]" />
+                <Clock className="w-5 h-5 text-[#0f172a]" />
                 <span><strong>Horaires :</strong> Lun-Ven 9h-18h</span>
               </div>
               <div className="flex items-center gap-2 text-slate-600">
-                <MapPin className="w-5 h-5 text-[#8B4513]" />
+                <MapPin className="w-5 h-5 text-[#0f172a]" />
                 <span><strong>Atelier :</strong> {settings.atelier.city}, {settings.atelier.department}</span>
               </div>
               <div className="flex items-center gap-2 text-slate-600">
-                <Zap className="w-5 h-5 text-[#8B4513]" />
+                <Zap className="w-5 h-5 text-[#0f172a]" />
                 <span><strong>Réponse :</strong> Sous 24h ouvrées</span>
               </div>
             </div>
@@ -370,10 +370,10 @@ export default async function ServiceClientelePage() {
             {faqQuick.map((faq, index) => (
               <div 
                 key={index}
-                className="bg-[#f6f1e9] p-6 border border-slate-200"
+                className="bg-[#f1f5f9] p-6 border border-slate-200"
               >
                 <div className="flex items-start gap-4">
-                  <CheckCircle2 className="w-6 h-6 text-[#8B4513] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-6 h-6 text-[#0f172a] flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-lg text-slate-900 mb-2">
                       {faq.question}
@@ -390,7 +390,7 @@ export default async function ServiceClientelePage() {
           <div className="mt-8 text-center">
             <Link
               href="/info/faq"
-              className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#CD853F] font-medium transition-colors"
+              className="inline-flex items-center gap-2 text-[#0f172a] hover:text-[#475569] font-medium transition-colors"
             >
               Voir toutes les questions fréquentes
               <ArrowRight size={16} />
@@ -400,12 +400,12 @@ export default async function ServiceClientelePage() {
       </section>
 
       {/* Satisfaction */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex justify-center gap-1 mb-4">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-8 h-8 text-[#CD853F] fill-current" />
+                <Star key={i} className="w-8 h-8 text-[#475569] fill-current" />
               ))}
             </div>
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-4">
@@ -417,15 +417,15 @@ export default async function ServiceClientelePage() {
             </p>
             <div className="flex flex-wrap justify-center gap-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#8B4513]">24h</div>
+                <div className="text-3xl font-bold text-[#0f172a]">24h</div>
                 <div className="text-sm text-slate-600">Délai de réponse</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#8B4513]">14 jours</div>
+                <div className="text-3xl font-bold text-[#0f172a]">14 jours</div>
                 <div className="text-sm text-slate-600">Pour changer d'avis</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#8B4513]">2 ans</div>
+                <div className="text-3xl font-bold text-[#0f172a]">2 ans</div>
                 <div className="text-sm text-slate-600">Garantie minimum</div>
               </div>
             </div>
@@ -446,14 +446,14 @@ export default async function ServiceClientelePage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
             >
               <MessageCircle size={18} />
               Nous contacter
             </Link>
             <Link
               href="/produits"
-              className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
             >
               Découvrir nos braseros
               <ArrowRight size={18} />
@@ -468,24 +468,24 @@ export default async function ServiceClientelePage() {
           <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
             <a 
               href={`mailto:${settings.storeEmail}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Mail className="w-4 h-4 text-[#8B4513]" />
+              <Mail className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storeEmail}</span>
             </a>
             <a 
               href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Phone className="w-4 h-4 text-[#8B4513]" />
+              <Phone className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storePhone}</span>
             </a>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#8B4513]" />
+              <Clock className="w-4 h-4 text-[#0f172a]" />
               <span>Lun-Ven : 9h-18h</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#8B4513]" />
+              <MapPin className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.atelier.city}, {settings.atelier.department}</span>
             </div>
           </div>

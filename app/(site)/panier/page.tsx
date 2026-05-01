@@ -198,7 +198,7 @@ export default function PanierPage() {
                 </div>
 
                 {totalPrice >= 500 && (
-                  <div className="rounded-lg bg-[#f6f1e9] px-3 py-2 text-xs text-[#8B4513] font-medium flex items-center gap-2">
+                  <div className="rounded-lg bg-[#f1f5f9] px-3 py-2 text-xs text-[#0f172a] font-medium flex items-center gap-2">
                     <Lock size={12} className="flex-shrink-0" />
                     <span>ou 3× {Math.ceil((totalPrice + 80) / 3)} € sans frais via Klarna</span>
                   </div>
@@ -221,19 +221,19 @@ export default function PanierPage() {
                 {/* Reassurance */}
                 <div className="mt-4 space-y-2 pt-4 border-t border-slate-100">
                   <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Lock size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <Lock size={14} className="text-[#0f172a] flex-shrink-0" />
                     <span>Paiement 100% sécurisé (SSL)</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Truck size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <Truck size={14} className="text-[#0f172a] flex-shrink-0" />
                     <span>Livraison +80 € — Fabrication et livraison sous 2 à 4 semaines</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Shield size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <Shield size={14} className="text-[#0f172a] flex-shrink-0" />
                     <span>Garantie 2 ans — SAV sous 48h</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <RotateCcw size={14} className="text-[#8B4513] flex-shrink-0" />
+                    <RotateCcw size={14} className="text-[#0f172a] flex-shrink-0" />
                     <span>Retour sous 14 jours</span>
                   </div>
                 </div>

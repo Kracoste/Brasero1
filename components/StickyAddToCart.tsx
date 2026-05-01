@@ -41,7 +41,7 @@ export function StickyAddToCart({ productName, price, onAdd, disabled, onDemand 
           type="button"
           onClick={onAdd}
           disabled={disabled}
-          className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-5 py-2.5 font-semibold text-white shadow-md active:scale-95 transition disabled:opacity-60"
+          className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0f172a] to-[#475569] px-5 py-2.5 font-semibold text-white shadow-md active:scale-95 transition disabled:opacity-60"
         >
           <ShoppingCart size={18} />
           <span className="text-sm">Ajouter</span>

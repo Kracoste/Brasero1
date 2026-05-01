@@ -5,7 +5,7 @@ export function BlogNewsletterInline() {
   return (
     <aside className="my-10 p-5 sm:p-6 bg-slate-50 border border-slate-200 rounded-lg not-prose">
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#8B4513] text-white flex items-center justify-center">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0f172a] text-white flex items-center justify-center">
           <Mail size={18} />
         </div>
         <div className="flex-1">
@@ -17,7 +17,7 @@ export function BlogNewsletterInline() {
           </p>
           <Link
             href="/info/bulletin-information"
-            className="inline-flex items-center text-sm font-medium text-[#8B4513] hover:underline"
+            className="inline-flex items-center text-sm font-medium text-[#0f172a] hover:underline"
           >
             S&apos;inscrire gratuitement →
           </Link>

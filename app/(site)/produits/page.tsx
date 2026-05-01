@@ -33,6 +33,11 @@ const CATEGORY_META: Record<string, { title: string; description: string; keywor
     description: "Range-bûches artisanaux en acier pour organiser et stocker votre bois de chauffage avec style. Manufacturés en France.",
     keywords: ["range-bûches", "rangement bois", "range-bûches design", "range-bûches acier"],
   },
+  "housse-protection": {
+    title: "Housses de protection brasero | Protégez votre brasero | Atelier LBF",
+    description: "Housses de protection artisanales pour braseros et planchas. Tissu imperméable haute qualité, protection contre les intempéries. Fabriquées en France.",
+    keywords: ["housse brasero", "housse protection brasero", "protection plancha", "couverture brasero", "housse étanche brasero"],
+  },
   promotions: {
     title: "Promotions braseros : jusqu'à -40% | Atelier LBF",
     description: "Promotions exceptionnelles jusqu'à -40% sur nos braseros artisanaux et accessoires Made in France. Offres limitées.",
@@ -131,6 +136,8 @@ export default async function ProductsPage({ searchParams }: Props) {
           .sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0))
       : category === "accessoire"
       ? allProducts.filter((product) => product.category === category && (!product.discountPercent || product.discountPercent === 0))
+      : category === "housse-protection"
+      ? allProducts.filter((product) => product.category === category && (!product.discountPercent || product.discountPercent === 0))
       : category === "brasero"
       ? allProducts.filter((product) => isBraseroGroupCategory(product.category))
       : category
@@ -147,6 +154,8 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Nos Promotions"
     : category === "range-buches"
     ? "Ranges Bûches"
+    : category === "housse-protection"
+    ? "Housses de protection"
     : category === "accessoire" && section === "range-buches"
     ? "Ranges Bûches"
     : category === "accessoire"
@@ -159,6 +168,8 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Préparez vos bûches en toute sécurité avec notre fendeur manuel manufacturé en France."
     : category === "range-buches"
     ? "Découvrez nos ranges bûches design et pratiques pour organiser votre bois."
+    : category === "housse-protection"
+    ? "Protégez votre brasero avec nos housses artisanales imperméables."
     : category === "accessoire" && section === "range-buches"
     ? "Découvrez nos ranges bûches design et pratiques pour organiser votre bois."
     : category === "accessoire"

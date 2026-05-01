@@ -241,10 +241,10 @@ export default async function AstucesConseilsPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                  <Lightbulb className="w-6 h-6 text-[#8B4513]" />
+                <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                  <Lightbulb className="w-6 h-6 text-[#0f172a]" />
                 </div>
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Conseils
                 </span>
               </div>
@@ -261,12 +261,12 @@ export default async function AstucesConseilsPage() {
         </section>
 
         {/* Sécurité */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Shield className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <Shield className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Sécurité
                 </span>
               </div>
@@ -284,7 +284,7 @@ export default async function AstucesConseilsPage() {
                   key={tip.title}
                   className="bg-white p-6 border border-slate-200"
                 >
-                  <tip.icon className="w-10 h-10 text-[#8B4513] mb-4" />
+                  <tip.icon className="w-10 h-10 text-[#0f172a] mb-4" />
                   <h3 className="font-semibold text-lg mb-2 text-slate-900">{tip.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     {tip.description}
@@ -301,8 +301,8 @@ export default async function AstucesConseilsPage() {
             <div className="grid lg:grid-cols-2 gap-12 items-start">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Flame className="w-5 h-5 text-[#8B4513]" />
-                  <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                  <Flame className="w-5 h-5 text-[#0f172a]" />
+                  <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                     Allumage
                   </span>
                 </div>
@@ -318,11 +318,11 @@ export default async function AstucesConseilsPage() {
                   {lightingSteps.map((item, index) => (
                     <div key={item.step} className="flex gap-4">
                       <div className="flex-shrink-0 flex flex-col items-center">
-                        <div className="w-10 h-10 bg-[#8B4513] text-white flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 bg-[#0f172a] text-white flex items-center justify-center font-bold">
                           {item.step}
                         </div>
                         {index < lightingSteps.length - 1 && (
-                          <div className="w-0.5 flex-1 bg-[#CD853F]" />
+                          <div className="w-0.5 flex-1 bg-[#475569]" />
                         )}
                       </div>
                       <div className="pt-1 pb-6">
@@ -334,9 +334,9 @@ export default async function AstucesConseilsPage() {
                 </div>
               </div>
               
-              <div className="bg-[#f6f1e9] p-8 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-8 border border-slate-200">
                 <div className="flex items-start gap-4 mb-6">
-                  <Info className="w-6 h-6 text-[#8B4513] flex-shrink-0 mt-0.5" />
+                  <Info className="w-6 h-6 text-[#0f172a] flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-slate-900 mb-2">
                       Astuce de pro
@@ -360,7 +360,7 @@ export default async function AstucesConseilsPage() {
                       "Briquet ou allumettes longues"
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-2 text-sm text-slate-700">
-                        <CheckCircle2 className="w-4 h-4 text-[#8B4513] flex-shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-[#0f172a] flex-shrink-0" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -372,12 +372,12 @@ export default async function AstucesConseilsPage() {
         </section>
 
         {/* Choix du bois */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <TreePine className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <TreePine className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Combustible
                 </span>
               </div>
@@ -401,7 +401,7 @@ export default async function AstucesConseilsPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Flame 
                           key={star} 
-                          className={`w-4 h-4 ${star <= wood.rating ? 'text-[#CD853F]' : 'text-slate-200'}`}
+                          className={`w-4 h-4 ${star <= wood.rating ? 'text-[#475569]' : 'text-slate-200'}`}
                           fill={star <= wood.rating ? 'currentColor' : 'none'}
                         />
                       ))}
@@ -438,8 +438,8 @@ export default async function AstucesConseilsPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Wrench className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <Wrench className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Entretien
                 </span>
               </div>
@@ -455,16 +455,16 @@ export default async function AstucesConseilsPage() {
               {maintenanceTips.map((maintenance) => (
                 <div 
                   key={maintenance.title}
-                  className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200"
+                  className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200"
                 >
                   <div className="flex items-center gap-3 mb-6">
-                    <maintenance.icon className="w-8 h-8 text-[#8B4513]" />
+                    <maintenance.icon className="w-8 h-8 text-[#0f172a]" />
                     <h3 className="text-xl font-semibold text-slate-900">{maintenance.title}</h3>
                   </div>
                   <ul className="space-y-3">
                     {maintenance.tips.map((tip) => (
                       <li key={tip} className="flex items-start gap-3 text-slate-700">
-                        <CheckCircle2 className="w-5 h-5 text-[#8B4513] flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-5 h-5 text-[#0f172a] flex-shrink-0 mt-0.5" />
                         <span>{tip}</span>
                       </li>
                     ))}
@@ -476,12 +476,12 @@ export default async function AstucesConseilsPage() {
         </section>
 
         {/* Astuces de pro */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <Sparkles className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Astuces
                 </span>
               </div>
@@ -496,7 +496,7 @@ export default async function AstucesConseilsPage() {
                   key={tip.title}
                   className="bg-white p-6 border border-slate-200"
                 >
-                  <tip.icon className="w-10 h-10 text-[#8B4513] mb-4" />
+                  <tip.icon className="w-10 h-10 text-[#0f172a] mb-4" />
                   <h3 className="font-semibold text-lg mb-2 text-slate-900">{tip.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     {tip.description}
@@ -520,14 +520,14 @@ export default async function AstucesConseilsPage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 <Mail size={18} />
                 Nous contacter
               </Link>
               <Link
                 href="/info/faq"
-                className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Voir la FAQ
                 <ArrowRight size={18} />
@@ -542,24 +542,24 @@ export default async function AstucesConseilsPage() {
             <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
               <a 
                 href={`mailto:${settings.storeEmail}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Mail className="w-4 h-4 text-[#8B4513]" />
+                <Mail className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storeEmail}</span>
               </a>
               <a 
                 href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Phone className="w-4 h-4 text-[#8B4513]" />
+                <Phone className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storePhone}</span>
               </a>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#8B4513]" />
+                <Clock className="w-4 h-4 text-[#0f172a]" />
                 <span>Lun-Ven : 9h-18h</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#8B4513]" />
+                <MapPin className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.atelier.city}, {settings.atelier.department}</span>
               </div>
             </div>

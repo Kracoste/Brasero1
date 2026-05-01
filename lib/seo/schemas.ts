@@ -39,6 +39,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   fendeur: "Fendeurs à bûches",
   accessoire: "Accessoires",
   "range-buches": "Range-bûches",
+  "housse-protection": "Housses de protection",
 };
 
 // ── Organisation ───────────────────────────────────────────────────────────

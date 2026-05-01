@@ -20,7 +20,7 @@ export function FloatingCart() {
       {/* Bouton flottant */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white shadow-2xl transition hover:scale-110 hover:brightness-110"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#0f172a] to-[#475569] text-white shadow-2xl transition hover:scale-110 hover:brightness-110"
         aria-label="Ouvrir le panier"
       >
         <ShoppingCart size={24} />
@@ -119,7 +119,7 @@ export function FloatingCart() {
               <Link
                 href="/panier"
                 onClick={() => setIsOpen(false)}
-                className="block w-full rounded-full bg-gradient-to-br from-[#8B4513] to-[#CD853F] py-3 text-center font-semibold text-white transition hover:brightness-110"
+                className="block w-full rounded-full bg-gradient-to-br from-[#0f172a] to-[#475569] py-3 text-center font-semibold text-white transition hover:brightness-110"
               >
                 Voir le panier complet
               </Link>

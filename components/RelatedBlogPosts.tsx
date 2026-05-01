@@ -11,7 +11,7 @@ export function RelatedBlogPosts({ posts }: RelatedBlogPostsProps) {
   if (!posts || posts.length === 0) return null;
 
   return (
-    <section className="py-10 sm:py-14 bg-[#f6f1e9]">
+    <section className="py-10 sm:py-14">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900 mb-6">
           Guides et conseils pour votre brasero
@@ -34,12 +34,12 @@ export function RelatedBlogPosts({ posts }: RelatedBlogPostsProps) {
                   />
                 </div>
               ) : (
-                <div className="h-40 bg-gradient-to-br from-[#8B4513]/10 to-[#CD853F]/10 flex items-center justify-center">
-                  <span className="text-4xl text-[#8B4513]/20">📖</span>
+                <div className="h-40 bg-slate-100 flex items-center justify-center">
+                  <span className="text-4xl text-slate-400">📖</span>
                 </div>
               )}
               <div className="p-4">
-                <h3 className="font-semibold text-sm text-slate-900 mb-2 group-hover:text-[#8B4513] transition-colors line-clamp-2">
+                <h3 className="font-semibold text-sm text-slate-900 mb-2 group-hover:text-slate-700 transition-colors line-clamp-2">
                   {post.title}
                 </h3>
                 <p className="text-slate-600 text-xs leading-relaxed mb-3 line-clamp-2">
@@ -50,7 +50,7 @@ export function RelatedBlogPosts({ posts }: RelatedBlogPostsProps) {
                     <Clock className="w-3 h-3" />
                     <span>{post.read_time} min</span>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[#8B4513] text-xs font-medium">
+                  <span className="inline-flex items-center gap-1 text-slate-900 text-xs font-medium">
                     Lire l&apos;article
                     <ArrowRight size={12} />
                   </span>

@@ -178,7 +178,7 @@ export default async function CommanderPage() {
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   href="/produits"
-                  className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] hover:brightness-110 text-white font-semibold px-6 py-3 rounded-md shadow-lg transition-all"
+                  className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] hover:brightness-110 text-white font-semibold px-6 py-3 rounded-md shadow-lg transition-all"
                 >
                   Voir nos braseros
                   <ArrowRight size={18} />
@@ -196,7 +196,7 @@ export default async function CommanderPage() {
         </section>
 
         {/* Étapes de commande */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
@@ -306,7 +306,7 @@ export default async function CommanderPage() {
         </section>
 
         {/* Garanties */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
@@ -322,14 +322,14 @@ export default async function CommanderPage() {
                 <Link
                   key={guarantee.title}
                   href={guarantee.href}
-                  className="bg-slate-50 p-6 border border-slate-200 hover:shadow-md hover:border-[#CD853F]/40 transition-all group"
+                  className="bg-slate-50 p-6 border border-slate-200 hover:shadow-md hover:border-[#475569]/40 transition-all group"
                 >
-                  <guarantee.icon className="w-10 h-10 text-[#8B4513] mb-4 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-semibold text-lg mb-2 text-slate-900 group-hover:text-[#8B4513] transition-colors">{guarantee.title}</h3>
+                  <guarantee.icon className="w-10 h-10 text-[#0f172a] mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-semibold text-lg mb-2 text-slate-900 group-hover:text-[#0f172a] transition-colors">{guarantee.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     {guarantee.description}
                   </p>
-                  <span className="inline-flex items-center gap-1 text-[#8B4513] text-sm font-medium mt-3 group-hover:gap-2 transition-all">
+                  <span className="inline-flex items-center gap-1 text-[#0f172a] text-sm font-medium mt-3 group-hover:gap-2 transition-all">
                     En savoir plus <ArrowRight size={14} />
                   </span>
                 </Link>
@@ -480,14 +480,14 @@ export default async function CommanderPage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Découvrir nos braseros
                 <ArrowRight size={18} />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 <Phone size={18} />
                 Nous contacter

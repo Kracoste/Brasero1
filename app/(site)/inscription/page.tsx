@@ -144,7 +144,7 @@ export default function InscriptionPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-slate-600">
             Vous avez déjà un compte ?{' '}
-            <Link href="/connexion" className="font-medium text-[#CD853F] hover:text-[#8B4513]">
+            <Link href="/connexion" className="font-medium text-[#475569] hover:text-[#0f172a]">
               Connectez-vous !
             </Link>
           </p>
@@ -167,7 +167,7 @@ export default function InscriptionPage() {
                 <select
                   value={clientType}
                   onChange={(e) => setClientType(e.target.value as 'particulier' | 'professionnel')}
-                  className="appearance-none rounded-none border-2 border-slate-800 bg-white px-4 py-2 pr-10 text-sm font-medium text-slate-800 focus:border-[#CD853F] focus:outline-none"
+                  className="appearance-none rounded-none border-2 border-slate-800 bg-white px-4 py-2 pr-10 text-sm font-medium text-slate-800 focus:border-[#475569] focus:outline-none"
                 >
                   <option value="particulier">Un particulier</option>
                   <option value="professionnel">Un professionnel</option>
@@ -185,7 +185,7 @@ export default function InscriptionPage() {
                   value="M"
                   checked={civilite === 'M'}
                   onChange={(e) => setCivilite(e.target.value as 'M')}
-                  className="h-5 w-5 border-2 border-slate-400 text-slate-800 focus:ring-[#CD853F]"
+                  className="h-5 w-5 border-2 border-slate-400 text-slate-800 focus:ring-[#475569]"
                 />
                 <span className="text-sm text-slate-700">M</span>
               </label>
@@ -196,7 +196,7 @@ export default function InscriptionPage() {
                   value="Mme"
                   checked={civilite === 'Mme'}
                   onChange={(e) => setCivilite(e.target.value as 'Mme')}
-                  className="h-5 w-5 border-2 border-slate-400 text-slate-800 focus:ring-[#CD853F]"
+                  className="h-5 w-5 border-2 border-slate-400 text-slate-800 focus:ring-[#475569]"
                 />
                 <span className="text-sm text-slate-700">Mme</span>
               </label>
@@ -214,7 +214,7 @@ export default function InscriptionPage() {
                 required
                 value={prenom}
                 onChange={(e) => setPrenom(e.target.value)}
-                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
               />
               <p className="mt-1 text-xs text-slate-500">
                 Seules les lettres et le point (.), suivi d'un espace, sont autorisés.
@@ -233,7 +233,7 @@ export default function InscriptionPage() {
                 required
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
-                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
               />
               <p className="mt-1 text-xs text-slate-500">
                 Seules les lettres et le point (.), suivi d'un espace, sont autorisés.
@@ -253,7 +253,7 @@ export default function InscriptionPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
               />
             </div>
 
@@ -271,12 +271,12 @@ export default function InscriptionPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                  className="block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B4513] hover:text-[#CD853F]"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#0f172a] hover:text-[#475569]"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -296,7 +296,7 @@ export default function InscriptionPage() {
                 autoComplete="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
                 placeholder="06 12 34 56 78"
               />
             </div>
@@ -314,7 +314,7 @@ export default function InscriptionPage() {
                 required
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
                 placeholder="12 rue de la République"
               />
             </div>
@@ -329,7 +329,7 @@ export default function InscriptionPage() {
                 type="text"
                 value={addressLine2}
                 onChange={(e) => setAddressLine2(e.target.value)}
-                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
                 placeholder="Bâtiment, étage..."
               />
             </div>
@@ -348,7 +348,7 @@ export default function InscriptionPage() {
                   required
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
-                  className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                  className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -363,7 +363,7 @@ export default function InscriptionPage() {
                   required
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                  className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
                 />
               </div>
             </div>
@@ -377,7 +377,7 @@ export default function InscriptionPage() {
                 name="country"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-[#CD853F] focus:outline-none"
+                className="mt-2 block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-[#475569] focus:outline-none"
               >
                 <option value="France">France</option>
                 <option value="Belgique">Belgique</option>
@@ -399,12 +399,12 @@ export default function InscriptionPage() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-slate-900 placeholder-slate-400 focus:border-[#CD853F] focus:outline-none"
+                  className="block w-full rounded-none border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-slate-900 placeholder-slate-400 focus:border-[#475569] focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B4513] hover:text-[#CD853F]"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#0f172a] hover:text-[#475569]"
                 >
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -416,7 +416,7 @@ export default function InscriptionPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative flex w-full justify-center rounded-lg bg-gradient-to-br from-[#8B4513] to-[#CD853F] px-4 py-3 text-sm font-semibold text-white hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#CD853F] focus:ring-offset-2 disabled:opacity-50"
+              className="group relative flex w-full justify-center rounded-lg bg-gradient-to-br from-[#0f172a] to-[#475569] px-4 py-3 text-sm font-semibold text-white hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#475569] focus:ring-offset-2 disabled:opacity-50"
             >
               {loading ? 'Inscription en cours...' : "S'inscrire"}
             </button>

@@ -20,7 +20,7 @@ export default function Error({
         <div className="flex items-center justify-center gap-4">
           <button
             onClick={reset}
-            className="rounded-lg bg-[#8B4513] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#723a0f] transition"
+            className="rounded-lg bg-[#0f172a] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#723a0f] transition"
           >
             Réessayer
           </button>

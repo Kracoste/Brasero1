@@ -186,6 +186,7 @@ export default function AdminProducts() {
             <option value="all">Toutes les catégories</option>
             <option value="brasero">Braséros</option>
             <option value="accessoire">Accessoires</option>
+            <option value="housse-protection">Housses de protection</option>
             <option value="fendeur">Fendeur à bûches</option>
           </select>
         </div>

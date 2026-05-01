@@ -154,10 +154,10 @@ export default async function DonneesEntreprisePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-[#8B4513]" />
+                <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-[#0f172a]" />
                 </div>
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Informations légales
                 </span>
               </div>
@@ -173,13 +173,13 @@ export default async function DonneesEntreprisePage() {
         </section>
 
         {/* Coordonnées */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Informations de contact */}
               <div>
                 <div className="flex items-center gap-2 mb-6">
-                  <Phone className="w-5 h-5 text-[#8B4513]" />
+                  <Phone className="w-5 h-5 text-[#0f172a]" />
                   <h2 className="text-2xl font-display font-bold text-slate-900">
                     Nous contacter
                   </h2>
@@ -187,8 +187,8 @@ export default async function DonneesEntreprisePage() {
                 
                 <div className="bg-white p-6 sm:p-8 border border-slate-200 space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-6 h-6 text-[#8B4513]" />
+                    <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Adresse</h3>
@@ -200,14 +200,14 @@ export default async function DonneesEntreprisePage() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-6 h-6 text-[#8B4513]" />
+                    <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Téléphone</h3>
                       <a 
                         href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-                        className="text-[#8B4513] hover:text-[#CD853F] transition-colors"
+                        className="text-[#0f172a] hover:text-[#475569] transition-colors"
                       >
                         {settings.storePhone}
                       </a>
@@ -215,14 +215,14 @@ export default async function DonneesEntreprisePage() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-6 h-6 text-[#8B4513]" />
+                    <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Email</h3>
                       <a 
                         href={`mailto:${settings.storeEmail}`}
-                        className="text-[#8B4513] hover:text-[#CD853F] transition-colors"
+                        className="text-[#0f172a] hover:text-[#475569] transition-colors"
                       >
                         {settings.storeEmail}
                       </a>
@@ -230,14 +230,14 @@ export default async function DonneesEntreprisePage() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0">
-                      <Globe className="w-6 h-6 text-[#8B4513]" />
+                    <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">
+                      <Globe className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Site web</h3>
                       <a 
                         href="https://www.atelier-lbf.fr"
-                        className="text-[#8B4513] hover:text-[#CD853F] transition-colors"
+                        className="text-[#0f172a] hover:text-[#475569] transition-colors"
                       >
                         www.atelier-lbf.fr
                       </a>
@@ -245,8 +245,8 @@ export default async function DonneesEntreprisePage() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-6 h-6 text-[#8B4513]" />
+                    <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Horaires</h3>
@@ -262,7 +262,7 @@ export default async function DonneesEntreprisePage() {
                 <div className="mt-6">
                   <Link
                     href="/contact"
-                    className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                    className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
                   >
                     <Mail size={18} />
                     Formulaire de contact
@@ -273,7 +273,7 @@ export default async function DonneesEntreprisePage() {
               {/* Carte */}
               <div>
                 <div className="flex items-center gap-2 mb-6">
-                  <MapPin className="w-5 h-5 text-[#8B4513]" />
+                  <MapPin className="w-5 h-5 text-[#0f172a]" />
                   <h2 className="text-2xl font-display font-bold text-slate-900">
                     Notre localisation
                   </h2>
@@ -303,8 +303,8 @@ export default async function DonneesEntreprisePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <FileText className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <FileText className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Informations légales
                 </span>
               </div>
@@ -315,9 +315,9 @@ export default async function DonneesEntreprisePage() {
 
             <div className="grid md:grid-cols-2 gap-8">
               {/* Informations société */}
-              <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
                 <div className="flex items-center gap-3 mb-6">
-                  <Briefcase className="w-6 h-6 text-[#8B4513]" />
+                  <Briefcase className="w-6 h-6 text-[#0f172a]" />
                   <h3 className="text-xl font-semibold text-slate-900">
                     Identification de la société
                   </h3>
@@ -334,9 +334,9 @@ export default async function DonneesEntreprisePage() {
 
               {/* Responsables */}
               <div className="space-y-8">
-                <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+                <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
                   <div className="flex items-center gap-3 mb-6">
-                    <Users className="w-6 h-6 text-[#8B4513]" />
+                    <Users className="w-6 h-6 text-[#0f172a]" />
                     <h3 className="text-xl font-semibold text-slate-900">
                       Responsables
                     </h3>
@@ -351,9 +351,9 @@ export default async function DonneesEntreprisePage() {
                   </dl>
                 </div>
 
-                <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+                <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
                   <div className="flex items-center gap-3 mb-6">
-                    <Globe className="w-6 h-6 text-[#8B4513]" />
+                    <Globe className="w-6 h-6 text-[#0f172a]" />
                     <h3 className="text-xl font-semibold text-slate-900">
                       Hébergement du site
                     </h3>
@@ -374,7 +374,7 @@ export default async function DonneesEntreprisePage() {
                           href={hosting.website}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[#8B4513] hover:text-[#CD853F] text-sm"
+                          className="inline-flex items-center gap-1 text-[#0f172a] hover:text-[#475569] text-sm"
                         >
                           {hosting.website}
                           <ExternalLink size={14} />
@@ -389,7 +389,7 @@ export default async function DonneesEntreprisePage() {
         </section>
 
         {/* Liens utiles */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
@@ -432,12 +432,12 @@ export default async function DonneesEntreprisePage() {
                   href={link.href}
                   className="bg-white p-6 border border-slate-200 hover:shadow-md transition-shadow group"
                 >
-                  <link.icon className="w-10 h-10 text-[#8B4513] mb-4" />
-                  <h3 className="font-semibold text-lg mb-1 text-slate-900 group-hover:text-[#8B4513] transition-colors">
+                  <link.icon className="w-10 h-10 text-[#0f172a] mb-4" />
+                  <h3 className="font-semibold text-lg mb-1 text-slate-900 group-hover:text-[#0f172a] transition-colors">
                     {link.title}
                   </h3>
                   <p className="text-slate-600 text-sm">{link.description}</p>
-                  <span className="inline-flex items-center gap-1 text-[#8B4513] text-sm mt-3 font-medium">
+                  <span className="inline-flex items-center gap-1 text-[#0f172a] text-sm mt-3 font-medium">
                     Consulter
                     <ArrowRight size={14} />
                   </span>
@@ -459,14 +459,14 @@ export default async function DonneesEntreprisePage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 <Mail size={18} />
                 Nous contacter
               </Link>
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Voir nos braseros
                 <ArrowRight size={18} />
@@ -481,24 +481,24 @@ export default async function DonneesEntreprisePage() {
             <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
               <a 
                 href={`mailto:${settings.storeEmail}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Mail className="w-4 h-4 text-[#8B4513]" />
+                <Mail className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storeEmail}</span>
               </a>
               <a 
                 href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Phone className="w-4 h-4 text-[#8B4513]" />
+                <Phone className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storePhone}</span>
               </a>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#8B4513]" />
+                <Clock className="w-4 h-4 text-[#0f172a]" />
                 <span>Lun-Ven : 9h-18h</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#8B4513]" />
+                <MapPin className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.atelier.city}, {settings.atelier.department}</span>
               </div>
             </div>

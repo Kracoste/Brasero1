@@ -218,19 +218,19 @@ export default async function RetoursPage() {
       ))}
 
       {/* Hero */}
-      <section className="bg-[#f6f1e9] py-16 sm:py-24">
+      <section className="bg-[#f1f5f9] py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center">
-                <RotateCcw className="w-6 h-6 text-[#CD853F]" />
+              <div className="w-12 h-12 bg-[#475569]/20 flex items-center justify-center">
+                <RotateCcw className="w-6 h-6 text-[#475569]" />
               </div>
-              <span className="text-[#CD853F] font-semibold uppercase tracking-wide text-sm">
+              <span className="text-[#475569] font-semibold uppercase tracking-wide text-sm">
                 Garantie satisfaction
               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900 leading-tight">
-              Satisfait ou <span className="text-[#CD853F]">remboursé</span>
+              Satisfait ou <span className="text-[#475569]">remboursé</span>
             </h1>
             <p className="mt-6 text-xl text-slate-600 leading-relaxed">
               14 jours pour changer d&apos;avis. Si votre brasero ne vous convient pas,
@@ -239,7 +239,7 @@ export default async function RetoursPage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 bg-[#CD853F] hover:bg-[#8B4513] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
+                className="inline-flex items-center gap-2 bg-[#475569] hover:bg-[#0f172a] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
               >
                 Voir nos braseros
                 <ArrowRight size={18} />
@@ -260,19 +260,19 @@ export default async function RetoursPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-[#CD853F]">14</div>
+              <div className="text-3xl sm:text-4xl font-bold text-[#475569]">14</div>
               <p className="text-slate-600 mt-1">jours pour retourner</p>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-[#CD853F]">100%</div>
+              <div className="text-3xl sm:text-4xl font-bold text-[#475569]">100%</div>
               <p className="text-slate-600 mt-1">remboursement intégral</p>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-[#CD853F]">14j</div>
+              <div className="text-3xl sm:text-4xl font-bold text-[#475569]">14j</div>
               <p className="text-slate-600 mt-1">délai de remboursement</p>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-[#CD853F]">0€</div>
+              <div className="text-3xl sm:text-4xl font-bold text-[#475569]">0€</div>
               <p className="text-slate-600 mt-1">frais cachés</p>
             </div>
           </div>
@@ -293,18 +293,18 @@ export default async function RetoursPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {steps.map((step, index) => (
-              <div key={step.title} className="relative bg-[#f6f1e9] p-6 border border-slate-200">
-                <div className="absolute -top-4 left-6 w-8 h-8 bg-[#CD853F] flex items-center justify-center text-white font-bold text-sm">
+              <div key={step.title} className="relative bg-[#f1f5f9] p-6 border border-slate-200">
+                <div className="absolute -top-4 left-6 w-8 h-8 bg-[#475569] flex items-center justify-center text-white font-bold text-sm">
                   {step.number}
                 </div>
-                <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mb-4 mt-2">
-                  <step.icon className="w-7 h-7 text-[#CD853F]" />
+                <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mb-4 mt-2">
+                  <step.icon className="w-7 h-7 text-[#475569]" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3">{step.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
 
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 left-full w-6 h-0.5 bg-[#CD853F]/40 -translate-y-1/2" />
+                  <div className="hidden lg:block absolute top-1/2 left-full w-6 h-0.5 bg-[#475569]/40 -translate-y-1/2" />
                 )}
               </div>
             ))}
@@ -313,7 +313,7 @@ export default async function RetoursPage() {
       </section>
 
       {/* Conditions */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
@@ -327,8 +327,8 @@ export default async function RetoursPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {conditions.map((condition) => (
               <div key={condition.title} className="bg-white p-6 border border-slate-200">
-                <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mb-4">
-                  <condition.icon className="w-7 h-7 text-[#CD853F]" />
+                <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mb-4">
+                  <condition.icon className="w-7 h-7 text-[#475569]" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3">{condition.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{condition.description}</p>
@@ -351,57 +351,57 @@ export default async function RetoursPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
               <div className="flex items-center gap-3 mb-4">
-                <RotateCcw className="w-8 h-8 text-[#CD853F]" />
+                <RotateCcw className="w-8 h-8 text-[#475569]" />
                 <h3 className="text-xl font-semibold text-slate-900">Droit de retour (14 jours)</h3>
               </div>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Changement d&apos;avis, sans justification</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Produit en état neuf, non utilisé</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Frais de retour à la charge du client</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Remboursement intégral sous 14 jours</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
               <div className="flex items-center gap-3 mb-4">
-                <Shield className="w-8 h-8 text-[#CD853F]" />
+                <Shield className="w-8 h-8 text-[#475569]" />
                 <h3 className="text-xl font-semibold text-slate-900">Garantie produit (2 ans)</h3>
               </div>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Défaut de fabrication ou vice caché</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Réparation ou remplacement gratuit</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Frais de retour pris en charge</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">Valable 2 ans après l&apos;achat</span>
                 </li>
               </ul>
               <Link
                 href="/garantie"
-                className="inline-flex items-center gap-2 text-[#8B4513] font-medium mt-4 hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-[#0f172a] font-medium mt-4 hover:gap-3 transition-all"
               >
                 En savoir plus sur la garantie <ArrowRight size={16} />
               </Link>
@@ -411,10 +411,10 @@ export default async function RetoursPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <HelpCircle className="w-12 h-12 text-[#CD853F] mx-auto mb-4" />
+            <HelpCircle className="w-12 h-12 text-[#475569] mx-auto mb-4" />
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
               Questions fréquentes sur les retours
             </h2>
@@ -426,9 +426,9 @@ export default async function RetoursPage() {
                 key={index}
                 className="bg-white border border-slate-200 group"
               >
-                <summary className="flex items-center justify-between cursor-pointer p-5 font-semibold text-slate-900 hover:text-[#8B4513] transition-colors">
+                <summary className="flex items-center justify-between cursor-pointer p-5 font-semibold text-slate-900 hover:text-[#0f172a] transition-colors">
                   {faq.question}
-                  <span className="text-[#CD853F] group-open:rotate-180 transition-transform">
+                  <span className="text-[#475569] group-open:rotate-180 transition-transform">
                     <ArrowRight className="rotate-90" size={18} />
                   </span>
                 </summary>
@@ -453,14 +453,14 @@ export default async function RetoursPage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="/produits"
-              className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-[#0f172a] hover:bg-[#475569] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               <CheckCircle2 size={18} />
               Découvrir nos braseros
             </Link>
             <Link
               href="/garantie"
-              className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               <Shield size={18} />
               Notre garantie 2 ans
@@ -475,20 +475,20 @@ export default async function RetoursPage() {
           <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
             <a
               href={`mailto:${settings.storeEmail}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Mail className="w-4 h-4 text-[#8B4513]" />
+              <Mail className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storeEmail}</span>
             </a>
             <a
               href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Phone className="w-4 h-4 text-[#8B4513]" />
+              <Phone className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storePhone}</span>
             </a>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#8B4513]" />
+              <MapPin className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.atelier.city}, {settings.atelier.department}</span>
             </div>
           </div>

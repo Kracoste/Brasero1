@@ -109,10 +109,10 @@ export default async function ConfidentialitePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-[#8B4513]" />
+                <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-[#0f172a]" />
                 </div>
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Confidentialité & Protection
                 </span>
               </div>
@@ -132,7 +132,7 @@ export default async function ConfidentialitePage() {
         </section>
 
         {/* Responsable du traitement */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-6">
@@ -173,9 +173,9 @@ export default async function ConfidentialitePage() {
               {dataTypes.map((data) => (
                 <div 
                   key={data.title}
-                  className="bg-[#f6f1e9] p-6 border border-slate-200"
+                  className="bg-[#f1f5f9] p-6 border border-slate-200"
                 >
-                  <data.icon className="w-10 h-10 text-[#8B4513] mb-4" />
+                  <data.icon className="w-10 h-10 text-[#0f172a] mb-4" />
                   <h3 className="font-semibold text-lg mb-2 text-slate-900">{data.title}</h3>
                   <p className="text-slate-700 text-sm mb-3">{data.description}</p>
                   <p className="text-slate-500 text-sm">
@@ -188,7 +188,7 @@ export default async function ConfidentialitePage() {
         </section>
 
         {/* Base légale */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-8 text-center">
               Base légale du traitement
@@ -197,7 +197,7 @@ export default async function ConfidentialitePage() {
             <div className="space-y-6">
               <div className="bg-white p-6 border border-slate-200">
                 <h3 className="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                   Exécution du contrat
                 </h3>
                 <p className="text-slate-600">
@@ -208,7 +208,7 @@ export default async function ConfidentialitePage() {
 
               <div className="bg-white p-6 border border-slate-200">
                 <h3 className="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                   Consentement
                 </h3>
                 <p className="text-slate-600">
@@ -219,7 +219,7 @@ export default async function ConfidentialitePage() {
 
               <div className="bg-white p-6 border border-slate-200">
                 <h3 className="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                   Intérêt légitime
                 </h3>
                 <p className="text-slate-600">
@@ -230,7 +230,7 @@ export default async function ConfidentialitePage() {
 
               <div className="bg-white p-6 border border-slate-200">
                 <h3 className="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                   Obligation légale
                 </h3>
                 <p className="text-slate-600">
@@ -249,7 +249,7 @@ export default async function ConfidentialitePage() {
               Durée de conservation des données
             </h2>
             
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-slate-200">
                   <span className="text-slate-700">Données de compte client</span>
@@ -273,7 +273,7 @@ export default async function ConfidentialitePage() {
         </section>
 
         {/* Vos droits */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
@@ -304,7 +304,7 @@ export default async function ConfidentialitePage() {
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
               >
                 <Mail size={18} />
                 Nous contacter
@@ -321,9 +321,9 @@ export default async function ConfidentialitePage() {
             </h2>
 
             <div className="space-y-6">
-              <div className="bg-[#f6f1e9] p-6 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-6 border border-slate-200">
                 <h3 className="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-3">
-                  <Cookie className="w-5 h-5 text-[#8B4513]" />
+                  <Cookie className="w-5 h-5 text-[#0f172a]" />
                   Cookies strictement nécessaires
                 </h3>
                 <p className="text-slate-600 mb-2">
@@ -333,9 +333,9 @@ export default async function ConfidentialitePage() {
                 <p className="text-sm text-slate-500">Durée : Session</p>
               </div>
 
-              <div className="bg-[#f6f1e9] p-6 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-6 border border-slate-200">
                 <h3 className="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-3">
-                  <Eye className="w-5 h-5 text-[#8B4513]" />
+                  <Eye className="w-5 h-5 text-[#0f172a]" />
                   Cookies analytiques
                 </h3>
                 <p className="text-slate-600 mb-2">
@@ -345,9 +345,9 @@ export default async function ConfidentialitePage() {
                 <p className="text-sm text-slate-500">Durée : 13 mois maximum</p>
               </div>
 
-              <div className="bg-[#f6f1e9] p-6 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-6 border border-slate-200">
                 <h3 className="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-3">
-                  <UserCheck className="w-5 h-5 text-[#8B4513]" />
+                  <UserCheck className="w-5 h-5 text-[#0f172a]" />
                   Cookies de préférences
                 </h3>
                 <p className="text-slate-600 mb-2">
@@ -365,10 +365,10 @@ export default async function ConfidentialitePage() {
         </section>
 
         {/* Sécurité */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8">
-              <Lock className="w-12 h-12 text-[#8B4513] mx-auto mb-4" />
+              <Lock className="w-12 h-12 text-[#0f172a] mx-auto mb-4" />
               <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
                 Sécurité de vos données
               </h2>
@@ -381,23 +381,23 @@ export default async function ConfidentialitePage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <span className="text-slate-700">Chiffrement SSL/TLS pour toutes les transmissions de données</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <span className="text-slate-700">Hébergement sécurisé sur des serveurs européens</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <span className="text-slate-700">Accès aux données limité aux personnes autorisées</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <span className="text-slate-700">Paiements sécurisés via Stripe (certifié PCI-DSS)</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <span className="text-slate-700">Mots de passe hashés et jamais stockés en clair</span>
                 </li>
               </ul>
@@ -412,27 +412,27 @@ export default async function ConfidentialitePage() {
               Partage et transfert de données
             </h2>
 
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
               <p className="text-slate-600 leading-relaxed mb-6">
                 Vos données personnelles peuvent être partagées avec :
               </p>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <div>
                     <strong className="text-slate-900">Transporteurs</strong>
                     <p className="text-slate-600 text-sm">Pour la livraison de votre brasero</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <div>
                     <strong className="text-slate-900">Prestataire de paiement (Stripe)</strong>
                     <p className="text-slate-600 text-sm">Pour le traitement sécurisé de vos paiements</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                   <div>
                     <strong className="text-slate-900">Hébergeur (Vercel/Supabase)</strong>
                     <p className="text-slate-600 text-sm">Pour l'hébergement sécurisé du site et des données</p>
@@ -448,7 +448,7 @@ export default async function ConfidentialitePage() {
         </section>
 
         {/* Réclamation */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-4">
               Réclamation auprès de la CNIL
@@ -461,7 +461,7 @@ export default async function ConfidentialitePage() {
               href="https://www.cnil.fr/fr/plaintes"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#CD853F] font-medium"
+              className="inline-flex items-center gap-2 text-[#0f172a] hover:text-[#475569] font-medium"
             >
               Accéder au site de la CNIL
               <ArrowRight size={16} />
@@ -482,7 +482,7 @@ export default async function ConfidentialitePage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 <Mail size={18} />
                 Nous contacter
@@ -496,19 +496,19 @@ export default async function ConfidentialitePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#8B4513]" />
+                <Mail className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storeEmail}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#8B4513]" />
+                <Phone className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storePhone}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#8B4513]" />
+                <Clock className="w-4 h-4 text-[#0f172a]" />
                 <span>Lun-Ven : 9h-18h</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#8B4513]" />
+                <MapPin className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.atelier.city}, {settings.atelier.department}</span>
               </div>
             </div>

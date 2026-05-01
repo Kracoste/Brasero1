@@ -427,7 +427,25 @@ export const resolveCardOverrides = (product: Product, filters: FilterState): Ca
   else if (materialSelections.includes('acier')) filterFinish = 'peint';
 
   // Déduire la plancha demandée par les filtres
-  const filterPlancha: string | undefined = planchaSelections[0];
+  let filterPlancha: string | undefined = planchaSelections[0];
+
+  // Préférence par défaut catalogue : si aucun filtre actif, on présente
+  // chaque brasero en "acier peint + plancha acier carbone".
+  // Ces valeurs ne sont appliquées que si la combinaison existe pour le produit ;
+  // sinon le code retombe naturellement sur la sous-fiche par défaut du produit.
+  if (!filterFinish && !filterPlancha) {
+    const hasPreferredCombo = (() => {
+      if (product.configurations) {
+        if (product.configurations['peint-acier']) return true;
+      }
+      if (product.configImages?.['peint-acier']?.length) return true;
+      return false;
+    })();
+    if (hasPreferredCombo) {
+      filterFinish = 'peint';
+      filterPlancha = 'acier';
+    }
+  }
 
   // Chercher la meilleure sous-fiche (configuration) correspondant aux filtres
   if (product.configurations) {
@@ -473,11 +491,41 @@ export const resolveCardOverrides = (product: Product, filters: FilterState): Ca
     if (bestConfig && bestKey) {
       const overrides: CardOverrides = { configKey: bestKey };
 
-      // Image de la sous-fiche
+      // Image de la sous-fiche : on essaie dans l'ordre :
+      // 1) images directes de la sous-fiche
+      // 2) configImages[bestKey]
+      // 3) fallback : n'importe quelle sous-fiche partageant le même finish (ex: peint-inox si on est sur peint-acier)
+      // 4) fallback : n'importe quelle entrée de configImages partageant le même finish
+      const [bestFinish] = bestKey.split('-');
       if (bestConfig.images && bestConfig.images.length > 0) {
         overrides.image = bestConfig.images[0];
       } else if (product.configImages?.[bestKey]?.length) {
         overrides.image = product.configImages[bestKey][0];
+      } else if (product.configurations) {
+        // Chercher dans les autres sous-fiches du même finish
+        for (const [k, cfg] of Object.entries(product.configurations)) {
+          if (k === bestKey) continue;
+          const [kFinish] = k.split('-');
+          if (kFinish !== bestFinish) continue;
+          if (cfg.images && cfg.images.length > 0) {
+            overrides.image = cfg.images[0];
+            break;
+          }
+          if (product.configImages?.[k]?.length) {
+            overrides.image = product.configImages[k][0];
+            break;
+          }
+        }
+      }
+      if (!overrides.image && product.configImages) {
+        for (const [k, imgs] of Object.entries(product.configImages)) {
+          if (!imgs?.length) continue;
+          const [kFinish] = k.split('-');
+          if (kFinish === bestFinish) {
+            overrides.image = imgs[0];
+            break;
+          }
+        }
       }
 
       // Diamètre et prix : prendre le premier diamètre qui matche les filtres

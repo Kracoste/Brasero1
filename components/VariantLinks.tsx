@@ -36,17 +36,17 @@ export function VariantLinks({ product }: VariantLinksProps) {
             <Link
               key={variantSlug}
               href={`/brasero-plancha/${variantSlug}`}
-              className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:border-[#CD853F] hover:shadow-md transition-all group"
+              className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:border-[#475569] hover:shadow-md transition-all group"
             >
               <div>
-                <span className="font-medium text-slate-900 group-hover:text-[#CD853F] transition-colors text-sm">
+                <span className="font-medium text-slate-900 group-hover:text-[#475569] transition-colors text-sm">
                   {shortName} — {FINISH_LABELS[finish] || finish}
                 </span>
                 <span className="block text-xs text-slate-500 mt-0.5">
                   {PLANCHA_LABELS[plancha] || plancha} · {diameter} cm
                 </span>
               </div>
-              <span className="text-[#CD853F] text-sm font-medium">
+              <span className="text-[#475569] text-sm font-medium">
                 Voir &rarr;
               </span>
             </Link>

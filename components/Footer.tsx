@@ -35,6 +35,7 @@ const categoryLinks = [
   { href: "/produits?category=fendeur", label: "Fendeurs à bûches" },
   { href: "/produits?category=range-buches", label: "Range-bûches" },
   { href: "/accessoires", label: "Accessoires" },
+  { href: "/produits?category=housse-protection", label: "Housses de protection" },
   { href: "/produits?category=promotions", label: "Promotions" },
 ];
 
@@ -46,7 +47,7 @@ type FooterProps = {
 export const Footer = ({ storeName, atelierCity }: FooterProps) => {
 
   return (
-    <footer className="border-t border-slate-100 bg-white text-slate-800">
+    <footer className="border-t border-slate-100 text-slate-800">
       <Container className="py-6 sm:py-8 lg:py-12">
         <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div>

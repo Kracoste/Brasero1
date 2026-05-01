@@ -131,19 +131,19 @@ export default async function QualitePage() {
       />
 
       {/* Hero */}
-      <section className="bg-[#f6f1e9] py-16 sm:py-24">
+      <section className="bg-[#f1f5f9] py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center">
-                <Shield className="w-6 h-6 text-[#CD853F]" />
+              <div className="w-12 h-12 bg-[#475569]/20 flex items-center justify-center">
+                <Shield className="w-6 h-6 text-[#475569]" />
               </div>
-              <span className="text-[#CD853F] font-semibold uppercase tracking-wide text-sm">
+              <span className="text-[#475569] font-semibold uppercase tracking-wide text-sm">
                 Étape 2/3
               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900 leading-tight">
-              Contrôle <span className="text-[#CD853F]">qualité</span>
+              Contrôle <span className="text-[#475569]">qualité</span>
             </h1>
             <p className="mt-6 text-xl text-slate-600 leading-relaxed">
               Avant de rejoindre votre jardin, chaque brasero passe par un processus de contrôle 
@@ -152,7 +152,7 @@ export default async function QualitePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 bg-[#CD853F] hover:bg-[#8B4513] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
+                className="inline-flex items-center gap-2 bg-[#475569] hover:bg-[#0f172a] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
               >
                 Voir nos créations
                 <ArrowRight size={18} />
@@ -170,20 +170,20 @@ export default async function QualitePage() {
       </section>
 
       {/* Navigation étapes */}
-      <section className="bg-[#f6f1e9] py-4 border-b border-slate-200">
+      <section className="bg-[#f1f5f9] py-4 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-4 sm:gap-8 text-sm">
-            <Link href="/fabrication" className="flex items-center gap-2 text-slate-500 hover:text-[#8B4513] transition-colors">
+            <Link href="/fabrication" className="flex items-center gap-2 text-slate-500 hover:text-[#0f172a] transition-colors">
               <span className="w-6 h-6 bg-slate-300 text-white flex items-center justify-center text-xs">1</span>
               Fabrication
             </Link>
             <ArrowRight className="w-4 h-4 text-slate-400" />
-            <span className="flex items-center gap-2 text-[#8B4513] font-semibold">
-              <span className="w-6 h-6 bg-[#8B4513] text-white flex items-center justify-center text-xs">2</span>
+            <span className="flex items-center gap-2 text-[#0f172a] font-semibold">
+              <span className="w-6 h-6 bg-[#0f172a] text-white flex items-center justify-center text-xs">2</span>
               Qualité
             </span>
             <ArrowRight className="w-4 h-4 text-slate-400" />
-            <Link href="/livraison" className="flex items-center gap-2 text-slate-500 hover:text-[#8B4513] transition-colors">
+            <Link href="/livraison" className="flex items-center gap-2 text-slate-500 hover:text-[#0f172a] transition-colors">
               <span className="w-6 h-6 bg-slate-300 text-white flex items-center justify-center text-xs">3</span>
               Livraison
             </Link>
@@ -206,7 +206,7 @@ export default async function QualitePage() {
       </section>
 
       {/* Triple contrôle */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
@@ -220,11 +220,11 @@ export default async function QualitePage() {
           <div className="grid md:grid-cols-3 gap-6">
             {controls.map((control, index) => (
               <div key={control.title} className="relative bg-white p-6 sm:p-8 border border-slate-200">
-                <div className="absolute -top-4 left-6 w-8 h-8 bg-[#CD853F] flex items-center justify-center text-white font-bold text-sm">
+                <div className="absolute -top-4 left-6 w-8 h-8 bg-[#475569] flex items-center justify-center text-white font-bold text-sm">
                   {index + 1}
                 </div>
-                <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mb-4 mt-2">
-                  <control.icon className="w-7 h-7 text-[#CD853F]" />
+                <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mb-4 mt-2">
+                  <control.icon className="w-7 h-7 text-[#475569]" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-3">{control.title}</h3>
                 <p className="text-slate-600 leading-relaxed">{control.description}</p>
@@ -249,14 +249,14 @@ export default async function QualitePage() {
               <ul className="grid sm:grid-cols-2 gap-3">
                 {criteria.map((criterion) => (
                   <li key={criterion} className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-[#CD853F] flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-[#475569] flex-shrink-0" />
                     <span>{criterion}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-[#f6f1e9] p-8 border border-slate-200">
-              <Microscope className="w-16 h-16 text-[#CD853F] mb-6" />
+            <div className="bg-[#f1f5f9] p-8 border border-slate-200">
+              <Microscope className="w-16 h-16 text-[#475569] mb-6" />
               <h3 className="text-2xl font-semibold text-slate-900 mb-4">
                 Taux de rejet : 3%
               </h3>
@@ -270,7 +270,7 @@ export default async function QualitePage() {
       </section>
 
       {/* Garanties */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
@@ -284,10 +284,10 @@ export default async function QualitePage() {
           <div className="grid md:grid-cols-3 gap-6">
             {guarantees.map((guarantee) => (
               <div key={guarantee.title} className="bg-white border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
-                <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mx-auto mb-4">
-                  <guarantee.icon className="w-7 h-7 text-[#CD853F]" />
+                <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mx-auto mb-4">
+                  <guarantee.icon className="w-7 h-7 text-[#475569]" />
                 </div>
-                <div className="text-3xl font-bold text-[#CD853F] mb-2">{guarantee.value}</div>
+                <div className="text-3xl font-bold text-[#475569] mb-2">{guarantee.value}</div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-3">{guarantee.title}</h3>
                 <p className="text-slate-600 leading-relaxed">{guarantee.description}</p>
               </div>
@@ -297,7 +297,7 @@ export default async function QualitePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900">
             Découvrez l&apos;étape suivante
@@ -308,7 +308,7 @@ export default async function QualitePage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="/livraison"
-              className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-[#0f172a] hover:bg-[#475569] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               <Truck size={18} />
               Livraison soignée
@@ -316,7 +316,7 @@ export default async function QualitePage() {
             </Link>
             <Link
               href="/fabrication"
-              className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               <Hammer size={18} />
               Retour fabrication
@@ -331,20 +331,20 @@ export default async function QualitePage() {
           <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
             <a 
               href={`mailto:${settings.storeEmail}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Mail className="w-4 h-4 text-[#8B4513]" />
+              <Mail className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storeEmail}</span>
             </a>
             <a 
               href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Phone className="w-4 h-4 text-[#8B4513]" />
+              <Phone className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storePhone}</span>
             </a>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#8B4513]" />
+              <MapPin className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.atelier.city}, {settings.atelier.department}</span>
             </div>
           </div>

@@ -110,10 +110,10 @@ export default async function NewsletterPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                <Mail className="w-6 h-6 text-[#8B4513]" />
+              <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                <Mail className="w-6 h-6 text-[#0f172a]" />
               </div>
-              <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+              <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                 Newsletter
               </span>
             </div>
@@ -130,7 +130,7 @@ export default async function NewsletterPage() {
       </section>
 
       {/* Formulaire d'inscription */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -145,7 +145,7 @@ export default async function NewsletterPage() {
               <ul className="mt-6 space-y-3">
                 {guarantees.map((guarantee) => (
                   <li key={guarantee} className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513] flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a] flex-shrink-0" />
                     <span>{guarantee}</span>
                   </li>
                 ))}
@@ -154,7 +154,7 @@ export default async function NewsletterPage() {
             
             <div id="formulaire-newsletter" className="bg-white p-8 sm:p-10 border border-slate-200 scroll-mt-24">
               <div className="text-center mb-8">
-                <Bell className="w-16 h-16 text-[#8B4513] mx-auto" />
+                <Bell className="w-16 h-16 text-[#0f172a] mx-auto" />
                 <h3 className="mt-4 text-xl font-semibold text-slate-900">
                   Rejoignez la newsletter
                 </h3>
@@ -174,7 +174,7 @@ export default async function NewsletterPage() {
                     name="email"
                     placeholder="votre@email.com"
                     required
-                    className="w-full px-4 py-3 border border-slate-300 focus:border-[#8B4513] focus:ring-1 focus:ring-[#8B4513] outline-none transition-colors"
+                    className="w-full px-4 py-3 border border-slate-300 focus:border-[#0f172a] focus:ring-1 focus:ring-[#0f172a] outline-none transition-colors"
                   />
                 </div>
                 
@@ -187,7 +187,7 @@ export default async function NewsletterPage() {
                     id="prenom"
                     name="prenom"
                     placeholder="Votre prénom"
-                    className="w-full px-4 py-3 border border-slate-300 focus:border-[#8B4513] focus:ring-1 focus:ring-[#8B4513] outline-none transition-colors"
+                    className="w-full px-4 py-3 border border-slate-300 focus:border-[#0f172a] focus:ring-1 focus:ring-[#0f172a] outline-none transition-colors"
                   />
                 </div>
                 
@@ -197,11 +197,11 @@ export default async function NewsletterPage() {
                     id="consent"
                     name="consent"
                     required
-                    className="mt-1 w-4 h-4 text-[#8B4513] border-slate-300 focus:ring-[#8B4513]"
+                    className="mt-1 w-4 h-4 text-[#0f172a] border-slate-300 focus:ring-[#0f172a]"
                   />
                   <label htmlFor="consent" className="text-sm text-slate-600">
                     J'accepte de recevoir la newsletter et j'ai lu la{" "}
-                    <Link href="/info/confidentialite-politique" className="text-[#8B4513] hover:underline">
+                    <Link href="/info/confidentialite-politique" className="text-[#0f172a] hover:underline">
                       politique de confidentialité
                     </Link>.
                   </label>
@@ -209,7 +209,7 @@ export default async function NewsletterPage() {
                 
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-4 transition-all"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-4 transition-all"
                 >
                   <Mail size={18} />
                   S'inscrire à la newsletter
@@ -241,9 +241,9 @@ export default async function NewsletterPage() {
             {benefits.map((benefit) => (
               <div 
                 key={benefit.title}
-                className="bg-[#f6f1e9] p-6 border border-slate-200 text-center"
+                className="bg-[#f1f5f9] p-6 border border-slate-200 text-center"
               >
-                <benefit.icon className="w-10 h-10 text-[#8B4513] mx-auto mb-4" />
+                <benefit.icon className="w-10 h-10 text-[#0f172a] mx-auto mb-4" />
                 <h3 className="font-semibold text-lg mb-2 text-slate-900">{benefit.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
                   {benefit.description}
@@ -255,7 +255,7 @@ export default async function NewsletterPage() {
       </section>
 
       {/* Contenu de la newsletter */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
@@ -272,7 +272,7 @@ export default async function NewsletterPage() {
                 key={content.title}
                 className="bg-white p-6 border border-slate-200"
               >
-                <content.icon className="w-10 h-10 text-[#8B4513] mb-4" />
+                <content.icon className="w-10 h-10 text-[#0f172a] mb-4" />
                 <h3 className="font-semibold text-lg mb-2 text-slate-900">{content.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
                   {content.description}
@@ -286,9 +286,9 @@ export default async function NewsletterPage() {
       {/* Engagement confidentialité */}
       <section className="py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#f6f1e9] p-8 sm:p-12 border border-slate-200">
+          <div className="bg-[#f1f5f9] p-8 sm:p-12 border border-slate-200">
             <div className="flex items-start gap-4">
-              <Shield className="w-12 h-12 text-[#8B4513] flex-shrink-0" />
+              <Shield className="w-12 h-12 text-[#0f172a] flex-shrink-0" />
               <div>
                 <h2 className="text-2xl font-display font-bold text-slate-900 mb-4">
                   Notre engagement confidentialité
@@ -304,7 +304,7 @@ export default async function NewsletterPage() {
                 </p>
                 <Link
                   href="/info/confidentialite-politique"
-                  className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#CD853F] font-medium transition-colors"
+                  className="inline-flex items-center gap-2 text-[#0f172a] hover:text-[#475569] font-medium transition-colors"
                 >
                   Lire notre politique de confidentialité
                   <ArrowRight size={16} />
@@ -327,14 +327,14 @@ export default async function NewsletterPage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="#formulaire-newsletter"
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all scroll-smooth"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all scroll-smooth"
             >
               <Mail size={18} />
               S'inscrire maintenant
             </Link>
             <Link
               href="/produits"
-              className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
             >
               Découvrir nos braseros
               <ArrowRight size={18} />
@@ -349,24 +349,24 @@ export default async function NewsletterPage() {
           <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
             <a 
               href={`mailto:${settings.storeEmail}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Mail className="w-4 h-4 text-[#8B4513]" />
+              <Mail className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storeEmail}</span>
             </a>
             <a 
               href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Phone className="w-4 h-4 text-[#8B4513]" />
+              <Phone className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storePhone}</span>
             </a>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#8B4513]" />
+              <Clock className="w-4 h-4 text-[#0f172a]" />
               <span>Lun-Ven : 9h-18h</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#8B4513]" />
+              <MapPin className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.atelier.city}, {settings.atelier.department}</span>
             </div>
           </div>

@@ -140,10 +140,10 @@ export default async function ContactInfoPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-[#8B4513]" />
+                <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6 text-[#0f172a]" />
                 </div>
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Contact
                 </span>
               </div>
@@ -159,14 +159,14 @@ export default async function ContactInfoPage() {
               <div className="mt-8 flex flex-wrap gap-4">
                 <a
                   href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-                  className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                  className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
                 >
                   <Phone size={18} />
                   Appeler maintenant
                 </a>
                 <a
                   href={`mailto:${settings.storeEmail}`}
-                  className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                  className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-6 py-3 transition-all"
                 >
                   <Mail size={18} />
                   Envoyer un email
@@ -177,12 +177,12 @@ export default async function ContactInfoPage() {
         </section>
 
         {/* Raisons de nous contacter */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <Users className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   À votre service
                 </span>
               </div>
@@ -200,7 +200,7 @@ export default async function ContactInfoPage() {
                   key={reason.title}
                   className="bg-white p-6 border border-slate-200 hover:shadow-md transition-shadow"
                 >
-                  <reason.icon className="w-10 h-10 text-[#8B4513] mb-4" />
+                  <reason.icon className="w-10 h-10 text-[#0f172a] mb-4" />
                   <h3 className="font-semibold text-lg mb-2 text-slate-900">{reason.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     {reason.description}
@@ -226,14 +226,14 @@ export default async function ContactInfoPage() {
                   les dimensions et toute personnalisation éventuelle.
                 </p>
                 
-                <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
+                <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
                   <ContactForm />
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
                   {advantages.map((advantage) => (
                     <div key={advantage} className="flex items-center gap-2 text-sm text-slate-600">
-                      <CheckCircle2 className="w-4 h-4 text-[#8B4513] flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[#0f172a] flex-shrink-0" />
                       <span>{advantage}</span>
                     </div>
                   ))}
@@ -246,10 +246,10 @@ export default async function ContactInfoPage() {
                   Nos coordonnées
                 </h2>
                 
-                <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200 space-y-6">
+                <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200 space-y-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-white flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-6 h-6 text-[#8B4513]" />
+                      <MapPin className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Adresse de l'atelier</h3>
@@ -262,13 +262,13 @@ export default async function ContactInfoPage() {
 
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-white flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-6 h-6 text-[#8B4513]" />
+                      <Phone className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Téléphone</h3>
                       <a 
                         href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-                        className="text-[#8B4513] hover:text-[#CD853F] transition-colors"
+                        className="text-[#0f172a] hover:text-[#475569] transition-colors"
                       >
                         {settings.storePhone}
                       </a>
@@ -280,13 +280,13 @@ export default async function ContactInfoPage() {
 
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-white flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-6 h-6 text-[#8B4513]" />
+                      <Mail className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Email</h3>
                       <a 
                         href={`mailto:${settings.storeEmail}`}
-                        className="text-[#8B4513] hover:text-[#CD853F] transition-colors"
+                        className="text-[#0f172a] hover:text-[#475569] transition-colors"
                       >
                         {settings.storeEmail}
                       </a>
@@ -298,7 +298,7 @@ export default async function ContactInfoPage() {
 
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-white flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-6 h-6 text-[#8B4513]" />
+                      <Clock className="w-6 h-6 text-[#0f172a]" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Horaires d'ouverture</h3>
@@ -324,7 +324,7 @@ export default async function ContactInfoPage() {
 
                 <div className="bg-white p-6 border border-slate-200">
                   <div className="flex items-start gap-4">
-                    <Calendar className="w-6 h-6 text-[#8B4513] flex-shrink-0 mt-0.5" />
+                    <Calendar className="w-6 h-6 text-[#0f172a] flex-shrink-0 mt-0.5" />
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-2">Visite de l'atelier</h3>
                       <p className="text-slate-600 text-sm leading-relaxed">
@@ -334,7 +334,7 @@ export default async function ContactInfoPage() {
                       </p>
                       <a
                         href={`mailto:${settings.storeEmail}?subject=Demande de visite de l'atelier`}
-                        className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#CD853F] font-medium mt-3 transition-colors"
+                        className="inline-flex items-center gap-2 text-[#0f172a] hover:text-[#475569] font-medium mt-3 transition-colors"
                       >
                         Demander une visite
                         <ArrowRight size={16} />
@@ -348,7 +348,7 @@ export default async function ContactInfoPage() {
         </section>
 
         {/* FAQ Contact */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
@@ -383,9 +383,9 @@ export default async function ContactInfoPage() {
                   key={index}
                   className="bg-white border border-slate-100 group"
                 >
-                  <summary className="flex items-center justify-between cursor-pointer p-5 font-semibold text-slate-900 hover:text-[#8B4513] transition-colors">
+                  <summary className="flex items-center justify-between cursor-pointer p-5 font-semibold text-slate-900 hover:text-[#0f172a] transition-colors">
                     {faq.question}
-                    <span className="text-[#8B4513] group-open:rotate-180 transition-transform">
+                    <span className="text-[#0f172a] group-open:rotate-180 transition-transform">
                       <ArrowRight className="rotate-90" size={18} />
                     </span>
                   </summary>
@@ -411,14 +411,14 @@ export default async function ContactInfoPage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Découvrir nos braseros
                 <ArrowRight size={18} />
               </Link>
               <Link
                 href="/atelier"
-                className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Visiter l'atelier
               </Link>
@@ -432,24 +432,24 @@ export default async function ContactInfoPage() {
             <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
               <a 
                 href={`mailto:${settings.storeEmail}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Mail className="w-4 h-4 text-[#8B4513]" />
+                <Mail className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storeEmail}</span>
               </a>
               <a 
                 href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Phone className="w-4 h-4 text-[#8B4513]" />
+                <Phone className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storePhone}</span>
               </a>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#8B4513]" />
+                <Clock className="w-4 h-4 text-[#0f172a]" />
                 <span>Lun-Ven : 9h-18h</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#8B4513]" />
+                <MapPin className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.atelier.city}, {settings.atelier.department}</span>
               </div>
             </div>

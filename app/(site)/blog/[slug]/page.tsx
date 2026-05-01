@@ -143,19 +143,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <Container className="max-w-3xl px-4 sm:px-6">
           {/* Breadcrumb nav */}
           <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8">
-            <Link href="/blog" className="hover:text-[#8B4513] transition-colors flex items-center gap-1">
+            <Link href="/blog" className="hover:text-[#0f172a] transition-colors flex items-center gap-1">
               <ArrowLeft size={14} />
               Blog
             </Link>
             <span>/</span>
-            <span className="text-[#8B4513]">
+            <span className="text-[#0f172a]">
               {CATEGORY_LABELS[post.category] || post.category}
             </span>
           </nav>
 
           {/* Header */}
           <header className="mb-10">
-            <span className="inline-block bg-[#f6f1e9] text-[#8B4513] text-xs font-medium px-3 py-1 mb-4">
+            <span className="inline-block bg-[#f1f5f9] text-[#0f172a] text-xs font-medium px-3 py-1 mb-4">
               {CATEGORY_LABELS[post.category] || post.category}
             </span>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-slate-900 leading-tight mb-6">
@@ -242,7 +242,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           )}
 
           {/* CTA : toujours vers la catégorie braséro pour laisser le client choisir */}
-          <div className="mt-12 p-6 sm:p-8 bg-[#f6f1e9] border border-slate-200 text-center">
+          <div className="mt-12 p-6 sm:p-8 bg-[#f1f5f9] border border-slate-200 text-center">
             <p className="text-lg font-semibold text-slate-900 mb-2">
               Nos braseros artisanaux manufacturés en France
             </p>
@@ -251,7 +251,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </p>
             <Link
               href="/produits?category=brasero"
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
             >
               Découvrir nos braseros
               <ArrowRight size={16} />
@@ -271,10 +271,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     href={`/blog/${rp.slug}`}
                     className="block p-4 border border-slate-200 hover:shadow-md transition-shadow group"
                   >
-                    <span className="text-xs text-[#8B4513] font-medium">
+                    <span className="text-xs text-[#0f172a] font-medium">
                       {CATEGORY_LABELS[rp.category] || rp.category}
                     </span>
-                    <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors line-clamp-2">
+                    <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#0f172a] transition-colors line-clamp-2">
                       {rp.title}
                     </h3>
                     <span className="text-xs text-slate-500 mt-2 block">
@@ -290,7 +290,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <div className="mt-12 text-center">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-[#8B4513] hover:underline font-medium"
+              className="inline-flex items-center gap-2 text-[#0f172a] hover:underline font-medium"
             >
               <ArrowLeft size={16} />
               Retour au blog

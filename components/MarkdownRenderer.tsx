@@ -87,7 +87,7 @@ function renderInline(text: string): React.ReactNode {
         <Link
           key={`link-${idx}-${match.index}`}
           href={match[2]}
-          className="text-[#8B4513] hover:underline font-medium"
+          className="text-[#0f172a] hover:underline font-medium"
         >
           {match[1]}
         </Link>
@@ -226,7 +226,7 @@ export function renderBlocks(blocks: MarkdownBlock[]): React.ReactNode[] {
           <div key={idx} className="my-8 text-center clear-both">
             <Link
               href={href}
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide px-6 py-3 rounded-sm transition-all text-sm uppercase"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide px-6 py-3 rounded-sm transition-all text-sm uppercase"
             >
               {block.text}
               <ArrowRight size={16} />

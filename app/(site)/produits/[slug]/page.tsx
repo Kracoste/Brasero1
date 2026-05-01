@@ -134,11 +134,30 @@ export default async function ProductPage({ params }: ProductPageProps) {
             reference={reference}
             compatibleAccessorySlugs={compatibleAccessorySlugs}
             preloadedAccessories={compatibleAccessories}
-            initialSelections={{
-              diameter: product.diameter,
-              finish: product.material?.toLowerCase().includes('corten') ? 'corten' : 'peint',
-              plancha: product.specs?.planchaMaterial ?? 'acier',
-            }}
+            initialSelections={(() => {
+              // Préférence par défaut : Acier peint + Plancha Acier carbone si disponibles dans les variantes.
+              // Sinon, on retombe sur les valeurs du produit de base.
+              const finishesAvailable = new Set<string>();
+              const planchasAvailable = new Set<string>();
+              const baseFinish = product.material?.toLowerCase().includes('corten') ? 'corten' : 'peint';
+              const basePlancha = product.specs?.planchaMaterial ?? 'acier';
+              finishesAvailable.add(baseFinish);
+              planchasAvailable.add(basePlancha);
+              for (const v of product.variants ?? []) {
+                if (v.finish) finishesAvailable.add(v.finish);
+                if (v.planchaMaterial) planchasAvailable.add(v.planchaMaterial);
+              }
+              for (const key of Object.keys(product.configurations ?? {})) {
+                const [f, p] = key.split('-');
+                if (f) finishesAvailable.add(f);
+                if (p) planchasAvailable.add(p);
+              }
+              return {
+                diameter: product.diameter,
+                finish: finishesAvailable.has('peint') ? 'peint' : baseFinish,
+                plancha: planchasAvailable.has('acier') ? 'acier' : basePlancha,
+              };
+            })()}
           />
         </Container>
       </Section>

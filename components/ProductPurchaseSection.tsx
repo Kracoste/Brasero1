@@ -167,15 +167,29 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
     );
   }, [showSelectors, basePlancha, variants, configPlanchas]);
 
-  // --- État des sélections : initialisé aux sélections initiales (variante) ou valeurs du produit de base ---
+  // --- Préférences par défaut sur les fiches braseros : Acier peint + Plancha Acier carbone ---
+  // Si la combinaison existe dans les options, elle est sélectionnée d'emblée.
+  // Sinon, on retombe sur la valeur du produit de base ou la première option dispo.
+  const PREFERRED_FINISH = 'peint';
+  const PREFERRED_PLANCHA = 'acier';
+  const hasPreferredFinish = finishOptions.some(o => o.value === PREFERRED_FINISH);
+  const hasPreferredPlancha = planchaOptions.some(o => o.value === PREFERRED_PLANCHA);
+
+  // --- État des sélections : initialisé aux sélections initiales (variante) ou valeurs préférées / produit de base ---
   const [selectedDiameter, setSelectedDiameter] = useState<number | null>(
     initialSelections?.diameter ?? baseDiameter ?? (diameterOptions.length > 0 ? diameterOptions[0].value as number : null)
   );
   const [selectedFinish, setSelectedFinish] = useState<string | null>(
-    initialSelections?.finish ?? baseFinish ?? (finishOptions.length > 0 ? finishOptions[0].value as string : null)
+    initialSelections?.finish
+      ?? (hasPreferredFinish ? PREFERRED_FINISH : null)
+      ?? baseFinish
+      ?? (finishOptions.length > 0 ? finishOptions[0].value as string : null)
   );
   const [selectedPlancha, setSelectedPlancha] = useState<string | null>(
-    initialSelections?.plancha ?? basePlancha ?? (planchaOptions.length > 0 ? planchaOptions[0].value as string : null)
+    initialSelections?.plancha
+      ?? (hasPreferredPlancha ? PREFERRED_PLANCHA : null)
+      ?? basePlancha
+      ?? (planchaOptions.length > 0 ? planchaOptions[0].value as string : null)
   );
 
   // --- Déterminer si la sélection courante correspond au produit de base ---

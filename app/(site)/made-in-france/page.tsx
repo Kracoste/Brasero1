@@ -110,19 +110,19 @@ export default async function MadeInFrancePage() {
       {/* SEO-19 : Schema Organization supprimé (doublon avec layout.tsx) */}
 
       {/* Hero */}
-      <section className="bg-[#f6f1e9] py-16 sm:py-24">
+      <section className="bg-[#f1f5f9] py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-[#CD853F]/20 flex items-center justify-center">
-                <Flag className="w-6 h-6 text-[#CD853F]" />
+              <div className="w-12 h-12 bg-[#475569]/20 flex items-center justify-center">
+                <Flag className="w-6 h-6 text-[#475569]" />
               </div>
-              <span className="text-[#CD853F] font-semibold uppercase tracking-wide text-sm">
+              <span className="text-[#475569] font-semibold uppercase tracking-wide text-sm">
                 Made in France
               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900 leading-tight">
-              Fabrication <span className="text-[#CD853F]">française</span>
+              Fabrication <span className="text-[#475569]">française</span>
             </h1>
             <p className="mt-6 text-xl text-slate-600 leading-relaxed">
               Chaque brasero est fabriqué à la main dans notre atelier de {settings.atelier.city}.
@@ -131,7 +131,7 @@ export default async function MadeInFrancePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/fabrication"
-                className="inline-flex items-center gap-2 bg-[#CD853F] hover:bg-[#8B4513] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
+                className="inline-flex items-center gap-2 bg-[#475569] hover:bg-[#0f172a] text-white font-semibold uppercase tracking-wide px-6 py-3 transition-all"
               >
                 Notre processus
                 <ArrowRight size={18} />
@@ -161,23 +161,23 @@ export default async function MadeInFrancePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-              <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mb-4">
-                <Factory className="w-7 h-7 text-[#CD853F]" />
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+              <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mb-4">
+                <Factory className="w-7 h-7 text-[#475569]" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">100% production française</h3>
               <p className="text-slate-600 leading-relaxed">De la conception à la livraison, tout est réalisé en France. Notre atelier est situé à Moncoutant dans les Deux-Sèvres.</p>
             </div>
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-              <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mb-4">
-                <Users className="w-7 h-7 text-[#CD853F]" />
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+              <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mb-4">
+                <Users className="w-7 h-7 text-[#475569]" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Artisans qualifiés</h3>
               <p className="text-slate-600 leading-relaxed">Notre équipe de ferronniers maîtrise les techniques traditionnelles du travail du métal, transmises de génération en génération.</p>
             </div>
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-              <div className="w-14 h-14 bg-[#CD853F]/20 flex items-center justify-center mb-4">
-                <TreePine className="w-7 h-7 text-[#CD853F]" />
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+              <div className="w-14 h-14 bg-[#475569]/20 flex items-center justify-center mb-4">
+                <TreePine className="w-7 h-7 text-[#475569]" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Matières premières locales</h3>
               <p className="text-slate-600 leading-relaxed">Nous privilégions les fournisseurs français et européens pour l&apos;acier et tous nos composants. Circuits courts garantis.</p>
@@ -187,7 +187,7 @@ export default async function MadeInFrancePage() {
       </section>
 
       {/* Processus détaillé */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 mb-4 text-center">
             De la plaque d&apos;acier à votre brasero
@@ -225,7 +225,7 @@ export default async function MadeInFrancePage() {
               },
             ].map((item) => (
               <div key={item.step} className="bg-white p-6 sm:p-8 border border-slate-200 flex gap-6">
-                <div className="text-3xl font-bold text-[#CD853F] flex-shrink-0 w-10">{item.step}</div>
+                <div className="text-3xl font-bold text-[#475569] flex-shrink-0 w-10">{item.step}</div>
                 <div>
                   <h3 className="text-xl font-semibold text-slate-900 mb-2">{item.title}</h3>
                   <p className="text-slate-600 leading-relaxed">{item.description}</p>
@@ -237,7 +237,7 @@ export default async function MadeInFrancePage() {
           <div className="mt-8 text-center">
             <Link
               href="/fabrication"
-              className="inline-flex items-center gap-2 text-[#8B4513] font-semibold hover:gap-3 transition-all"
+              className="inline-flex items-center gap-2 text-[#0f172a] font-semibold hover:gap-3 transition-all"
             >
               Voir le processus en détail
               <ArrowRight size={18} />
@@ -253,27 +253,27 @@ export default async function MadeInFrancePage() {
             Brasero artisanal français vs brasero importé
           </h2>
           <p className="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
-            Le prix ne raconte pas toute l&apos;histoire. <Link href="/blog/pourquoi-brasero-artisanal-francais" className="text-[#8B4513] hover:underline font-medium">Lire le comparatif complet</Link>.
+            Le prix ne raconte pas toute l&apos;histoire. <Link href="/blog/pourquoi-brasero-artisanal-francais" className="text-[#0f172a] hover:underline font-medium">Lire le comparatif complet</Link>.
           </p>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border border-slate-200">
               <thead>
-                <tr className="bg-[#f6f1e9]">
+                <tr className="bg-[#f1f5f9]">
                   <th className="p-4 font-semibold text-slate-900 border-b border-slate-200">Critère</th>
-                  <th className="p-4 font-semibold text-[#8B4513] border-b border-slate-200">Atelier LBF</th>
+                  <th className="p-4 font-semibold text-[#0f172a] border-b border-slate-200">Atelier LBF</th>
                   <th className="p-4 font-semibold text-slate-500 border-b border-slate-200">Brasero importé</th>
                 </tr>
               </thead>
               <tbody className="text-sm text-slate-600">
                 <tr className="border-b border-slate-100">
                   <td className="p-4 font-medium text-slate-900">Épaisseur socle</td>
-                  <td className="p-4 font-medium text-[#8B4513]">3 mm</td>
+                  <td className="p-4 font-medium text-[#0f172a]">3 mm</td>
                   <td className="p-4">1 — 1,5 mm</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50">
                   <td className="p-4 font-medium text-slate-900">Épaisseur plancha</td>
-                  <td className="p-4 font-medium text-[#8B4513]">8 — 10 mm</td>
+                  <td className="p-4 font-medium text-[#0f172a]">8 — 10 mm</td>
                   <td className="p-4">2 — 3 mm</td>
                 </tr>
                 <tr className="border-b border-slate-100">
@@ -283,7 +283,7 @@ export default async function MadeInFrancePage() {
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50">
                   <td className="p-4 font-medium text-slate-900">Durée de vie</td>
-                  <td className="p-4 font-medium text-[#8B4513]">20+ ans</td>
+                  <td className="p-4 font-medium text-[#0f172a]">20+ ans</td>
                   <td className="p-4">1 — 3 saisons</td>
                 </tr>
                 <tr className="border-b border-slate-100">
@@ -298,12 +298,12 @@ export default async function MadeInFrancePage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 font-medium text-slate-900">Garantie</td>
-                  <td className="p-4 font-medium text-[#8B4513]">2 ans</td>
+                  <td className="p-4 font-medium text-[#0f172a]">2 ans</td>
                   <td className="p-4">6 mois ou aucune</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-900">Coût sur 20 ans</td>
-                  <td className="p-4 font-medium text-[#8B4513]">~60 €/an</td>
+                  <td className="p-4 font-medium text-[#0f172a]">~60 €/an</td>
                   <td className="p-4">~75 €/an (remplacement tous les 2-3 ans)</td>
                 </tr>
               </tbody>
@@ -313,13 +313,13 @@ export default async function MadeInFrancePage() {
       </section>
 
       {/* Notre atelier */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center gap-2 mb-4">
-                <MapPin className="w-5 h-5 text-[#CD853F]" />
-                <span className="text-sm font-semibold uppercase tracking-wide text-[#CD853F]">
+                <MapPin className="w-5 h-5 text-[#475569]" />
+                <span className="text-sm font-semibold uppercase tracking-wide text-[#475569]">
                   {settings.atelier.city}, {settings.atelier.department}
                 </span>
               </div>
@@ -342,7 +342,7 @@ export default async function MadeInFrancePage() {
               </p>
               <Link
                 href="/atelier"
-                className="inline-flex items-center gap-2 text-[#8B4513] font-semibold hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-[#0f172a] font-semibold hover:gap-3 transition-all"
               >
                 Visiter notre atelier
                 <ArrowRight size={18} />
@@ -352,19 +352,19 @@ export default async function MadeInFrancePage() {
               <h3 className="text-xl font-semibold text-slate-900 mb-6">En chiffres</h3>
               <div className="space-y-6">
                 <div>
-                  <div className="text-3xl font-bold text-[#CD853F]">100%</div>
+                  <div className="text-3xl font-bold text-[#475569]">100%</div>
                   <div className="text-slate-600">Fabrication française</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#CD853F]">3 mm</div>
+                  <div className="text-3xl font-bold text-[#475569]">3 mm</div>
                   <div className="text-slate-600">Épaisseur d&apos;acier minimum</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#CD853F]">2 ans</div>
+                  <div className="text-3xl font-bold text-[#475569]">2 ans</div>
                   <div className="text-slate-600">Garantie sur tous les produits</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#CD853F]">20+</div>
+                  <div className="text-3xl font-bold text-[#475569]">20+</div>
                   <div className="text-slate-600">Années de durée de vie</div>
                 </div>
               </div>
@@ -384,29 +384,29 @@ export default async function MadeInFrancePage() {
           </p>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-              <Recycle className="w-8 h-8 text-[#CD853F] mb-4" />
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+              <Recycle className="w-8 h-8 text-[#475569] mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Pas de transport intercontinental</h3>
               <p className="text-slate-600 leading-relaxed">
                 Un brasero importé de Chine parcourt 20 000 km en container. Le nôtre parcourt quelques centaines de kilomètres entre l&apos;aciérie européenne, notre atelier et votre domicile. L&apos;empreinte carbone est incomparable.
               </p>
             </div>
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-              <ShieldCheck className="w-8 h-8 text-[#CD853F] mb-4" />
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+              <ShieldCheck className="w-8 h-8 text-[#475569] mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Un brasero qui dure 20 ans</h3>
               <p className="text-slate-600 leading-relaxed">
                 Un brasero artisanal de 3 mm d&apos;acier remplace 5 à 10 braseros jetables sur sa durée de vie. Moins de déchets, moins de production, moins de transport. La durabilité est la meilleure forme d&apos;écologie.
               </p>
             </div>
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-              <Wrench className="w-8 h-8 text-[#CD853F] mb-4" />
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+              <Wrench className="w-8 h-8 text-[#475569] mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Réparable, pas jetable</h3>
               <p className="text-slate-600 leading-relaxed">
                 Plancha usée après 15 ans ? On vous en fournit une neuve. Grille endommagée ? Pièce détachée disponible. Un brasero Atelier LBF se répare, il ne se jette pas en déchetterie.
               </p>
             </div>
-            <div className="bg-[#f6f1e9] p-6 sm:p-8 border border-slate-200">
-              <Heart className="w-8 h-8 text-[#CD853F] mb-4" />
+            <div className="bg-[#f1f5f9] p-6 sm:p-8 border border-slate-200">
+              <Heart className="w-8 h-8 text-[#475569] mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Emploi local</h3>
               <p className="text-slate-600 leading-relaxed">
                 Chaque brasero vendu finance un emploi d&apos;artisan ferronnier en Nouvelle-Aquitaine. Les compétences restent sur le territoire, les bénéfices aussi. C&apos;est un cercle vertueux.
@@ -417,16 +417,16 @@ export default async function MadeInFrancePage() {
       </section>
 
       {/* Articles liés */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 mb-8 text-center">
             Articles sur la fabrication et la qualité
           </h2>
           <div className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {(latestBlogPosts || []).map((post) => (
-              <Link key={post.slug} href={`/blog/${post.slug}`} className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#CD853F] transition-all group">
-                <span className="text-xs text-[#8B4513] font-medium">Guide</span>
-                <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#8B4513] transition-colors text-sm">{post.title}</h3>
+              <Link key={post.slug} href={`/blog/${post.slug}`} className="block bg-white p-5 border border-slate-200 hover:shadow-md hover:border-[#475569] transition-all group">
+                <span className="text-xs text-[#0f172a] font-medium">Guide</span>
+                <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#0f172a] transition-colors text-sm">{post.title}</h3>
               </Link>
             ))}
           </div>
@@ -442,7 +442,7 @@ export default async function MadeInFrancePage() {
             </h2>
           </div>
 
-          <div className="bg-[#f6f1e9] p-8 border border-slate-200">
+          <div className="bg-[#f1f5f9] p-8 border border-slate-200">
             <ul className="space-y-4">
               {[
                 "Atelier ouvert aux visiteurs : venez voir comment sont fabriqués vos braseros",
@@ -453,7 +453,7 @@ export default async function MadeInFrancePage() {
                 "Chaque brasero porte notre signature — fierté du travail bien fait",
               ].map((item, index) => (
                 <li key={index} className="flex items-start gap-4">
-                  <CheckCircle2 className="w-6 h-6 text-[#CD853F] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-6 h-6 text-[#475569] flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700 leading-relaxed">{item}</span>
                 </li>
               ))}
@@ -463,7 +463,7 @@ export default async function MadeInFrancePage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 bg-[#f1f5f9]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 mb-10 text-center">
             Questions fréquentes
@@ -471,9 +471,9 @@ export default async function MadeInFrancePage() {
           <div className="space-y-4">
             {faqItems.map((faq, index) => (
               <details key={index} className="bg-white border border-slate-200 group">
-                <summary className="p-5 sm:p-6 cursor-pointer font-semibold text-slate-900 hover:text-[#8B4513] transition-colors list-none flex items-center justify-between">
+                <summary className="p-5 sm:p-6 cursor-pointer font-semibold text-slate-900 hover:text-[#0f172a] transition-colors list-none flex items-center justify-between">
                   {faq.question}
-                  <span className="text-[#CD853F] text-xl ml-4 group-open:rotate-45 transition-transform">+</span>
+                  <span className="text-[#475569] text-xl ml-4 group-open:rotate-45 transition-transform">+</span>
                 </summary>
                 <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-slate-600 leading-relaxed">
                   {faq.answer}
@@ -496,14 +496,14 @@ export default async function MadeInFrancePage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="/produits?category=brasero"
-              className="inline-flex items-center gap-2 bg-[#8B4513] hover:bg-[#CD853F] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-[#0f172a] hover:bg-[#475569] text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               <Award size={18} />
               Nos braseros français
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold uppercase tracking-wide px-8 py-4 transition-all"
             >
               Nous contacter
             </Link>
@@ -517,20 +517,20 @@ export default async function MadeInFrancePage() {
           <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
             <a
               href={`mailto:${settings.storeEmail}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Mail className="w-4 h-4 text-[#8B4513]" />
+              <Mail className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storeEmail}</span>
             </a>
             <a
               href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-              className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+              className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
             >
-              <Phone className="w-4 h-4 text-[#8B4513]" />
+              <Phone className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.storePhone}</span>
             </a>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#8B4513]" />
+              <MapPin className="w-4 h-4 text-[#0f172a]" />
               <span>{settings.atelier.city}, {settings.atelier.department}</span>
             </div>
           </div>

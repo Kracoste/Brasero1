@@ -63,7 +63,7 @@ export function CartCrossSell() {
               )}
             </div>
             <div className="p-2.5">
-              <p className="text-xs font-semibold text-slate-900 line-clamp-1 group-hover:text-[#8B4513] transition-colors">
+              <p className="text-xs font-semibold text-slate-900 line-clamp-1 group-hover:text-[#0f172a] transition-colors">
                 {product.name}
               </p>
               <Price amount={product.price} className="text-sm text-slate-700 mt-1" />

@@ -61,18 +61,18 @@ export default async function BlogPage() {
   const rest = posts.slice(1);
 
   return (
-    <div className="bg-white">
+    <div>
       <JsonLd data={breadcrumb} />
 
       {/* Hero */}
-      <section className="relative bg-white overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-[#8B4513]" />
+              <div className="w-12 h-12 bg-slate-100 flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-slate-900" />
               </div>
-              <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+              <span className="text-slate-900 font-medium uppercase tracking-wide text-sm">
                 Blog
               </span>
             </div>
@@ -97,8 +97,8 @@ export default async function BlogPage() {
                 href={cat === "tous" ? "/blog" : `/blog?cat=${cat}`}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
                   cat === "tous"
-                    ? "bg-[#8B4513] text-white"
-                    : "bg-[#f6f1e9] text-slate-700 hover:bg-[#8B4513] hover:text-white"
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-900 hover:text-white"
                 }`}
               >
                 {CATEGORY_LABELS[cat] || cat} ({categoryCounts[cat] || 0})
@@ -110,7 +110,7 @@ export default async function BlogPage() {
 
       {/* Featured article */}
       {featured && (
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link
               href={`/blog/${featured.slug}`}
@@ -129,13 +129,13 @@ export default async function BlogPage() {
                     />
                   </div>
                 ) : (
-                  <div className="bg-gradient-to-br from-[#8B4513] to-[#CD853F] p-8 sm:p-12 flex items-center justify-center min-h-[250px]">
+                  <div className="bg-slate-900 p-8 sm:p-12 flex items-center justify-center min-h-[250px]">
                     <BookOpen className="w-32 h-32 text-white/30" />
                   </div>
                 )}
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-4 mb-4">
-                    <span className="bg-[#f6f1e9] text-[#8B4513] text-xs font-medium px-3 py-1">
+                    <span className="bg-slate-100 text-slate-900 text-xs font-medium px-3 py-1">
                       {CATEGORY_LABELS[featured.category] || featured.category}
                     </span>
                     <span className="text-sm text-slate-500">
@@ -158,7 +158,7 @@ export default async function BlogPage() {
                       <Clock className="w-4 h-4" />
                       <span>{featured.read_time} min de lecture</span>
                     </div>
-                    <span className="inline-flex items-center gap-2 text-[#8B4513] font-medium">
+                    <span className="inline-flex items-center gap-2 text-slate-900 font-medium">
                       Lire l&apos;article
                       <ArrowRight size={16} />
                     </span>
@@ -195,13 +195,13 @@ export default async function BlogPage() {
                         />
                     </div>
                   ) : (
-                    <div className="bg-[#f6f1e9] p-8 flex items-center justify-center">
-                      <BookOpen className="w-16 h-16 text-[#8B4513]/30" />
+                    <div className="bg-slate-100 p-8 flex items-center justify-center">
+                      <BookOpen className="w-16 h-16 text-slate-400" />
                     </div>
                   )}
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="bg-[#f6f1e9] text-[#8B4513] text-xs font-medium px-2 py-1">
+                      <span className="bg-slate-100 text-slate-900 text-xs font-medium px-2 py-1">
                         {CATEGORY_LABELS[post.category] || post.category}
                       </span>
                       <span className="text-xs text-slate-500">
@@ -217,7 +217,7 @@ export default async function BlogPage() {
                           : ""}
                       </span>
                     </div>
-                    <h3 className="font-semibold text-lg text-slate-900 mb-2 group-hover:text-[#8B4513] transition-colors">
+                    <h3 className="font-semibold text-lg text-slate-900 mb-2 group-hover:text-slate-700 transition-colors">
                       {post.title}
                     </h3>
                     <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-3">
@@ -228,7 +228,7 @@ export default async function BlogPage() {
                         <Clock className="w-3 h-3" />
                         <span>{post.read_time} min</span>
                       </div>
-                      <span className="inline-flex items-center gap-1 text-[#8B4513] text-sm font-medium">
+                      <span className="inline-flex items-center gap-1 text-slate-900 text-sm font-medium">
                         Lire
                         <ArrowRight size={14} />
                       </span>
@@ -255,7 +255,7 @@ export default async function BlogPage() {
             </p>
             <Link
               href="/produits"
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-slate-900 text-white hover:bg-slate-700 font-medium tracking-wide uppercase px-8 py-4 transition-all"
             >
               Découvrir nos braseros
               <ArrowRight size={18} />
@@ -265,7 +265,7 @@ export default async function BlogPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+      <section className="py-16 sm:py-24 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
             Envie de passer à l&apos;action ?
@@ -277,7 +277,7 @@ export default async function BlogPage() {
           <div className="mt-8">
             <Link
               href="/produits"
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-slate-900 text-white hover:bg-slate-700 font-medium tracking-wide uppercase px-8 py-4 transition-all"
             >
               Voir nos braseros
               <ArrowRight size={18} />

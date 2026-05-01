@@ -624,6 +624,10 @@ export function generateProductMetaTitle(product: Product): string {
     return `${product.name} | Fendeur à bûches sécurisé, manufacturé en France | Atelier LBF — ${price}€`;
   }
 
+  if (product.category === "housse-protection") {
+    return `${product.name} | Housse de protection brasero imperméable | Atelier LBF — ${price}€`;
+  }
+
   return `${product.name} | Accessoire brasero artisanal | Atelier LBF — ${price}€`;
 }
 
@@ -657,6 +661,8 @@ export function generateProductMetaDescription(product: Product): string {
     }
   } else if (product.category === "fendeur") {
     desc = `${product.name} : fendeur à bûches artisanal, plus sécurisé qu'une hache. Manufacturé en France dans les Deux-Sèvres. ${price}€. Garantie 2 ans.`;
+  } else if (product.category === "housse-protection") {
+    desc = `${product.name} : housse de protection brasero imperméable, protection contre les intempéries. Compatible tous modèles Atelier LBF. Fabriquée en France. ${price}€.`;
   } else {
     desc = `${product.name} : accessoire brasero artisanal, compatible tous modèles Atelier LBF. Manufacturé en France. ${price}€. Garanti 2 ans.`;
   }

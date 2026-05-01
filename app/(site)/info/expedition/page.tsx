@@ -177,10 +177,10 @@ export default async function ExpeditionPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                  <Truck className="w-6 h-6 text-[#8B4513]" />
+                <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                  <Truck className="w-6 h-6 text-[#0f172a]" />
                 </div>
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Livraison & Expédition
                 </span>
               </div>
@@ -197,12 +197,12 @@ export default async function ExpeditionPage() {
         </section>
 
         {/* Zones de livraison */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Globe className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <Globe className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Zones de livraison
                 </span>
               </div>
@@ -224,7 +224,7 @@ export default async function ExpeditionPage() {
                   <h3 className="text-lg font-semibold text-slate-900 mb-2">
                     {zone.zone}
                   </h3>
-                  <div className="flex items-center gap-2 text-[#8B4513] font-medium mb-2">
+                  <div className="flex items-center gap-2 text-[#0f172a] font-medium mb-2">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm">{zone.delay}</span>
                   </div>
@@ -236,7 +236,7 @@ export default async function ExpeditionPage() {
             </div>
 
             <div className="mt-8 bg-white p-6 border border-slate-200 flex items-start gap-4">
-              <AlertCircle className="w-6 h-6 text-[#8B4513] flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-6 h-6 text-[#0f172a] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-slate-900">Autres destinations</p>
                 <p className="text-slate-600 mt-1">
@@ -245,7 +245,7 @@ export default async function ExpeditionPage() {
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#CD853F] font-medium mt-3"
+                  className="inline-flex items-center gap-2 text-[#0f172a] hover:text-[#475569] font-medium mt-3"
                 >
                   Nous contacter
                   <ArrowRight size={16} />
@@ -271,9 +271,9 @@ export default async function ExpeditionPage() {
               {shippingFeatures.map((feature) => (
                 <div 
                   key={feature.title}
-                  className="bg-[#f6f1e9] p-6 border border-slate-200"
+                  className="bg-[#f1f5f9] p-6 border border-slate-200"
                 >
-                  <feature.icon className="w-10 h-10 text-[#8B4513] mb-4" />
+                  <feature.icon className="w-10 h-10 text-[#0f172a] mb-4" />
                   <h3 className="font-semibold text-lg mb-2 text-slate-900">{feature.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     {feature.description}
@@ -285,7 +285,7 @@ export default async function ExpeditionPage() {
         </section>
 
         {/* Suivi de commande */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -302,11 +302,11 @@ export default async function ExpeditionPage() {
                   {trackingSteps.map((item, index) => (
                     <div key={item.step} className="flex gap-4">
                       <div className="flex-shrink-0 flex flex-col items-center">
-                        <div className="w-10 h-10 bg-[#8B4513] text-white flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 bg-[#0f172a] text-white flex items-center justify-center font-bold">
                           {item.step}
                         </div>
                         {index < trackingSteps.length - 1 && (
-                          <div className="w-0.5 flex-1 bg-[#CD853F]" />
+                          <div className="w-0.5 flex-1 bg-[#475569]" />
                         )}
                       </div>
                       <div className="pt-1 pb-8">
@@ -320,7 +320,7 @@ export default async function ExpeditionPage() {
               
               <div className="bg-white p-8 sm:p-10 border border-slate-200">
                 <div className="text-center">
-                  <Box className="w-16 h-16 text-[#8B4513] mx-auto" />
+                  <Box className="w-16 h-16 text-[#0f172a] mx-auto" />
                   <h3 className="mt-6 text-xl font-semibold text-slate-900">
                     Numéro de suivi
                   </h3>
@@ -329,7 +329,7 @@ export default async function ExpeditionPage() {
                     numéro de suivi. Vous pouvez ainsi suivre votre colis en temps 
                     réel sur le site du transporteur.
                   </p>
-                  <div className="mt-6 p-4 bg-[#f6f1e9]">
+                  <div className="mt-6 p-4 bg-[#f1f5f9]">
                     <p className="text-sm text-slate-500">Exemple de numéro de suivi</p>
                     <p className="font-mono text-lg text-slate-900 mt-1">FR123456789XY</p>
                   </div>
@@ -349,34 +349,34 @@ export default async function ExpeditionPage() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-[#f6f1e9] p-8 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-8 border border-slate-200">
                 <h3 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-[#8B4513]" />
+                  <CheckCircle2 className="w-6 h-6 text-[#0f172a]" />
                   À la réception
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                     <span className="text-slate-700">Vérifiez l'état du colis avant de signer</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                     <span className="text-slate-700">En cas de dommage visible, émettez des réserves écrites</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                     <span className="text-slate-700">Prenez des photos si nécessaire</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513] mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a] mt-0.5 flex-shrink-0" />
                     <span className="text-slate-700">Contactez-nous sous 48h en cas de problème</span>
                   </li>
                 </ul>
               </div>
 
-              <div className="bg-[#f6f1e9] p-8 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-8 border border-slate-200">
                 <h3 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-3">
-                  <AlertCircle className="w-6 h-6 text-[#8B4513]" />
+                  <AlertCircle className="w-6 h-6 text-[#0f172a]" />
                   Braseros personnalisés et sur mesure
                 </h3>
                 <p className="text-slate-600 leading-relaxed mb-4">
@@ -396,7 +396,7 @@ export default async function ExpeditionPage() {
         </section>
 
         {/* FAQ */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
@@ -431,9 +431,9 @@ export default async function ExpeditionPage() {
                   key={index}
                   className="bg-white border border-slate-100 group"
                 >
-                  <summary className="flex items-center justify-between cursor-pointer p-5 font-semibold text-slate-900 hover:text-[#8B4513] transition-colors">
+                  <summary className="flex items-center justify-between cursor-pointer p-5 font-semibold text-slate-900 hover:text-[#0f172a] transition-colors">
                     {faq.question}
-                    <span className="text-[#8B4513] group-open:rotate-180 transition-transform">
+                    <span className="text-[#0f172a] group-open:rotate-180 transition-transform">
                       <ArrowRight className="rotate-90" size={18} />
                     </span>
                   </summary>
@@ -459,14 +459,14 @@ export default async function ExpeditionPage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 <Mail size={18} />
                 Nous contacter
               </Link>
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Voir nos braseros
                 <ArrowRight size={18} />
@@ -480,19 +480,19 @@ export default async function ExpeditionPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#8B4513]" />
+                <Mail className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storeEmail}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#8B4513]" />
+                <Phone className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storePhone}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#8B4513]" />
+                <Clock className="w-4 h-4 text-[#0f172a]" />
                 <span>Lun-Ven : 9h-18h</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#8B4513]" />
+                <MapPin className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.atelier.city}, {settings.atelier.department}</span>
               </div>
             </div>

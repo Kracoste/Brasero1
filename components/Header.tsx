@@ -59,6 +59,7 @@ export const Header = () => {
                   const isActive =
                     pathname === link.href ||
                     pathname.includes("category=accessoire") ||
+                    pathname.includes("category=housse-protection") ||
                     pathname.includes("category=fendeur");
                   return (
                     <div
@@ -99,6 +100,12 @@ export const Header = () => {
                           className="px-4 py-3 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50"
                         >
                           Fendeur à bûches
+                        </Link>
+                        <Link
+                          href="/produits?category=housse-protection"
+                          className="px-4 py-3 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          Housses de protection
                         </Link>
                         <Link
                           href="/produits?category=accessoire"

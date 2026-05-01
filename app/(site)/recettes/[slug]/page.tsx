@@ -114,13 +114,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
       <JsonLd data={recipeSchema} />
 
       <Container className="max-w-4xl space-y-8">
-        <Link href="/recettes" className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-[#8B4513]">
+        <Link href="/recettes" className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-[#0f172a]">
           <ArrowLeft size={16} />
           Toutes les recettes
         </Link>
 
         <header className="space-y-4">
-          <span className="inline-block text-xs uppercase tracking-wide text-[#8B4513] font-semibold">
+          <span className="inline-block text-xs uppercase tracking-wide text-[#0f172a] font-semibold">
             {categoryLabel}
           </span>
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
@@ -130,19 +130,19 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
           <div className="flex flex-wrap gap-5 pt-2 text-sm text-slate-600 border-y border-slate-200 py-4">
             <span className="inline-flex items-center gap-1.5">
-              <Clock size={16} className="text-[#8B4513]" />
+              <Clock size={16} className="text-[#0f172a]" />
               <span>
                 <strong className="text-slate-900">{totalTime} min</strong> ({recipe.prep_time_minutes} prép + {recipe.cook_time_minutes} cuisson)
               </span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Users size={16} className="text-[#8B4513]" />
+              <Users size={16} className="text-[#0f172a]" />
               <span>
                 Pour <strong className="text-slate-900">{recipe.servings} personnes</strong>
               </span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <ChefHat size={16} className="text-[#8B4513]" />
+              <ChefHat size={16} className="text-[#0f172a]" />
               <span className="capitalize">
                 Difficulté : <strong className="text-slate-900">{recipe.difficulty}</strong>
               </span>
@@ -168,10 +168,10 @@ export default async function RecipePage({ params }: RecipePageProps) {
         <div className="grid gap-8 md:grid-cols-[1fr_2fr] pt-4">
           <aside className="space-y-4">
             <h2 className="font-display text-xl font-semibold text-slate-900">Ingrédients</h2>
-            <ul className="space-y-2 text-sm text-slate-700 bg-[#f6f1e9] rounded-xl p-5">
+            <ul className="space-y-2 text-sm text-slate-700 bg-[#f1f5f9] rounded-xl p-5">
               {recipe.ingredients.map((ing, i) => (
                 <li key={i} className="flex gap-2">
-                  <span className="font-semibold text-[#8B4513] whitespace-nowrap">
+                  <span className="font-semibold text-[#0f172a] whitespace-nowrap">
                     {ing.quantity} {ing.unit}
                   </span>
                   <span>{ing.name}</span>
@@ -185,7 +185,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
             <ol className="space-y-4">
               {recipe.instructions.map((inst) => (
                 <li key={inst.step} className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8B4513] text-white flex items-center justify-center font-semibold text-sm">
+                  <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0f172a] text-white flex items-center justify-center font-semibold text-sm">
                     {inst.step}
                   </span>
                   <p className="text-slate-700 pt-1">{inst.text}</p>
@@ -203,13 +203,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
         )}
 
         {relatedProduct && (
-          <div className="rounded-2xl bg-gradient-to-br from-[#8B4513] to-[#6d3610] p-8 text-white space-y-3">
+          <div className="rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#6d3610] p-8 text-white space-y-3">
             <p className="text-sm uppercase tracking-wide opacity-80">Pour réussir cette recette</p>
             <h2 className="font-display text-2xl font-semibold">{relatedProduct.name}</h2>
             <p className="text-sm opacity-90">{relatedProduct.shortDescription}</p>
             <Link
               href={`/produits/${relatedProduct.slug}`}
-              className="inline-flex items-center gap-2 bg-white text-[#8B4513] px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-[#0f172a] px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors"
             >
               Voir ce produit
             </Link>

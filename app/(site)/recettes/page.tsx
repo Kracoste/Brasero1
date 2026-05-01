@@ -94,7 +94,7 @@ export default async function RecettesPage() {
                           )}
                         </div>
                         <div className="p-5 space-y-2">
-                          <h3 className="font-semibold text-slate-900 group-hover:text-[#8B4513] transition-colors">
+                          <h3 className="font-semibold text-slate-900 group-hover:text-[#0f172a] transition-colors">
                             {recipe.title}
                           </h3>
                           {recipe.excerpt && (
@@ -107,7 +107,7 @@ export default async function RecettesPage() {
                             <span className="inline-flex items-center gap-1">
                               <Users size={14} /> {recipe.servings} pers.
                             </span>
-                            <span className="capitalize text-[#8B4513] font-medium">{recipe.difficulty}</span>
+                            <span className="capitalize text-[#0f172a] font-medium">{recipe.difficulty}</span>
                           </div>
                         </div>
                       </Link>

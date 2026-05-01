@@ -28,21 +28,21 @@ export async function BlogProductRecommendation({ productSlug, ctaText, variant 
 
   if (variant === "inline") {
     return (
-      <aside className="my-10 flex flex-col sm:flex-row items-center gap-5 p-5 bg-[#f6f1e9] border-l-4 border-[#8B4513] rounded-r-lg not-prose">
+      <aside className="my-10 flex flex-col sm:flex-row items-center gap-5 p-5 bg-[#f1f5f9] border-l-4 border-[#0f172a] rounded-r-lg not-prose">
         {image && (
           <div className="relative w-28 h-28 flex-shrink-0 rounded overflow-hidden bg-white">
             <Image src={image.src} alt={image.alt || product.name} fill className="object-cover" sizes="112px" />
           </div>
         )}
         <div className="flex-1 text-center sm:text-left">
-          <p className="text-xs uppercase tracking-wider text-[#8B4513] font-semibold mb-1">Notre recommandation</p>
+          <p className="text-xs uppercase tracking-wider text-[#0f172a] font-semibold mb-1">Notre recommandation</p>
           <h3 className="text-lg font-semibold text-slate-900 mb-1">{product.name}</h3>
           {product.shortDescription && (
             <p className="text-sm text-slate-600 line-clamp-2 mb-3">{product.shortDescription}</p>
           )}
           <Link
             href={`/produits/${product.slug}`}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#8B4513] hover:text-[#CD853F]"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0f172a] hover:text-[#475569]"
           >
             {label}
             <ArrowRight size={14} />
@@ -56,12 +56,12 @@ export async function BlogProductRecommendation({ productSlug, ctaText, variant 
     <div className="mt-12 border border-slate-200 rounded-lg overflow-hidden bg-white">
       <div className="grid sm:grid-cols-[260px_1fr]">
         {image && (
-          <div className="relative aspect-square sm:aspect-auto bg-[#f6f1e9]">
+          <div className="relative aspect-square sm:aspect-auto bg-[#f1f5f9]">
             <Image src={image.src} alt={image.alt || product.name} fill className="object-cover" sizes="(max-width: 640px) 100vw, 260px" />
           </div>
         )}
         <div className="p-6 sm:p-8 flex flex-col justify-center">
-          <p className="text-xs uppercase tracking-wider text-[#8B4513] font-semibold mb-2">Produit recommandé</p>
+          <p className="text-xs uppercase tracking-wider text-[#0f172a] font-semibold mb-2">Produit recommandé</p>
           <h3 className="text-xl font-display font-bold text-slate-900 mb-2">{product.name}</h3>
           {product.shortDescription && (
             <p className="text-sm text-slate-600 mb-4">{product.shortDescription}</p>
@@ -69,7 +69,7 @@ export async function BlogProductRecommendation({ productSlug, ctaText, variant 
           <div className="flex items-center gap-4">
             <Link
               href={`/produits/${product.slug}`}
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white font-medium tracking-wide uppercase px-5 py-2.5 text-sm hover:brightness-110 transition-all"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white font-medium tracking-wide uppercase px-5 py-2.5 text-sm hover:brightness-110 transition-all"
             >
               {label}
               <ArrowRight size={14} />

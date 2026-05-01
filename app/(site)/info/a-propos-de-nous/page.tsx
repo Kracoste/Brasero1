@@ -160,10 +160,10 @@ export default async function AProposPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-[#f6f1e9] flex items-center justify-center">
-                  <Users className="w-6 h-6 text-[#8B4513]" />
+                <div className="w-12 h-12 bg-[#f1f5f9] flex items-center justify-center">
+                  <Users className="w-6 h-6 text-[#0f172a]" />
                 </div>
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   À propos
                 </span>
               </div>
@@ -180,13 +180,13 @@ export default async function AProposPage() {
         </section>
 
         {/* Notre histoire */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <History className="w-5 h-5 text-[#8B4513]" />
-                  <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                  <History className="w-5 h-5 text-[#0f172a]" />
+                  <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                     Notre histoire
                   </span>
                 </div>
@@ -206,7 +206,7 @@ export default async function AProposPage() {
                 <div className="mt-8">
                   <Link
                     href="/atelier"
-                    className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#CD853F] font-medium transition-colors"
+                    className="inline-flex items-center gap-2 text-[#0f172a] hover:text-[#475569] font-medium transition-colors"
                   >
                     Visiter notre atelier
                     <ArrowRight size={16} />
@@ -215,7 +215,7 @@ export default async function AProposPage() {
               </div>
               
               <div className="bg-white p-8 border border-slate-200">
-                <Flame className="w-16 h-16 text-[#8B4513] mx-auto mb-6" />
+                <Flame className="w-16 h-16 text-[#0f172a] mx-auto mb-6" />
                 <blockquote className="text-center">
                   <p className="text-xl text-slate-700 italic leading-relaxed">
                     "Nous croyons que le feu a le pouvoir de rassembler. Chaque brasero 
@@ -235,8 +235,8 @@ export default async function AProposPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-[#8B4513]" />
-                <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                <Target className="w-5 h-5 text-[#0f172a]" />
+                <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                   Nos valeurs
                 </span>
               </div>
@@ -252,9 +252,9 @@ export default async function AProposPage() {
               {values.map((value) => (
                 <div 
                   key={value.title}
-                  className="bg-[#f6f1e9] p-6 border border-slate-200"
+                  className="bg-[#f1f5f9] p-6 border border-slate-200"
                 >
-                  <value.icon className="w-10 h-10 text-[#8B4513] mb-4" />
+                  <value.icon className="w-10 h-10 text-[#0f172a] mb-4" />
                   <h3 className="font-semibold text-lg mb-2 text-slate-900">{value.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     {value.description}
@@ -266,7 +266,7 @@ export default async function AProposPage() {
         </section>
 
         {/* Timeline */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
@@ -281,11 +281,11 @@ export default async function AProposPage() {
               {milestones.map((milestone, index) => (
                 <div key={milestone.year} className="flex gap-4">
                   <div className="flex-shrink-0 flex flex-col items-center">
-                    <div className="w-16 h-10 bg-[#8B4513] text-white flex items-center justify-center font-bold text-sm">
+                    <div className="w-16 h-10 bg-[#0f172a] text-white flex items-center justify-center font-bold text-sm">
                       {milestone.year}
                     </div>
                     {index < milestones.length - 1 && (
-                      <div className="w-0.5 flex-1 bg-[#CD853F]" />
+                      <div className="w-0.5 flex-1 bg-[#475569]" />
                     )}
                   </div>
                   <div className="pt-1 pb-8">
@@ -304,8 +304,8 @@ export default async function AProposPage() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Users className="w-5 h-5 text-[#8B4513]" />
-                  <span className="text-[#8B4513] font-medium uppercase tracking-wide text-sm">
+                  <Users className="w-5 h-5 text-[#0f172a]" />
+                  <span className="text-[#0f172a] font-medium uppercase tracking-wide text-sm">
                     Notre équipe
                   </span>
                 </div>
@@ -326,29 +326,29 @@ export default async function AProposPage() {
                 <ul className="mt-6 space-y-3">
                   {teamValues.map((value) => (
                     <li key={value} className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle2 className="w-5 h-5 text-[#8B4513] flex-shrink-0" />
+                      <CheckCircle2 className="w-5 h-5 text-[#0f172a] flex-shrink-0" />
                       <span>{value}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               
-              <div className="bg-[#f6f1e9] p-8 border border-slate-200">
+              <div className="bg-[#f1f5f9] p-8 border border-slate-200">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white p-6 text-center">
-                    <p className="text-4xl font-bold text-[#8B4513]">500+</p>
+                    <p className="text-4xl font-bold text-[#0f172a]">500+</p>
                     <p className="text-sm text-slate-600 mt-1">Braseros livrés</p>
                   </div>
                   <div className="bg-white p-6 text-center">
-                    <p className="text-4xl font-bold text-[#8B4513]">5</p>
+                    <p className="text-4xl font-bold text-[#0f172a]">5</p>
                     <p className="text-sm text-slate-600 mt-1">Artisans</p>
                   </div>
                   <div className="bg-white p-6 text-center">
-                    <p className="text-4xl font-bold text-[#8B4513]">100%</p>
+                    <p className="text-4xl font-bold text-[#0f172a]">100%</p>
                     <p className="text-sm text-slate-600 mt-1">Made in France</p>
                   </div>
                   <div className="bg-white p-6 text-center">
-                    <p className="text-4xl font-bold text-[#8B4513]">2 ans</p>
+                    <p className="text-4xl font-bold text-[#0f172a]">2 ans</p>
                     <p className="text-sm text-slate-600 mt-1">Garantie</p>
                   </div>
                 </div>
@@ -370,14 +370,14 @@ export default async function AProposPage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 <Mail size={18} />
                 Nous contacter
               </Link>
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 border-2 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Découvrir nos braseros
                 <ArrowRight size={18} />
@@ -392,24 +392,24 @@ export default async function AProposPage() {
             <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600">
               <a 
                 href={`mailto:${settings.storeEmail}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Mail className="w-4 h-4 text-[#8B4513]" />
+                <Mail className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storeEmail}</span>
               </a>
               <a 
                 href={`tel:${settings.storePhone.replace(/\s/g, '')}`}
-                className="flex items-center gap-2 hover:text-[#8B4513] transition-colors"
+                className="flex items-center gap-2 hover:text-[#0f172a] transition-colors"
               >
-                <Phone className="w-4 h-4 text-[#8B4513]" />
+                <Phone className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.storePhone}</span>
               </a>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#8B4513]" />
+                <Clock className="w-4 h-4 text-[#0f172a]" />
                 <span>Lun-Ven : 9h-18h</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#8B4513]" />
+                <MapPin className="w-4 h-4 text-[#0f172a]" />
                 <span>{settings.atelier.city}, {settings.atelier.department}</span>
               </div>
             </div>

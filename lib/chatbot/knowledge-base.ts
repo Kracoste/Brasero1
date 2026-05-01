@@ -160,7 +160,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   {
     keywords: ['accessoire', 'spatule', 'pique', 'ustensile', 'planche', 'découpe', 'kit'],
     question: 'Quels accessoires proposez-vous ?',
-    answer: 'Nous proposons des accessoires artisanaux assortis à nos braseros :\n\n• **Spatule** — en acier forgé, idéale pour la plancha\n• **Pique à viande** — pour retourner et servir\n• **Planche à découper** — en bois d\'acajou massif\n• **Kit ustensiles** — l\'ensemble complet pour cuisiner au brasero\n\nTous nos accessoires sont manufacturés en France avec les mêmes standards de qualité.',
+    answer: 'Nous proposons des accessoires artisanaux assortis à nos braseros :\n\n• **Spatule** — en acier forgé, idéale pour la plancha\n• **Pique à viande** — pour retourner et servir\n• **Planche à découper** — en bois d\'acajou massif\n• **Kit ustensiles** — l\'ensemble complet pour cuisiner au brasero\n• **Housses de protection** — tissu imperméable pour protéger votre brasero\n\nTous nos accessoires sont manufacturés en France avec les mêmes standards de qualité.',
     category: 'accessoires',
   },
 ];

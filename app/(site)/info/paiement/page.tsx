@@ -164,7 +164,7 @@ export default async function PaiementPage() {
         <section className="relative bg-white py-16 sm:py-24 overflow-hidden">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 bg-[#8B4513]/10 text-[#8B4513] px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 bg-[#0f172a]/10 text-[#0f172a] px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <Lock size={16} />
                 Paiement 100% sécurisé
               </div>
@@ -178,7 +178,7 @@ export default async function PaiementPage() {
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   href="/produits"
-                  className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] hover:brightness-110 text-white font-medium tracking-wide uppercase px-6 py-3 transition-all"
+                  className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] hover:brightness-110 text-white font-medium tracking-wide uppercase px-6 py-3 transition-all"
                 >
                   Voir nos braseros
                   <ArrowRight size={18} />
@@ -196,7 +196,7 @@ export default async function PaiementPage() {
         </section>
 
         {/* Moyens de paiement */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
@@ -214,13 +214,13 @@ export default async function PaiementPage() {
                   className="relative bg-white p-6 sm:p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
                 >
                   <div className="w-12 h-12 bg-orange-100 flex items-center justify-center mb-4">
-                    <method.icon className="w-6 h-6 text-[#8B4513]" />
+                    <method.icon className="w-6 h-6 text-[#0f172a]" />
                   </div>
                   
                   <h3 className="text-lg font-semibold text-slate-900 mb-1">
                     {method.title}
                   </h3>
-                  <p className="text-sm text-[#8B4513] font-medium mb-3">
+                  <p className="text-sm text-[#0f172a] font-medium mb-3">
                     {method.description}
                   </p>
                   <p className="text-slate-600 text-sm leading-relaxed">
@@ -249,7 +249,7 @@ export default async function PaiementPage() {
                   {securityFeatures.map((feature) => (
                     <div key={feature.title} className="flex gap-4">
                       <div className="flex-shrink-0 w-10 h-10 bg-orange-100 flex items-center justify-center">
-                        <feature.icon className="w-5 h-5 text-[#8B4513]" />
+                        <feature.icon className="w-5 h-5 text-[#0f172a]" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-slate-900">{feature.title}</h3>
@@ -261,7 +261,7 @@ export default async function PaiementPage() {
               </div>
               
               <div className="text-center">
-                <Shield className="w-16 h-16 text-[#8B4513] mx-auto" />
+                <Shield className="w-16 h-16 text-[#0f172a] mx-auto" />
                 <h3 className="mt-6 text-xl font-semibold text-slate-900">
                   Paiement via Stripe
                 </h3>
@@ -286,19 +286,19 @@ export default async function PaiementPage() {
         </section>
 
         {/* Paiement en 3x */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1">
                 <div className="bg-white p-8 sm:p-10">
                   <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
-                    <CreditCard className="w-6 h-6 text-[#8B4513]" />
+                    <CreditCard className="w-6 h-6 text-[#0f172a]" />
                     Comment ça marche ?
                   </h3>
                   
                   <div className="space-y-6">
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 bg-[#8B4513] text-white flex items-center justify-center font-bold text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 bg-[#0f172a] text-white flex items-center justify-center font-bold text-sm">
                         1
                       </div>
                       <div>
@@ -307,7 +307,7 @@ export default async function PaiementPage() {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 bg-[#8B4513] text-white flex items-center justify-center font-bold text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 bg-[#0f172a] text-white flex items-center justify-center font-bold text-sm">
                         2
                       </div>
                       <div>
@@ -316,7 +316,7 @@ export default async function PaiementPage() {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 bg-[#8B4513] text-white flex items-center justify-center font-bold text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 bg-[#0f172a] text-white flex items-center justify-center font-bold text-sm">
                         3
                       </div>
                       <div>
@@ -346,19 +346,19 @@ export default async function PaiementPage() {
                 </p>
                 <ul className="mt-6 space-y-3">
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                     Aucun frais, aucun intérêt
                   </li>
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                     À partir de 500€ d'achat
                   </li>
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                     Décision instantanée
                   </li>
                   <li className="flex items-center gap-3 text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-[#8B4513]" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0f172a]" />
                     100% en ligne, sans justificatif
                   </li>
                 </ul>
@@ -371,7 +371,7 @@ export default async function PaiementPage() {
         <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center">
-              <FileText className="w-12 h-12 text-[#8B4513] mx-auto mb-6" />
+              <FileText className="w-12 h-12 text-[#0f172a] mx-auto mb-6" />
               <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
                 Facturation simplifiée
               </h2>
@@ -399,10 +399,10 @@ export default async function PaiementPage() {
         </section>
 
         {/* FAQ */}
-        <section className="py-16 sm:py-24 bg-[#f6f1e9]">
+        <section className="py-16 sm:py-24 bg-[#f1f5f9]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <HelpCircle className="w-12 h-12 text-[#8B4513] mx-auto mb-6" />
+              <HelpCircle className="w-12 h-12 text-[#0f172a] mx-auto mb-6" />
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-slate-900">
                 Questions fréquentes
               </h2>
@@ -442,14 +442,14 @@ export default async function PaiementPage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/produits"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] hover:brightness-110 text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] hover:brightness-110 text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 Découvrir nos braseros
                 <ArrowRight size={18} />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#8B4513] to-[#CD853F] hover:brightness-110 text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] hover:brightness-110 text-white font-medium tracking-wide uppercase px-8 py-4 transition-all"
               >
                 <Phone size={18} />
                 Nous contacter

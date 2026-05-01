@@ -140,13 +140,13 @@ export function CustomizationSelector({
         onClick={handleToggle}
         className={`w-full flex items-center justify-between rounded-lg border-2 px-4 py-3 transition-all ${
           enabled
-            ? 'border-[#8B4513] bg-[#8B4513]/5'
+            ? 'border-[#0f172a] bg-[#0f172a]/5'
             : 'border-slate-200 bg-white hover:border-slate-300'
         }`}
       >
         <div className="flex items-center gap-3">
           <div className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all ${
-            enabled ? 'border-[#8B4513] bg-[#8B4513]' : 'border-slate-300'
+            enabled ? 'border-[#0f172a] bg-[#0f172a]' : 'border-slate-300'
           }`}>
             {enabled && (
               <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -158,7 +158,7 @@ export function CustomizationSelector({
             Personnaliser mon brasero — Découpe laser
           </span>
         </div>
-        <span className="text-sm font-bold text-[#8B4513]">
+        <span className="text-sm font-bold text-[#0f172a]">
           +{priceSupplement.toFixed(0)} € HT
         </span>
       </button>
@@ -205,7 +205,7 @@ export function CustomizationSelector({
 
                   {face.mode === 'none' && (
                     <div className="flex gap-2">
-                      <label className="flex-1 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 px-3 py-3 cursor-pointer hover:border-[#8B4513] hover:bg-[#8B4513]/5 transition">
+                      <label className="flex-1 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 px-3 py-3 cursor-pointer hover:border-[#0f172a] hover:bg-[#0f172a]/5 transition">
                         <Upload size={16} className="text-slate-400" />
                         <span className="text-xs font-medium text-slate-600">Image</span>
                         <input
@@ -222,7 +222,7 @@ export function CustomizationSelector({
                       <button
                         type="button"
                         onClick={() => updateFace(faceNum, { mode: 'text', font: 'serif' })}
-                        className="flex-1 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 px-3 py-3 hover:border-[#8B4513] hover:bg-[#8B4513]/5 transition"
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 px-3 py-3 hover:border-[#0f172a] hover:bg-[#0f172a]/5 transition"
                       >
                         <Type size={16} className="text-slate-400" />
                         <span className="text-xs font-medium text-slate-600">Texte</span>
@@ -232,7 +232,7 @@ export function CustomizationSelector({
 
                   {face.uploading && (
                     <div className="flex items-center justify-center py-4">
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-[#8B4513]" />
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-[#0f172a]" />
                       <span className="ml-2 text-xs text-slate-500">Upload en cours...</span>
                     </div>
                   )}
@@ -260,14 +260,14 @@ export function CustomizationSelector({
                         value={face.text || ''}
                         onChange={e => updateFace(faceNum, { text: e.target.value })}
                         maxLength={50}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-[#8B4513] focus:ring-1 focus:ring-[#8B4513]/20 focus:outline-none"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-[#0f172a] focus:ring-1 focus:ring-[#0f172a]/20 focus:outline-none"
                         style={{ fontFamily: AVAILABLE_FONTS.find(f => f.id === face.font)?.family }}
                       />
                       <div className="relative">
                         <select
                           value={face.font || 'serif'}
                           onChange={e => updateFace(faceNum, { font: e.target.value })}
-                          className="w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-8 text-sm cursor-pointer focus:border-[#8B4513] focus:ring-1 focus:ring-[#8B4513]/20 focus:outline-none"
+                          className="w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-8 text-sm cursor-pointer focus:border-[#0f172a] focus:ring-1 focus:ring-[#0f172a]/20 focus:outline-none"
                         >
                           {AVAILABLE_FONTS.map(font => (
                             <option key={font.id} value={font.id} style={{ fontFamily: font.family }}>
