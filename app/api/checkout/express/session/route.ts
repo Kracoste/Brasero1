@@ -5,20 +5,17 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit, getClientIP, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
-type ExpressBody = {
+type SessionBody = {
   productSlug: string;
   variantLabel?: string;
   quantity?: number;
+  paymentMethod: 'klarna';
 };
 
 const SHIPPING_COST_CENTS = 8000;
 
 /**
- * Crée un PaymentIntent pour le paiement express (Apple Pay / Google Pay / Klarna)
- * via <ExpressCheckoutElement> côté client.
- *
- * Note : la collecte d'adresse de livraison est gérée par <AddressElement>
- * côté client. Le webhook Stripe traitera la commande comme d'habitude.
+ * Crée une Session Stripe Checkout pour Klarna (redirection vers la page Klarna).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +23,7 @@ export async function POST(request: NextRequest) {
     const clientIP = getClientIP(headersList);
     const { maxRequests, windowMs } = RATE_LIMIT_PRESETS.sensitive;
 
-    if (!checkRateLimit(`express-${clientIP}`, maxRequests, windowMs)) {
+    if (!checkRateLimit(`express-session-${clientIP}`, maxRequests, windowMs)) {
       return NextResponse.json(
         { error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.' },
         { status: 429 }
@@ -37,12 +34,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Le paiement n\'est pas configuré.' }, { status: 503 });
     }
 
-    const body: ExpressBody = await request.json();
-    const { productSlug, variantLabel } = body;
+    const body: SessionBody = await request.json();
+    const { productSlug, variantLabel, paymentMethod } = body;
     const quantity = Math.max(1, Math.min(99, Math.floor(body.quantity ?? 1)));
 
     if (!productSlug || typeof productSlug !== 'string') {
       return NextResponse.json({ error: 'Produit invalide' }, { status: 400 });
+    }
+    if (paymentMethod !== 'klarna') {
+      return NextResponse.json({ error: 'Méthode invalide' }, { status: 400 });
     }
 
     const supabase = await createClient();
@@ -75,31 +75,59 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Prix invalide' }, { status: 400 });
     }
 
-    const totalCents = Math.round(price * 100) * quantity + SHIPPING_COST_CENTS;
+    const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://www.atelier-lbf.fr';
+    const images = Array.isArray(product.images) ? product.images : [];
+    const firstImage =
+      typeof images[0] === 'string' ? images[0] : (images[0] as { src?: string })?.src ?? null;
+    const absoluteImage = firstImage
+      ? firstImage.startsWith('http')
+        ? firstImage
+        : `${origin}${firstImage.startsWith('/') ? '' : '/'}${firstImage}`
+      : null;
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalCents,
-      currency: 'eur',
-      // automatic_payment_methods active toutes les méthodes activées dans le dashboard Stripe
-      // (carte, Apple Pay, Google Pay, Link, Klarna, etc.) selon le device
-      automatic_payment_methods: { enabled: true },
-      shipping: undefined, // collecté par AddressElement côté client
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['klarna'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: itemName,
+              images: absoluteImage ? [absoluteImage] : [],
+              metadata: { slug: productSlug, ...(variantLabel ? { variant: variantLabel } : {}) },
+            },
+            unit_amount: Math.round(price * 100),
+          },
+          quantity,
+        },
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: { name: 'Livraison — Transport Schenker', images: [], metadata: {} },
+            unit_amount: SHIPPING_COST_CENTS,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${origin}/commande/succes?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/produits/${productSlug}`,
+      billing_address_collection: 'auto',
+      shipping_address_collection: {
+        allowed_countries: ['FR', 'BE', 'DE', 'LU', 'CH'],
+      },
+      phone_number_collection: { enabled: true },
+      locale: 'fr',
       metadata: {
         express: 'true',
         product_slug: productSlug,
-        product_name: itemName,
-        quantity: String(quantity),
         ...(variantLabel ? { variant: variantLabel } : {}),
       },
     });
 
-    return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
-      amount: totalCents,
-      productName: itemName,
-    });
+    return NextResponse.json({ url: session.url });
   } catch (err) {
-    console.error('Erreur express PaymentIntent:', err);
+    console.error('Erreur express session:', err);
     return NextResponse.json(
       { error: 'Erreur lors de la création du paiement' },
       { status: 500 }
