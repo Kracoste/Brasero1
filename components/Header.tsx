@@ -85,13 +85,13 @@ export const Header = () => {
                       </Link>
                       <div
                         className={cn(
-                          "absolute left-0 top-full z-20 mt-2 w-56 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity overflow-hidden",
+                          "absolute left-0 top-full z-20 mt-2 w-56 flex-col bg-white shadow-lg ring-1 ring-slate-200 transition-opacity overflow-hidden",
                           accessoriesOpen ? "flex opacity-100" : "hidden opacity-0",
                         )}
                       >
                         <Link
                           href="/produits?category=range-buches"
-                          className="px-4 py-3 text-[0.9rem] font-semibold text-[#8b2d2d] hover:bg-slate-50 rounded-t-xl"
+                          className="px-4 py-3 text-[0.9rem] font-semibold text-[#8b2d2d] hover:bg-slate-50"
                         >
                           Range-bûches
                         </Link>
@@ -109,7 +109,7 @@ export const Header = () => {
                         </Link>
                         <Link
                           href="/produits?category=accessoire"
-                          className="px-4 py-3 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50 rounded-b-xl"
+                          className="px-4 py-3 text-[0.9rem] font-medium text-slate-700 hover:bg-slate-50"
                         >
                           Tous nos accessoires
                         </Link>
@@ -183,7 +183,7 @@ export const Header = () => {
               {/* Menu déroulant */}
               <div
                 className={cn(
-                  "absolute top-full mt-2 w-48 flex-col rounded-xl bg-white shadow-lg ring-1 ring-slate-200 transition-opacity z-50 overflow-hidden",
+                  "absolute top-full mt-2 w-48 flex-col bg-white shadow-lg ring-1 ring-slate-200 transition-opacity z-50 overflow-hidden",
                   accountMenuOpen ? "flex opacity-100" : "hidden opacity-0"
                 )}
               >
