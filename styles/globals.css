@@ -149,3 +149,56 @@ body {
   width: 100%;
 }
 
+/* ───────── Blog — typographie éditoriale premium ───────── */
+
+.blog-lettrine {
+  float: left;
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 700;
+  font-size: 4.5rem;
+  line-height: 0.9;
+  margin: 0.35rem 0.75rem 0 0;
+  color: #8b2d2d;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .blog-lettrine {
+    font-size: 3.5rem;
+    margin: 0.3rem 0.6rem 0 0;
+  }
+}
+
+.blog-image-bleed {
+  position: relative;
+}
+
+.blog-image-bleed img {
+  max-height: 80vh;
+  object-fit: cover;
+}
+
+article a {
+  text-underline-offset: 4px;
+}
+
+/* Bloc image+texte qui sort de la colonne d'article pour occuper toute la largeur du site */
+.blog-duo-full {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding-left: max(2rem, calc((100vw - 1280px) / 2));
+  padding-right: max(2rem, calc((100vw - 1280px) / 2));
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .blog-duo-full {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+

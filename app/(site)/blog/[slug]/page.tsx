@@ -103,11 +103,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
   const hasPromotions = (promoCount ?? 0) > 0 || hasActiveCoupon;
 
-  // Split le contenu au milieu (sur une frontière H2) pour insérer un bloc newsletter
+  // Split le contenu au milieu (sur une frontière H2) pour insérer un bloc newsletter.
+  // On exclut les H2 trop proches du début/de la fin et ceux qui sont à l'intérieur
+  // d'un bloc spécial ([compare], [atelier]) — ce qui en pratique n'arrive pas car
+  // les blocs spéciaux n'ont pas de H2 dedans, mais on est prudent.
   const lines = post.content.split("\n");
-  const h2Indexes = lines
-    .map((l, i) => (l.startsWith("## ") ? i : -1))
-    .filter((i) => i > 0);
+  const specialOpen = /^\[(compare|atelier)\]$/;
+  const specialClose = /^\[\/(compare|atelier)\]$/;
+  let insideSpecial = false;
+  const h2Indexes: number[] = [];
+  lines.forEach((l, i) => {
+    const t = l.trim();
+    if (specialOpen.test(t)) insideSpecial = true;
+    else if (specialClose.test(t)) insideSpecial = false;
+    else if (!insideSpecial && l.startsWith("## ") && i > 0) h2Indexes.push(i);
+  });
   let splitIndex = -1;
   if (h2Indexes.length >= 2) {
     const middleLine = lines.length / 2;
@@ -140,7 +150,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <JsonLd data={breadcrumb} />
 
       <Section className="pt-6 sm:pt-10 pb-16 sm:pb-24">
-        <Container className="max-w-3xl px-4 sm:px-6">
+        <Container className="max-w-2xl px-4 sm:px-6">
           {/* Breadcrumb nav */}
           <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8">
             <Link href="/blog" className="hover:text-[#0f172a] transition-colors flex items-center gap-1">
@@ -200,9 +210,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Content */}
           <article className="prose-slate max-w-none">
-            {renderMarkdownContent(firstHalf)}
+            {renderMarkdownContent(firstHalf, { withLettrine: true })}
             {secondHalf && <BlogNewsletterInline />}
-            {secondHalf && renderMarkdownContent(secondHalf)}
+            {secondHalf && renderMarkdownContent(secondHalf, { withLettrine: false })}
           </article>
 
           {/* Produit recommandé contextuel : slug manuel si défini, sinon matching auto */}
