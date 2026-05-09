@@ -327,7 +327,7 @@ export function parseMarkdownBlocks(content: string): MarkdownBlock[] {
 function renderParagraph(text: string, idx: number, withLettrine: boolean): React.ReactNode {
   if (!withLettrine || text.length < 2) {
     return (
-      <p key={idx} className="text-slate-700 leading-[1.85] my-5 text-[1.05rem]">
+      <p key={idx} className="text-slate-800 leading-[1.9] my-7 text-[1.075rem]">
         {renderInline(text, `p-${idx}`)}
       </p>
     );
@@ -336,14 +336,14 @@ function renderParagraph(text: string, idx: number, withLettrine: boolean): Reac
   const match = text.match(/^(\W*)(\w)(.*)$/);
   if (!match) {
     return (
-      <p key={idx} className="text-slate-700 leading-[1.85] my-5 text-[1.05rem]">
+      <p key={idx} className="text-slate-800 leading-[1.9] my-7 text-[1.075rem]">
         {renderInline(text, `p-${idx}`)}
       </p>
     );
   }
   const [, prefix, firstChar, rest] = match;
   return (
-    <p key={idx} className="text-slate-700 leading-[1.85] my-5 text-[1.05rem] blog-lettrine-paragraph">
+    <p key={idx} className="text-slate-800 leading-[1.9] my-7 text-[1.075rem] blog-lettrine-paragraph">
       {prefix}
       <span className="blog-lettrine">{firstChar}</span>
       {renderInline(rest, `p-${idx}`)}
@@ -411,7 +411,7 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
         elements.push(
           <h2
             key={idx}
-            className="text-2xl sm:text-3xl font-display font-semibold text-slate-900 mt-16 mb-5 clear-both tracking-tight"
+            className="text-2xl sm:text-3xl font-display font-semibold text-slate-900 mt-24 mb-7 clear-both tracking-tight"
           >
             {block.text}
           </h2>
@@ -422,7 +422,7 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
         elements.push(
           <h3
             key={idx}
-            className="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-10 mb-3 clear-both tracking-tight"
+            className="text-lg sm:text-xl font-display font-semibold text-slate-900 mt-14 mb-4 clear-both tracking-tight"
           >
             {block.text}
           </h3>
@@ -431,11 +431,11 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
 
       case "list":
         elements.push(
-          <ul key={idx} className="list-none pl-0 space-y-3 my-6">
+          <ul key={idx} className="list-none pl-0 space-y-5 my-8">
             {block.items.map((item, i) => (
               <li
                 key={i}
-                className="text-slate-700 leading-[1.75] text-[1.05rem] pl-6 relative before:content-[''] before:absolute before:left-0 before:top-[0.85em] before:w-3 before:h-px before:bg-[#8b2d2d]"
+                className="text-slate-700 leading-[1.85] text-[1.05rem] pl-6 relative before:content-[''] before:absolute before:left-0 before:top-[0.85em] before:w-3 before:h-px before:bg-[#8b2d2d]"
               >
                 {renderInline(item, `li-${idx}-${i}`)}
               </li>
@@ -450,16 +450,16 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
 
       case "blockquote": {
         if (block.variant === "highlight") {
-          // Encadré premium (bloc avec gras dedans, ex : désambiguïsation)
+          // Encadré premium (bloc avec gras dedans, ex : désambiguïsation) — full bleed
           elements.push(
             <aside
               key={idx}
-              className="my-10 border-l-2 border-[#8b2d2d] bg-[#f4f1ec] px-6 py-5 clear-both"
+              className="blog-duo-full my-10 border-l-2 border-[#8b2d2d] bg-[#f4f1ec] px-6 py-6 sm:px-10 sm:py-8 clear-both"
             >
               {block.lines.map((l, i) => (
                 <p
                   key={i}
-                  className="text-slate-800 leading-relaxed text-[0.98rem] my-1"
+                  className="text-slate-800 leading-relaxed text-[1rem] my-1"
                 >
                   {renderInline(l, `bq-${idx}-${i}`)}
                 </p>
@@ -467,16 +467,16 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
             </aside>
           );
         } else {
-          // Exergue éditorial : phrase clé sortie de la colonne
+          // Exergue éditorial : phrase clé sortie de la colonne — full bleed
           elements.push(
             <blockquote
               key={idx}
-              className="my-12 -mx-2 sm:-mx-8 px-6 py-2 border-l-[3px] border-[#8b2d2d] clear-both"
+              className="blog-duo-full my-14 px-6 sm:px-10 py-4 border-l-[3px] border-[#8b2d2d] clear-both"
             >
               {block.lines.map((l, i) => (
                 <p
                   key={i}
-                  className="text-xl sm:text-2xl font-display italic text-slate-800 leading-snug"
+                  className="text-2xl sm:text-3xl font-display italic text-slate-800 leading-snug max-w-3xl"
                 >
                   {renderInline(l, `bq-${idx}-${i}`)}
                 </p>
@@ -489,14 +489,14 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
 
       case "table":
         elements.push(
-          <div key={idx} className="my-10 overflow-x-auto clear-both">
-            <table className="w-full border-collapse text-[0.95rem]">
+          <div key={idx} className="blog-duo-full my-12 overflow-x-auto clear-both">
+            <table className="w-full border-collapse text-[0.98rem]">
               <thead>
                 <tr className="border-b-2 border-slate-900">
                   {block.headers.map((h, i) => (
                     <th
                       key={i}
-                      className="text-left font-semibold text-slate-900 py-3 px-3 tracking-wide"
+                      className="text-left font-semibold text-slate-900 py-4 px-4 tracking-wide"
                     >
                       {renderInline(h, `th-${idx}-${i}`)}
                     </th>
@@ -510,7 +510,7 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
                     className="border-b border-slate-200 hover:bg-[#faf8f5] transition-colors"
                   >
                     {row.map((cell, ci) => (
-                      <td key={ci} className="py-3 px-3 text-slate-700 align-top">
+                      <td key={ci} className="py-4 px-4 text-slate-700 align-top">
                         {renderInline(cell, `td-${idx}-${ri}-${ci}`)}
                       </td>
                     ))}
@@ -526,16 +526,16 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
         elements.push(
           <aside
             key={idx}
-            className="my-12 bg-[#f4f1ec] border-l-4 border-[#8b2d2d] px-6 py-6 sm:px-8 sm:py-7 clear-both"
+            className="blog-duo-full my-14 bg-[#f4f1ec] border-l-4 border-[#8b2d2d] px-6 py-7 sm:px-10 sm:py-9 clear-both"
           >
-            <p className="text-[0.7rem] uppercase tracking-[0.2em] text-[#8b2d2d] font-semibold mb-3">
+            <p className="text-[0.7rem] uppercase tracking-[0.2em] text-[#8b2d2d] font-semibold mb-4">
               Le geste de l&apos;artisan
             </p>
             {block.lines
               .filter((l) => l.trim() !== "")
               .filter((l) => !l.match(/^\*\*Le geste de l['']artisan\*\*$/i))
               .map((l, i) => (
-                <p key={i} className="text-slate-800 leading-[1.75] text-[1rem] my-2">
+                <p key={i} className="text-slate-800 leading-[1.75] text-[1.05rem] my-2 max-w-3xl">
                   {renderInline(l, `at-${idx}-${i}`)}
                 </p>
               ))}
@@ -547,7 +547,7 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
         elements.push(
           <div
             key={idx}
-            className="my-12 grid grid-cols-1 sm:grid-cols-2 gap-px bg-slate-200 border border-slate-200 clear-both"
+            className="blog-duo-full my-14 grid grid-cols-1 sm:grid-cols-2 gap-px bg-slate-200 border border-slate-200 clear-both"
           >
             {block.columns.map((col, ci) => (
               <div key={ci} className="bg-white p-6 sm:p-7">
@@ -587,12 +587,12 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
         elements.push(
           <div
             key={idx}
-            className="my-14 bg-[#f4f1ec] py-10 px-6 text-center clear-both"
+            className="blog-duo-full my-14 bg-[#f4f1ec] py-12 sm:py-16 px-6 text-center clear-both"
           >
-            <p className="font-display text-5xl sm:text-6xl font-bold text-[#8b2d2d] leading-none mb-3 tracking-tight">
+            <p className="font-display text-6xl sm:text-7xl lg:text-8xl font-bold text-[#8b2d2d] leading-none mb-4 tracking-tight">
               {block.value}
             </p>
-            <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-slate-600">
+            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-slate-600 max-w-2xl mx-auto">
               {block.label}
             </p>
           </div>
@@ -668,8 +668,8 @@ export function renderBlocks(blocks: MarkdownBlock[], options: { withLettrine?: 
 
       case "hr":
         elements.push(
-          <div key={idx} className="my-14 flex items-center justify-center clear-both" aria-hidden="true">
-            <span className="block w-12 h-px bg-slate-300" />
+          <div key={idx} className="blog-duo-full my-16 flex items-center justify-center clear-both" aria-hidden="true">
+            <span className="block w-16 h-px bg-slate-300" />
           </div>
         );
         break;

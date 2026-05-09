@@ -16,9 +16,10 @@ import {
   generateBreadcrumbSchema,
 } from "@/lib/seo/schemas";
 import { renderMarkdownContent } from "@/components/MarkdownRenderer";
-import { BlogProductRecommendation } from "@/components/BlogProductRecommendation";
 import { BlogNewsletterInline } from "@/components/BlogNewsletterInline";
+import { BlogSidebar } from "@/components/BlogSidebar";
 import { pickProductSlugForArticle } from "@/lib/blog/product-matcher";
+import { mapSupabaseProduct } from "@/lib/utils";
 
 export const revalidate = 60;
 
@@ -137,6 +138,30 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       category: post.category,
     }));
 
+  // Récupération du produit pour la sidebar
+  let sidebarProduct: {
+    slug: string;
+    name: string;
+    price: number;
+    image?: { src: string; alt?: string } | null;
+  } | null = null;
+  if (recommendedProductSlug) {
+    const { data: rawProduct } = await supabase
+      .from("products")
+      .select("*")
+      .eq("slug", recommendedProductSlug)
+      .single();
+    const product = mapSupabaseProduct(rawProduct);
+    if (product) {
+      sidebarProduct = {
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        image: product.images?.[0] || null,
+      };
+    }
+  }
+
   const articleSchema = generateArticleSchema(post);
   const breadcrumb = generateBreadcrumbSchema([
     { name: "Accueil", url: "/" },
@@ -149,8 +174,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <JsonLd data={articleSchema} />
       <JsonLd data={breadcrumb} />
 
-      <Section className="pt-6 sm:pt-10 pb-16 sm:pb-24">
-        <Container className="max-w-2xl px-4 sm:px-6">
+      {/* HERO PLEINE LARGEUR */}
+      <header className="bg-[#faf8f5] pt-6 sm:pt-8 pb-10 sm:pb-14 border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* Breadcrumb nav */}
           <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8">
             <Link href="/blog" className="hover:text-[#0f172a] transition-colors flex items-center gap-1">
@@ -163,82 +189,101 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </span>
           </nav>
 
-          {/* Header */}
-          <header className="mb-10">
-            <span className="inline-block bg-[#f1f5f9] text-[#0f172a] text-xs font-medium px-3 py-1 mb-4">
-              {CATEGORY_LABELS[post.category] || post.category}
-            </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-slate-900 leading-tight mb-6">
-              {post.title}
-            </h1>
-            {post.excerpt && (
-              <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-6">
-                {post.excerpt}
-              </p>
-            )}
-            {post.featured_image && (
-              <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden mb-6">
-                <Image
-                  src={post.featured_image.src}
-                  alt={post.featured_image.alt}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 720px"
-                  priority
-                />
+          <span className="inline-block bg-white text-[#8b2d2d] text-[0.7rem] font-semibold uppercase tracking-[0.2em] px-3 py-1.5 mb-5 border border-slate-200">
+            {CATEGORY_LABELS[post.category] || post.category}
+          </span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-semibold text-slate-900 leading-[1.1] tracking-tight mb-6 max-w-4xl">
+            {post.title}
+          </h1>
+          {post.excerpt && (
+            <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-6 max-w-3xl">
+              {post.excerpt}
+            </p>
+          )}
+          <div className="flex items-center gap-6 text-sm text-slate-500">
+            {post.published_at && (
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />
+                <time dateTime={post.published_at}>
+                  {new Date(post.published_at).toLocaleDateString("fr-FR", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </time>
               </div>
             )}
-            <div className="flex items-center gap-6 text-sm text-slate-500 border-b border-slate-200 pb-6">
-              {post.published_at && (
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4" />
-                  <time dateTime={post.published_at}>
-                    {new Date(post.published_at).toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </time>
-                </div>
-              )}
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                <span>{post.read_time} min de lecture</span>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4" />
+              <span>{post.read_time} min de lecture</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Image hero pleine largeur sous le titre */}
+        {post.featured_image && (
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-10">
+            <div className="relative w-full aspect-[21/9] overflow-hidden">
+              <Image
+                src={post.featured_image.src}
+                alt={post.featured_image.alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                priority
+              />
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* CONTENU ARTICLE — grille 2 colonnes, sidebar sticky à droite */}
+      <Section className="pt-12 sm:pt-16 pb-16 sm:pb-24">
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px] gap-12 lg:gap-20 xl:gap-24">
+            {/* COLONNE PRINCIPALE — article */}
+            <div className="min-w-0">
+              <article className="prose-slate max-w-none">
+                {renderMarkdownContent(firstHalf, { withLettrine: true })}
+                {secondHalf && <BlogNewsletterInline />}
+                {secondHalf && renderMarkdownContent(secondHalf, { withLettrine: false })}
+              </article>
+
+              {/* Boutons de partage */}
+              <div className="mt-10 pt-6 border-t border-slate-200">
+                <p className="text-sm font-semibold text-slate-700 mb-3">Partager cet article</p>
+                <ShareButtons slug={slug} title={post.title} />
               </div>
             </div>
-          </header>
 
-          {/* Content */}
-          <article className="prose-slate max-w-none">
-            {renderMarkdownContent(firstHalf, { withLettrine: true })}
-            {secondHalf && <BlogNewsletterInline />}
-            {secondHalf && renderMarkdownContent(secondHalf, { withLettrine: false })}
-          </article>
-
-          {/* Produit recommandé contextuel : slug manuel si défini, sinon matching auto */}
-          {recommendedProductSlug && (
-            <BlogProductRecommendation
-              productSlug={recommendedProductSlug}
+            {/* SIDEBAR — desktop uniquement, sticky avec scroll synchronisé */}
+            <BlogSidebar
+              relatedPosts={relatedPosts.map((rp) => ({
+                slug: rp.slug,
+                title: rp.title,
+                category: rp.category,
+                read_time: rp.read_time,
+              }))}
+              recommendedProduct={sidebarProduct}
               ctaText={post.cta_text}
             />
-          )}
-
-          {/* Boutons de partage */}
-          <div className="mt-10 pt-6 border-t border-slate-200">
-            <p className="text-sm font-semibold text-slate-700 mb-3">Partager cet article</p>
-            <ShareButtons slug={slug} title={post.title} />
           </div>
+        </div>
+      </Section>
 
+      {/* SECTIONS PLEINE LARGEUR EN PIED D'ARTICLE */}
+      <div className="bg-[#faf8f5] py-16 sm:py-20 border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
           {/* CTA Promotions — visible uniquement si au moins un produit est en promo */}
           {hasPromotions && (
-            <div className="mt-12 p-6 sm:p-8 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 text-center rounded-lg">
+            <div className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 text-center p-8 sm:p-12 rounded-lg">
               <span className="inline-block bg-red-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
                 Offres en cours
               </span>
-              <p className="text-lg sm:text-xl font-bold text-slate-900 mb-2">
+              <p className="text-lg sm:text-2xl font-bold text-slate-900 mb-2">
                 Profitez de nos promotions
               </p>
-              <p className="text-sm text-slate-600 mb-4">
+              <p className="text-sm text-slate-600 mb-5">
                 Braseros et accessoires en réduction — quantités limitées.
               </p>
               <Link
@@ -251,44 +296,47 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           )}
 
-          {/* CTA : toujours vers la catégorie braséro pour laisser le client choisir */}
-          <div className="mt-12 p-6 sm:p-8 bg-[#f1f5f9] border border-slate-200 text-center">
-            <p className="text-lg font-semibold text-slate-900 mb-2">
+          {/* CTA : toujours vers la catégorie braséro */}
+          <div className="bg-white border border-slate-200 text-center p-10 sm:p-14">
+            <p className="text-[0.7rem] uppercase tracking-[0.25em] text-[#8b2d2d] font-semibold mb-3">
+              La gamme Atelier LBF
+            </p>
+            <p className="text-2xl sm:text-3xl font-display font-semibold text-slate-900 mb-3">
               Nos braseros artisanaux manufacturés en France
             </p>
-            <p className="text-sm text-slate-600 mb-4">
-              Le Fermier, Le Morris, L&apos;Obélix, Le Coffy — découvrez la gamme complète.
+            <p className="text-base text-slate-600 mb-6 max-w-xl mx-auto">
+              Le Fermier, Le Morris, L&apos;Obélix, Le Coffy — quatre modèles, une même exigence de qualité, des centaines de braseros livrés partout en France.
             </p>
             <Link
               href="/produits?category=brasero"
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#475569] text-white hover:brightness-110 font-medium tracking-wide uppercase px-6 py-3 transition-all"
+              className="inline-flex items-center gap-2 bg-[#0f172a] text-white hover:bg-[#1e293b] font-medium tracking-[0.18em] uppercase px-8 py-4 text-[0.75rem] transition-colors"
             >
               Découvrir nos braseros
-              <ArrowRight size={16} />
+              <ArrowRight size={14} />
             </Link>
           </div>
 
           {/* Related articles */}
           {relatedPosts.length > 0 && (
-            <div className="mt-16 pt-10 border-t border-slate-200">
-              <h2 className="text-xl font-display font-bold text-slate-900 mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-display font-semibold text-slate-900 mb-8 text-center tracking-tight">
                 Articles similaires
               </h2>
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {relatedPosts.map((rp) => (
                   <Link
                     key={rp.slug}
                     href={`/blog/${rp.slug}`}
-                    className="block p-4 border border-slate-200 hover:shadow-md transition-shadow group"
+                    className="block p-6 bg-white border border-slate-200 hover:border-[#8b2d2d] hover:shadow-md transition-all group"
                   >
-                    <span className="text-xs text-[#0f172a] font-medium">
+                    <span className="text-[0.7rem] uppercase tracking-[0.2em] text-[#8b2d2d] font-semibold">
                       {CATEGORY_LABELS[rp.category] || rp.category}
                     </span>
-                    <h3 className="font-semibold text-slate-900 mt-1 group-hover:text-[#0f172a] transition-colors line-clamp-2">
+                    <h3 className="font-display font-semibold text-slate-900 mt-2 group-hover:text-[#8b2d2d] transition-colors text-lg leading-snug line-clamp-3">
                       {rp.title}
                     </h3>
-                    <span className="text-xs text-slate-500 mt-2 block">
-                      {rp.read_time} min
+                    <span className="text-xs text-slate-500 mt-3 block">
+                      {rp.read_time} min de lecture
                     </span>
                   </Link>
                 ))}
@@ -297,17 +345,17 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           )}
 
           {/* Back to blog */}
-          <div className="mt-12 text-center">
+          <div className="text-center pt-4">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-[#0f172a] hover:underline font-medium"
+              className="inline-flex items-center gap-2 text-[#8b2d2d] hover:text-[#6e2323] font-medium"
             >
               <ArrowLeft size={16} />
-              Retour au blog
+              Retour à tous les articles
             </Link>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </div>
     </div>
   );
 }

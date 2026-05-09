@@ -182,23 +182,33 @@ article a {
   text-underline-offset: 4px;
 }
 
-/* Bloc image+texte qui sort de la colonne d'article pour occuper toute la largeur du site */
+/* ───────── Blog article — layout grille article + sidebar ─────────
+   Les blocs spéciaux (chiffre, atelier, table, compare, duo, blockquote)
+   restent dans la colonne article (pas de débord vers la sidebar). */
+
 .blog-duo-full {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  padding-left: max(2rem, calc((100vw - 1280px) / 2));
-  padding-right: max(2rem, calc((100vw - 1280px) / 2));
-  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
 }
 
-@media (max-width: 640px) {
-  .blog-duo-full {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-  }
+/* Sidebar : scroll interne discret quand le contenu dépasse la hauteur de l'écran */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(139, 45, 45, 0.2);
+  border-radius: 2px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 45, 45, 0.4);
+}
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 45, 45, 0.2) transparent;
 }
 

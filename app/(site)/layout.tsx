@@ -26,10 +26,10 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
       <AnalyticsProvider>
         <CartProvider>
           <FavoritesProvider>
-            <div className="flex min-h-screen flex-col text-slate-900 overflow-x-hidden">
+            <div className="flex min-h-screen flex-col text-slate-900" style={{ overflowX: "clip" }}>
               <ReassuranceBar />
               <Header />
-              <main className="flex-1 overflow-x-hidden">{children}</main>
+              <main className="flex-1" style={{ overflowX: "clip" }}>{children}</main>
               <Commitments />
               <Footer storeName={settings.storeName} atelierCity={settings.atelier.city} />
               <FloatingCart />
