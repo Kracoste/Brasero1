@@ -18,6 +18,7 @@ import {
 import { renderMarkdownContent } from "@/components/MarkdownRenderer";
 import { BlogNewsletterInline } from "@/components/BlogNewsletterInline";
 import { BlogSidebar } from "@/components/BlogSidebar";
+import { BlogProductRecommendation } from "@/components/BlogProductRecommendation";
 import { pickProductSlugForArticle } from "@/lib/blog/product-matcher";
 import { mapSupabaseProduct } from "@/lib/utils";
 
@@ -245,8 +246,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="min-w-0">
               <article className="prose-slate max-w-none">
                 {renderMarkdownContent(firstHalf, { withLettrine: true })}
+                {/* Carte produit mobile — milieu d'article (la sidebar desktop joue ce rôle sur grand écran) */}
+                {recommendedProductSlug && (
+                  <div className="lg:hidden">
+                    <BlogProductRecommendation
+                      productSlug={recommendedProductSlug}
+                      ctaText={post.cta_text}
+                      variant="inline"
+                    />
+                  </div>
+                )}
                 {secondHalf && <BlogNewsletterInline />}
                 {secondHalf && renderMarkdownContent(secondHalf, { withLettrine: false })}
+                {/* Carte produit mobile — fin d'article */}
+                {recommendedProductSlug && (
+                  <div className="lg:hidden">
+                    <BlogProductRecommendation
+                      productSlug={recommendedProductSlug}
+                      ctaText={post.cta_text}
+                      variant="footer"
+                    />
+                  </div>
+                )}
               </article>
 
               {/* Boutons de partage */}

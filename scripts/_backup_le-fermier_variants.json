@@ -1,0 +1,79 @@
+{
+  "slug": "le-fermier",
+  "variants": [
+    {
+      "label": "Ø50 cm — Corten — Plancha acier",
+      "price": 1200,
+      "finish": "corten",
+      "diameter": 50,
+      "priceBrasero": 1000,
+      "pricePlancha": 200,
+      "planchaMaterial": "acier"
+    },
+    {
+      "label": "Ø50 cm — Corten — Plancha inox",
+      "price": 1450,
+      "finish": "corten",
+      "diameter": 50,
+      "priceBrasero": 1000,
+      "pricePlancha": 450,
+      "planchaMaterial": "inox"
+    },
+    {
+      "label": "Ø50 cm — Peint — Plancha acier",
+      "price": 1200,
+      "finish": "peint",
+      "diameter": 50,
+      "priceBrasero": 1000,
+      "pricePlancha": 200,
+      "planchaMaterial": "acier"
+    },
+    {
+      "label": "Ø50 cm — Peint — Plancha inox",
+      "price": 1450,
+      "finish": "peint",
+      "diameter": 50,
+      "priceBrasero": 1000,
+      "pricePlancha": 450,
+      "planchaMaterial": "inox"
+    },
+    {
+      "label": "Ø100 cm — Corten — Plancha acier",
+      "price": 1600,
+      "finish": "corten",
+      "diameter": 100,
+      "priceBrasero": 1400,
+      "pricePlancha": 200,
+      "planchaMaterial": "acier"
+    },
+    {
+      "label": "Ø100 cm — Corten — Plancha inox",
+      "price": 1850,
+      "finish": "corten",
+      "diameter": 100,
+      "priceBrasero": 1400,
+      "pricePlancha": 450,
+      "planchaMaterial": "inox"
+    },
+    {
+      "label": "Ø100 cm — Peint — Plancha acier",
+      "price": 1600,
+      "finish": "peint",
+      "diameter": 100,
+      "priceBrasero": 1400,
+      "pricePlancha": 200,
+      "planchaMaterial": "acier"
+    },
+    {
+      "label": "Ø100 cm — Peint — Plancha inox",
+      "price": 1850,
+      "finish": "peint",
+      "diameter": 100,
+      "priceBrasero": 1400,
+      "pricePlancha": 450,
+      "planchaMaterial": "inox"
+    }
+  ],
+  "configurations": null,
+  "savedAt": "2026-05-11T07:09:50.619Z"
+}

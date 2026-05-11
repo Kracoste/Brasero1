@@ -53,6 +53,17 @@ const PLANCHA_LABELS: Record<string, string> = {
   inox: 'Plancha Inox',
 };
 
+// Couleurs des pastilles — visuel matière
+const FINISH_SWATCHES: Record<string, string> = {
+  corten: '#8b4513', // marron rouille corten
+  peint: '#1c2230',  // noir thermolaqué
+};
+
+const PLANCHA_SWATCHES: Record<string, string> = {
+  acier: '#3a3a3a', // acier carbone, gris foncé mat
+  inox: '#c0c4c8',  // inox, gris clair brillant
+};
+
 /** Valeur spéciale = produit de base (pas un variant) */
 const BASE_VALUE = '__base__';
 
@@ -276,82 +287,113 @@ export function ProductPurchaseSection({ product, compatibleAccessorySlugs, prel
     return parts.length > 0 ? parts.join(' — ') : undefined;
   }, [matchedVariant, customizationFaces]);
 
-  const selectClass =
-    'w-full appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-medium text-slate-800 shadow-sm transition-all focus:border-slate-900 focus:ring-2 focus:ring-slate-900/20 focus:outline-none cursor-pointer';
-
-  const chevronIcon = (
-    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-      <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    </div>
-  );
-
   return (
     <div className="space-y-4">
-      {/* Sélecteurs de configuration — menus déroulants alignés */}
+      {/* Sélecteurs de configuration — pastilles style Hermès */}
       {showSelectors && (
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* Diamètre */}
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {/* Diamètre — pastilles avec le chiffre dedans */}
             {diameterOptions.length > 0 && (
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                  Diamètre
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedDiameter ?? ''}
-                    onChange={e => setSelectedDiameter(Number(e.target.value))}
-                    className={selectClass}
-                  >
-                    {diameterOptions.map(o => (
-                      <option key={o.value} value={o.value}>Ø{o.value} cm</option>
-                    ))}
-                  </select>
-                  {chevronIcon}
+                <p className="text-sm text-slate-600 mb-2">
+                  <span className="text-slate-500">Diamètre :</span>{' '}
+                  <span className="font-semibold text-slate-900">
+                    {selectedDiameter ? `Ø ${selectedDiameter} cm` : '—'}
+                  </span>
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {diameterOptions.map(o => {
+                    const isSelected = selectedDiameter === o.value;
+                    return (
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() => setSelectedDiameter(Number(o.value))}
+                        aria-pressed={isSelected}
+                        aria-label={`Diamètre ${o.value} cm`}
+                        className={`relative h-11 w-11 rounded-full flex items-center justify-center text-[0.78rem] font-semibold transition-all border-2 ${
+                          isSelected
+                            ? 'border-slate-900 text-slate-900 bg-white'
+                            : 'border-transparent bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        {o.value}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Matière / Finition */}
+            {/* Matière / Finition — pastilles colorées */}
             {finishOptions.length > 0 && (
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                  Matière
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedFinish ?? ''}
-                    onChange={e => setSelectedFinish(e.target.value)}
-                    className={selectClass}
-                  >
-                    {finishOptions.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                  {chevronIcon}
+                <p className="text-sm text-slate-600 mb-2">
+                  <span className="text-slate-500">Finition :</span>{' '}
+                  <span className="font-semibold text-slate-900">
+                    {finishOptions.find(o => o.value === selectedFinish)?.label ?? '—'}
+                  </span>
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {finishOptions.map(o => {
+                    const isSelected = selectedFinish === o.value;
+                    const color = FINISH_SWATCHES[String(o.value)] ?? '#94a3b8';
+                    return (
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() => setSelectedFinish(String(o.value))}
+                        aria-pressed={isSelected}
+                        aria-label={o.label}
+                        title={o.label}
+                        className={`relative h-11 w-11 rounded-full flex items-center justify-center transition-all border-2 ${
+                          isSelected ? 'border-slate-900' : 'border-transparent hover:border-slate-300'
+                        }`}
+                      >
+                        <span
+                          className="block h-7 w-7 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Plancha */}
+            {/* Plancha — pastilles colorées */}
             {planchaOptions.length > 0 && (
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                  Plancha
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedPlancha ?? ''}
-                    onChange={e => setSelectedPlancha(e.target.value)}
-                    className={selectClass}
-                  >
-                    {planchaOptions.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                  {chevronIcon}
+                <p className="text-sm text-slate-600 mb-2">
+                  <span className="text-slate-500">Plancha :</span>{' '}
+                  <span className="font-semibold text-slate-900">
+                    {planchaOptions.find(o => o.value === selectedPlancha)?.label ?? '—'}
+                  </span>
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {planchaOptions.map(o => {
+                    const isSelected = selectedPlancha === o.value;
+                    const color = PLANCHA_SWATCHES[String(o.value)] ?? '#94a3b8';
+                    return (
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() => setSelectedPlancha(String(o.value))}
+                        aria-pressed={isSelected}
+                        aria-label={o.label}
+                        title={o.label}
+                        className={`relative h-11 w-11 rounded-full flex items-center justify-center transition-all border-2 ${
+                          isSelected ? 'border-slate-900' : 'border-transparent hover:border-slate-300'
+                        }`}
+                      >
+                        <span
+                          className="block h-7 w-7 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
