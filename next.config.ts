@@ -49,10 +49,11 @@ const nextConfig: NextConfig = {
     ],
     // Réduire le cache des images pour permettre les mises à jour plus rapides
     minimumCacheTTL: 86400,
-    // En développement local, les IPs NAT64 (IPv6) de Supabase sont rejetées
-    // par la protection SSRF de Next.js. On désactive l'optimisation en dev.
-    // En production (Vercel), l'optimisation reste active.
-    unoptimized: process.env.NODE_ENV === 'development',
+    // Optimisation désactivée : le plan Vercel Hobby a un quota mensuel
+    // d'optimisations d'images qui, une fois dépassé, renvoie un HTTP 402
+    // et casse l'affichage. Les images du blog sont déjà servies en WebP
+    // bien compressé (~290 KB), donc l'optimisation Vercel n'apporte rien.
+    unoptimized: true,
   },
 };
 
