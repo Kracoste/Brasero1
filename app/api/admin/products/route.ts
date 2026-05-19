@@ -163,8 +163,6 @@ export async function PUT(request: NextRequest) {
       // Invalider la liste des produits
       revalidatePath('/produits', 'page');
       revalidatePath('/produits', 'layout');
-      // Invalider la page promotions
-      revalidatePath('/promotions', 'page');
       // Invalider la page d'accueil
       revalidatePath('/', 'page');
       revalidatePath('/', 'layout');

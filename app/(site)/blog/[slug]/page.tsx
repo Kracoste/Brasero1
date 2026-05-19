@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, Clock, Calendar } from "lucide-react";
 import { ShareButtons } from "@/components/ShareButtons";
@@ -9,8 +10,6 @@ import { Container } from "@/components/Container";
 import { Section } from "@/components/Section";
 import { JsonLd } from "@/components/JsonLd";
 import { getBlogPost, getRelatedBlogPosts } from "@/lib/data/blog";
-import { createClient } from "@/lib/supabase/server";
-import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   generateArticleSchema,
   generateBreadcrumbSchema,
@@ -85,26 +84,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const relatedPosts = await getRelatedBlogPosts(slug, post.category, 3);
 
-  const supabase = await createClient();
-  const { count: promoCount } = await supabase
-    .from("products")
-    .select("slug", { count: "exact", head: true })
-    .gt("discount_percent", 0);
-
-  let hasActiveCoupon = false;
-  const adminClient = getSupabaseAdminClient();
-  if (adminClient && (promoCount ?? 0) === 0) {
-    const now = new Date().toISOString();
-    const { count: couponCount } = await adminClient
-      .from("coupons")
-      .select("id", { count: "exact", head: true })
-      .eq("is_active", true)
-      .in("discount_type", ["percentage", "fixed"])
-      .or(`expires_at.is.null,expires_at.gt.${now}`);
-    hasActiveCoupon = (couponCount ?? 0) > 0;
-  }
-  const hasPromotions = (promoCount ?? 0) > 0 || hasActiveCoupon;
-
   // Split le contenu au milieu (sur une frontière H2) pour insérer un bloc newsletter.
   // On exclut les H2 trop proches du début/de la fin et ceux qui sont à l'intérieur
   // d'un bloc spécial ([compare], [atelier]) — ce qui en pratique n'arrive pas car
@@ -147,6 +126,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     image?: { src: string; alt?: string } | null;
   } | null = null;
   if (recommendedProductSlug) {
+    const supabase = await createClient();
     const { data: rawProduct } = await supabase
       .from("products")
       .select("*")
@@ -295,28 +275,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {/* SECTIONS PLEINE LARGEUR EN PIED D'ARTICLE */}
       <div className="bg-[#faf8f5] py-16 sm:py-20 border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
-          {/* CTA Promotions — visible uniquement si au moins un produit est en promo */}
-          {hasPromotions && (
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 text-center p-8 sm:p-12 rounded-lg">
-              <span className="inline-block bg-red-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
-                Offres en cours
-              </span>
-              <p className="text-lg sm:text-2xl font-bold text-slate-900 mb-2">
-                Profitez de nos promotions
-              </p>
-              <p className="text-sm text-slate-600 mb-5">
-                Braseros et accessoires en réduction — quantités limitées.
-              </p>
-              <Link
-                href="/promotions"
-                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold tracking-wide uppercase px-6 py-3 rounded-md transition-all"
-              >
-                Voir nos promotions
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-          )}
-
           {/* CTA : toujours vers la catégorie braséro */}
           <div className="bg-white border border-slate-200 text-center p-10 sm:p-14">
             <p className="text-[0.7rem] uppercase tracking-[0.25em] text-[#8b2d2d] font-semibold mb-3">

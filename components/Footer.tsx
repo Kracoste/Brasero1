@@ -36,7 +36,6 @@ const categoryLinks = [
   { href: "/produits?category=range-buches", label: "Range-bûches" },
   { href: "/accessoires", label: "Accessoires" },
   { href: "/produits?category=housse-protection", label: "Housses de protection" },
-  { href: "/produits?category=promotions", label: "Promotions" },
 ];
 
 type FooterProps = {

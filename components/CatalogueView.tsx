@@ -79,7 +79,7 @@ export const CatalogueView = ({ products, showCategoryFilters = true, category, 
             showCategoryFilters={showCategoryFilters}
             variant={category === "fendeur" ? "fendeur" : "default"}
             diameters={availableDiameters}
-            showFormatAndDimensions={category !== "accessoire" && category !== "promotions"}
+            showFormatAndDimensions={category !== "accessoire"}
             showAccessoryFilters={category === "accessoire"}
             currentCategory={category}
           />

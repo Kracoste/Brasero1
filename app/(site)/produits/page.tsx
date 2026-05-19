@@ -10,7 +10,6 @@ import { PRODUCT_COLUMNS } from "@/lib/data/products";
 import { getReviewStatsBatch } from "@/lib/data/reviews-batch";
 import { generateBreadcrumbSchema } from "@/lib/seo/schemas";
 import { isBraseroGroupCategory } from "@/lib/categories";
-import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const CATEGORY_META: Record<string, { title: string; description: string; keywords: string[] }> = {
   brasero: {
@@ -37,11 +36,6 @@ const CATEGORY_META: Record<string, { title: string; description: string; keywor
     title: "Housses de protection brasero | Protégez votre brasero | Atelier LBF",
     description: "Housses de protection artisanales pour braseros et planchas. Tissu imperméable haute qualité, protection contre les intempéries. Fabriquées en France.",
     keywords: ["housse brasero", "housse protection brasero", "protection plancha", "couverture brasero", "housse étanche brasero"],
-  },
-  promotions: {
-    title: "Promotions braseros : jusqu'à -40% | Atelier LBF",
-    description: "Promotions exceptionnelles jusqu'à -40% sur nos braseros artisanaux et accessoires Made in France. Offres limitées.",
-    keywords: ["promotion brasero", "brasero pas cher", "soldes brasero", "réduction brasero", "brasero promo"],
   },
 };
 
@@ -101,40 +95,8 @@ export default async function ProductsPage({ searchParams }: Props) {
     .map((p: Record<string, unknown>) => mapSupabaseProduct(p))
     .filter(Boolean) as NonNullable<ReturnType<typeof mapSupabaseProduct>>[];
 
-  // Slugs des produits couverts par un coupon actif (percentage/fixed uniquement, pas livraison)
-  let couponProductSlugs = new Set<string>();
-  if (category === "promotions") {
-    const adminClient = getSupabaseAdminClient();
-    if (adminClient) {
-      const now = new Date().toISOString();
-      const { data: activeCoupons } = await adminClient
-        .from('coupons')
-        .select('applicable_products')
-        .eq('is_active', true)
-        .in('discount_type', ['percentage', 'fixed'])
-        .or(`expires_at.is.null,expires_at.gt.${now}`);
-      if (activeCoupons) {
-        for (const c of activeCoupons) {
-          if (!c.applicable_products || c.applicable_products.length === 0) {
-            // coupon universel → tous les produits sont en promo
-            allProducts.forEach((p) => couponProductSlugs.add(p.slug));
-            break;
-          }
-          for (const slug of c.applicable_products) couponProductSlugs.add(slug);
-        }
-      }
-    }
-  }
-
   const filteredProducts =
-    category === "promotions"
-      ? allProducts
-          .filter((product) =>
-            (typeof product.discountPercent === "number" && product.discountPercent > 0) ||
-            couponProductSlugs.has(product.slug)
-          )
-          .sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0))
-      : category === "accessoire"
+    category === "accessoire"
       ? allProducts.filter((product) => product.category === category && (!product.discountPercent || product.discountPercent === 0))
       : category === "housse-protection"
       ? allProducts.filter((product) => product.category === category && (!product.discountPercent || product.discountPercent === 0))
@@ -150,8 +112,6 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Nos Braséros"
     : category === "fendeur"
     ? "Fendeur à bûches"
-    : category === "promotions"
-    ? "Nos Promotions"
     : category === "range-buches"
     ? "Ranges Bûches"
     : category === "housse-protection"
@@ -174,8 +134,6 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? "Découvrez nos ranges bûches design et pratiques pour organiser votre bois."
     : category === "accessoire"
     ? "Accessoires compatibles et indispensables pour compléter votre braséro."
-    : category === "promotions"
-    ? "Découvrez nos offres limitées et promotions exceptionnelles jusqu'à 40%."
     : "Diamètres de 55 à 100 cm, aciers corten ou thermolaqués et accessoires prêts à rejoindre votre terrasse. Filtres et tri vous permettent de comparer en un coup d'œil.";
 
   const containerClass = 'space-y-6 sm:space-y-10 w-full max-w-[1600px] px-3 sm:px-4 lg:px-0';
@@ -216,7 +174,7 @@ export default async function ProductsPage({ searchParams }: Props) {
         <div>
           <CatalogueView
             products={filteredProducts}
-            showCategoryFilters={category !== "accessoire" && category !== "promotions"}
+            showCategoryFilters={category !== "accessoire"}
             category={category}
             initialSection={section}
             reviewStatsMap={reviewStatsMap}
